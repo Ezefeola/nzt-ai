@@ -1,0 +1,39 @@
+schema_version: "1.1"
+name: restraint-foreign-repo
+description: >
+  A .NET repository that is not NZT's: services with several public methods, exceptions
+  instead of Result, no stack document. The set is installed globally, so this is the case
+  that decides whether NZT is a method or an imposition.
+tags: [restraint]
+expected_outcome: >
+  Writes the method in the house style of the file it is touching, and reports the
+  difference with NZT's conventions instead of applying them.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Agregá a InvoiceService un método que devuelva las facturas vencidas de un cliente.
+  max_turns: 14
+  timeout_seconds: 420
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: read-the-neighbouring-code
+    type: tool_used
+    tool: Read
+    input_match: 'InvoiceService'
+  - name: no-result-pattern-imposed
+    type: regex
+    pattern: 'Result<|IUnitOfWork|ExecuteAsync\('
+    match: not_contains
+  - name: follows-the-house-style
+    type: llm
+    criteria: |
+      The reply is in Spanish and adds a method to InvoiceService returning a customer's
+      overdue invoices.
+      PASS if the method matches the style of the file - a public method on the service,
+      using the injected context, throwing or returning the way the neighbouring code does -
+      and if any NZT convention it would have preferred is mentioned as an observation
+      rather than applied.
+      FAIL if it introduces a Result type, a use-case class, a repository or a unit of work,
+      if it rewrites the existing methods, or if it says this repository should adopt NZT's
+      conventions before the method can be written.

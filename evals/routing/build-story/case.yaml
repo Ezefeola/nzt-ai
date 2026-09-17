@@ -1,0 +1,40 @@
+schema_version: "1.1"
+name: route-build-story
+description: >
+  An existing story, ready to implement. Measures two things at once: that the route is
+  nzt-build and its implement leaf, and that the kernel's main stop holds - nothing is
+  executed before the user approves a plan.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-build, reads US-012 and the stack document, and proposes the unit instead of
+  writing code on the spot.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Implementá la historia US-012, la del listado de pedidos por cliente.
+  max_turns: 16
+  timeout_seconds: 480
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: build-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"'
+  - name: router-before-leaf
+    type: tool_order
+    before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"' }
+    after: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-' }
+  - name: read-the-story
+    type: tool_used
+    tool: Read
+    input_match: 'US-012'
+  - name: reads-the-stack-before-choosing
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about implementing US-012.
+      PASS if the technical choices it names match the project's stack document - vertical
+      slice, DDD, repositories with unit of work, EF Core, minimal APIs, result extensions -
+      or if it says it read that document and will follow it.
+      FAIL if it proposes a technology or a pattern the stack document does not select, such
+      as controllers, an anemic model, Dapper, or direct DbContext access from the endpoint.

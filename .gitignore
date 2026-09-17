@@ -1,0 +1,15 @@
+# Salida del build: se regenera con install/build.sh
+dist/
+
+# Resultados de corridas de evals (el HTML y el JSON de cada corrida)
+evals/results/
+
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+.vs/
+
+# Sistema
+Thumbs.db
+.DS_Store

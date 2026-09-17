@@ -1,0 +1,39 @@
+schema_version: "1.1"
+name: kernel-loaded
+description: >
+  The smoke case. Proves the workspace's CLAUDE.md reached the run: NZT answers in the
+  user's language, classifies the request and proposes before executing. If this case
+  fails, every other case in the suite is measuring something else.
+tags: [smoke, routing]
+expected_outcome: >
+  Loads nzt, reads the project's state and specs, and comes back with a plan in Spanish
+  and a question or an assumption - without writing anything.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero sumarle al proyecto una feature de cupones de descuento. ¿Cómo seguimos?
+  max_turns: 14
+  timeout_seconds: 420
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: entry-point-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt"'
+  - name: answer-is-spanish
+    type: regex
+    pattern: '[áéíóúñ¿¡]|\b(?:qué|cómo|según|está|también|para el|de la)\b'
+    flags: i
+  - name: read-the-project
+    type: tool_used
+    tool: Read
+  - name: proposes-before-executing
+    type: llm
+    criteria: |
+      The reply is written in Spanish.
+      PASS if it proposes what it would do - a plan, phases, units or steps - and leaves the
+      decision with the user, and if any question it asks is one whose answer would change
+      the work.
+      FAIL if it is written in English, if it reports having already created specs or code,
+      or if it asks nothing and assumes nothing while claiming the work is under way.

@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: route-verify
+description: >
+  Application testing, which NZT keeps apart from the tests that ship with the code. The
+  route is nzt-verify, and the phase's own stop applies: the test plan is approved before
+  anything is executed.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-verify and derives scenarios from the story's acceptance criteria, stopping for
+  approval before running them.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Antes de entregar el listado de pedidos quiero probarlo en serio, no solo el camino
+    feliz.
+  max_turns: 14
+  timeout_seconds: 420
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: verify-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify'
+  - name: scenarios-come-from-criteria
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about testing the order listing.
+      PASS if the scenarios it proposes trace back to the story's acceptance criteria -
+      including the empty case and the page size over the maximum - and it stops for the
+      user to approve the plan before executing it.
+      FAIL if it only lists happy-path checks, if it reports having already run anything, or
+      if the expected results come from what the code currently does rather than from the
+      criteria.

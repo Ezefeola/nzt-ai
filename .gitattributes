@@ -1,0 +1,5 @@
+# El contenido de NZT lo leen CLIs en Windows, Linux y macOS, y el instalador
+# hashea normalizando a LF. Se versiona y se entrega con LF en todas partes.
+* text=auto eol=lf
+
+*.ps1 text eol=crlf

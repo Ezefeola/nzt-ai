@@ -1,0 +1,47 @@
+schema_version: "1.1"
+name: stack-blazor-render
+description: >
+  The frontend area, whose stack selects auto rendering and code-behind. Measures that the
+  render axis resolves to the selected mode and that the screen's three states are there
+  from the first version instead of only the happy path.
+tags: [stack]
+expected_outcome: >
+  Loads the Blazor area router, the components leaf and the auto render leaf, and writes a
+  component that calls the feature's typed client and renders loading, empty and error.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Armá la pantalla del listado de pedidos del cliente en Pedidos.Web. Mostrame el
+    componente.
+  max_turns: 18
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: blazor-area-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-frontend-blazor"'
+  - name: selected-render-leaf-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-frontend-blazor-render-auto"'
+  - name: other-render-modes-not-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-frontend-blazor-render-(?:server|webassembly|static)"'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-http-client-in-the-component
+    type: regex
+    pattern: 'HttpClient'
+    match: not_contains
+  - name: three-states-and-the-typed-client
+    type: llm
+    criteria: |
+      The reply is in Spanish and contains a Blazor component for the order listing.
+      PASS if the component reaches the API through the feature's typed client, and renders
+      loading, empty and error as well as the list.
+      FAIL if it only renders the list, if it injects HttpClient or builds a URL itself, or
+      if it puts the C# inline when the stack document selects code-behind.

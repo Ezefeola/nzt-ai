@@ -1,0 +1,43 @@
+schema_version: "1.1"
+name: stack-endpoint-axis
+description: >
+  The exclusive-axis check. The stack says minimal-apis, and the prompt uses the word
+  "controller" the way a person does. Loading the other side of the axis is the failure
+  this case exists to catch, and it is scored in both arms.
+tags: [stack]
+expected_outcome: >
+  Loads the minimal APIs leaf, never the controllers one, and writes a minimal API endpoint
+  that delegates to the use case.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Falta exponer el alta de pedido por HTTP. Agregá el controller de POST /orders.
+  max_turns: 16
+  timeout_seconds: 480
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: selected-endpoint-leaf-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-endpoints-minimal"'
+  - name: other-side-of-the-axis-not-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-endpoints-controllers"'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-controller-class
+    type: regex
+    pattern: ':\s*ControllerBase|\[ApiController\]'
+    match: not_contains
+  - name: follows-the-stack-not-the-wording
+    type: llm
+    criteria: |
+      The reply is in Spanish and delivers an HTTP endpoint for creating an order.
+      PASS if it is a minimal API endpoint - a mapped route delegating to the use case - and
+      if the mismatch with the word "controller" in the request is either handled silently by
+      following the stack or named explicitly.
+      FAIL if it writes an MVC controller class because the request used that word, or if it
+      changes the stack document to match the wording.

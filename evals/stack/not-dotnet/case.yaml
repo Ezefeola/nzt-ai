@@ -1,0 +1,45 @@
+schema_version: "1.1"
+name: stack-not-dotnet
+description: >
+  D18 installs the whole stack layer in every project, so the guard against applying it
+  where it does not belong is a rule and not a packaging decision. Here the work is the
+  same shape as the .NET cases - a paginated listing - in a TypeScript project.
+tags: [stack, restraint]
+expected_outcome: >
+  Reads the stack document, builds the listing with Fastify and Prisma, and loads no skill
+  from the .NET or Blazor areas.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Avanzá con la unidad: el listado de pedidos tiene que venir paginado. Mostrame el
+    código.
+  max_turns: 16
+  timeout_seconds: 480
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: no-dotnet-area-skill
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-blazor-area-skill
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-frontend-blazor'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-csharp-in-the-answer
+    type: regex
+    pattern: 'AsNoTracking|IQueryable|DbContext|```csharp'
+    match: not_contains
+  - name: builds-with-the-projects-stack
+    type: llm
+    criteria: |
+      The reply is in Spanish and delivers a paginated order listing.
+      PASS if the code is TypeScript using the project's own stack - Fastify and Prisma - and
+      follows the conventions of the file it is changing.
+      FAIL if it proposes C#, EF Core or .NET patterns, or if it suggests adopting them here.
