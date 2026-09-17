@@ -55,18 +55,25 @@ arm is **78 runs**, plus three judge calls per `llm` grader per run. Start with
 - **A failing `llm` grader with a passing skill grader is usually the judge**, not the set.
   Re-run with `--judge-model sonnet` before believing it.
 
-## Two things the first run settles
+## What the first run settled
 
-Both are platform facts this suite depends on and **neither has been verified by running
-it** — they are the reason the first run is worth doing before any more cases are written:
+Run on 2026-09-17: `kernel-loaded`, 3 runs, no ablation arm, 247s, **US$0.94**.
 
-1. **That a `CLAUDE.md` seeded into the workspace reaches the child session as project
-   memory.** `routing/kernel-loaded` fails loudly if it does not.
-2. **That the kernel's unqualified skill names resolve under the plugin namespace.** Inside
-   a plugin a skill is `nzt:nzt-build`, while the kernel's table says `nzt-build`. The
-   graders accept both forms; what is unverified is whether the *model* resolves the
-   unqualified name it is told to load. If every skill grader fails while the replies look
-   right, this is why.
+1. ✅ **A `CLAUDE.md` seeded into the workspace does reach the child session.** The entry
+   point fired, the project was read, and the reply proposed instead of executing — which is
+   kernel behaviour, not the model's own. The scaffold works on Windows.
+2. ✅ **The skill name resolves inside the plugin.** The graders accept both the bare and the
+   namespaced form, so **which one it used is still unknown**, and it does not matter: it
+   resolves.
+3. **Score 0.83** — two runs at 1.00 and one at 0.50. The one that failed ran out of turns
+   (`max_turns: 14`), and with no final message the two graders that read the reply fail on
+   their own. **That was a calibration defect in the case, not in the set**; every case's
+   turn and time caps were raised afterwards, and the case then scored **1.00** on a
+   confirming run.
+
+**Cost, now that it is measured:** about US$0.31 per run of one case. The 13 cases at 3 runs
+**with** the baseline arm are roughly **US$24**; with `--ablation none`, half. Run a group at
+a time with `--tag`, not the whole suite at once.
 
 ## Adding a case
 

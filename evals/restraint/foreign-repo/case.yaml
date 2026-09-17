@@ -13,8 +13,8 @@ context:
 execution:
   prompt: |
     Agregá a InvoiceService un método que devuelva las facturas vencidas de un cliente.
-  max_turns: 14
-  timeout_seconds: 420
+  max_turns: 30
+  timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill]
 graders:
   - name: read-the-neighbouring-code

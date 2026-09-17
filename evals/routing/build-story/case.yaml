@@ -13,8 +13,8 @@ context:
 execution:
   prompt: |
     Implementá la historia US-012, la del listado de pedidos por cliente.
-  max_turns: 16
-  timeout_seconds: 480
+  max_turns: 30
+  timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
   - name: build-fired

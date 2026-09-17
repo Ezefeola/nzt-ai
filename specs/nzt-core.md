@@ -610,7 +610,7 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 | 3 | Router raíz `nzt` + `nzt-plan` (mínimo funcional end‑to‑end) | ✅ |
 | 4 | Routers de fase (7) | ✅ |
 | 5 | Hojas del modo construcción, de a una por unidad | ✅ |
-| 6 | Evals: casos de disparo por skill, medición de sub/sobre‑disparo | suite escrita · **la primera corrida la corre el usuario** |
+| 6 | Evals: casos de disparo por skill, medición de sub/sobre‑disparo | suite escrita · **primera corrida hecha** (`kernel-loaded`) · falta el resto |
 | 7 | Capa de stack: .NET 10 + Blazor, portada del set existente (4.5) | ✅ |
 | 8 | Rama profesor: `nzt-learn` + 7 hojas (4.6) | ✅ |
 | 9 | Medición de R1 con el catálogo completo en Codex | — |
@@ -2127,13 +2127,32 @@ respuesta a las dos mitades vuelve al kernel.
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
 **Dónde estamos, en una línea:** **el roadmap está construido entero — 91 skills, la suite de
-evals y el instalador —; lo que falta es correr las dos mediciones, y las corre el usuario.**
-La revisión contra Temper terminó (ocho fases, 22 tensiones), su fase de aplicación también,
-la capa de stack se cerró con sus tres áreas, y las fases 6 y 10 están escritas y probadas
-hasta donde se puede probar sin gastar cuota ni tocar el HOME real.
+evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La
+revisión contra Temper terminó (ocho fases, 22 tensiones), su fase de aplicación también, y
+la capa de stack se cerró con sus tres áreas.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25) están cerradas. Lo
 que puede reabrir una es la medición de la fase 9, y está dicho cuál: I4.
+
+**Lo que falta, en orden, al 2026-09-17:**
+
+1. **Instalar de verdad** — el usuario dijo que lo hace él. Nunca se ejecutó fuera de
+   destinos temporales.
+2. **Correr el resto de los evals.** Corrió `kernel-loaded` y pasó; faltan 12 casos.
+   **Conviene empezar por el grupo `stack`** (`--tag stack`), que son los cuatro de ejes
+   excluyentes y donde vive el riesgo real del set — `routing` ya demostró que el andamio
+   anda. Presupuesto abajo.
+3. **Medir R1 en Codex** (fase 9), que después de instalar ya no necesita copia manual.
+4. **La deuda de la convención de comentarios de `nzt-build`** (al final de esta sección): su
+   disparador —*cuando se porten sus hojas*— se cumplió con la capa de stack terminada, y
+   quedó sin hacer. Es una unidad chica y es la única pendiente de escritura en todo el set.
+
+**El repositorio ya es un repositorio.** `git` inicializado, remoto
+`https://github.com/Ezefeola/nzt-ai.git`, rama `main`, primer commit con 146 archivos.
+`dist/`, `evals/results/` y los `bin/obj` quedan afuera por `.gitignore`; un `.gitattributes`
+fuerza LF en todo menos los `.ps1`, que es lo que evita que el checkout ensucie diffs y
+hashes. **El `README.md` de la raíz existe** y explica para qué sirve NZT y qué aporta, no
+qué contiene.
 
 **El instalador (fase 10) está construido**: `installer/src/Nzt.Cli`, consola .NET 10, sin
 dependencias, con el contenido embebido. **Instala global y sin plugins** (D24): bloque
@@ -2162,10 +2181,24 @@ plataforma en C6):
   que no es nuestro **no tienen que cargar nada**. Van con `arm: both` para que también
   puntúen en el arm sin el set.
 
-**Lo que la primera corrida decide, además de los scores:** si un `CLAUDE.md` sembrado en el
-workspace llega como memoria de proyecto, y si el modelo resuelve el nombre sin namespace
-(`nzt-build`) que le dicta el kernel cuando adentro del plugin la skill es `nzt:nzt-build`.
-**Las dos están escritas como no verificadas** en `evals/README.md`, que es el runbook.
+**La primera corrida se hizo el 2026-09-17** — `kernel-loaded`, 3 corridas, sin arm de
+ablación, 247s, **US$ 0,94** — y contestó las dos preguntas que bloqueaban todo lo demás:
+
+- ✅ **El `CLAUDE.md` sembrado llega a la sesión hija.** El agente disparó el punto de
+  entrada, leyó el proyecto y **propuso en vez de ejecutar**, que es conducta del kernel y no
+  del modelo suelto. El andamio del scaffold funciona en Windows.
+- ✅ **El nombre de skill se resuelve adentro del plugin.** El grader acepta las dos formas,
+  así que **cuál de las dos usó sigue sin saberse** y no hace falta saberlo: resuelve.
+- **Score 0,83.** Dos corridas 1,00 y una 0,50, y la que falló no falló por NZT: **se quedó
+  sin turnos** (`max_turns: 14`), y sin mensaje final los dos graders que miran la respuesta
+  caen solos. **Era un defecto de calibración de los casos, no del set**: los 13 subieron sus
+  topes de turnos (a 25-35, salvo los de restraint, que se quedan bajos a propósito) y de
+  tiempo. **Reconfirmado después del arreglo: `kernel-loaded` da 1,00** (1 corrida, 119s,
+  US$ 0,30), sin tocar el techo de turnos.
+
+**Lo que eso deja medido para planificar:** una corrida de un caso son ~US$ 0,31. Los 13
+casos a 3 corridas **con** arm de ablación son **~US$ 24**; con `--ablation none`, la mitad.
+Conviene correr por grupo (`--tag`) y no la suite entera de una.
 
 De las 44 unidades del catálogo original — 35 del modo construcción, 8 de la rama profesor,
 más la hoja que sumó D9 — hay **37 escritas**, y **no queda ninguna pendiente en los pasos 1

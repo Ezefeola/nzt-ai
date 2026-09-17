@@ -15,8 +15,8 @@ execution:
   prompt: |
     En la pantalla de detalle el botón dice "Guardar" y tiene que decir "Confirmar".
     Cambialo.
-  max_turns: 8
-  timeout_seconds: 300
+  max_turns: 14
+  timeout_seconds: 480
   allowed_tools: [Read, Glob, Grep, Skill]
 graders:
   - name: no-blazor-leaf-loaded

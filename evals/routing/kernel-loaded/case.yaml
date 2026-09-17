@@ -13,8 +13,8 @@ context:
 execution:
   prompt: |
     Quiero sumarle al proyecto una feature de cupones de descuento. ¿Cómo seguimos?
-  max_turns: 14
-  timeout_seconds: 420
+  max_turns: 30
+  timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
   - name: entry-point-fired

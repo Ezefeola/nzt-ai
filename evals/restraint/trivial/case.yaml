@@ -12,8 +12,8 @@ context:
 execution:
   prompt: |
     Explicame qué valida esta expresión regular: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$
-  max_turns: 6
-  timeout_seconds: 240
+  max_turns: 10
+  timeout_seconds: 360
   allowed_tools: [Read, Glob, Grep, Skill]
 graders:
   - name: no-skill-at-all

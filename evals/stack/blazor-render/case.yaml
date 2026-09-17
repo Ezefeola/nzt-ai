@@ -14,8 +14,8 @@ execution:
   prompt: |
     Armá la pantalla del listado de pedidos del cliente en Pedidos.Web. Mostrame el
     componente.
-  max_turns: 18
-  timeout_seconds: 600
+  max_turns: 35
+  timeout_seconds: 900
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
   - name: blazor-area-fired

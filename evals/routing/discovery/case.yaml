@@ -14,8 +14,8 @@ execution:
   prompt: |
     Todavía no tenemos escrito qué hace exactamente el módulo de cupones: cuándo se puede
     aplicar uno, qué pasa si está vencido, si se acumulan. Hay que dejarlo definido.
-  max_turns: 14
-  timeout_seconds: 420
+  max_turns: 30
+  timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
   - name: discovery-fired

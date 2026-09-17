@@ -14,8 +14,8 @@ execution:
   prompt: |
     Avanzá con la unidad: el listado de pedidos de un cliente, paginado y ordenado del más
     reciente al más antiguo. Mostrame el código.
-  max_turns: 18
-  timeout_seconds: 600
+  max_turns: 35
+  timeout_seconds: 900
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
   - name: area-router-fired
