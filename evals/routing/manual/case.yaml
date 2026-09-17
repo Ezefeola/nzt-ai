@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: route-manual
+description: >
+  The end user's manual (D37). It is UX work, not documentation of the system: the route is
+  nzt-ux, the chapters are the tasks the person came to do, and nothing gets a chapter that
+  no verified criterion supports. The failure modes are a module-by-module tour of the
+  screens and a manual describing behavior nobody verified.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-ux, proposes an interactive self-contained HTML manual organised by the
+  operator's tasks, sourced from the story's verified criteria and its evidence, and stops
+  for approval before writing it.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero armarles un manual a los operadores que van a usar esto, algo lindo e
+    interactivo, no un PDF aburrido.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: ux-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ux'
+  - name: organised-by-task
+    type: llm
+    criteria: |
+      The reply is in Spanish and proposes a user manual for the operators of the orders
+      product.
+      PASS if its chapters are things the operator wants to accomplish, named the way they
+      would say them, and the manual is one self-contained HTML file that opens without a
+      server or a network.
+      FAIL if the structure follows the system instead of the person - a chapter per module,
+      per screen or per menu entry, a field-by-field reference, a tour of the UI - or if it
+      proposes a format that needs a build step, a CDN or an external service.
+  - name: only-verified-behavior
+    type: llm
+    criteria: |
+      The project has one story, US-012, with its criteria verified, and nothing else built.
+      PASS if what the manual will describe comes from that verified behavior and its
+      recorded evidence - criteria, test results, screenshots to be captured from the real
+      screens - and the reply is explicit that features that do not exist or were not
+      verified get no chapter.
+      FAIL if it drafts chapters for capabilities the project does not have (users,
+      permissions, reports, settings, integrations), if it invents screenshots or screens,
+      or if it presents the whole manual as ready to write with no approval stop.

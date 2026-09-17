@@ -1,13 +1,13 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 13 cases in three groups, and each group measures one of the two failure modes.
+suite is 18 cases in three groups, and each group measures one of the two failure modes.
 
 | Group | Cases | What it measures |
 |---|---|---|
-| `routing/` | 6 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
+| `routing/` | 10 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
 | `stack/` | 4 | **The exclusive axes.** The stack document selects one option per axis and only that leaf loads |
-| `restraint/` | 3 | **Over-triggering.** A question, a one-word edit and a repository that is not ours must load nothing |
+| `restraint/` | 4 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned and a repository that is not ours must load nothing |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
 detail: NZT's routing is instructed there (R2), so a run without it measures description
@@ -39,8 +39,8 @@ claude plugin eval dist/plugin --scaffold --threshold 0.8
 
 ## What a run costs
 
-Roughly `cases × runs × 2` agent runs — 13 cases at the default 3 runs with the baseline
-arm is **78 runs**, plus three judge calls per `llm` grader per run. Start with
+Roughly `cases × runs × 2` agent runs — 18 cases at the default 3 runs with the baseline
+arm is **108 runs**, plus three judge calls per `llm` grader per run. Start with
 `--case kernel-loaded`, then `--tag smoke`, then the whole suite.
 
 ## Reading the result
@@ -71,9 +71,14 @@ Run on 2026-09-17: `kernel-loaded`, 3 runs, no ablation arm, 247s, **US$0.94**.
    turn and time caps were raised afterwards, and the case then scored **1.00** on a
    confirming run.
 
-**Cost, now that it is measured:** about US$0.31 per run of one case. The 13 cases at 3 runs
-**with** the baseline arm are roughly **US$24**; with `--ablation none`, half. Run a group at
+**Cost, now that it is measured:** about US$0.31 per run of one case. The 18 cases at 3 runs
+**with** the baseline arm are roughly **US$34**; with `--ablation none`, half. Run a group at
 a time with `--tag`, not the whole suite at once.
+
+**The five newest cases have not been run** — `close-feature`, `diagram-offered` and
+`no-diagram` came with the second pass over Temper (13.12), `test-data` with D36 and
+`manual` with D37. They are calibrated the way the others were **after** their first run,
+not before it. Expect the first run of each to be a calibration run.
 
 ## Adding a case
 

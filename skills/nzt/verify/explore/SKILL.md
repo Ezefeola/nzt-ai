@@ -36,6 +36,10 @@ Risk behind it: money shown to the customer differing from money charged.
   reproduce is an anecdote.
 - Vary deliberately: the same action twice, out of order, interrupted, with the back button,
   with data at the extremes. You are looking for what the scripted set could not predict.
+- **Data you create to explore is still data you clean up.** The mechanism and the cleanup
+  are the same as anywhere else (`nzt-verify-test-data`); what changes is that a session
+  creates it as it goes, so it is undone at the end of the session and what could not be
+  undone is written in the notes.
 
 ## Classify against the requirement, not against intuition
 

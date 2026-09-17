@@ -12,9 +12,11 @@ If you did not arrive here from `nzt-architecture`, load it first.
 
 ## Before designing
 
-Read the feature's `spec.md` and its stories, `Docs/architecture.md`, and the stack
-document of every component you touch. You are fitting this feature into a system that
-already made decisions; re-deciding them here is how two architectures start.
+Read the feature's `spec.md` and its stories, `Docs/architecture.md`, the stack document of
+every component you touch, and `Docs/domain-model.md` if it exists — the entities this
+feature works with already have a shape, and a design that invents a second one is where
+two models start. You are fitting this feature into a system that already made decisions;
+re-deciding them here is how two architectures start.
 
 **Design against the spec, not against the request.** If a rule is not in the spec, it is
 not a requirement — it goes back to discovery as a question, and you design the rest
@@ -53,12 +55,15 @@ An order goes `draft → confirmed → invoiced`, and `confirmed → cancelled`.
 follows its order and is released on cancellation (RN-cancelar-libera-cupon).
 
 ## Integrations
-| System | We send | We expect | On failure |
+| Id | We send | We expect | On failure |
 |---|---|---|---|
-| Billing | confirmed order | invoice id | queued and retried; order unaffected |
+| INT-01 · Billing | confirmed order | invoice id | queued and retried; order unaffected |
 
 ## Open
 - QT-04 · Does a cancelled order return the coupon immediately or at end of day?
+
+## Decided
+- QT-03 · 2026-09-15 · The redemption is written in the order's transaction. (ADR-004)
 ```
 
 ## Flows
@@ -102,9 +107,14 @@ succeeded?
 
 ## Integrations
 
-Each external system gets what we send, what we expect back, and **what happens when it is
-unavailable or slow**. Timeouts and retries are part of the contract, not an
-implementation detail.
+- **Cite the `INT-NN`** of `Docs/architecture.md` instead of describing the system again.
+  The product-level row says what we need from it and what happens when it is not there;
+  this table says what **this flow** sends and expects.
+- Each one gets what we send, what we expect back, and **what happens when it is unavailable
+  or slow**. Timeouts and retries are part of the contract, not an implementation detail.
+- A system nobody recorded at product level gets its `INT-NN` there first, in the same unit.
+- **How it actually behaves is checked, not remembered**: `nzt-research`, with the sources
+  cited from the `QT-NN` that rests on them.
 
 ## Questions
 
@@ -113,13 +123,19 @@ implementation detail.
 - One that belongs to a later phase is written where that phase will read it and is left
   alone. Deciding a build question now is deciding it with less information than whoever
   gets there will have.
+- **An answered one moves to `Decided`, with its date and its answer, and is never
+  deleted.** That is what stops a settled question from being reopened after the feature
+  closes; when it earned an ADR, the line cites it.
 - A contradiction in the spec is not resolved here. Raise it, pause what depends on it, and
   keep designing the rest.
 
 ## Diagrams
 
-A sequence diagram earns its place when the order of steps between several participants is
-what is hard to follow. Anything a numbered list already says does not need a picture.
+Three are earned here, all of them offered: **`sequence`** for the order between
+participants, **`state`** for an entity's lifecycle, and **`flow`** for branching that lives
+inside one component. `nzt-architecture-diagrams` decides which one and offers it;
+`nzt-architecture-diagrams-behavior` draws it. Anything a numbered list already says does
+not need a picture, and a declined diagram leaves the prose carrying it.
 
 ## Done when
 
@@ -128,7 +144,8 @@ Rehearse it: could someone implement this feature without asking you a structura
 - Every story has its flow, with components named per step.
 - Every business rule has its enforcement row.
 - Every multi-effect flow says what happens when a step fails.
-- Every integration says what happens when it is down.
+- Every integration cites its `INT-NN` and says what happens when it is down.
+- Every answered question is in `Decided`, with its date.
 - Nothing contradicts `Docs/architecture.md` or a stack document; contradictions were
   raised, not absorbed.
 - Open technical questions are `QT-NN`, not assumptions.

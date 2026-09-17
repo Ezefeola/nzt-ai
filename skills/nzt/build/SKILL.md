@@ -14,7 +14,8 @@ and the coverage marks on the criteria of the story being implemented.
 
 **Does not own:** deciding what to build (`nzt-discovery`), deciding how it is structured
 (`nzt-architecture`), the application-level test plan and its evidence (`nzt-verify`). The
-boundary on tests: the ones that travel with the code are yours; the ones derived from an
+boundary on tests: the ones that travel with the code are yours — `nzt-build-tests` says what
+makes one worth keeping, whatever the stack — and the ones derived from an
 approved test-plan scenario are `nzt-verify`'s.
 
 ## Required guidance
@@ -28,12 +29,14 @@ next to it, with no guidance reloaded.**
 
 | The unit is | Load |
 |---|---|
+| Surveying existing code the change will run into | `nzt-build-recon` |
 | Implementing specified behavior | `nzt-build-implement` |
 | Repairing a reported defect | `nzt-build-implement` |
 | Changing structure without changing behavior | `nzt-build-refactor` |
 | Removing a behavior that exists | `nzt-build-remove` |
 | Adding, updating or removing a package | `nzt-build-dependencies` |
 | Credentials or sensitive configuration | `nzt-build-secrets` |
+| Writing the automated tests that ship with the change | `nzt-build-tests` |
 | Writing the test first, **only if the stack selected TDD** | `nzt-build-tdd` |
 
 If the component's stack selected one of these areas, load its area router — it is
@@ -69,10 +72,19 @@ before the first story. Do not invent a story to justify it.
 
 They apply to every unit of this phase, so they live here and not in a leaf.
 
-- A comment says **why**. What the line already says is noise.
+- A comment says **why**. What the line already says is noise, and it goes stale: the line
+  changes, the comment stays, and the file carries two answers with nothing to say which
+  one runs.
+- **What a comment usually tries to fix is a name.** A variable, a method or a type that
+  said too little. Fix the name instead.
 - Explain the non-obvious: a workaround with its cause, an externally imposed constraint, a
-  decision that looks wrong and is not. Name its source when it has one (`Q-07`, `QT-03`, a
-  bug id).
+  decision that looks wrong and is not. Name its source when the source is a record that
+  does not move — an ADR, a defect id, a provider's issue.
+- **The spec does not travel into the code.** No rule slug, no story id, no requirement
+  text in a comment. Traceability lives in the specs, where each rule has one original that
+  changes in one place; a rule quoted in the code is a **second original** that drifts the
+  first time the rule is edited, with nothing pointing at it to say so. The code implements
+  the rule; it does not cite it.
 - Never leave commented-out code. Version control already keeps it; a commented block is a
   question nobody can answer.
 - No change logs, author names or dates in comments. That is the repository's job.
@@ -93,8 +105,12 @@ They apply to every unit of this phase, so they live here and not in a leaf.
   that should exist and does not, say so and let the plan decide.
 - **Change markers have fixed meaning**: `[modify]` replaces the old behavior instead of
   adding a parallel path, `[remove]` takes it out, and `[SPEC-CONFLICT]` is what you emit
-  when the spec contradicts itself while you are building. Markers survive until the
-  feature closes; whoever implements does not clean them up.
+  when the spec contradicts itself while you are building. The first two are put there by
+  `nzt-discovery-change`, when the user approved the change; they survive until
+  `nzt-plan-close` sweeps them, and whoever implements does not clean them up.
+- **Technical work you find and do not do is reported, and it becomes an entry in
+  `Docs/tech-debt.md` when the user decides to defer it** — never a comment in the code and
+  never a silent omission.
 - A refactor changes structure and nothing else. If behavior changed, it was not a
   refactor: it needs its own spec and its own verification. A refactor still needs the
   existing behavior verified, and the technical documents kept current.

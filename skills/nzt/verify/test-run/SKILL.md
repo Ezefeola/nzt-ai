@@ -13,11 +13,45 @@ new test you invent mid-run.
 
 If you did not arrive here from `nzt-verify`, load it first.
 
+## Data first, cleanup last
+
+Every scenario that needs data arrives with the two scripts the plan approved
+(`nzt-verify-test-data`). Around each run:
+
+1. **Run its setup**, with the mechanism the stack document records.
+2. **Verify the precondition instead of assuming it** — read the record back. A setup that
+   executed is not a state that exists, and a scenario run on a precondition that is not
+   there is **`blocked` with that cause, never `failed`**: nothing was tested.
+3. Run the scenario.
+4. **Run its teardown, whether it passed or failed.** The failing scenario leaves the most
+   behind and is the one everybody forgets.
+5. **Record the cleanup**: done, or what was left where. A teardown that did not run is data
+   debt with a name, not silence.
+
+Data the user has to create is handed over like a scenario they run: what to execute,
+against which environment, what to send back — and it is recorded as theirs, with the date.
+
 ## Through the real entry point
 
 **A UI scenario is never marked passed with API evidence.** The API answering correctly says
 nothing about whether the screen calls it, renders it, or lets the user get there. If the
 scenario says the user does it on screen, it is done on screen.
+
+## Driving each target
+
+The plan already says which target each scenario runs against, and with what. How each one
+is driven:
+
+- **The API, directly** — the project's own HTTP client, or a terminal request. Assert the
+  status, the response shape the project actually uses, **and the persisted effect**: a 200
+  is not evidence that the row changed. A rule about who may do it is tested by trying it as
+  someone who may not.
+- **The screen, as a user** — a browser the session can drive, in the isolated profile the
+  plan names, with the four channels below.
+- **When this session cannot drive a browser**, and the scenario needs one: hand it to the
+  user with exactly what to do and what to capture, and record the evidence they bring as
+  theirs — *executed by the user*, with the date. That is a valid run. Inventing an API
+  equivalent and marking the screen scenario passed is not.
 
 ## Act like a user
 
@@ -102,6 +136,8 @@ Rehearse it: could someone read this document and know exactly what was run, wha
 and what is still unknown?
 
 - Every scenario has a dated run with its state, or is `blocked` with its cause.
+- Every setup ran with its precondition verified, and every teardown ran or left its debt
+  written down.
 - Every UI scenario was run through the UI.
 - Every failure has evidence, and every expected result that passed has its capture.
 - Console, network and accessibility observations are recorded even when the scenario

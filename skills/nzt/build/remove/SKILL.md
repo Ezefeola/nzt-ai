@@ -54,8 +54,10 @@ Deleting a column, a table or the rows in it is **not** part of removing code:
   present; a criterion for behavior that does not exist can only be verified as a failure.
 - A stack document, a feature design or an architecture document naming what you removed is
   updated in the same unit.
-- A `[remove]` marker is what authorised this. It stays until the feature is closed; it is
-  not cleared by whoever implements.
+- A `[remove]` marker is what authorised this, and `nzt-discovery-change` is what put it
+  there. It stays until `nzt-plan-close` sweeps it; it is not cleared by whoever implements.
+- **The criterion that proves the absence keeps its test**, even after the marker is gone.
+  Sweeping a marker never authorises deleting a regression.
 
 ## Deprecating instead of removing
 

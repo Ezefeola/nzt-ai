@@ -52,11 +52,11 @@ método completo; eso está escrito en el kernel y es lo que hace que se banque 
 
 | Fase | De qué se ocupa |
 |---|---|
-| `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias |
-| `nzt-architecture` | Cómo se resuelve: componentes, stack, diseño técnico, ADR |
-| `nzt-ux` | Pantallas, flujos, sistema de diseño, revisión de usabilidad |
+| `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias, y el cambio a una feature que ya existe |
+| `nzt-architecture` | Cómo se resuelve: componentes, stack, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
+| `nzt-ux` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
 | `nzt-build` | El código, y los tests que viajan con él |
-| `nzt-verify` | Diseñar y correr pruebas, y registrar la evidencia |
+| `nzt-verify` | Diseñar y correr pruebas —API o pantalla, y lo dice antes de correr—, **crear los datos que faltan y borrarlos después**, medir la performance que espera el usuario, registrar la evidencia, y leer código o documentos buscando lo que no cierra |
 | `nzt-ship` | Versionado, CI/CD, despliegue, observabilidad |
 | `nzt-learn` | **Enseñarte a vos** en lugar de hacerlo por vos |
 
@@ -117,6 +117,6 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo
 ```
 
-**91 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
+**110 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
 abierto están en la sección 14 de [`specs/nzt-core.md`](specs/nzt-core.md), que es el punto
 de retomada: si volvés al proyecto después de un tiempo, se empieza por ahí.

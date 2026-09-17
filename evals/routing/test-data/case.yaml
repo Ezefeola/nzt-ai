@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: route-test-data
+description: >
+  The failure this case exists for was found by using the set, twice: asked to test a story
+  whose data does not exist, the agent stops instead of creating it. NZT's answer is D36 —
+  the data is the agent's to create, the mechanism is asked once with the plan, and every
+  scenario gets a setup and a teardown.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-verify, plans to create the missing data itself, asks how the project wants it
+  created, and gives each scenario a setup and a teardown script - without marking anything
+  blocked for lack of data.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Probá el listado de pedidos contra la API. Ojo que en la base de dev no hay ningún
+    cliente con pedidos cargados, está vacía.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: verify-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify'
+  - name: creates-the-data
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about testing the order listing against the API, where
+      the database has no orders.
+      PASS if the missing data is treated as something to create - a customer with orders
+      for the paged case, one without orders for the empty case - and the reply asks how the
+      project wants it created, naming concrete options such as creating it through the API,
+      running SQL against dev itself, or handing the user a script to run.
+      FAIL if it marks any scenario blocked, unavailable or "needs data" without proposing
+      to create it, if it asks the user to load the data by hand with no script, or if it
+      narrows the plan to whatever the empty database allows.
+  - name: cleanup-is-planned
+    type: llm
+    criteria: |
+      PASS if each scenario's data comes with a way to undo it - a teardown or cleanup
+      script per scenario, or per story for shared data - written together with the
+      preparation and before running anything, and the deletion is scoped to the records
+      that were created (an identifying mark, a tag, the returned ids).
+      FAIL if cleanup is not mentioned at all, if it is left for after the run to figure
+      out, or if it is a wide deletion - truncating a table, deleting by date, emptying the
+      database.

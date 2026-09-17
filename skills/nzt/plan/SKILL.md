@@ -18,8 +18,9 @@ A unit is the smallest piece that can be delivered and reviewed on its own. Cut 
 - Its `do` line fits on one line. If it needs a paragraph, it is more than one unit.
 
 Typical units, one each: a product document, a glossary, a feature spec, a story, a
-feature's technical design, a screen, a story implemented, a story's test set, a release.
-Never bundle "write the 4 specs" into one unit: four specs are four units.
+feature's technical design, a screen, a story implemented, a story's test set, a release,
+a feature closed. Never bundle "write the 4 specs" into one unit: four specs are four
+units.
 
 **A row is a step, not a file.** Which artifacts a step produces is decided when that step
 is produced: the plan says what it delivers, not which files will end up existing.
@@ -188,6 +189,9 @@ are still unclear, and do not redo finished work without a reason.
 - Never do two units in one turn without explicit authorisation for that batch.
 - Never leave a unit `doing` at the end of a turn without a `detail` line.
 - Never rewrite history: a unit that was dropped is `dropped`, not deleted.
+- **A feature is closed by the user's acceptance, and closing it is a unit**: load
+  `nzt-plan-close`, which sweeps its markers, brings its documents current and writes its
+  history entry. A feature with markers left in its spec is not done.
 - The state holds the continuation and the plan; progress lives in the artifacts. Keep it
   to one line per unit, or it stops being state and becomes a document.
 - The plan serves the work. If it stops describing reality, fix the plan; do not follow it

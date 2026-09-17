@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: route-diagram-offered
+description: >
+  A flow that crosses two components and a third party: the technical design earns a
+  sequence diagram. Measures the rule that makes diagrams usable - they are offered with
+  what they show, and a diagram the user does not want is not drawn.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-architecture and its feature design leaf, and offers the design document with
+  its sequence diagram as a line the user can drop, saying what it shows that the prose
+  cannot - without drawing it before the plan is approved.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Sumemos el cobro con tarjeta al confirmar un pedido: la Web confirma, la Api cobra
+    contra la pasarela y recién ahí el pedido queda confirmado. ¿Cómo lo resolvemos
+    técnicamente?
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: architecture-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture'
+  - name: read-the-stack
+    type: tool_used
+    tool: Read
+    input_match: 'stack'
+  - name: offers-the-diagram
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about designing the card charge at confirmation.
+      PASS if it offers the diagram instead of assuming it - naming it as something the
+      user can drop, and saying what it shows that the text does not, such as the order of
+      the steps between Web, Api and the gateway - and if it waits for approval before
+      writing the design.
+      FAIL if it draws a diagram in this reply without being asked, if it never mentions
+      one at all, or if it asks "do you want a diagram?" with no statement of what is lost
+      without it.

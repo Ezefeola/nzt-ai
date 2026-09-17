@@ -36,6 +36,21 @@ lives. Match the shape of the rule to its technique:
 | Many independent parameters | Pairwise combinations | Coverage without the full product |
 | A user goal across screens | Use-case walkthrough | The path, with its interruptions |
 
+## The target changes the case, not the technique
+
+The techniques above are the same for every target; **what you can observe is not**. A
+criterion covered in two areas usually needs a scenario in each, and each one asks its own
+question:
+
+- **Against the API**: the rule at its edges, the same call by someone who may not make it,
+  the shape of the error, and what ended up persisted. Nothing about what the user sees.
+- **Against the screen**: the user's task from where they actually start, the loading, empty
+  and error states, what is reachable and what is not, and whether the message means
+  something to a person. Nothing about what the rule does for another client.
+- **One case on both** is worth it where the two could disagree — a total shown and a total
+  stored, a permission hidden and a permission enforced. Hiding an action is not enforcing
+  it, and that pair is the case that proves it.
+
 ## What no technique generates for you
 
 Go looking for these every time; they are where the expensive defects are:
@@ -74,8 +89,9 @@ When time or the environment cut the run short, say what was left out and at wha
 ```markdown
 ### E-02 · An expired coupon leaves the total untouched
 - **Covers:** US-002 CA-01 (RN-cupon-vencido)
-- **Data:** order of $10.000; coupon `INVIERNO20`, expired 2026-05-01
+- **Data:** order of $10.000; coupon `NZT-E02-INVIERNO20`, expired 2026-05-01
 - **Preconditions:** the customer is logged in with an order in progress
+- **Setup / cleanup:** `data/US-012/E-02-setup.sql` · `data/US-012/E-02-teardown.sql`
 - **Steps:** apply the code at checkout
 - **Expected:** the total stays $10.000 and the coupon is reported as expired
 - **Material effects:** none
@@ -88,8 +104,10 @@ When time or the environment cut the run short, say what was left out and at wha
 - **Status vocabulary is closed**: `pending`, `passed`, `failed`, `blocked`. `blocked`
   always carries its cause. Without a closed vocabulary, *"it mostly worked"* gets into the
   document.
-- Preconditions you cannot reach are a data problem to solve, not a result. Creating them is
-  part of running the scenario.
+- Preconditions you cannot reach are a data problem to solve, not a result. **A scenario
+  whose data does not exist yet is designed with its two scripts — setup and teardown — and
+  they are approved with the plan, not improvised while running.** The mechanism is the
+  user's decision and is asked once, with the plan: `nzt-verify-test-data`.
 
 ## The plan is approved before anything runs
 
@@ -104,7 +122,7 @@ you would?
 
 - Every criterion appears in the coverage table, including the ones with no scenario.
 - Every scenario says what it covers, its data, its expected result and its material
-  effects.
+  effects, and the ones whose data does not exist yet name their setup and teardown scripts.
 - Every expected result traces to a requirement, not to the running system.
 - The edges the techniques do not generate were looked for and either written or dismissed
   with a reason.

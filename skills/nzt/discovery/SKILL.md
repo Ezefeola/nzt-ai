@@ -11,8 +11,8 @@ This phase is the functional analyst of the set. It establishes **what** somethi
 ## Boundaries
 
 **Owns:** the analysis record and its questions, the product definition, the glossary,
-feature specs, user stories and their acceptance criteria, and specs derived from existing
-code.
+feature specs, user stories and their acceptance criteria, changes to a feature that
+already exists, and specs derived from existing code.
 
 **Does not own:** how it is solved (`nzt-architecture`), screens (`nzt-ux`), code
 (`nzt-build`). A spec that names a class, a table or a package has drifted into
@@ -33,12 +33,13 @@ does not mean load every row.
 | Domain vocabulary and what each term means here | `nzt-discovery-glossary` |
 | A feature: scope, business rules, non-functional requirements | `nzt-discovery-write-spec` |
 | One story: acceptance criteria with area coverage | `nzt-discovery-write-stories` |
+| A functional change to a feature that already exists | `nzt-discovery-change` |
 | Behavior that exists only as code | `nzt-discovery-reverse` |
 
 ## One unit
 
 One document. One product definition, one glossary, one feature spec, **one story**, one
-module reverse-engineered. Never two in the same unit.
+module reverse-engineered, one change proposed and merged. Never two in the same unit.
 
 ## Where it lands
 
@@ -47,6 +48,8 @@ module reverse-engineered. Never two in the same unit.
 - The interview, append-only → `Docs/analysis.md` for the product,
   `Plan/specs/<feature>/analysis.md` for a feature
 - One story per file → `Plan/specs/<feature>/stories/US-NNN-<slug>.md`
+- A change to an existing feature → `Plan/specs/<feature>/change.md`, temporary: it is
+  merged into the spec and its stories, and then deleted
 - The feature folder is `F-NNN-<slug>`. That is what `<feature>` stands for everywhere
 
 ## Rules

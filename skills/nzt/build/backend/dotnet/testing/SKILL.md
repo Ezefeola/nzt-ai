@@ -9,7 +9,9 @@ What makes a test valuable does not change with the stack; this is **how a .NET 
 into practice**. The stack document records the adopted choices, and **the test projects
 already in the repository are the evidence in force**.
 
-Load `nzt-build-backend-dotnet` before applying this.
+Load `nzt-build-backend-dotnet` and `nzt-build-tests` before applying this: the criteria that
+decide what is worth testing, what is substituted and what survives a refactor live there,
+and this leaf only says how .NET does it.
 
 ## Framework and runner: the project's, unchanged
 

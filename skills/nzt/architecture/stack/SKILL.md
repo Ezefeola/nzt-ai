@@ -23,8 +23,10 @@ Three readers, and each one needs something different from it:
   frontend —`). An area with no stack document does not exist.
 - **The area skills select by axis.** Where a technology offers exclusive alternatives,
   this file says which one was taken, and only that one is ever loaded.
-- **Build and verify read the opt-ins.** Whether this component is written test-first, or
-  gets automated end-to-end tests, is decided here and nowhere else.
+- **Build and verify read the opt-ins.** Whether this component is written test-first, gets
+  automated end-to-end tests, or how its application tests obtain their data, is decided
+  here and nowhere else. The opt-in is the user's answer, written once so no phase asks it
+  again — `nzt-verify-test-data` has what the data one is choosing between.
 
 ## The file
 
@@ -47,6 +49,8 @@ component: Pedidos.Api · area: backend
 ## Opt-ins
 - **Test-first:** yes, for business rules. Not for wiring and configuration.
 - **Automated end-to-end tests:** no. Revisit when there is a second client.
+- **Test data:** SQL scripts, run by the agent against `dev`. Setup and teardown per
+  scenario.
 
 ## Conventions
 - One folder per use case, with its request, handler and validator together.

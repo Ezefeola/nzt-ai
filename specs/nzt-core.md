@@ -157,35 +157,54 @@ nombre de la skill sale del path (sección 9.1):
 ```
 skills/nzt/                      nzt
 ├─ plan/                         nzt-plan
+│  └─ close/                     nzt-plan-close             → cierre de feature (D25)
+├─ research/                     nzt-research               → evidencia externa (D31)
 ├─ discovery/                    nzt-discovery          (análisis funcional)
 │  ├─ analysis/                  nzt-discovery-analysis     → análisis append-only (T2)
 │  ├─ product/                   nzt-discovery-product      → Docs/
 │  ├─ glossary/                  nzt-discovery-glossary     → Docs/
 │  ├─ write-spec/                nzt-discovery-write-spec   → Plan/specs/ (feature)
 │  ├─ write-stories/             nzt-discovery-write-stories → Plan/specs/ (historias, T1)
+│  ├─ change/                    nzt-discovery-change       → cambio a feature viva (D28)
 │  └─ reverse/                   nzt-discovery-reverse
 ├─ architecture/                 nzt-architecture
 │  ├─ design-product/            nzt-architecture-design-product
 │  ├─ stack/                     nzt-architecture-stack     → documento de stack (D9)
 │  ├─ design-feature/            nzt-architecture-design-feature
-│  └─ adr/                       nzt-architecture-adr
+│  ├─ domain/                    nzt-architecture-domain    → domain-model.md (D26)
+│  ├─ contexts/                  nzt-architecture-contexts  → context-map.md (D26)
+│  ├─ tech-debt/                 nzt-architecture-tech-debt → tech-debt.md (D29)
+│  ├─ review/                    nzt-architecture-review    → mejoras con evidencia (D30)
+│  ├─ diagrams/                  nzt-architecture-diagrams  → catálogo y reglas (D27)
+│  │  ├─ components/             nzt-architecture-diagrams-components
+│  │  ├─ domain/                 nzt-architecture-diagrams-domain
+│  │  └─ behavior/               nzt-architecture-diagrams-behavior
+│  ├─ adr/                       nzt-architecture-adr
+│  └─ rfc/                       nzt-architecture-rfc       → a pedido (D35)
 ├─ ux/                           nzt-ux
 │  ├─ screen/                    nzt-ux-screen       (incluye navegación, T11)
 │  ├─ mockup/                    nzt-ux-mockup       → HTML, a pedido (T12)
+│  ├─ manual/                    nzt-ux-manual       → manual del usuario final (D37)
 │  ├─ system/                    nzt-ux-system       → Docs/ de UX + visual (T13)
 │  └─ review/                    nzt-ux-review
 ├─ build/                        nzt-build                 (convención de comentarios, T4)
+│  ├─ recon/                     nzt-build-recon           → relevamiento de impacto (D30)
 │  ├─ implement/                 nzt-build-implement
 │  ├─ refactor/                  nzt-build-refactor
 │  ├─ remove/                    nzt-build-remove           → barrido de eliminación (T4)
 │  ├─ dependencies/              nzt-build-dependencies     (T4)
 │  ├─ secrets/                   nzt-build-secrets          (T4)
+│  ├─ tests/                     nzt-build-tests            → criterio de test (D32)
 │  └─ tdd/                       nzt-build-tdd              → opt-in del stack (T4)
 ├─ verify/                       nzt-verify
 │  ├─ test-design/               nzt-verify-test-design
+│  ├─ test-data/                 nzt-verify-test-data   → setup y teardown por caso (D36)
 │  ├─ test-run/                  nzt-verify-test-run    (incluye la ejecución, T7)
 │  ├─ explore/                   nzt-verify-explore     → exploratoria por cartas (T7)
+│  ├─ performance/               nzt-verify-performance → tiempo que espera el usuario (D34)
 │  ├─ automate/                  nzt-verify-automate    → E2E, opt-in del stack (T8)
+│  ├─ review/                    nzt-verify-review      → defectos leyendo código (D30)
+│  ├─ audit/                     nzt-verify-audit       → documentos vs código (D30)
 │  └─ bug/                       nzt-verify-bug
 ├─ ship/                         nzt-ship
 │  ├─ vcs/                       nzt-ship-vcs
@@ -468,8 +487,18 @@ una feature vive con su spec en `Plan/`.
 ```
 <proyecto>/
 ├─ Docs/                       # lo que sobrevive a cualquier feature y es del arquitecto:
-│  ├─ ...                      # modelo de dominio, arquitectura del sistema, ADRs, glosario
+│  ├─ product.md · glossary.md # de discovery, con nombre fijo (D7)
 │  ├─ analysis.md              # entrevista de producto, append-only (D5)
+│  ├─ architecture.md          # componentes, límites, sistemas externos con su INT-NN (D10)
+│  ├─ domain-model.md          # entidades, campos, agregados (D26)
+│  ├─ context-map.md           # contextos, dependencias y eventos — si hay más de uno (D26)
+│  ├─ adr/ADR-NNN-<slug>.md    # una decisión por archivo
+│  ├─ rfc/RFC-NNN-<slug>.md    # propuesta en discusión, a pedido (D35)
+│  ├─ tech-debt.md             # trabajo técnico diferido, con su impacto (D29)
+│  ├─ history.md               # log append-only de ciclos cerrados (D25)
+│  ├─ design-system.md · ui-components.md   # de nzt-ux-system (D11)
+│  ├─ manual/<audiencia>.html  # el manual del usuario final, a pedido (D37)
+│  │  └─ assets/               # sus imágenes, sacadas de la evidencia de verify
 │  ├─ deployment.md            # entornos con su autorizador, pipeline, rollback (T16)
 │  └─ releases.md              # log append-only de despliegues y rollbacks (T16)
 └─ Plan/
@@ -478,12 +507,15 @@ una feature vive con su spec en `Plan/`.
       └─ F-NNN-<slug>/       # "<feature>" en el resto del documento (D6)
          ├─ spec.md            # transversal: alcance, reglas, NFR, índice de historias
          ├─ analysis.md        # entrevista append-only con sus Q-NN
+         ├─ change.md          # propuesta de cambio, temporal: se fusiona y se borra (D28)
          ├─ stories/
          │  └─ US-NNN-<slug>.md  # criterios + cobertura por área
          ├─ design/            # diseño técnico de esta feature
          └─ testing/
             ├─ README.md       # índice: última ejecución, bugs abiertos, huecos (T9)
             ├─ <historia>.md   # pruebas: casos, datos, esperado, obtenido
+            ├─ performance.md  # medición que no es de una sola historia (D34)
+            ├─ data/           # por historia: setup y teardown de cada escenario (D36)
             ├─ evidencias/     # por ejecución, referenciada desde la tabla
             └─ bugs/
                └─ BUG-NNN-<slug>.md   # un archivo por defecto (T10)
@@ -495,6 +527,11 @@ una feature vive con su spec en `Plan/`.
   aprueba. Las áreas del proyecto son las que declaran sus documentos de stack (T3).
 - `analysis.md` es append‑only: las respuestas superadas se marcan, no se editan (13.2).
   Hay uno por altitud: el de producto en `Docs/` y el de cada feature junto a su spec (D5).
+- **Los datos de cada escenario son dos archivos, no una improvisación**: `data/<historia>/`
+  lleva un script que los prepara y otro que borra exactamente lo que ese preparó, escritos
+  con el plan y aprobados con él (D36). El mecanismo —API, SQL que corre el agente, SQL que
+  corre la persona— lo elige el usuario una vez y vive en el opt-in `Test data` del
+  documento de stack, no acá.
 - Cada historia tiene su archivo de pruebas en `testing/`, escrito **antes** de ejecutarlas
   (casos + datos + resultado esperado) y completado **después** (resultado obtenido). Un
   reensayo **agrega** una ejecución fechada; nunca pisa la anterior (13.5 #17).
@@ -506,6 +543,18 @@ una feature vive con su spec en `Plan/`.
   el router `nzt-architecture` en la fase 4, no el kernel. **Excepción: los documentos de
   UX** — design system e inventario de componentes compartidos — los define y mantiene
   `nzt-ux-system` (T13).
+- **Los dos logs append-only del proyecto son `Docs/history.md` y `Docs/releases.md`**, y
+  no se pisan: el primero es qué cambió el producto y por qué, una entrada por ciclo
+  cerrado (D25); el segundo, qué se desplegó y cuándo (T16). Ninguno de los dos lleva
+  checkboxes, y ninguno reemplaza al presente, que siempre vive en la spec.
+- **`tech-debt.md` es el único documento con estado abierto/resuelto**, y aun así sin
+  checkboxes: una entrada se mueve de sección (D29).
+- **El manual del usuario final es el único artefacto que lee alguien de afuera del equipo**,
+  vive en `Docs/manual/` y es **a pedido**; desde que existe, cada cierre de feature lo pone
+  al día como a cualquier otro documento (D37).
+- **Los `QT-NN` no tienen archivo propio**: viven en el documento de diseño que los va a
+  leer, y al responderse pasan a su sección `Decided` en el mismo archivo, con fecha
+  (D27 lo fija junto con los diagramas).
 
 ## 9. Estructura de este repositorio
 
@@ -860,6 +909,208 @@ que se tira.
   este CLI no escribió**, y una edición local del usuario se conserva incluso a través de
   reinstalaciones, porque el manifiesto guarda el último hash *instalado* y no el editado.
 
+Las siete siguientes salen de la segunda pasada sobre Temper (13.12), todas decididas por
+el usuario a partir de los huecos que esa pasada encontró.
+
+- **D25.** **El cierre de feature tiene hoja propia, `nzt-plan-close`, y produce
+  `Docs/history.md`.** El set ya prometía el barrido — `nzt-build`, `implement` y `remove`
+  delegaban los marcadores a *"whoever closes the feature"* y la spec lo nombraba dos veces
+  — y **ninguna de las 91 skills lo hacía**: era una referencia colgada, no una decisión.
+  Cuelga de `nzt-plan` y no de una fase porque **es transversal a todas**: barre los
+  marcadores de la spec, pasa la tabla de documentos afectados, escribe la historia y cierra
+  el estado. Lo dispara **la aceptación del usuario**, no que el código compile.
+  Consecuencias: `nzt-plan` gana su primera hoja, y el `history.md` es lo único que queda de
+  una regla que el barrido borra de la spec, así que la entrada se escribe **antes** de
+  reportar la feature como cerrada.
+- **D26.** **El modelo de dominio y el mapa de contextos son dos hojas y dos documentos**:
+  `nzt-architecture-domain` → `Docs/domain-model.md` y `nzt-architecture-contexts` →
+  `Docs/context-map.md`. El router ya declaraba poseer *"the domain model in technical
+  terms"* y el glosario ya mandaba el modelo a *"architecture's own document"*, pero
+  **ninguna hoja lo escribía**: `design-product` produce componentes y límites, y
+  `design-feature` solo datos por feature. Son dos y no una porque no entran en 200 líneas
+  (D3) y **son dos trabajos**: adentro de un contexto, el agregado; entre contextos, el
+  límite de significado. El de contextos **solo existe con más de un contexto o un
+  tercero**, y el de dominio se escribe **después de las specs que modela**, porque los
+  campos salen de los criterios.
+- **D27.** **Los diagramas son un catálogo cerrado de siete, en cuatro skills, y son
+  artefacto *ofrecido*.** `nzt-architecture-diagrams` decide cuál se gana y lleva las reglas
+  compartidas; las tres hojas que dibujan se agrupan **por documento anfitrión** —
+  `components` (contexto y componentes), `domain` (contextos acotados y agregados),
+  `behavior` (secuencia, estado y flujo) — y no una por tipo como Temper, porque cuatro
+  tipos por archivo entran en el techo y siete skills se pagan siete veces en R1. **Sin
+  sub-router**: las nombra el router de fase, como EF Core (D19), y cada hoja abre con su
+  línea de carga doble (D20). La regla que las hace usables la puso el usuario: **se ofrecen
+  cuando la charla las gana, diciendo qué muestran que la prosa no, y si no los quiere no se
+  dibujan.** Un diagrama que ya existe se mantiene con el cambio. En la misma decisión entra
+  el arreglo de los `QT-NN`: **una pregunta respondida pasa a `Decided` en su mismo
+  documento, con fecha, y no se borra** — eso da lo que Temper resolvía con un
+  `design-decisions.md` aparte, sin un archivo más.
+- **D28.** **Cambiar una feature que ya existe tiene hoja propia, `nzt-discovery-change`, y
+  un archivo temporal `Plan/specs/<feature>/change.md`.** Faltaba el paso previo: el set
+  tenía los marcadores `[modify]` y `[remove]` en build, pero **nadie explicaba quién los
+  pone**, y editar una spec es destructivo y sin undo. La propuesta es el área de staging
+  donde el usuario aprueba antes de tocar la fuente de verdad; se fusiona con marcadores y
+  **se borra en la misma unidad**. Con esto los marcadores tienen ciclo completo:
+  `change` los pone, `build` construye contra ellos y `close` (D25) los barre. Y queda
+  cerrada la regla que faltaba: **un `remove` deja un criterio que verifica la ausencia, y
+  ese test sobrevive al barrido**.
+- **D29.** **`Docs/tech-debt.md` cuelga de arquitectura y no lleva checkboxes.** Es técnico
+  —*"el caso de uso mezcla validación con persistencia"* no se escribe en lenguaje de
+  negocio— así que vive en `Docs/`, cuyo inventario es de esa fase. Contra Temper, **sin
+  checkboxes**: el avance en NZT se lee de los criterios de una historia, en un solo lugar
+  (T1), y una casilla acá sería un segundo lugar donde algo parece hecho; una entrada se
+  mueve de **Abiertas** a **Resueltas** y nada más. Y una regla que Temper deja implícita:
+  **una entrada nace cuando el usuario decide diferir**, no cuando el agente encuentra algo
+  — lo encontrado y no decidido vive en el reporte de la unidad.
+- **D30.** **La rama `analyze-*` de Temper no se porta como rama: se reparte por dueño.**
+  NZT no tiene fase de análisis técnico (4.4 decidió que el análisis funcional es una fase y
+  lo técnico se resuelve en su fase), así que las cuatro lecturas que faltaban entran donde
+  ya vive su trabajo: **`nzt-build-recon`** (relevamiento de impacto antes de tocar código
+  que existe: quién más lo consume, con evidencia), **`nzt-verify-review`** (defectos
+  leyendo código, que es lo que un escenario no encuentra porque la spec no lo cubre),
+  **`nzt-verify-audit`** (documentos contra código, con sus dos barridos y sus tres
+  veredictos) y **`nzt-architecture-review`** (mejoras estructurales sobre evidencia de
+  dependencias, historia de cambios y runtime). `analyze-reverse` ya estaba en
+  `nzt-discovery-reverse` y `analyze-verify` ya estaba repartido entre `nzt-verify` y el
+  readiness de `nzt-ship`. **Las dos de verify no necesitan aplicación corriendo**, y el
+  router lo dice para que no arrastren el freno del plan de pruebas.
+- **D31.** **`nzt-research` es hoja de primer nivel y la nombra el guardrail del kernel.**
+  El kernel ya tenía la regla —*"say what you checked, not what you believe"*— pero no el
+  método, que es lo que hace la diferencia: fijar la versión en uso antes de buscar,
+  la jerarquía de fuentes, y **etiquetar cada afirmación** (`documented` · `observed` ·
+  `inferred` · `unverified`). No cuelga de ninguna fase porque cualquiera la necesita, y no
+  paga ruteo por eso: **el guardrail que la nombra está en el archivo que siempre está en
+  contexto**, así que se descubre sin ocupar una fila de la tabla.
+- **D32.** **`development-testing-code-tests` se porta después de todo, como
+  `nzt-build-tests`, y el set queda en 106.** Era la única decisión que la segunda pasada
+  dejó abierta en vez de cerrada, y el usuario la cerró del otro lado. La razón que la tenía
+  afuera no era mala —lo que hace valioso a un test se repartía entre `nzt-build-tdd` y
+  `nzt-verify-test-design`— pero **los dos repartos son parciales**: `tdd` decide el *orden*
+  y es opt-in del stack, así que un proyecto que no lo eligió no ve nada; y
+  `verify-test-design` deriva casos de un criterio para el plan de pruebas de aplicación, no
+  para los tests que viajan con el código. Lo que quedaba sin hogar era el **criterio**: qué
+  se testea y qué no, las cuatro cualidades con la resistencia al refactor como no
+  negociable, estado sobre interacción, un solo Act y sin lógica adentro, flaky = defecto,
+  coverage como indicador y no objetivo, y **cuándo un cambio de comportamiento gana test**.
+  Tres cosas que esta hoja fija y que la fuente de Temper no podía fijar:
+  **(1) es de fase, no de stack**, así que **no lleva ejemplo de código** —la regla de 4.5:
+  ningún router ni hoja de fase asume .NET— y la práctica concreta sigue siendo del área;
+  **(2) la hoja de área la nombra en su línea de carga** (D20), que es lo que evita que un
+  proyecto .NET lea la práctica sin el criterio; **(3) el límite con `tdd` queda escrito en
+  las dos**: una decide el orden, la otra el valor, y el valor vale igual si el test se
+  escribe antes o después. El precio que 13.12 había aceptado —un proyecto que no es .NET sin
+  guía de tests— deja de pagarse, y el costo real son ~150 chars de listado.
+
+Las tres últimas las pidió el usuario después de leer el reporte de la segunda pasada.
+
+- **D33.** **Probar empieza por elegir el componente, y por chequear con qué se puede
+  probar.** Pedido del usuario: *"siempre que se pida hacer tests pregunte qué componente
+  queremos testear, si la api o el front, son distintas pruebas"*. Se resuelve **sin hoja
+  nueva**, como T7 resolvió la mecánica de ejecución: el router `nzt-verify` gana una
+  sección con la pregunta y una **tabla de tres filas —API, pantalla, las dos— que dice qué
+  ejercita cada objetivo y, sobre todo, qué *no* puede probar**; `test-design` dice cómo
+  cambia el caso según el objetivo (la técnica no cambia, lo observable sí); y `test-run`
+  cómo se maneja cada uno. Dos cosas que esto fija:
+  **(1) las opciones son las áreas que declara el stack** (T3), así que la pregunta se lee
+  del proyecto y no se inventa;
+  **(2) la capacidad del host se chequea antes de prometer**, y se escribe en capacidades y
+  no en productos —*driving a browser depends on the host offering a tool for it*— porque
+  una skill que asume una herramienta de un proveedor rompe la portabilidad (C1) y envejece
+  con él. Cuando no hay browser manejable, las salidas honestas son dos: **la corre el
+  usuario y el agente registra su evidencia como suya** —*executed by the user*, con fecha—
+  o queda `blocked` con esa causa. Inventar el equivalente por API y marcar el escenario de
+  pantalla como pasado es lo único prohibido, y ya era regla: *API evidence does not
+  establish that the UI works*.
+- **D34.** **La performance que se mide es la que espera el usuario: `nzt-verify-performance`.**
+  Es hoja de verify y no de build porque **mide contra un requisito y produce evidencia**,
+  que es el trabajo de esa fase; optimizar es de build, y la hoja lo dice. Lo que la hace
+  útil y no un juguete: **el número se compara contra el requisito no funcional de la
+  historia, y si no hay requisito lo que se produjo es una línea de base y el objetivo es una
+  pregunta para el usuario** — el agente nunca declara *"esto es lento"* por su cuenta.
+  Percentiles y no promedio, volumen de datos y entorno escritos al lado del número, frío y
+  caliente distinguidos, y una tabla de cuatro lugares donde se va el tiempo para **localizar
+  antes de proponer**. Incluye lo que el usuario pidió como *experiencia*: los tres estados
+  de una pantalla que carga, y que **una mejora percibida se registra como percibida y no
+  como aceleración** — un spinner hace legible la espera, no arregla la consulta. Se cierra
+  el ciclo en los dos extremos: el requisito lo escribe `nzt-discovery-write-spec` (ahora con
+  su condición: *a 5.000 órdenes*), y lo que solo aparece con tráfico real sigue siendo de
+  `nzt-ship-observability`.
+- **D35.** **El RFC es hoja de arquitectura y documento *a pedido*: `nzt-architecture-rfc`.**
+  Pedido del usuario para los cambios que hay que acordar con más gente que él. El corte con
+  el ADR es lo que justifica una hoja aparte y está escrito en las dos: **un RFC pregunta, un
+  ADR registra**; el RFC vive mientras la decisión está abierta y guarda la discusión, el ADR
+  se escribe cuando ya se tomó y guarda la decisión. **Un RFC aceptado produce su ADR** y el
+  ADR lo nombra; nunca se edita un RFC para convertirlo en registro, porque lo que conserva
+  —las objeciones con su autor— es justo lo que un ADR no conserva. Gana un RFC lo que cumple
+  **las tres**: caro de revertir, afecta a gente que no está decidiendo, y hay elección real
+  (con una sola opción es un anuncio, y un anuncio no necesita ventana de comentarios). Tres
+  reglas que lo hacen honesto: **la ventana es una fecha, no una sensación**; **un RFC que
+  nadie contestó no es consenso** y el resultado tiene que decirlo; y **el agente no es
+  participante** — resume posiciones, no las inventa, y la decisión del usuario nunca se
+  escribe como consenso. Mientras está abierto no se construye nada, y eso se registra en
+  `waiting_on` del estado.
+- **D36.** **Los datos de prueba son una hoja propia, con dos scripts por escenario:
+  `nzt-verify-test-data`.** Segundo hallazgo de usar el set, no de leerlo (13.5, segundo
+  hueco): el agente se frenó por falta de datos. 13.5 #31 ya obligaba a crearlos, pero no
+  decía **cómo**, y sin eso la obligación se cumple de cualquier forma o no se cumple.
+  Tres cosas quedan fijadas, y las tres salen del pedido del usuario:
+  **(1) el mecanismo lo elige él, una sola vez.** Se pregunta con el plan —no por escenario,
+  no en medio de una corrida— con una tabla de cuatro opciones que dice de cada una cuándo
+  es la más barata, qué **no** puede alcanzar y qué cuesta: la semilla que el proyecto ya
+  tiene, el alta por la API bajo prueba, SQL que corre el agente, SQL que corre la persona.
+  La respuesta se escribe como opt-in `Test data` en el documento de stack del componente
+  (T3 otra vez: lo que verify necesita saber del proyecto se lee del stack), y desde ahí se
+  lee.
+  **(2) Cada escenario tiene su par de scripts, escritos juntos y antes de correr**:
+  `data/<historia>/E-NN-setup.*` y `E-NN-teardown.*`, aprobados con el plan. El teardown se
+  escribe al mismo tiempo que el setup porque uno escrito después borra lo que el agente se
+  acuerda de haber creado. Y **borra por la marca que puso el setup** —un tag que el
+  escenario es dueño— nunca por fecha, nunca un `TRUNCATE`: el borrado ancho es el único
+  modo de falla de esto que se lleva trabajo ajeno puesto.
+  **(3) No poder ejecutar no es `blocked`.** Sin acceso al motor, el script se escribe igual
+  y se entrega: qué correr, contra qué entorno, qué devolver — y esa ejecución se registra
+  como del usuario, con fecha, igual que un escenario que corre él. Lo que sí se dice al
+  proponer SQL es su precio: escribir por detrás del producto puede crear una fila que sus
+  propias reglas nunca permitirían, y entonces el escenario prueba un estado que no puede
+  existir. Para un estado que el producto sí sabe producir, su punto de entrada es el script
+  más seguro. La verificación de la precondición después del setup cierra el círculo: un
+  setup que corrió no es un estado que existe, y el escenario que arranca sin su precondición
+  queda `blocked`, nunca `failed` — no se probó nada.
+- **D37.** **El manual del usuario final es hoja de UX: `nzt-ux-manual`.** Pedido del
+  usuario, con su filosofía explícita —*el software está pensado para el usuario final, hay
+  que hacerlo sentir especial*— y una pregunta abierta: cuándo se arma. Las tres cosas que
+  fija:
+  **(1) Es de UX y no de ship ni de discovery.** Es la única superficie del set que lee
+  alguien de afuera del equipo, usa el tema real de `Docs/design-system.md` —**nunca una
+  segunda paleta**, la misma regla del mockup y por la misma razón: un manual con su propia
+  identidad se lee como el documento de un tercero sobre tu producto— y su autoridad son los
+  criterios verificados. Ship lo publica (una fila más en la lista de alistamiento), verify
+  le presta la evidencia de donde salen las capturas.
+  **(2) Cuándo: un capítulo por feature cerrada, no al final del proyecto.** Contra la
+  intuición del usuario, y con razón: al cierre el comportamiento dejó de moverse, él ya lo
+  aceptó y la evidencia tiene días en vez de meses; dejado para el final se escribe de
+  memoria sobre decisiones que nadie recuerda y es lo primero que se recorta cuando el
+  proyecto se atrasa —además de que un producto que sigue saliendo nunca llega al final. El
+  primer cierre crea el armazón (audiencias, índice, camino *empezá acá*) y cada cierre
+  siguiente suma o corrige su capítulo. **Lo que el usuario intuía sí existe, pero es otra
+  cosa**: la pasada de coherencia antes de que el manual llegue a gente real —un release, una
+  entrega, una capacitación—, la única unidad cuyo sujeto es el archivo entero.
+  **(3) Qué lo hace ameno, escrito como reglas y no como gusto.** Capítulos que son objetivos
+  dichos como los diría la persona (*"Cobrar un pedido"*, nunca *"Módulo de cobros"*: un
+  manual ordenado como el menú es el índice del sistema, no el de ella); cada capítulo abre
+  con lo que va a tener al final; un paso, una acción, y qué se ve después; prohibido
+  `simplemente`, `obviamente` y `solo tenés que`, que el que está trabado lee como *el
+  problema sos vos*; **nada es culpa del lector** —lo que suele salir mal se escribe como
+  *esto pasa y así salís*, con el mensaje que va a ver de verdad—; y tampoco se lo
+  infantiliza: una línea al final de la tarea nombrando lo que logró vale más que un emoji
+  por título. Un archivo por audiencia, que abre de un pendrive sin red ni build, teclado y
+  WCAG 2.2 AA, capturas **de la evidencia y recortadas**, nunca inventadas, porque la mentira
+  visual es la que la gente cree. Y el freno que lo hace honesto: **solo se documenta lo que
+  existe y pasó verificación**; lo construido sin verificar no tiene capítulo, lo planificado
+  no tiene nada, y **ningún `TODO` llega a la página del usuario** — el hueco se le reporta a
+  quien pidió el manual. Como el mockup, es a pedido y **si no se va a mantener no se crea**:
+  vencido es el artefacto que más se cree justo porque parece terminado.
+
 ## 13. Revisión contra Temper v3
 
 Temper v3 (`../temper-ai-v3`) es un set SDD maduro y funcionando. NZT no lo copia: se
@@ -879,6 +1130,12 @@ Se hace **de a una fase**, con freno, no todo junto.
 | Ship | `ship-*` | ✅ revisada |
 | Profesor | `learning-*` | ✅ revisada |
 | Plan y estado | `workflow-plan`, el `state.json` de Temper, su modelo de autonomía | ✅ revisada |
+| **Segunda pasada** | todo lo que esta tabla no nombró: `analyze-*`, `sdd-diagrams-*`, `sdd-documents-write-{entities,context-map,tech-debt,history,delta,design-decisions}`, `sdd-workflow-close-feature` | ✅ 13.12 |
+
+**Esa última fila es el aprendizaje de la revisión**: revisar *por fase* deja afuera lo que
+no cuelga de una fase, y lo que no se mira no queda descartado — queda sin mirar. Las seis
+ausencias que encontró la segunda pasada (13.12) no eran decisiones tomadas: eran skills que
+nunca entraron a la tabla.
 
 ### 13.1 Adoptado de la revisión de arquitectura
 
@@ -1399,6 +1656,33 @@ de quien ejecuta, y por eso no se cumplió. En NZT se dice fuerte:
     el cajón donde termina todo lo incómodo y la corrida reporta verde sobre la mitad de los
     casos. Y los datos que se crean siguen las reglas que ya están: aislados, predecibles,
     con limpieza, y **sin tocar registros de usuarios reales salvo autorización explícita**.
+
+#### Segundo hueco usando NZT: obligar a crear los datos no dice cómo
+
+Los dos puntos de arriba se escribieron y **volvió a pasar lo mismo** en una sesión real con
+NZT puesto: el agente quiso probar casos para los que no tenía datos. #31 dice *creálos* y
+#32 dice *eso no es `blocked`*, pero ninguno de los dos dice **con qué mecanismo, ni quién lo
+decide, ni qué pasa después con lo que se creó** — y una obligación sin procedimiento se
+cumple distinto cada vez. Lo que agrega D36, en hoja propia (`nzt-verify-test-data`):
+
+33. **El mecanismo lo elige el usuario, una vez, con el plan.** Cuatro opciones con su costo
+    y su límite —la semilla que el proyecto ya tiene, el alta por la API bajo prueba, SQL que
+    corre el agente, SQL que corre la persona— y la respuesta vive como opt-in `Test data`
+    en el documento de stack del componente. Se pregunta una vez y después se lee. **Lo que
+    ya existe gana**: un insert a mano que duplica una factory se pudre en cuanto se mueve el
+    esquema.
+34. **Dos scripts por escenario, escritos juntos y antes de correr**: uno prepara, otro borra
+    exactamente lo que el primero creó, **por la marca que el setup puso**, nunca por fecha y
+    nunca un `TRUNCATE`. Un teardown escrito después de la corrida borra lo que el agente se
+    acuerda de haber creado; uno que puede vaciar una tabla la vacía. El setup es
+    re-ejecutable, los valores son los del criterio y no aleatorios, y lo compartido por
+    varios escenarios tiene su propio par a nivel historia.
+35. **El ciclo alrededor de la corrida**: correr el setup → **verificar la precondición en
+    vez de asumirla** (un setup que se ejecutó no es un estado que existe; si no está, el
+    escenario es `blocked` con esa causa y no `failed`) → correr el escenario → **correr el
+    teardown pase o falle** —el que falla es el que más deja atrás y el que todos olvidan— →
+    **registrar la limpieza**, y lo que no se pudo borrar queda escrito como deuda de datos
+    con su entorno y su marca, no en silencio.
 
 Las cuatro tensiones que abrió esta revisión — **T7 a T10** — están resueltas en 13.3.
 
@@ -2122,30 +2406,120 @@ respuesta a las dos mitades vuelve al kernel.
   de NZT, que rastrea a nivel unidad. Sí se adopta la idea de **registrar la autorización
   de tanda en el estado** en vez de confiar en la memoria de la conversación.
 
+Lo que la segunda pasada (13.12) decidió **no** portar, con su razón:
+
+- **Una skill por tipo de diagrama** (siete en Temper): se agrupan en tres por documento
+  anfitrión más el catálogo, por D3 y por R1 (D27).
+- **`integrations.md` como documento propio**: el mapa producto‑nivel es la tabla de
+  sistemas externos de `Docs/architecture.md`, ahora con `INT-NN` estable, y el contrato por
+  flujo vive en el diseño de la feature citando ese id. Un archivo más sería un tercer lugar
+  donde el mismo contrato se desincroniza.
+- **`design-decisions.md` como documento propio**: las preguntas técnicas viven donde la
+  fase las va a leer (13.1 #2), y al responderse pasan a `Decided` en el mismo archivo
+  (D27). Juntarlas en un archivo aparte las separa del documento que las necesita.
+- **`update-when` en todos los documentos**: solo los de UX lo llevan (T13). El barrido del
+  cierre no lo necesita porque el inventario de `Docs/` es corto y cerrado: la tabla de
+  `nzt-plan-close` lista qué documento mirar según qué cambió, y para los de UX manda leer
+  su `update-when` (D25).
+- **Historia de producto separada de la historia de feature**: un solo `Docs/history.md`
+  append-only, con la feature nombrada en cada entrada. Dos archivos con el mismo formato y
+  distinto alcance es una decisión sobre dónde escribir que nadie quiere tomar dos veces.
+
+### 13.12 Segunda pasada: lo que la primera revisión no minó
+
+La revisión de 13.1–13.10 se hizo **por fase**, y su tabla de fases nombraba qué skills de
+Temper minar en cada una. Lo que quedó afuera de esa tabla no se descartó: **no se miró**.
+Esta pasada lo miró, comparando las 122 skills de Temper contra las 91 de NZT **contenido
+contra contenido**, no por nombre.
+
+**Lo que dio bien, y no hay que revisar de nuevo.** La rama de desarrollo está completa: 49
+skills `development-*` → 49 `nzt-build*` con D32, y la diferencia de secciones por hoja es
+estructural (D3 y la regla 11 sacan *when to use*, *required guidance* y *related work*), no
+de contenido. Se verificaron a mano las fusiones (`ef-core-bulk`, `ef-core-domain`,
+`components`+`forms`) y las hojas que más encogieron (`repositories`, `performance`, `linq`,
+`csharp`): nada se perdió. También cerraron bien las fusiones de las otras ramas —
+`ui-components`+`visual-direction` → `nzt-ux-system`, `deployment-documentation` →
+`nzt-ship-release`, `application-execution` → `nzt-verify-test-run`, `story-report` →
+`nzt-plan`, `write-progress` → `nzt-learn-plan`, las tres de stack → `nzt-architecture-stack`.
+
+**Los seis huecos que encontró**, en orden de gravedad, y dónde quedaron resueltos:
+
+| Hueco | Qué era | Resuelto en |
+|---|---|---|
+| Nadie cerraba una feature | Tres skills delegaban el barrido a un cierre inexistente | D25 |
+| El modelo de dominio no tenía quién lo escribiera | El router lo declaraba suyo y el glosario lo mandaba a un documento sin autor | D26 |
+| Diagramas: permiso sin procedimiento | Tres párrafos contra 8 skills de Temper | D27 |
+| Cambiar una feature viva | Los marcadores existían; el paso que los pone, no | D28 |
+| La rama `analyze-*` nunca minada | Faltaban relevamiento, defectos por lectura, auditoría documental y review estructural | D30, D31 |
+| Documentos sin destino | `tech-debt.md`, `context-map.md`, `history.md`, `QT` decididas, `INT-NN` | D26, D27, D29, 13.11 |
+
+**Y una deuda vieja que esta pasada saldó**: la convención de comentarios de `nzt-build` era
+*"el único contenido que la revisión mandó escribir sin dictar"* y estaba pendiente desde el
+paso 2 de la sección 14. Contrastada contra `development-comment-conventions`, le faltaban
+las dos reglas que más pagan y se agregaron: **arreglar el nombre en lugar de comentarlo**, y
+**la spec no viaja al código** — ningún slug de regla, id de historia ni texto de requisito
+dentro de un comentario, porque es un segundo original que deriva en la primera edición. La
+versión anterior decía lo contrario (*"name its source (`Q-07`, `QT-03`)"*); ahora solo se
+nombra una fuente que **no se mueve**: un ADR, un id de defecto, el issue de un proveedor.
+
+**Lo que el usuario sumó después de leer el reporte** (D33–D35), que no son huecos de la
+comparación sino producto suyo: **elegir el componente a probar y chequear con qué se puede
+probar** (sin hoja nueva), **`nzt-verify-performance`** —la performance como la espera el
+usuario, medida contra su requisito— y **`nzt-architecture-rfc`**, el documento a pedido para
+lo que hay que acordar con más gente.
+
+**El costo de las dos tandas, medido:** el catálogo pasa de **91 a 108 skills** —14 de los
+seis huecos, `nzt-build-tests` por D32, y dos más por D34 y D35— y el listado de R1 de
+**17.816 a 20.467 caracteres**, 2,6× el piso de 8.000 de Codex. No es una sorpresa ni
+un cambio de categoría: C2 ya estaba desbordado y su modo de falla es **degradación en dos
+pasos** —primero acorta descriptions, después omite skills con un warning— y lo que tiene
+que sobrevivir son los routers, que las nombran. Las descriptions nuevas se escribieron
+apuntando a ~150 chars (D17) en vez de al techo de 250. **Lo que esto sí hace es subir la
+prioridad de la fase 9**: medir R1 en Codex con el catálogo completo dejó de ser una
+curiosidad.
+
 ## 14. Estado de la construcción
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
-**Dónde estamos, en una línea:** **el roadmap está construido entero — 91 skills, la suite de
-evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La
-revisión contra Temper terminó (ocho fases, 22 tensiones), su fase de aplicación también, y
-la capa de stack se cerró con sus tres áreas.
+**Dónde estamos, en una línea:** **el roadmap está construido entero — 110 skills, la suite
+de evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La
+revisión contra Temper terminó (ocho fases, 22 tensiones), su fase de aplicación también, la
+capa de stack se cerró con sus tres áreas, y **la segunda pasada (13.12) cerró los seis
+huecos que la primera no había mirado** con D25–D31: el cierre de feature, el modelo de
+dominio, los diagramas, el cambio a una feature viva, las cuatro lecturas de la rama
+`analyze-*` y los documentos sin destino. **D32 cerró además la única que esa pasada había
+dejado abierta** —el criterio genérico de tests, hoy `nzt-build-tests`— y **D33–D35 son lo
+que el usuario sumó después**: elegir el componente a probar con el chequeo de qué se puede
+probar, `nzt-verify-performance` y el RFC a pedido. **D36 y D37 son las dos últimas, y las
+dos salieron de usar el set**: los datos de prueba, con `nzt-verify-test-data` —mecanismo
+acordado una vez con el usuario y guardado en el opt-in `Test data` del stack, y un setup y
+un teardown por escenario, escritos antes de correr—, y el **manual del usuario final**, con
+`nzt-ux-manual`: hoja de UX, a pedido, un capítulo por feature cerrada y solo sobre
+comportamiento verificado.
 
-**No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25) están cerradas. Lo
-que puede reabrir una es la medición de la fase 9, y está dicho cuál: I4.
+**No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
+riesgos) están cerradas, y la última decisión de contenido la cerró D37. Lo que puede reabrir
+una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
+más urgente del roadmap**.
 
 **Lo que falta, en orden, al 2026-09-17:**
 
 1. **Instalar de verdad** — el usuario dijo que lo hace él. Nunca se ejecutó fuera de
-   destinos temporales.
-2. **Correr el resto de los evals.** Corrió `kernel-loaded` y pasó; faltan 12 casos.
+   destinos temporales. Son 19 skills más que antes: la instalación es la misma operación.
+2. **Medir R1 en Codex** (fase 9). Era el tercer punto y subió: el listado está en 20.765
+   caracteres, 2,6× el piso de 8.000, y **lo que no está verificado es si una skill omitida
+   del listado se puede seleccionar igual por nombre** (C2). De eso depende si el catálogo
+   puede seguir creciendo o si hay que empezar a fusionar hojas.
+3. **Correr el resto de los evals.** Corrió `kernel-loaded` y pasó; faltan 17 casos.
    **Conviene empezar por el grupo `stack`** (`--tag stack`), que son los cuatro de ejes
    excluyentes y donde vive el riesgo real del set — `routing` ya demostró que el andamio
-   anda. Presupuesto abajo.
-3. **Medir R1 en Codex** (fase 9), que después de instalar ya no necesita copia manual.
-4. **La deuda de la convención de comentarios de `nzt-build`** (al final de esta sección): su
-   disparador —*cuando se porten sus hojas*— se cumplió con la capa de stack terminada, y
-   quedó sin hacer. Es una unidad chica y es la única pendiente de escritura en todo el set.
+   anda. Los tres casos nuevos de 13.12 (`close-feature`, `diagram-offered`, `no-diagram`)
+   y los de D36 y D37 (`test-data`, `manual`) **nunca se corrieron**: su primera corrida es
+   de calibración.
+   Presupuesto abajo.
+4. **Nada pendiente de escritura.** La deuda de la convención de comentarios de `nzt-build`
+   —la única que quedaba— **se saldó en la segunda pasada** (13.12, último párrafo).
 
 **El repositorio ya es un repositorio.** `git` inicializado, remoto
 `https://github.com/Ezefeola/nzt-ai.git`, rama `main`, primer commit con 146 archivos.
@@ -2156,30 +2530,44 @@ qué contiene.
 
 **El instalador (fase 10) está construido**: `installer/src/Nzt.Cli`, consola .NET 10, sin
 dependencias, con el contenido embebido. **Instala global y sin plugins** (D24): bloque
-delimitado en `~/.claude/CLAUDE.md` y `$CODEX_HOME/AGENTS.md`, y las 91 skills aplanadas en
-`~/.claude/skills` y `~/.agents/skills`. `dotnet run --project installer/tests/Nzt.Cli.Checks`
+delimitado en `~/.claude/CLAUDE.md` y `$CODEX_HOME/AGENTS.md`, y las skills aplanadas —hoy
+105— en `~/.claude/skills` y `~/.agents/skills`. El contenido entra por glob del `.csproj`,
+así que una skill nueva no le toca una línea de código al instalador. `dotnet run --project installer/tests/Nzt.Cli.Checks`
 da **PASS: 43 installer checks** contra destinos temporales — incluida la que compara byte a
 byte el bloque del CLI contra el `dist/CLAUDE.md` del build, que es lo que mantiene a raya a
 I2. **Lo que todavía no pasó: instalarlo de verdad en esta máquina.** El `--dry-run` sobre el
 HOME real dice que en Claude Code serían 92 archivos nuevos, y que en Codex el `AGENTS.md`
 existente se actualizaría conservando su contenido y con backup.
 
-**La fase 6, en concreto.** `evals/` tiene **13 casos en tres grupos** contra
+**La fase 6, en concreto.** `evals/` tiene **18 casos en tres grupos** contra
 `dist/plugin/`, el set aplanado como plugin que ahora arma el build (D23, hechos de
 plataforma en C6):
 
-- **`routing/` (6)** — sub-disparo: un pedido dicho como lo dice un usuario llega al router
+- **`routing/` (10)** — sub-disparo: un pedido dicho como lo dice un usuario llega al router
   de fase correcto, y los frenos del kernel aguantan. Incluye `kernel-loaded`, el caso de
   humo que prueba que el `CLAUDE.md` sembrado llegó a la corrida —**si ese falla, ningún
   otro resultado significa nada**— y `learn`, que es la decisión de ruteo más difícil del
   set: tema técnico adentro de un proyecto .NET, y la única señal que lo cambia todo es
-  *aprender*.
+  *aprender*. Los dos de 13.12: **`close-feature`**, que siembra una feature aceptada con
+  sus marcadores puestos (fixture `feature-done.sh`) y mide que el cierre los reconozca sin
+  ofrecer borrar el test de la ausencia, y **`diagram-offered`**, que mide la regla que hace
+  usables a los diagramas: se ofrecen diciendo qué muestran, no se dibujan de prepo. **El de
+  D36 es `test-data`**, y es el único caso del set que mide un modo de falla observado dos
+  veces: se pide probar contra una base vacía, y lo que se mide es que los datos se creen en
+  vez de frenarse, que el mecanismo se pregunte y que cada escenario tenga su limpieza
+  acotada a lo que creó — con `blocked` y el borrado ancho como las dos formas de fallar. **El
+  de D37 es `manual`**: se pide *algo lindo e interactivo* para los operadores sobre la
+  feature ya verificada, y mide lo que separa un manual de una documentación —capítulos que
+  son tareas dichas como las diría la persona, un HTML que abre solo— con el recorrido
+  módulo por módulo y el capítulo sobre algo no verificado como las dos formas de fallar.
 - **`stack/` (4)** — los ejes excluyentes: el documento de stack elige uno y solo esa hoja
   carga. `endpoint-axis` dice *controller* en el pedido con `minimal-apis` en el stack;
   `not-dotnet` es *una carpeta instalada no es una autorización* vuelto medición.
-- **`restraint/` (3)** — sobre-disparo: una pregunta, un cambio de una palabra y un repo
-  que no es nuestro **no tienen que cargar nada**. Van con `arm: both` para que también
-  puntúen en el arm sin el set.
+- **`restraint/` (4)** — sobre-disparo: una pregunta, un cambio de una palabra, un repo que
+  no es nuestro y **un pedido que no gana ningún diagrama** no tienen que cargar nada. Van
+  con `arm: both` para que también puntúen en el arm sin el set; `no-diagram` suma un grader
+  de regex contra `flowchart`/`sequenceDiagram` en la respuesta, porque el modo de falla del
+  catálogo nuevo es dibujar sin que nadie lo haya pedido.
 
 **La primera corrida se hizo el 2026-09-17** — `kernel-loaded`, 3 corridas, sin arm de
 ablación, 247s, **US$ 0,94** — y contestó las dos preguntas que bloqueaban todo lo demás:
@@ -2196,8 +2584,8 @@ ablación, 247s, **US$ 0,94** — y contestó las dos preguntas que bloqueaban t
   tiempo. **Reconfirmado después del arreglo: `kernel-loaded` da 1,00** (1 corrida, 119s,
   US$ 0,30), sin tocar el techo de turnos.
 
-**Lo que eso deja medido para planificar:** una corrida de un caso son ~US$ 0,31. Los 13
-casos a 3 corridas **con** arm de ablación son **~US$ 24**; con `--ablation none`, la mitad.
+**Lo que eso deja medido para planificar:** una corrida de un caso son ~US$ 0,31. Los 18
+casos a 3 corridas **con** arm de ablación son **~US$ 34**; con `--ablation none`, la mitad.
 Conviene correr por grupo (`--tag`) y no la suite entera de una.
 
 De las 44 unidades del catálogo original — 35 del modo construcción, 8 de la rama profesor,
@@ -2232,6 +2620,25 @@ set nombra hoy una skill que no exista** — se verifica cruzando las referencia
    loop— y nada más; cada hoja la nombra en su línea de carga (D20).
 5. ✅ **`testing`** y **`security`**.
 6. ✅ El área de **Blazor** (D21) y **`nzt-ship-backend-dotnet`** con sus cuatro hojas (D22).
+
+**La segunda pasada sumó 17 skills y el set quedó en 108** (13.12, decisiones D25–D35). En
+el orden en que se escribieron, que es por dependencia: las cuatro de diagramas primero
+—catálogo y después las tres que dibujan—, porque los dos documentos nuevos las citan;
+después `domain` y `contexts`, que son los destinos que faltaban; `tech-debt` y `review`;
+`plan-close`, que necesita nombrar todo lo anterior en su tabla de barrido;
+`discovery-change`, que cierra el ciclo de los marcadores con el cierre; `build-recon`,
+`verify-review`, `verify-audit`, `research` y, al final, `build-tests` (D32). **Los enganches
+se hicieron en la misma tanda** y son lo que evita que quede otra referencia colgada: el
+kernel nombra `nzt-research` en su guardrail de evidencia externa, `nzt-plan` nombra el
+cierre en sus reglas y en sus unidades típicas, los routers de arquitectura, discovery, build
+y verify listan sus hojas nuevas, `implement` y `remove` dicen quién pone y quién barre cada
+marcador, el glosario apunta a `domain-model.md` con nombre, `design-product` y
+`design-feature` ganaron `INT-NN`, su sección `Decided` y el puntero a los diagramas, y
+**`nzt-build-tests` quedó nombrada en los cuatro lugares que la necesitan**: el router de
+build (fila y línea de límite), `implement` en el paso donde un cambio gana su test, `tdd`
+con el corte orden/valor, y la hoja de área de .NET en su línea de carga doble (D20). **Ninguna skill del set nombra
+hoy una skill que no exista**, verificado igual que antes: cruzando las referencias `nzt-*`
+contra los paths del árbol.
 
 **Lo que sigue**, en el orden en que conviene hacerlo:
 
@@ -2296,9 +2703,10 @@ dejó afuera:
   entra en el plan, **un entorno compartido es `nzt-ship-release`** y nombra el entorno. Es
   la regla de autorización de `nzt-ship`, aplicada, no una nueva.
 - **La hoja de `testing` es solo la práctica .NET.** Lo que hace valioso a un test no vive
-  ahí: la disciplina test-first está en `nzt-build-tdd` y cómo un criterio se convierte en
-  casos, en `nzt-verify-test-design`. Temper tiene además `development-testing-code-tests`;
-  NZT no la porta y la hoja de área no la reemplaza.
+  ahí: la disciplina test-first está en `nzt-build-tdd`, cómo un criterio se convierte en
+  casos, en `nzt-verify-test-design`, y **el criterio genérico está en `nzt-build-tests`**,
+  que la hoja de área nombra en su línea de carga. *(Cuando se escribió esto, esa hoja no
+  existía y el hueco quedó registrado como decidido; lo cerró D32.)*
 
 **El área de Blazor salió de `development-frontend-blazor*`** (9 skills en Temper → router +
 9 hojas acá, D21) **y la de ship de `ship-dotnet-*`** (4 en Temper → router + 4 hojas, D22).
@@ -2401,6 +2809,11 @@ skills/nzt/ship/backend/dotnet/  → nzt-ship-backend-dotnet (51) — router de 
                                      pipeline (62), observability (52)
 91 skills · ~17.634 chars de listado  ← arriba del piso; con C2 eso es degradación, no corte,
                                         y los 11 routers son lo que debe sobrevivir
+
+segunda pasada (13.12, D25–D35): +17 skills, ninguna de stack
+108 skills · 20.467 chars de listado  ← 2,6× el piso
+D36: +1 (nzt-verify-test-data) · D37: +1 (nzt-ux-manual)
+110 skills · 20.765 chars de listado  ← el número de hoy, 2,6× el piso
 ```
 
 **Modo de trabajo acordado (opción B):** primero se revisa **todo** contra Temper v3 fase
@@ -2467,8 +2880,8 @@ Lo que eso cambia y lo que no:
 - **Cambia** que el núcleo instalado solo —el caso de un proyecto que no es .NET, y el del
   modo profesor— entra en Codex incluso sin contexto conocido.
 - **No cambia** que el catálogo completo no entra: ya no es proyección — **el set completo
-  mide 17.634 chars con 91 skills** (12), 2,2× el piso. La mitigación sigue siendo la de 12 y
-  lo que queda por decidir es I4.
+  medía 17.634 chars con 91 skills** (12), 2,2× el piso, y **hoy mide 20.765 con 110**
+  (13.12 + D36 + D37), 2,6×. La mitigación sigue siendo la de 12 y lo que queda por decidir es I4.
 - **No cambia** que la fase 9 es la que decide. El piso de 8.000 es el caso sin contexto
   conocido; el presupuesto real de 2% hay que medirlo en Codex, y esa medición **la tiene
   que correr el usuario**, porque requiere Codex CLI instalado con el set copiado.
@@ -2531,10 +2944,12 @@ Lo que eso cambia y lo que no:
    de artefactos, presentación del plan (markdown sin bloque de código, el *por qué* por
    paso, las tres declaraciones), aprobación y autonomía, la disciplina de preguntas con sus
    tres lugares y las dos salidas de una pregunta escrita, el bloque de conflicto, el orden
-   del freno y los cuatro campos del reporte (T21), y la reconciliación al retomar. **194
-   líneas**: es el archivo más grande del set y le quedan 6 de margen bajo el techo de D3.
-   Lo próximo que quiera entrar ahí no sube el techo ni se va a `references/` (D4): o se
-   comprime, o significa que `nzt-plan` está haciendo dos trabajos.
+   del freno y los cuatro campos del reporte (T21), y la reconciliación al retomar. Salió en
+   **194 líneas** y la segunda pasada le sumó 4 (el cierre como unidad y como regla, D25):
+   **198, con 2 de margen bajo el techo de D3.** Es el archivo más grande del set y el único
+   que ya no tiene lugar. Lo próximo que quiera entrar ahí no sube el techo ni se va a
+   `references/` (D4): o se comprime, o significa que `nzt-plan` está haciendo dos trabajos —
+   y el candidato natural a salir es el bloque de preguntas, que es lo más autónomo.
 4. ✅ **Las hojas**, de a una por unidad, con el catálogo en 36 más 8 de la rama
    profesor. **Escritas 37 de 44: los dos modos están completos.** Las seis ramas:
    `nzt-discovery` (`analysis`, `write-spec`, `write-stories`, `product`, `glossary`,
@@ -2580,10 +2995,13 @@ estado (#8), el bug de tres estados (#19) y **la generación de datos de prueba 
 #32)** — el único punto de toda la revisión que sale de usar Temper y no de leerlo: el
 agente frenó por falta de datos que él mismo podía crear.
 
-**Deuda que dejó el paso 2, para mirar cuando se escriban las hojas:** la convención de
-comentarios del router `nzt-build` es el único contenido que la revisión mandó escribir sin
-dictar; salió redactada de cero y conviene revisarla contra el árbol `development-*` de
-Temper cuando se porten sus hojas.
+**Deuda que dejó el paso 2 — saldada el 2026-09-17.** La convención de comentarios del
+router `nzt-build` era el único contenido que la revisión mandó escribir sin dictar, y se
+contrastó contra `development-comment-conventions` en la segunda pasada: le faltaban
+*arreglar el nombre en lugar de comentarlo* y *la spec no viaja al código*, y la línea que
+invitaba a citar un `Q-NN` o un `QT-NN` adentro de un comentario se reemplazó por la regla
+correcta — solo se nombra una fuente que no se mueve (13.12, último párrafo). **No queda
+contenido pendiente de escritura en el set.**
 
 ## Fuentes
 

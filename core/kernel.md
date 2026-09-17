@@ -91,7 +91,7 @@ continuing inside a phase whose router is already loaded in this session.
 | Building, changing or executing the plan | `nzt-plan` |
 | Functional analysis: requirements, business rules, scope, specs | `nzt-discovery` |
 | How to solve it: components, stack, technical design | `nzt-architecture` |
-| Screens, flows, visual and interaction design | `nzt-ux` |
+| Screens, flows, visual design, and the end user's manual | `nzt-ux` |
 | Writing or changing code against specs | `nzt-build` |
 | Designing or running tests, recording evidence | `nzt-verify` |
 | Versioning, CI/CD, releasing, deploying | `nzt-ship` |
@@ -109,7 +109,7 @@ named it. Each router says where its artifacts land; the kernel does not keep a 
 - **Say what you checked, not what you believe.** How an external system, API, library or
   standard behaves is verified in its authoritative source, and the source is named, before
   it enters a proposal, a design or the code. What you could not verify you call
-  unverified: memory is not evidence.
+  unverified: memory is not evidence. `nzt-research` has the method.
 - **Evidence is not a decision.** Specs are the expected behavior; code is evidence of the
   actual one. An observation never silently becomes a business rule. Keep the user's
   decisions, your own in-scope ones, your proposals and your observations distinguishable.

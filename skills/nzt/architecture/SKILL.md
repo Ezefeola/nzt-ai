@@ -11,9 +11,10 @@ structure, and it records why.
 ## Boundaries
 
 **Owns:** components and their boundaries, stack and technology choices, the domain model
-in technical terms (entities, aggregates, value objects), persistence, consistency,
-integrations and contracts, cross-cutting concerns, decision records, and the inventory of
-`Docs/` — which documents exist and when each one is created.
+in technical terms (entities, aggregates, value objects), the cut into contexts,
+persistence, consistency, integrations and contracts, cross-cutting concerns, decision
+records, deferred technical work, the diagrams of all of it, and the inventory of `Docs/` —
+which documents exist and when each one is created.
 
 **Does not own:** business rules (`nzt-discovery`), screen design (`nzt-ux`), writing the
 code (`nzt-build`). Two sets of `Docs/` files are not yours either: the UX documents —
@@ -33,7 +34,17 @@ already loaded — the table below does not mean load every row.
 | The product's structure: components, boundaries, external systems | `nzt-architecture-design-product` |
 | One component's adopted technologies, versions and areas | `nzt-architecture-stack` |
 | One feature's technical design: flows, data, integrations | `nzt-architecture-design-feature` |
+| The entities of the business, their fields and their aggregates | `nzt-architecture-domain` |
+| More than one context, or meaning shared with a third party | `nzt-architecture-contexts` |
 | A consequential decision with alternatives and consequences | `nzt-architecture-adr` |
+| A decision that needs agreement from people outside this conversation — **on request** | `nzt-architecture-rfc` |
+| Technical work found and deliberately deferred | `nzt-architecture-tech-debt` |
+| Judging an existing structure against evidence, not designing one | `nzt-architecture-review` |
+
+**A diagram is never drawn from habit.** When a document of this phase earns one, load
+`nzt-architecture-diagrams`: it decides which of the seven is earned, offers it, and names
+the skill that draws it. A diagram the user does not want is not drawn, and the prose
+carries the weight alone.
 
 ## When to skip this phase
 
@@ -48,11 +59,20 @@ decision record.
 
 ## Where it lands
 
-- Components, boundaries and the reasoning behind them → `Docs/architecture.md`
-- Decision records → `Docs/adr/`
+- Components, boundaries, external systems and the reasoning behind them →
+  `Docs/architecture.md`
+- The entities of the business, with their aggregates when the stack says so →
+  `Docs/domain-model.md`
+- The contexts, their dependencies and the domain events → `Docs/context-map.md`, only when
+  there is more than one context or a third party
+- Decision records → `Docs/adr/` · proposals still being agreed → `Docs/rfc/`, on request ·
+  deferred technical work → `Docs/tech-debt.md`
 - One stack document per component and area → `Docs/<area>-stack-<component>.md`
 - A feature's technical design → `Plan/specs/<feature>/design/design.md`, with any contract
   or diagram it needs beside it in the same folder
+- A review's findings go in its report, and land where each one belongs: an ADR, an entry
+  of deferred work, or a proposal back to the product design. It writes no document of its
+  own.
 
 ## Rules
 
@@ -71,14 +91,20 @@ decision record.
   nobody asked for is cost with no buyer.
 - A decision that is expensive to reverse gets an ADR: the alternatives considered, what
   was chosen, what it costs. A decision nobody can reconstruct gets relitigated every
-  quarter.
+  quarter. **One that also has to be agreed by people outside this conversation goes through
+  an RFC first**, and nothing is built while that RFC is open.
 - Respect what exists. In an existing system the current structure is a constraint and a
   source of information, not an accident to correct in passing.
 - A technical question that belongs to this phase is written here with a stable `QT-NN`
   before it is asked. One that belongs to a later phase is written where that phase will
   read it, and is not decided early.
+- **An answered `QT-NN` is not deleted: it moves to `Decided`, with its answer and its
+  date, in the same document.** Open and decided together are this phase's record of what
+  was settled; a question that disappears once it is answered leaves the next reader
+  deciding it again, and nothing says it was ever asked.
 - A version or a capability is verified in the project's own evidence — the manifest, the
-  configuration, the SDK pin — not inferred from what compiles or from what is newest.
+  configuration, the SDK pin — not inferred from what compiles or from what is newest. How
+  an external system behaves is verified in its own documentation: `nzt-research`.
 
 ## Done when
 

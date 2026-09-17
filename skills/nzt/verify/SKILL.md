@@ -11,10 +11,12 @@ tried, with what data, what was expected, and what actually happened.
 ## Boundaries
 
 **Owns:** the application-level test plan, its execution, the recorded evidence, the
-defects found, and the end-to-end regression derived from approved scenarios.
+defects found, the end-to-end regression derived from approved scenarios, and the two
+readings that need no run: code read for defects, and documents measured against the code.
 
-**Does not own:** the automated tests that ship with the code, and fixing a defect — both
-are `nzt-build`. This phase finds it, records it, and is the one that closes it.
+**Does not own:** the automated tests that ship with the code (`nzt-build-tests`), and fixing
+a defect — both are `nzt-build`. This phase finds it, records it, and is the one that closes
+it.
 
 ## Required guidance
 
@@ -27,10 +29,42 @@ the table below does not mean load every row.
 | The unit is | Load |
 |---|---|
 | Deriving the scenarios a story needs, before running any | `nzt-verify-test-design` |
+| Creating the data a scenario needs, and undoing it afterwards | `nzt-verify-test-data` |
 | Running scenarios and recording what happened | `nzt-verify-test-run` |
 | Exploring under a charter to find what scripted cases miss | `nzt-verify-explore` |
+| Measuring whether it is fast enough for the user, and where the time goes | `nzt-verify-performance` |
 | Automating an approved scenario that already passed by hand — **stack opt-in** | `nzt-verify-automate` |
+| Reading code for defects nobody specified a case for | `nzt-verify-review` |
+| Checking whether the documents still match the code | `nzt-verify-audit` |
 | Recording a defect: reproduction, evidence, impact | `nzt-verify-bug` |
+
+The last three need no running application: they read. The others are the plan, its
+execution and its evidence, and they do not start before the two stops below.
+
+## Which component, and with what
+
+**Ask what is being tested when the request does not say it.** *"Test the order listing"*
+does not say whether the subject is the API's rules or the screen the operator uses: they
+are different scenarios, different evidence, and they prove different things. The options
+are the **areas the stack declares** — the same closed list the criteria use to mark
+coverage — so this is read, never invented.
+
+| The target | What its scenarios exercise | What they cannot prove |
+|---|---|---|
+| The API, driven directly | rules, validations, permissions, contracts, error shapes, what was persisted | that any screen calls it, renders it, or lets the user reach it |
+| The screen, driven as a user | the user's task end to end, its loading, empty and error states, what is actually reachable | that the rule holds for a client that is not this screen |
+| Both, on the same case | that the two agree — the expensive one, kept for the flow that matters | |
+
+**Then check what this session can actually drive, before promising it.** An HTTP client and
+a terminal are almost always available; **driving a browser depends on the host offering a
+tool for it** — a browser-automation integration, when the environment has one. Say which
+one you will use, in the plan, for each target.
+
+If nothing here can drive a browser, the screen scenarios have two honest exits and no
+third: **the user runs them and you record the evidence they bring**, or they are `blocked`
+with that cause while the API scenarios continue. **A UI scenario is never marked passed on
+API evidence**, and a plan that quietly turns a frontend scenario into an API call is
+reporting something nobody asked for.
 
 ## The stop that comes first
 
@@ -38,14 +72,22 @@ the table below does not mean load every row.
 authorises writing the plan; it does not skip that stop. The approval is then reused for
 the whole plan — you do not ask scenario by scenario.
 
-The plan declares, per scenario, its **material effects** (payments, messages, deletions)
-and **how its data is obtained**. An unknown destination or a missing authorisation blocks
-that scenario; the rest continue.
+The plan declares, per scenario, **which target it runs against and with what**, its
+**material effects** (payments, messages, deletions) and **how its data is obtained**. An
+unknown destination or a missing authorisation blocks that scenario; the rest continue.
+
+**The data mechanism is agreed there too, once.** Creating it through the API under test,
+running SQL against the engine yourself, or handing the user a script to run are different
+costs and different risks, and which one this project wants is the user's decision — asked
+with the plan, recorded in the component's stack document, and read from then on.
+`nzt-verify-test-data` has the options and what each one cannot reach.
 
 ## One unit
 
 One story's test set: design it, run it, record it. Not "test the feature" — a feature with
-four stories is four units. One exploratory session is one unit, and so is one bug.
+four stories is four units. One exploratory session is one unit, and so is one bug, one
+code reading, one document audit and one performance measurement, each with its cut agreed
+before it starts.
 
 ## Where it lands
 
@@ -53,7 +95,9 @@ four stories is four units. One exploratory session is one unit, and so is one b
   running: cases, data, expected result. Completed **after**: actual result.
 - Index, mandatory from the second story with tests →
   `Plan/specs/<feature>/testing/README.md`: last run, result, open bugs, criteria with no
-  scenario, and what is automated.
+  scenario, what is automated, and any data left behind by a cleanup that did not run.
+- Data scripts, one setup and one teardown per scenario →
+  `Plan/specs/<feature>/testing/data/<story>/`
 - Evidence, per run, in its own folder → `Plan/specs/<feature>/testing/evidence/`
 - One file per defect → `Plan/specs/<feature>/testing/bugs/BUG-NNN-<slug>.md`
 
@@ -65,11 +109,13 @@ four stories is four units. One exploratory session is one unit, and so is one b
   analysis, not a decision you make while testing.
 - **Closed status vocabulary**: `pending`, `passed`, `failed`, `blocked`. `blocked` always
   carries its cause. Without a closed vocabulary, "it mostly worked" gets into the document.
-- **You generate the test data.** Creating a scenario's preconditions is part of running it:
-  through the same entry point under test, through the API, or through whatever seeding
-  mechanism the project has. *"I have no expired coupon to test with"* is not a result — it
-  is a coupon to create. Data you create is isolated, predictable and cleaned up, and it
-  never touches real users' records without explicit authorisation.
+- **You generate the test data, with the mechanism the user chose.** Creating a scenario's
+  preconditions is part of running it. *"I have no expired coupon to test with"* is not a
+  result — it is a coupon to create. **Every scenario that needs data gets two scripts,
+  written before the run: one that prepares it and one that deletes exactly what the first
+  one created**, because data nobody agreed to keep is data somebody else will trip over.
+  Data you create is isolated, predictable and undone, and it never touches real users'
+  records without explicit authorisation.
 - **`blocked` is for what you cannot resolve, not for what you did not think to create.** A
   missing tool, a missing account, a missing authorisation for a material effect, an
   environment that does not exist: that is blocked. Data you could have created inside the
@@ -102,10 +148,15 @@ not be run is reported as not run, with its reason.
 
 ## Closing checklist
 
-- [ ] Plan written and approved before execution.
+- [ ] Plan written and approved before execution, naming each scenario's target.
+- [ ] Data mechanism agreed with the user and recorded in the stack document.
+- [ ] Every scenario that needed data has its setup and teardown scripts, and every teardown
+      that did not run is recorded as data debt.
+- [ ] What this session can drive was checked, and no screen scenario was resolved with API
+      evidence.
 - [ ] Every scenario has a status from the closed vocabulary.
 - [ ] Every `blocked` carries a cause you genuinely could not resolve.
 - [ ] Criteria with no scenario listed in the index.
 - [ ] Evidence saved per run and referenced from the results table.
 - [ ] Bugs filed with their state, and none of them silently fixed here.
-- [ ] Index updated: last run, result, open bugs, what is automated.
+- [ ] Index updated: last run, result, open bugs, what is automated, data left behind.

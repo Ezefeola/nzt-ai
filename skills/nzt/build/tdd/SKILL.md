@@ -10,6 +10,10 @@ it, and the existence of tests in the repository is not a decision to work this 
 stack does not say test-first, build the story with `nzt-build-implement` and write the
 tests that ship with the code.
 
+**This leaf decides the order, never the value.** What is worth testing, what gets
+substituted and what makes a test survive a refactor is `nzt-build-tests`, and it holds
+whether the test comes first or last.
+
 If you did not arrive here from `nzt-build`, load it first.
 
 ## The cycle

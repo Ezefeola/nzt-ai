@@ -99,6 +99,11 @@ rules once looking only for what can go wrong.
 **Expected result, never mechanism.** *"The listing loads in under 2 seconds"* is spec;
 *"we use Redis"* is architecture, and it does not go in this file.
 
+**A number written here is a number somebody measures** — `nzt-verify-performance` measures
+against it, and without it a measurement can only ever be a baseline nobody can call good or
+bad. So write the number with the condition that makes it meaningful: *at 5.000 orders*,
+*on the shared environment*.
+
 - Watch for the ones that sound technical and are not: *"only the owner can see their
   order"* is a business rule, and it belongs with the rules.
 - A number the user did not give you is not a requirement. Ask for it, or write what was

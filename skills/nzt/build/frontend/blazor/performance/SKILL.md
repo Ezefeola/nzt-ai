@@ -15,6 +15,10 @@ subtree**.
 > **Measure before and after.** Optimising by intuition here reliably makes the code harder to
 > read and no faster.
 
+The number the user actually waits for, and the requirement it is measured against, come from
+`nzt-verify-performance`. This leaf is what you do **after** that measurement located the cost
+in the render.
+
 Load `nzt-build-frontend-blazor` before applying this.
 
 ## What actually causes a rerender

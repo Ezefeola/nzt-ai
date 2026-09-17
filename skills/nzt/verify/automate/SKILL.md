@@ -36,8 +36,11 @@ The same rules as running by hand, because it is the same act, delegated:
   restyle and teaches the team to distrust the suite.
 - **Wait for observable conditions**, never for fixed time. A sleep is a flaky test with a
   delay fuse.
-- **Each test creates the data it needs and does not depend on another test's leftovers.**
-  Order-dependent suites fail in whatever order the runner picks tomorrow.
+- **Each test creates the data it needs and removes it afterwards, and does not depend on
+  another test's leftovers.** Order-dependent suites fail in whatever order the runner picks
+  tomorrow. The manual scenario already has its setup and teardown
+  (`nzt-verify-test-data`): port them into the test's own hooks instead of inventing a
+  second way to seed the same rows.
 - Assert the scenario's expected result, the one the plan wrote — not what the application
   happens to produce today.
 

@@ -58,6 +58,9 @@ Each point declared, not assumed:
   reads them.
 - Health checks and telemetry already instrumented.
 - **Rollback plan written.**
+- **The user's manual current for what this release changes**, if the product has one. It
+  reaches the person before the feature does, and a manual describing the previous version
+  generates the support call the manual existed to prevent.
 - **Observation plan**: which signals, against which baseline, for how long, with which
   threshold.
 

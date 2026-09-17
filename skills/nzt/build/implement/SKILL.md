@@ -13,7 +13,9 @@ If you did not arrive here from `nzt-build`, load it first.
 ## Before writing code
 
 Read the story and the rules it cites, the feature design if it has one, and the stack
-document of the component and area you are touching. Reuse what is already loaded.
+document of the component and area you are touching. Reuse what is already loaded. **When
+the change lands on code nobody can describe from memory, the survey comes first**:
+`nzt-build-recon`, and its risks are what the plan cuts the work by.
 
 - **The stack is the operating memory.** It is read before choosing a technology or a
   pattern, so the repository does not get rediscovered on every task. A missing technical
@@ -33,7 +35,9 @@ document of the component and area you are touching. Reuse what is already loade
 2. Implement each one **where the design says the rule is enforced**. If the design does
    not say, and the answer is structural, that is a design gap: raise it, do the rest.
 3. Verify what you changed. Compile what is affected, and run the checks the change
-   justifies.
+   justifies. **Behavior that changed earns its automated tests** — `nzt-build-tests` says
+   which and what makes them worth keeping — unless the stack decided against them, and then
+   say what is left uncovered.
 4. Mark coverage on the criteria you built **and ran**.
 5. Report what exists now, what is left, and what you could not verify.
 
@@ -62,13 +66,17 @@ from.**
 ## Change markers
 
 They have fixed meanings, and they survive until the feature is closed — whoever
-implements does not clear them:
+implements does not clear them, and `nzt-plan-close` is what sweeps them:
 
 | Marker | What it means |
 |---|---|
 | `[modify]` | **Replace** the old behavior, not add a parallel path beside it |
 | `[remove]` | Take it out. The sweep is `nzt-build-remove`'s job |
 | `[SPEC-CONFLICT]` | The spec contradicts itself and you found it while building |
+
+The first two arrive with an approved change — `nzt-discovery-change` put them there — so a
+marker is authorisation, not a suggestion. **You never add one yourself**: if the spec
+should change, that goes through discovery.
 
 On `[SPEC-CONFLICT]`: emit it, pause what depends on it, keep building the rest. It is
 resolved with the user, never by picking one reading quietly.
@@ -105,7 +113,9 @@ are the one who fixed it. Report the fix and let that phase move its state.
 
 - No criterion, no code — except authorised setup, and repairs to your own change.
 - A defect you introduced is repaired and verified in the same unit, without asking.
-- Something you find outside the scope is **reported, not implemented**.
+- Something you find outside the scope is **reported, not implemented**. If the user decides
+  to leave it, it becomes an entry in `Docs/tech-debt.md`; undecided, it stays in the report
+  and nowhere else.
 
 ## Closing
 

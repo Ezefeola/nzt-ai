@@ -21,8 +21,12 @@ One of these is enough:
 - **It was contested.** Two defensible answers, and the reasoning is what makes the choice
   legible later.
 
-What does not: anything reversible in an afternoon, and anything the stack document already
-records. A row in `Docs/<area>-stack-<component>.md` saying `Endpoints: minimal APIs` needs
+**If the decision also needs agreement from people who are not in this conversation, the
+RFC comes first** (`nzt-architecture-rfc`) and this record is what its acceptance produces —
+with the options already argued there, and naming it.
+
+What does not earn a record: anything reversible in an afternoon, and anything the stack
+document already records. A row in `Docs/<area>-stack-<component>.md` saying `Endpoints: minimal APIs` needs
 no ADR unless choosing it cost something worth remembering.
 
 ## The file

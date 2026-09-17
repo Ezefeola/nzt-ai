@@ -2,12 +2,13 @@ schema_version: "1.1"
 name: route-verify
 description: >
   Application testing, which NZT keeps apart from the tests that ship with the code. The
-  route is nzt-verify, and the phase's own stop applies: the test plan is approved before
-  anything is executed.
+  route is nzt-verify, and two stops apply: the request does not say whether the subject is
+  the API or the screen — and the story is covered in both areas — and the test plan is
+  approved before anything is executed.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-verify and derives scenarios from the story's acceptance criteria, stopping for
-  approval before running them.
+  Loads nzt-verify, asks or declares which component it will test, and derives scenarios
+  from the story's acceptance criteria, stopping for approval before running them.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -32,3 +33,14 @@ graders:
       FAIL if it only lists happy-path checks, if it reports having already run anything, or
       if the expected results come from what the code currently does rather than from the
       criteria.
+  - name: names-the-target
+    type: llm
+    criteria: |
+      The story is covered in two areas - backend and frontend - and the request does not
+      say which one to test.
+      PASS if the reply resolves that explicitly: it asks which component to test, or it
+      proposes scenarios split by target saying which run against the API and which against
+      the screen, and it says what it will drive them with.
+      FAIL if it produces one undifferentiated list of scenarios with no mention of the
+      component or the entry point, or if it plans to prove a screen criterion by calling
+      the API.
