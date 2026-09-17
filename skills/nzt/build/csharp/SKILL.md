@@ -40,6 +40,20 @@ language: **you are the boundary where the term lands in English code.**
   the compiler resolves the name to the namespace, which makes the type impossible to
   import. For an `Order` type the folder is `Orders`.
 
+## Members in one order, and each group together
+
+Inside a type: **nested types · constants and static fields · instance fields ·
+constructors · properties · methods**, public before private. Each group is contiguous.
+
+**A member added later joins its group.** Declaring it beside the method that uses it, or at
+the end of the file because that is where the file ended, scatters a type's state through
+its behaviour — and it is the most common way this order breaks, because the member is
+usually written in the same edit as the method that needed it. **Adding a member is not
+appending to the file.**
+
+The domain model fixes its own order on top of this, and inside an entity or a value object
+that one wins: `nzt-build-backend-dotnet-domain-ddd`.
+
 ## Never a primary constructor
 
 Not for injection, not for DTOs, not for records, not for structs.
@@ -164,6 +178,8 @@ not yours.
 - [ ] File-scoped namespace, one top-level type, file named after it, `sealed` unless
       something inherits.
 - [ ] No folder named after a type.
+- [ ] Members in order with each group contiguous, and nothing appended at the end of the
+      file.
 - [ ] No primary constructors; dependencies are `readonly` fields set in a constructor.
 - [ ] No `var`.
 - [ ] No `global using`, `using static`, alias usings or qualified names in the body, and

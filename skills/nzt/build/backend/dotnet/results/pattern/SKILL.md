@@ -84,6 +84,39 @@ public sealed class Result<TResponse> : Result
   second field summarising the same failure drifts from it the first time somebody fills one
   and forgets the other — and then the API reports two versions of what happened.
 
+## Every return builds its own Result
+
+**`Failure` is called where the return happens, never behind a private helper.** A
+`Rejected()`, a `NotFound()` or any private method whose job is to hand back a `Result` is
+forbidden — including when three returns produce exactly the same failure.
+
+```csharp
+// no
+if (account is null) return Rejected();
+
+// yes
+if (account is null)
+{
+    return Result<SignInResponseDto>.Failure(
+        HttpStatusCode.Unauthorized,
+        [StaffAccount.Errors.SignInIsNotValid]);
+}
+```
+
+- **What the reader needs at a return is the status and the message**, and the helper hides
+  exactly those two behind a name. Reading the operation turns into jumping to the bottom of
+  the file and back, once per branch.
+- **It saves nothing**: the call it replaces is already one expression.
+- **The repetition is not duplication.** The message exists once, on the entity's `Errors`.
+  What repeats is the decision to answer that way — and those are independent decisions that
+  agree today. Merging them into one helper is what makes it expensive the day one of them
+  changes: the sign-in that answers differently on the third attempt is that day.
+- One helper becomes three, each named by whoever wrote it, and the operation ends up with a
+  private vocabulary no other operation shares.
+
+**This is about the `Result`, not about private methods.** A private method that computes
+something is fine; one that returns a `Result` is not.
+
 ## The status code travels inside the Result
 
 The coupling to `HttpStatusCode` is deliberate and agreed. **Do not add a second
@@ -123,5 +156,7 @@ project selected; the other is not your business.
 - [ ] The two types are the ones written here: closed base, `sealed` generic, private
       constructors, `Success` and `Failure`, nothing added.
 - [ ] `Failure` never receives a payload; `Success` always does.
+- [ ] Every `Result` is built at the return that produces it, and no private method returns
+      one.
 - [ ] The status code is set in the use case and nowhere else.
 - [ ] `Payload` is read only after `IsSuccess`, and never with a `!`.

@@ -12,16 +12,18 @@ Desde la raíz del repositorio:
 
 ```powershell
 dotnet run --project installer/src/Nzt.Cli
-dotnet run --project installer/src/Nzt.Cli -- lint
+dotnet run --project installer/src/Nzt.Cli -- verify
 dotnet run --project installer/src/Nzt.Cli -- status
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code --dry-run
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code
 dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
 
-Sin argumentos abre el menú, **muestra la simulación y recién ahí pregunta**. En scripts los
-identificadores son `claude-code`, `codex` y `all`. Un identificador desconocido aborta sin
-tocar nada.
+Sin argumentos abre el menú: **instalar, desinstalar, verificar el contenido y ver estado**,
+en un bucle hasta que elegís salir. Primero la acción, después el destino, y las dos que
+escriben **muestran la simulación y recién ahí preguntan**, con `No` por defecto. En scripts
+los identificadores son `claude-code`, `codex` y `all`. Un identificador desconocido aborta
+sin tocar nada.
 
 ## Dónde queda instalado
 

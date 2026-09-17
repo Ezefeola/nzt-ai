@@ -36,7 +36,7 @@ public static class Program
             "install" => Install(ProvidersFrom(args), dryRun, manifestDir),
             "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir),
             "status" => Status(manifestDir),
-            "lint" => LintOnly(),
+            "lint" or "verify" => Lint(detailed: false),
             "help" or "--help" or "-h" => Help(),
             _ => Fail($"Comando desconocido: {command}")
         };
@@ -53,52 +53,123 @@ public static class Program
               nzt install --provider <id> [--dry-run]
               nzt uninstall --provider <id> [--dry-run]
               nzt status
-              nzt lint
+              nzt lint | verify
 
             Proveedores: claude-code, codex, all
             """);
         return 0;
     }
 
+    /// <summary>
+    /// El menú: instalar, desinstalar, verificar el contenido, ver estado. Vuelve
+    /// a preguntar hasta que se elige salir, porque verificar y ver estado no son
+    /// el final de nada. Las dos acciones que escriben muestran la simulación
+    /// completa y recién ahí preguntan.
+    /// </summary>
     private static int Menu()
     {
         Console.WriteLine($"NZT installer {Version}\n");
-        Console.WriteLine("  1) Claude Code");
-        Console.WriteLine("  2) Codex");
-        Console.WriteLine("  3) Todos los proveedores soportados");
-        Console.WriteLine("  4) Ver estado");
-        Console.WriteLine("  5) Salir\n");
-        Console.Write("  Seleccioná destino: ");
+
+        while (true)
+        {
+            Console.WriteLine("  ¿Qué querés hacer?\n");
+            Console.WriteLine("    1) Instalar");
+            Console.WriteLine("    2) Desinstalar");
+            Console.WriteLine("    3) Verificar el contenido");
+            Console.WriteLine("    4) Ver estado");
+            Console.WriteLine("    5) Salir\n");
+            Console.Write("  Opción: ");
+
+            var choice = Console.ReadLine()?.Trim();
+            Console.WriteLine();
+
+            // Sin entrada —una tubería cerrada, no una terminal— se sale en vez
+            // de girar para siempre sobre un ReadLine que ya devolvió null.
+            if (choice is null) return 0;
+
+            switch (choice)
+            {
+                case "1": MenuInstall(); break;
+                case "2": MenuUninstall(); break;
+                case "3": Lint(detailed: true); break;
+                case "4": Status(null); break;
+                case "5": return 0;
+                default: Error("Opción inválida."); break;
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    private static void MenuInstall()
+    {
+        var targets = AskProvider("¿Dónde lo instalo?");
+        if (targets.Count == 0) return;
+
+        // Primero se muestra exactamente lo que haría, y recién ahí se pregunta.
+        if (Install(targets, dryRun: true, null) != 0) return;
+
+        if (!Confirm("¿Instalar?"))
+        {
+            Console.WriteLine("  No se escribió nada.");
+            return;
+        }
+
+        Install(targets, dryRun: false, null);
+    }
+
+    private static void MenuUninstall()
+    {
+        var targets = AskProvider("¿De dónde lo saco?");
+        if (targets.Count == 0) return;
+
+        // La simulación va primero acá también, y más: esto borra. Lo que se
+        // conserva por estar editado aparece antes de confirmar, no después.
+        Console.WriteLine("  Se remueve solamente lo que instaló este CLI, según su manifiesto.\n");
+        if (Uninstall(targets, dryRun: true, null) != 0) return;
+
+        if (!Confirm("¿Desinstalar?"))
+        {
+            Console.WriteLine("  No se borró nada.");
+            return;
+        }
+
+        Uninstall(targets, dryRun: false, null);
+    }
+
+    private static IReadOnlyList<Provider> AskProvider(string question)
+    {
+        Console.WriteLine($"  {question}\n");
+        Console.WriteLine("    1) Claude Code");
+        Console.WriteLine("    2) Codex");
+        Console.WriteLine("    3) Todos los proveedores soportados");
+        Console.WriteLine("    4) Volver\n");
+        Console.Write("  Opción: ");
 
         var choice = Console.ReadLine()?.Trim();
         Console.WriteLine();
 
-        IReadOnlyList<Provider> targets = choice switch
-        {
-            "1" => [Provider.ClaudeCode()],
-            "2" => [Provider.Codex()],
-            "3" => Provider.All,
-            "4" => [],
-            _ => []
-        };
+        var targets = ProvidersFor(choice);
+        if (targets.Count == 0 && choice is not null and not "4") Error("Opción inválida.");
 
-        if (choice == "4") return Status(null);
-        if (choice == "5" || targets.Count == 0) return choice is "5" ? 0 : Fail("Opción inválida.");
+        return targets;
+    }
 
-        // Primero se muestra exactamente lo que haría, y recién ahí se pregunta.
-        if (Install(targets, dryRun: true, null) != 0) return 1;
+    /// <summary>La opción del menú, traducida a proveedores. `4`, vacío o inválido no eligen ninguno.</summary>
+    public static IReadOnlyList<Provider> ProvidersFor(string? choice) => choice switch
+    {
+        "1" => [Provider.ClaudeCode()],
+        "2" => [Provider.Codex()],
+        "3" => Provider.All,
+        _ => []
+    };
 
-        Console.Write("\n  ¿Instalar? [s/N]: ");
+    private static bool Confirm(string question)
+    {
+        Console.Write($"\n  {question} [s/N]: ");
         var answer = Console.ReadLine()?.Trim().ToLowerInvariant();
         Console.WriteLine();
-
-        if (answer is not ("s" or "si" or "sí" or "y" or "yes"))
-        {
-            Console.WriteLine("  No se escribió nada.");
-            return 0;
-        }
-
-        return Install(targets, dryRun: false, null);
+        return answer is "s" or "si" or "sí" or "y" or "yes";
     }
 
     // ── Comandos ───────────────────────────────────────────────────────────────
@@ -218,16 +289,34 @@ public static class Program
         return 0;
     }
 
-    private static int LintOnly()
+    /// <summary>
+    /// Verificar el contenido: qué trae el ejecutable embebido y si cumple sus
+    /// propias reglas. `detailed` lista skill por skill —lo que hace verificable
+    /// la palabra "verificar"—; sin él queda el resumen, que es lo que sirve en CI.
+    /// </summary>
+    private static int Lint(bool detailed)
     {
         var catalog = ContentCatalog.Load();
         var report = Linter.Run(catalog);
+
+        if (detailed)
+        {
+            Console.WriteLine($"  {"skill",-46} {"líneas",6}  {"chars",5}");
+            foreach (var skill in catalog.Skills)
+                Console.WriteLine($"  {skill.Name,-46} {skill.LineCount,6}  "
+                    + $"{skill.FrontMatter.Get("description")?.Length ?? 0,5}");
+            Console.WriteLine();
+        }
 
         foreach (var issue in report.Issues)
             Console.WriteLine($"  {issue.Where}: {issue.Message}");
 
         Console.WriteLine($"\n{report.SkillCount} skills · ~{report.ListingChars} chars de listado"
             + $" · {report.Issues.Count} problema(s)");
+
+        if (detailed && report.Ok)
+            Console.WriteLine($"Todas dentro de {Linter.MaxLines} líneas y {Linter.MaxDescription}"
+                + " chars de description.");
 
         if (report.OverListingFloor)
             Warn($"el listado pasa el piso de {LintReport.CodexFloor} (R1).");

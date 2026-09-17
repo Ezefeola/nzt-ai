@@ -90,6 +90,11 @@ will catch.
 **A caller's identity is never taken from what the client asserted.** It arrives as trusted
 server-supplied data, and a protected resource has its own guidance.
 
+**And it does not wrap its own returns.** The `Result` is built at each return — status and
+message visible right there — never behind a private `Rejected()` or `NotFound()`, however
+many branches end the same way. The reason is in the Result pattern's own guidance, and it
+is the same one: at a return, the status and the message are what the reader came for.
+
 ## Closing checklist
 
 - [ ] One class per operation, named after the operation, **with no suffix**, its interface
@@ -104,5 +109,6 @@ server-supplied data, and a protected resource has its own guidance.
       unrelated errors are not converted into it.
 - [ ] The status code is set here and matches how the project already answers that kind of
       failure.
+- [ ] Every `Result` built at its own return, with no private helper returning one.
 - [ ] No `HttpContext`, no ASP.NET response types, no hand-written mapping, no exceptions for
       expected failures.

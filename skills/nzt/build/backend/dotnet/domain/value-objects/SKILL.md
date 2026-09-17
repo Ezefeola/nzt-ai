@@ -31,36 +31,40 @@ email` is validated wherever someone remembers to; an `Email` is valid because i
 
 ## How it is written
 
-**A `sealed record`, immutable, with a private constructor and a static `Create`** that
-validates first — the same shape as an aggregate's `Create`:
+**A `sealed record`, immutable, with an empty private constructor and a static `Create`**
+that validates first — the same shape, and the same order, as an aggregate:
 
 ```csharp
 public sealed record DateRange
 {
-    private DateRange(DateOnly start, DateOnly end)
-    {
-        Start = start;
-        End = end;
-    }
+    private DateRange() { }
 
-    public DateOnly Start { get; }
-    public DateOnly End { get; }
+    public static class Errors { /* … */ }
+
+    public DateOnly Start { get; init; }
+    public DateOnly End { get; init; }
 
     public static (IReadOnlyList<string> Errors, DateRange? Range) Create(
         DateOnly start,
         DateOnly end)
     {
-        // validate, then build
+        // validate, then:
+        DateRange range = new() { Start = start, End = end };
     }
 }
 ```
 
 - **`record` for equality by value**, which is the whole point: two `DateRange` with the same
   dates compare equal without writing `Equals`.
-- **Properties are get-only.** A value object is never modified — **changing it is creating
-  another one** and assigning it. That is what makes sharing a reference to it safe.
+- **The constructor is empty and takes no parameters**, like the aggregate's: one place
+  assigns the values, and that place is `Create`, by name.
+- **Properties are `init`, never settable afterwards.** A value object is never modified —
+  **changing it is creating another one** and assigning it. `init` is what lets the object
+  initializer fill it while keeping it immutable to everyone outside `Create`.
 - **No public constructor and no `Create` that skips validation**, or an invalid instance
   exists and the type stops being a guarantee.
+- **Members in one order**: constructor, `Rules` and `Errors` if it has them, every property
+  together, `Create`, then its behaviour. A property added later joins the properties.
 
 The caller **checks the value for null**, never the error list, so no `!` is needed.
 
@@ -106,8 +110,10 @@ uses it** — it is never copied.
       field.
 - [ ] It lives in a `ValueObjects/` folder: inside its aggregate if only that one uses it, in
       the shared area if more than one does.
-- [ ] `sealed record`, get-only properties, immutable: modifying means creating another.
-- [ ] Private constructor, static `Create` returning `(errors, value?)`, and no other way in.
+- [ ] `sealed record`, `init` properties, immutable: modifying means creating another.
+- [ ] **Empty** private constructor, static `Create` returning `(errors, value?)` and
+      building with an object initializer, and no other way in.
+- [ ] Members in order, with every property together.
 - [ ] The caller checks the value for null, not the error list.
 - [ ] Its behaviour lives inside it and returns new values.
 - [ ] It has no id, is not queried on its own, and does not appear in a DTO.

@@ -160,9 +160,10 @@ The report has four fields, in 3–5 lines:
 - Every open `[TO-DEFINE]` appears in **every** report until it is resolved.
 - Finishing early does not cancel an agreed stop, and a progress report does not create a
   new approval gate or end the task.
-- Recommend clearing context only for a concrete benefit, saying what it is, and only after
-  persisting. Finishing a unit does not justify it on its own, and a reset is neither a
-  completion gate nor evidence of verification.
+- **Every report ends saying where the context stands**, as the kernel requires. Advising to
+  clear is a different thing: it fires from 20% consumed — strongly past 40% — or for a
+  concrete benefit you name, and only after persisting. Finishing a unit does not justify it
+  on its own, and a reset is neither a completion gate nor evidence of verification.
 
 ## Stopping early
 

@@ -29,7 +29,7 @@ donde quedaste y no descubrir a lo último que entendió otra cosa.**
 
 Tres capas, y la de arriba está siempre cargada.
 
-**1. El kernel** (~160 líneas) se instala en el archivo que tu proveedor lee en toda sesión
+**1. El kernel** (~180 líneas) se instala en el archivo que tu proveedor lee en toda sesión
 —`~/.claude/CLAUDE.md` o `~/.codex/AGENTS.md`—. Trae el bucle, los frenos, el formato del
 estado y **la tabla de ruteo**. Eso último es la decisión de diseño más importante del set:
 qué skill cargar está *instruido en una tabla*, no librado a que el modelo adivine por la
@@ -81,9 +81,10 @@ Global, para toda la máquina, con .NET 10:
 dotnet run --project installer/src/Nzt.Cli
 ```
 
-El menú te deja elegir Claude Code, Codex o los dos, **te muestra la simulación y recién ahí
-pregunta**. Instala un bloque delimitado en el archivo de instrucciones —respetando lo que ya
-tengas, con backup— y las skills en la carpeta de usuario del proveedor.
+El menú tiene cuatro acciones —**instalar, desinstalar, verificar el contenido y ver
+estado**—, te deja elegir Claude Code, Codex o los dos, y **te muestra la simulación y recién
+ahí pregunta**. Instala un bloque delimitado en el archivo de instrucciones —respetando lo
+que ya tengas, con backup— y las skills en la carpeta de usuario del proveedor.
 
 ```bash
 dotnet run --project installer/src/Nzt.Cli -- status

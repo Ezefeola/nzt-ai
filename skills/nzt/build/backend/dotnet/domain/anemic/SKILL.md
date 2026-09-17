@@ -27,6 +27,10 @@ navigations. Nothing else.
 Collections are initialised where they are declared, and relationships follow the ORM's
 general rule: foreign key plus navigation.
 
+**Members go in one order**: `Rules`, `Errors`, then every property together — and that is
+the whole file, because there are no methods. **A property added later joins the
+properties**; it never lands at the end because that is where the cursor was.
+
 ## `Rules` and `Errors` still live on the entity
 
 The logic runs in the use case, but **what the business fixed does not get copied into it**:

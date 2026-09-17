@@ -1,0 +1,39 @@
+schema_version: "1.1"
+name: stack-result-inline
+description: >
+  A use case with several failing branches, which is where the model's DRY instinct fires:
+  it collapses the repeated Result into a private Rejected() helper. D39 forbids that - the
+  Result is built at each return, because the status and the message are what a reader came
+  for. The prompt asks for three failures on purpose.
+tags: [stack]
+expected_outcome: >
+  Loads the use-case and Result leaves and writes ExecuteAsync with each failure returning
+  Result<T>.Failure inline, with its status code and the message from the entity's Errors.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Avanzá con la unidad: el caso de uso que confirma un pedido. Falla si el pedido no
+    existe, si ya está confirmado y si no tiene ninguna línea. Mostrame el código.
+  max_turns: 35
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: use-case-leaf-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-use-cases"'
+  - name: no-private-method-returning-a-result
+    type: regex
+    pattern: 'private\s+(static\s+)?(async\s+)?(Task<)?Result<'
+    match: not_contains
+  - name: builds-the-result-at-every-return
+    type: llm
+    criteria: |
+      The reply is in Spanish and contains C# for a use case that confirms an order, with
+      three failing branches.
+      PASS if every failing branch returns Result<...>.Failure(...) written at that return,
+      with its own status code and its message taken from the entity's Errors.
+      FAIL if any branch returns through a private helper, a local function or a field that
+      builds the Result - a Rejected(), NotFound() or similar - even if the rest are inline,
+      and FAIL if the repeated failures are collapsed into one shared return.

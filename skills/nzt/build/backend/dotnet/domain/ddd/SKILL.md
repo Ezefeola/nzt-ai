@@ -79,10 +79,53 @@ edge left** — every query becomes a decision about how much of the model to dr
 When a use case needs data from another aggregate, it queries for it. That is a second read,
 and it is the honest cost of having boundaries.
 
+## The entity's layout, in this order
+
+```csharp
+public sealed class StaffAccount
+{
+    private StaffAccount() { }                          // 1 · empty, and the only one
+    public static class Rules { /* … */ }               // 2
+    public static class Errors { /* … */ }              // 3
+
+    public Guid Id { get; private set; }                // 4 · every property, together
+    public string Name { get; private set; }
+    public string? PasswordHash { get; private set; }
+
+    public static (IReadOnlyList<string> Errors, StaffAccount? Account) Create(/* … */)  // 5
+    public void DefinePassword(string passwordHash) { } // 6 · behaviour, after it
+}
+```
+
+**A property added later joins the properties.** Writing it next to the method that happens
+to use it — `PasswordHash` sitting under `DefinePassword` because that method came second —
+scatters the entity's state through its behaviour. **Adding a member is not appending to the
+file.**
+
 ## Creating: `Create` returns errors and a nullable entity
 
-**The constructor is private and the only way in is a static `Create`**, which validates
-before building — an invalid entity never comes to exist.
+**The constructor is private, empty, and the only way in is a static `Create`**, which
+validates before building — an invalid entity never comes to exist.
+
+**The constructor takes no parameters and assigns nothing** — `private StaffAccount() { }`.
+It exists to stop anyone building the entity from outside, and it is what EF materialises
+with. One listing every field is a second place that changes every time a property appears,
+it says nothing `Create` does not already say, and at the call site
+`(guid, name, email, 0, null)` tells nobody what each value is.
+
+`Create` builds it with an **object initializer**, every value beside the name of what it is:
+
+```csharp
+StaffAccount account = new()
+{
+    Id = Guid.CreateVersion7(),
+    Name = name.Trim(),
+    Status = StaffAccountStatus.Active
+};
+```
+
+The private setters are reachable there because that code is inside the type: **nothing is
+made public for it**, and the entity stays unbuildable from outside.
 
 ```csharp
 public static (IReadOnlyList<string> Errors, Order? Order) Create(/* … */)
@@ -144,8 +187,10 @@ to paginate it in memory.
 - [ ] References to other aggregates are **the id only**; navigations inside are fine.
 - [ ] Every business value and message is in the entity's `Rules` and `Errors`, and no other
       layer declares its own.
-- [ ] Private constructor, static `Create` returning `(errors, entity?)`, and the use case
-      checks the entity for null.
+- [ ] **Empty** private constructor, static `Create` returning `(errors, entity?)` and
+      building with an object initializer, and the use case checks the entity for null.
+- [ ] The file follows the order — constructor, `Rules`, `Errors`, **every property
+      together**, `Create`, behaviour — and no member was appended at the end.
 - [ ] Mutating methods are named after the operation and return the errors.
 - [ ] No exceptions for expected failures, no HTTP, no `Result`, no persistence and no I/O
       inside the domain.

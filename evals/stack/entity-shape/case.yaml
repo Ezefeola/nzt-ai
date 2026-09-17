@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: stack-entity-shape
+description: >
+  Inside an approved unit, a DDD entity. Two conventions found by using the set on a real
+  project (D38): the private constructor is empty and Create builds with an object
+  initializer, and the members go in one order with every property together. The failure
+  modes are a constructor that lists every field, and a property written next to the method
+  that uses it.
+tags: [stack]
+expected_outcome: >
+  Loads the .NET area router and the DDD domain leaf, and writes an entity with an empty
+  private constructor, Rules and Errors at the top, every property together, and Create
+  building through an object initializer.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Avanzá con la unidad: la entidad Customer, con su nombre, su email y su estado, y el
+    alta. Mostrame el código.
+  max_turns: 35
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: ddd-leaf-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-domain-ddd"'
+  - name: the-private-constructor-takes-nothing
+    type: regex
+    pattern: 'private\s+Customer\(\s*\)'
+  - name: anemic-leaf-not-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-domain-anemic"'
+    min: 0
+    max: 0
+    arm: both
+  - name: shape-and-order
+    type: llm
+    criteria: |
+      The reply is in Spanish and contains C# for a Customer entity of a DDD model.
+      PASS if all three hold: the private constructor takes no parameters and assigns
+      nothing; Create builds the entity with an object initializer, setting each value by
+      name; and the members are in one order - the constructor, the nested Rules and Errors
+      classes, then every property together, then Create and the behaviour methods.
+      FAIL if the constructor takes the entity's fields as parameters and assigns them, if
+      Create calls a constructor with positional values, or if any property is declared
+      after Create or in between the methods rather than with the other properties.

@@ -37,16 +37,32 @@ one module in reverse engineering, one story, one spec's test set.
 
 Every unit ends the same way, in this order: land on a safe point — nothing half-written,
 no open question left hanging — then write `Plan/state.json`, then report in 3–5 lines what
-you did and what comes next, then **stop and wait**. A report written before the state is
-persisted is lost if the session ends between the two.
+you did and what comes next **and where the context stands**, then **stop and wait**. A
+report written before the state is persisted is lost if the session ends between the two.
 
 Specs are written one at a time, never in batches. Accompanied is the default: chain units
 without stopping only for a batch the user authorised for that run. Autonomy is offered
 once, when the plan is presented — not answering is accompanied, approving the plan does
 not select it, and "continue" advances the next agreed stretch without changing mode.
 
-If the context is heavy or the session is close to compacting, stop at the current unit
-boundary, leave the state clean, and say so.
+## Context
+
+The session is disposable; the state file is not. **At the end of every run, once the state
+is written, say where the context stands and whether it is worth clearing the session.**
+
+- **Read it from the signal the host gives you** — a remaining budget, a compaction warning,
+  whatever this session exposes. **If there is no signal, say that, and say what you can
+  observe instead**: units closed, how much was read. **Never invent a percentage.** A made
+  up number is a recommendation resting on nothing.
+- **The scale is what you have consumed.** Under 20%, say where it stands and nothing more.
+  **From 20%, recommend clearing.** From 30%, say it plainly: that is where the answers
+  start getting worse. **Past 40%, recommend it strongly.** A full window degrades the work
+  long before it runs out, and what is left still has to cover what the next unit reads.
+- **Clearing is safe exactly when the state is current**, which is why it comes after
+  writing it, never before. If the context is heavy mid-unit, stop at the next boundary,
+  leave the state clean, and say so.
+- **You recommend; you never clear.** That is the user's, and if they keep going, you keep
+  going.
 
 ## State
 
@@ -75,6 +91,10 @@ user anything.
   user selects it, not when they approve the plan.
 - Write the file when a unit ends, not while you are inside one. Rewrite `units` when the
   user changes the plan.
+- **Write it for a session that has none of this conversation.** The test is literal: if
+  picking the work up again would need something that exists only in the chat — a decision
+  taken out loud, where a unit actually stopped, what it is waiting on — it goes in the
+  file. Context gets cleared; what is not here is gone.
 - On resuming, reconcile it with the disk and with the user's current decisions. Evidence
   settles what happened; it does not settle what was agreed.
 - Keep every line to one line. If a unit needs a paragraph, it is more than one unit.

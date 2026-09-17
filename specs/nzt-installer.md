@@ -41,20 +41,36 @@ Dos advertencias sobre esa tabla:
 
 ## 3. Interfaz
 
-Menú interactivo al arrancar sin argumentos, que **muestra la simulación y recién ahí
-pregunta** — el `--dry-run` no es un modo aparte que haya que acordarse de usar:
+Menú interactivo al arrancar sin argumentos. **Primero se elige la acción, después el
+destino**, y las dos que escriben **muestran la simulación y recién ahí preguntan** — el
+`--dry-run` no es un modo aparte que haya que acordarse de usar:
 
 ```
 NZT installer 0.1.0
 
-  1) Claude Code
-  2) Codex
-  3) Todos los proveedores soportados
-  4) Ver estado
-  5) Salir
+  ¿Qué querés hacer?
 
-  Seleccioná destino:
+    1) Instalar
+    2) Desinstalar
+    3) Verificar el contenido
+    4) Ver estado
+    5) Salir
+
+  Opción:
 ```
+
+- **El menú es un bucle**: verificar y ver estado no son el final de nada, así que vuelve a
+  preguntar hasta que se elige salir.
+- **Instalar y desinstalar preguntan el destino** —Claude Code, Codex, todos, o volver—,
+  imprimen la simulación completa y piden confirmación con **`No` por defecto**. Volver no
+  elige ningún proveedor, y ningún proveedor significa que no se escribe nada.
+- **Desinstalar dice antes de simular qué alcance tiene**: solo lo que instaló este CLI,
+  según su manifiesto.
+- **Verificar el contenido** lista skill por skill —líneas y chars de description—, después
+  los problemas y el total del listado contra el piso de Codex. Es el mismo lint del modo no
+  interactivo, con el detalle que hace verificable la palabra *verificar*.
+- **Sin entrada —una tubería cerrada, no una terminal— el menú sale en vez de girar**, que es
+  el modo de falla de un bucle sobre `ReadLine`.
 
 Y modo no interactivo, para poder scriptearlo:
 
@@ -62,13 +78,14 @@ Y modo no interactivo, para poder scriptearlo:
 nzt install --provider claude-code|codex|all [--dry-run]
 nzt uninstall --provider claude-code|codex|all [--dry-run]
 nzt status
-nzt lint
+nzt lint | verify
 ```
 
 - `--dry-run` imprime exactamente lo que haría, sin tocar el disco.
 - `status` informa qué hay instalado, en qué versión, dónde, y **cuántos archivos editó el
   usuario**.
-- `lint` corre las reglas del set sin instalar nada.
+- `lint` —o `verify`, el mismo comando— corre las reglas del set sin instalar nada, en su
+  forma resumida: lo que sirve en CI es el conteo y el código de salida, no la tabla.
 - `--manifest-dir <ruta>` aísla el manifiesto; es lo que usan las comprobaciones.
 
 ## 4. Qué hace, paso a paso

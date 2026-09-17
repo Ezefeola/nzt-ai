@@ -475,6 +475,10 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
   hay en disco. **La evidencia manda sobre los hechos; no sobre los acuerdos**: el disco
   corrige qué se hizo, no qué se había acordado hacer (13.9 #25).
 - Todo en una línea. Si una unidad necesita un párrafo, es más de una unidad.
+- **Se escribe para una sesión que no tiene nada de esta conversación** (D40). La prueba es
+  literal: si retomar necesitara algo que solo existe en el chat —una decisión dicha en voz
+  alta, dónde frenó de verdad una unidad, qué la traba—, va al archivo. El contexto se
+  limpia; lo que no está acá, se perdió.
 - Al arrancar una sesión, si existe, se lee **antes** de preguntar nada.
 - El usuario lo edita a mano cuando quiere: reordenar, sacar unidades, cambiar el alcance.
 - Se omite solo para trabajo de una sola unidad en un proyecto que todavía no tiene estado.
@@ -1116,6 +1120,68 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   no tiene nada, y **ningún `TODO` llega a la página del usuario** — el hueco se le reporta a
   quien pidió el manual. Como el mockup, es a pedido y **si no se va a mantener no se crea**:
   vencido es el artefacto que más se cree justo porque parece terminado.
+
+- **D38.** **Dos convenciones de código que salieron de usar NZT en un proyecto real, y van
+  en la capa de stack, no en el kernel.** El usuario leyó el código generado de una entidad y
+  encontró las dos:
+  **(1) El constructor privado es vacío.** Uno que recibe cada campo es un segundo lugar que
+  cambia cada vez que aparece una propiedad, no dice nada que `Create` no diga ya, y en la
+  llamada `(guid, name, email, 0, null)` no le dice a nadie qué es cada valor. Queda
+  `private Entidad() { }` —que además es con el que EF materializa (ya estaba escrito en la
+  hoja de EF Core: *a parameterless private one is the simplest thing that works*)— y
+  `Create` arma con **object initializer**, cada valor al lado del nombre de lo que es. Los
+  setters privados se alcanzan desde ahí porque el código está adentro del tipo: no se hace
+  público nada. En los value objects la misma regla implica `{ get; init; }` en vez de
+  get-only, que sigue siendo inmutable para todo el que no sea `Create`.
+  **(2) Los miembros van en un orden y cada grupo va junto.** En la entidad: constructor,
+  `Rules`, `Errors`, **todas las propiedades juntas**, `Create`, y después el comportamiento.
+  El caso real fue `PasswordHash` declarado abajo de `Create`, pegado al `DefinePassword` que
+  lo usaba —el modo de falla es ese: la propiedad se escribe en la misma edición que el
+  método que la necesitó, y queda donde terminó el archivo—. La regla general va en
+  `nzt-build-csharp` como *agregar un miembro no es apendear al archivo*, con el orden de
+  cualquier tipo; la de la entidad y la del value object, en sus hojas de dominio, que son
+  las que mandan adentro del modelo. El modelo anémico también la lleva, sin métodos.
+  **Dónde no van: en el kernel.** Son convenciones de C#, y el kernel no sabe de lenguajes.
+  Se suma el caso `stack/entity-shape`, que mide las dos sobre código emitido.
+- **D39.** **El `Result` se arma en cada return, nunca detrás de un método privado.** Tercer
+  hallazgo del mismo proyecto: un `private static Result<SignInResponseDto> Rejected()` con
+  tres llamadas. La regla va en `nzt-build-backend-dotnet-results-pattern` —que es la hoja
+  dueña de cómo se usa `Result`— y se nombra en `nzt-build-backend-dotnet-use-cases`, que es
+  donde el método se escribiría. Las razones, que son lo que impide que el modelo lo
+  "mejore" de nuevo: **en un return lo que el lector vino a buscar son el status y el
+  mensaje**, y el helper esconde justo esos dos detrás de un nombre; no ahorra nada, porque
+  lo que reemplaza ya es una expresión; y **la repetición no es duplicación** —el mensaje
+  vive una sola vez en el `Errors` de la entidad, lo que se repite es la decisión de
+  contestar así, y son decisiones independientes que hoy coinciden: juntarlas es lo que
+  sale caro el día que una cambia—. El corte que la hace aplicable sin daño: **es sobre el
+  `Result`, no sobre los métodos privados** — uno que calcula algo está bien, uno que
+  devuelve un `Result` no. Lo mide `stack/result-inline`, con un pedido de tres fallas
+  distintas, que es donde el instinto de DRY del modelo se dispara.
+
+- **D40.** **El estado se escribe para contexto cero, y cada corrida termina diciendo cómo
+  viene el contexto.** Pedido del usuario después de usar NZT con Claude: *"podemos en
+  cualquier momento limpiar contexto y continuar en limpio"*. Va **al kernel**, porque no es
+  de una fase: es cómo termina cualquier corrida. Tres piezas:
+  **(1) El estándar del estado deja de ser implícito.** No alcanza con escribir
+  `Plan/state.json` al cerrar la unidad: se escribe **para un lector que no tiene nada de la
+  conversación**, y la prueba es literal —si retomar necesitara algo que solo existe en el
+  chat, va al archivo—. Sin eso, el archivo pasa el ojo del que sí se acuerda y falla con el
+  que no, que es el único caso que importa.
+  **(2) El reporte de cierre suma una línea: cómo viene el contexto y si conviene limpiar.**
+  La escala es **sobre lo consumido**, y la fijó el usuario: **debajo del 20% no se recomienda
+  nada**, **desde el 20% se recomienda limpiar**, **en el 30% se dice que se está cerca de la
+  zona donde las respuestas empeoran** —la *dumb zone*— y **pasado el 40% se recomienda
+  fuerte**. Es deliberadamente temprano: la ventana llena degrada el trabajo mucho antes de
+  agotarse, y lo que queda todavía tiene que alcanzar para lo que la próxima unidad va a
+  leer. *(La primera redacción lo puso al revés —sobre contexto libre— y el usuario lo
+  corrigió; queda anotado porque el número sin la palabra `consumido` es ambiguo y ya se leyó
+  mal una vez.)*
+  **(3) El número se lee de la señal que dé el host, y si no hay señal se dice** —nunca se
+  inventa un porcentaje, que sería una recomendación apoyada en nada (C1: lo que cada
+  proveedor expone no es igual, así que la regla es condicional y el comando concreto vive en
+  el adapter, `/clear` en Claude Code). **El agente recomienda, no limpia**: limpiar es del
+  usuario, y se aconseja siempre después de persistir, nunca antes. `nzt-plan` se alineó: el
+  reporte siempre dice cómo viene, y *aconsejar limpiar* es otra cosa, con su ventana.
 
 ## 13. Revisión contra Temper v3
 
@@ -2497,27 +2563,37 @@ dominio, los diagramas, el cambio a una feature viva, las cuatro lecturas de la 
 `analyze-*` y los documentos sin destino. **D32 cerró además la única que esa pasada había
 dejado abierta** —el criterio genérico de tests, hoy `nzt-build-tests`— y **D33–D35 son lo
 que el usuario sumó después**: elegir el componente a probar con el chequeo de qué se puede
-probar, `nzt-verify-performance` y el RFC a pedido. **D36 y D37 son las dos últimas, y las
-dos salieron de usar el set**: los datos de prueba, con `nzt-verify-test-data` —mecanismo
+probar, `nzt-verify-performance` y el RFC a pedido. **D36 a D40 son las últimas, y las
+cinco salieron de usar el set**: los datos de prueba, con `nzt-verify-test-data` —mecanismo
 acordado una vez con el usuario y guardado en el opt-in `Test data` del stack, y un setup y
 un teardown por escenario, escritos antes de correr—, y el **manual del usuario final**, con
 `nzt-ux-manual`: hoja de UX, a pedido, **armado al final de lo que se entrega** y solo sobre
-comportamiento verificado.
+comportamiento verificado. **D38 y D39 son las primeras que no agregan una skill sino que
+corrigen contenido** —igual que **D40**, que es la primera que toca el kernel desde el
+recorte de 13.10—, y las tres reglas de código salieron de leer lo que NZT generó en un
+proyecto real: el constructor privado vacío, el orden de los miembros, y el `Result` armado
+en cada return en vez de escondido en un método privado. **D40 sale de la misma corrida, pero
+es de método y no de código**: el estado escrito para contexto cero, y el cierre de cada
+corrida diciendo cómo viene el contexto y si conviene limpiar, recomendándolo **desde el 20%
+consumido y fuerte pasado el 40%**.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D37. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D40. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 
 **Lo que falta, en orden, al 2026-09-17:**
 
-1. **Instalar de verdad** — el usuario dijo que lo hace él. Nunca se ejecutó fuera de
-   destinos temporales. Son 19 skills más que antes: la instalación es la misma operación.
+1. ✅ **Instalado de verdad.** El usuario lo corrió el 2026-09-17: **Claude Code, 111
+   archivos** —las skills más el bloque de instrucciones—, manifiesto en
+   `%LOCALAPPDATA%\nzt\manifests\claude-code.json`. **Codex sigue sin instalar**, y eso es
+   exactamente lo que bloquea el punto 2. Reinstalar después de cada tanda es la misma
+   operación: lo nuevo se crea y lo que no cambió queda igual.
 2. **Medir R1 en Codex** (fase 9). Era el tercer punto y subió: el listado está en 20.765
    caracteres, 2,6× el piso de 8.000, y **lo que no está verificado es si una skill omitida
    del listado se puede seleccionar igual por nombre** (C2). De eso depende si el catálogo
    puede seguir creciendo o si hay que empezar a fusionar hojas.
-3. **Correr el resto de los evals.** Corrió `kernel-loaded` y pasó; faltan 17 casos.
+3. **Correr el resto de los evals.** Corrió `kernel-loaded` y pasó; faltan 19 casos.
    **Conviene empezar por el grupo `stack`** (`--tag stack`), que son los cuatro de ejes
    excluyentes y donde vive el riesgo real del set — `routing` ya demostró que el andamio
    anda. Los tres casos nuevos de 13.12 (`close-feature`, `diagram-offered`, `no-diagram`)
@@ -2537,15 +2613,26 @@ qué contiene.
 **El instalador (fase 10) está construido**: `installer/src/Nzt.Cli`, consola .NET 10, sin
 dependencias, con el contenido embebido. **Instala global y sin plugins** (D24): bloque
 delimitado en `~/.claude/CLAUDE.md` y `$CODEX_HOME/AGENTS.md`, y las skills aplanadas —hoy
-105— en `~/.claude/skills` y `~/.agents/skills`. El contenido entra por glob del `.csproj`,
+110— en `~/.claude/skills` y `~/.agents/skills`. El contenido entra por glob del `.csproj`,
 así que una skill nueva no le toca una línea de código al instalador. `dotnet run --project installer/tests/Nzt.Cli.Checks`
-da **PASS: 43 installer checks** contra destinos temporales — incluida la que compara byte a
+da **PASS: 47 installer checks** contra destinos temporales — incluida la que compara byte a
 byte el bloque del CLI contra el `dist/CLAUDE.md` del build, que es lo que mantiene a raya a
-I2. **Lo que todavía no pasó: instalarlo de verdad en esta máquina.** El `--dry-run` sobre el
-HOME real dice que en Claude Code serían 92 archivos nuevos, y que en Codex el `AGENTS.md`
-existente se actualizaría conservando su contenido y con backup.
+I2. **Y ya se instaló de verdad**: Claude Code, 111 archivos, el 2026-09-17.
 
-**La fase 6, en concreto.** `evals/` tiene **18 casos en tres grupos** contra
+**El menú es de cuatro acciones** (pedido del usuario, tomado del instalador de Temper v3):
+instalar, desinstalar, **verificar el contenido** y ver estado, en un bucle hasta salir.
+Primero la acción y después el destino; las dos que escriben imprimen la simulación completa
+y recién ahí preguntan, con `No` por defecto; desinstalar aclara su alcance —solo lo del
+manifiesto— **antes** de simular. Se hizo **sin agregar dependencias**: Temper usa
+Spectre.Console y acá el ejecutable sigue siendo un artefacto sin paquetes, así que el menú
+es `Console` y opciones numeradas. Dos detalles que valen su línea: sin entrada —una tubería
+cerrada— el menú **sale en vez de girar sobre un `ReadLine` que ya devolvió `null`**, y
+*verificar* lista skill por skill con sus líneas y sus chars de description, que es lo que
+hace verificable la palabra; el `lint` no interactivo se queda con el resumen, que es lo que
+sirve en CI. La opción del menú traducida a proveedor tiene sus propias comprobaciones: son
+las cuatro que llevaron los checks de 43 a 47.
+
+**La fase 6, en concreto.** `evals/` tiene **20 casos en tres grupos** contra
 `dist/plugin/`, el set aplanado como plugin que ahora arma el build (D23, hechos de
 plataforma en C6):
 
@@ -2566,9 +2653,14 @@ plataforma en C6):
   feature ya verificada, y mide lo que separa un manual de una documentación —capítulos que
   son tareas dichas como las diría la persona, un HTML que abre solo— con el recorrido
   módulo por módulo y el capítulo sobre algo no verificado como las dos formas de fallar.
-- **`stack/` (4)** — los ejes excluyentes: el documento de stack elige uno y solo esa hoja
+- **`stack/` (6)** — los ejes excluyentes: el documento de stack elige uno y solo esa hoja
   carga. `endpoint-axis` dice *controller* en el pedido con `minimal-apis` en el stack;
-  `not-dotnet` es *una carpeta instalada no es una autorización* vuelto medición.
+  `not-dotnet` es *una carpeta instalada no es una autorización* vuelto medición. **Los dos
+  nuevos miden convenciones sobre el código emitido**, que es lo que ningún otro grupo hace:
+  `entity-shape` (D38) el constructor privado vacío —con un regex sobre la firma— y el orden
+  de los miembros, con la propiedad escrita abajo del método que la usa como la forma
+  concreta de fallar; y `result-inline` (D39) pide **tres fallas distintas a propósito**,
+  porque es ahí donde el modelo colapsa los returns en un `Rejected()` privado.
 - **`restraint/` (4)** — sobre-disparo: una pregunta, un cambio de una palabra, un repo que
   no es nuestro y **un pedido que no gana ningún diagrama** no tienen que cargar nada. Van
   con `arm: both` para que también puntúen en el arm sin el set; `no-diagram` suma un grader
@@ -2590,8 +2682,8 @@ ablación, 247s, **US$ 0,94** — y contestó las dos preguntas que bloqueaban t
   tiempo. **Reconfirmado después del arreglo: `kernel-loaded` da 1,00** (1 corrida, 119s,
   US$ 0,30), sin tocar el techo de turnos.
 
-**Lo que eso deja medido para planificar:** una corrida de un caso son ~US$ 0,31. Los 18
-casos a 3 corridas **con** arm de ablación son **~US$ 34**; con `--ablation none`, la mitad.
+**Lo que eso deja medido para planificar:** una corrida de un caso son ~US$ 0,31. Los 20
+casos a 3 corridas **con** arm de ablación son **~US$ 38**; con `--ablation none`, la mitad.
 Conviene correr por grupo (`--tag`) y no la suite entera de una.
 
 De las 44 unidades del catálogo original — 35 del modo construcción, 8 de la rama profesor,
@@ -2648,16 +2740,18 @@ contra los paths del árbol.
 
 **Lo que sigue**, en el orden en que conviene hacerlo:
 
-1. **Instalar** — `dotnet run --project installer/src/Nzt.Cli` y elegir destino. El menú
-   muestra la simulación antes de preguntar.
+1. **Instalar** — `dotnet run --project installer/src/Nzt.Cli`, elegir la acción y después el
+   destino. El menú tiene cuatro: instalar, desinstalar, verificar el contenido y ver estado,
+   y las dos que escriben muestran la simulación antes de preguntar.
 2. **Correr los evals** (fase 6) — `bash install/build.sh` y después
    `claude plugin eval dist/plugin --scaffold --case kernel-loaded --ablation none`: tres
    corridas y alcanza para saber si el andamio funciona.
 3. **Medir R1 en Codex** (fase 9) — necesita Codex CLI con el set instalado, que después del
    paso 1 ya está.
 
-**Los tres los corre el usuario**: el primero le escribe en el HOME, el segundo le consume
-cuota de modelo y el tercero necesita el otro CLI. El set ya se puede usar tal como está.
+**Los tres los corre el usuario**: el primero le escribe en el HOME —y el de Claude Code ya
+lo corrió—, el segundo le consume cuota de modelo y el tercero necesita el otro CLI. El set
+ya se puede usar tal como está.
 
 **Cómo se porta una hoja de la capa de stack.**
 
@@ -2750,8 +2844,8 @@ corresponda **en la misma unidad**. Así salieron D5 a D15.
 **Construido y validado por el build:**
 
 ```
-core/kernel.md + adapters      → dist/CLAUDE.md, dist/AGENTS.md (161 líneas)
-core/kernel.md                 → 150 líneas: recorte de 13.10 + guardrails de T20 aplicados
+core/kernel.md + adapters      → dist/CLAUDE.md, dist/AGENTS.md (183 líneas)
+core/kernel.md                 → 170 líneas: recorte de 13.10, guardrails de T20, y D40
 install/build.ps1 / build.sh   → generan y validan (nombre↔path, ≤200 líneas, ≤250 chars
                                  de description, presupuesto R1)
 skills/nzt/                    → nzt (81), nzt-plan (194, el más grande del set)

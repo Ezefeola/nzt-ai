@@ -32,6 +32,7 @@ public static class Program
         BlockMatchesWhatTheBuildEmits();
         DoesNotTouchADamagedBlock();
         LintCatchesNamePathMismatch();
+        MenuChoiceResolvesTheProvider();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -313,6 +314,26 @@ public static class Program
             ]);
 
         return (provider, catalog, Path.Combine(home, "manifests"));
+    }
+
+    /// <summary>
+    /// La opción del menú tiene que resolver al proveedor que dice, y sobre todo
+    /// **no** resolver a ninguno cuando no se eligió: instalar y desinstalar
+    /// arrancan de acá, y "ninguno" es lo que hace que volver no escriba nada.
+    /// </summary>
+    private static void MenuChoiceResolvesTheProvider()
+    {
+        Check("la opción 1 es Claude Code",
+            Cli.Program.ProvidersFor("1") is [{ Id: "claude-code" }]);
+        Check("la opción 2 es Codex",
+            Cli.Program.ProvidersFor("2") is [{ Id: "codex" }]);
+        Check("la opción 3 son todos",
+            Cli.Program.ProvidersFor("3").Count == Provider.All.Count);
+        Check("volver, vacío e inválido no eligen ninguno",
+            Cli.Program.ProvidersFor("4").Count == 0
+            && Cli.Program.ProvidersFor("").Count == 0
+            && Cli.Program.ProvidersFor(null).Count == 0
+            && Cli.Program.ProvidersFor("9").Count == 0);
     }
 
     private static SkillFile Skill(string name, string text) =>
