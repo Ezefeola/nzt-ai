@@ -49,28 +49,31 @@ destino**, y las dos que escriben **muestran la simulación y recién ahí pregu
 NZT installer 0.1.0
 
   ¿Qué querés hacer?
-
-    1) Instalar
-    2) Desinstalar
-    3) Verificar el contenido
-    4) Ver estado
-    5) Salir
-
-  Opción:
+  > Instalar
+    Desinstalar
+    Verificar el contenido
+    Ver estado
+    Salir
 ```
 
+- **No se escribe nada para elegir.** Las listas se recorren con ↑ ↓ y se eligen con Enter.
+  Que no haya nada que tipear es lo que hace que **no exista una opción inválida**: la única
+  forma de no elegir es elegir *Volver* o *Salir*.
 - **El menú es un bucle**: verificar y ver estado no son el final de nada, así que vuelve a
   preguntar hasta que se elige salir.
 - **Instalar y desinstalar preguntan el destino** —Claude Code, Codex, todos, o volver—,
   imprimen la simulación completa y piden confirmación con **`No` por defecto**. Volver no
   elige ningún proveedor, y ningún proveedor significa que no se escribe nada.
+- **La confirmación también es una lista**, `No` y `Sí`, y `No` va primero porque la opción
+  marcada al abrir es la primera: el defecto tiene que ser el que no toca el disco.
 - **Desinstalar dice antes de simular qué alcance tiene**: solo lo que instaló este CLI,
   según su manifiesto.
 - **Verificar el contenido** lista skill por skill —líneas y chars de description—, después
   los problemas y el total del listado contra el piso de Codex. Es el mismo lint del modo no
   interactivo, con el detalle que hace verificable la palabra *verificar*.
-- **Sin entrada —una tubería cerrada, no una terminal— el menú sale en vez de girar**, que es
-  el modo de falla de un bucle sobre `ReadLine`.
+- **Sin terminal —una tubería cerrada— el menú no abre**: dice que hacen falta los comandos y
+  sale con 0. Una lista navegable no puede contestarse desde una tubería, y colgarse
+  esperando una flecha que no va a llegar es el modo de falla que hay que evitar.
 
 Y modo no interactivo, para poder scriptearlo:
 
@@ -159,7 +162,7 @@ plano duplicado.
 installer/
 ├─ README.md                      # runbook
 ├─ src/Nzt.Cli/
-│  ├─ Nzt.Cli.csproj              # net10.0, console, sin dependencias externas
+│  ├─ Nzt.Cli.csproj              # net10.0, console, una sola dependencia: Spectre.Console
 │  ├─ Program.cs                  # menú, argumentos y reporte
 │  ├─ Content/                    # catálogo embebido y frontmatter
 │  ├─ Providers/Provider.cs       # un destino por proveedor
@@ -170,8 +173,11 @@ installer/
 
 - **El contenido se embebe al compilar** (`core/**/*.md` y `skills/**/SKILL.md`): el
   ejecutable *es* el set, y su versión es la versión del set.
-- **Sin dependencias de paquetes.** Temper usa Spectre.Console; acá la salida es lo bastante
-  simple como para no pagar una dependencia que después hay que mantener.
+- **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
+  flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de
+  serlo —teclas crudas, redibujado, terminales que no lo son—, así que se usa el mismo
+  paquete que Temper en vez de escribirlo de nuevo. **Solo los prompts**: el reporte, la
+  simulación, `status` y el lint siguen siendo `Console`, sin markup.
 - Multiplataforma: las rutas salen de `Environment.SpecialFolder.UserProfile`, nunca de
   concatenar strings.
 - Distribución: se usa desde el repo con .NET 10. Un binario self-contained es una opción, no

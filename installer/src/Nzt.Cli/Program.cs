@@ -3,6 +3,7 @@ using Nzt.Cli.Content;
 using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
 using Nzt.Cli.Providers;
+using Spectre.Console;
 
 namespace Nzt.Cli;
 
@@ -60,41 +61,46 @@ public static class Program
         return 0;
     }
 
+    /// <summary>Las acciones del menú principal, en el orden en que se ofrecen.</summary>
+    public enum MenuAction { Install, Uninstall, Verify, Status, Exit }
+
+    /// <summary>Los destinos que ofrecen instalar y desinstalar. `Back` no elige ninguno.</summary>
+    public enum ProviderChoice { ClaudeCode, Codex, All, Back }
+
     /// <summary>
-    /// El menú: instalar, desinstalar, verificar el contenido, ver estado. Vuelve
-    /// a preguntar hasta que se elige salir, porque verificar y ver estado no son
-    /// el final de nada. Las dos acciones que escriben muestran la simulación
-    /// completa y recién ahí preguntan.
+    /// El menú: instalar, desinstalar, verificar el contenido, ver estado. Se
+    /// recorre con las flechas y se elige con Enter —no se escribe nada, así que
+    /// no hay opción inválida posible—, y vuelve a preguntar hasta que se elige
+    /// salir, porque verificar y ver estado no son el final de nada. Las dos
+    /// acciones que escriben muestran la simulación completa y recién ahí preguntan.
     /// </summary>
     private static int Menu()
     {
         Console.WriteLine($"NZT installer {Version}\n");
 
+        // Sin terminal —una tubería cerrada— no hay flechas que leer: se sale en
+        // vez de girar sobre un prompt que nadie puede contestar.
+        if (Console.IsInputRedirected)
+        {
+            Console.WriteLine("  El menú necesita una terminal. Sin ella están los comandos: nzt help.");
+            return 0;
+        }
+
         while (true)
         {
-            Console.WriteLine("  ¿Qué querés hacer?\n");
-            Console.WriteLine("    1) Instalar");
-            Console.WriteLine("    2) Desinstalar");
-            Console.WriteLine("    3) Verificar el contenido");
-            Console.WriteLine("    4) Ver estado");
-            Console.WriteLine("    5) Salir\n");
-            Console.Write("  Opción: ");
+            var action = Ask("¿Qué querés hacer?", MenuLabel,
+                MenuAction.Install, MenuAction.Uninstall, MenuAction.Verify,
+                MenuAction.Status, MenuAction.Exit);
 
-            var choice = Console.ReadLine()?.Trim();
             Console.WriteLine();
 
-            // Sin entrada —una tubería cerrada, no una terminal— se sale en vez
-            // de girar para siempre sobre un ReadLine que ya devolvió null.
-            if (choice is null) return 0;
-
-            switch (choice)
+            switch (action)
             {
-                case "1": MenuInstall(); break;
-                case "2": MenuUninstall(); break;
-                case "3": Lint(detailed: true); break;
-                case "4": Status(null); break;
-                case "5": return 0;
-                default: Error("Opción inválida."); break;
+                case MenuAction.Install: MenuInstall(); break;
+                case MenuAction.Uninstall: MenuUninstall(); break;
+                case MenuAction.Verify: Lint(detailed: true); break;
+                case MenuAction.Status: Status(null); break;
+                default: return 0;
             }
 
             Console.WriteLine();
@@ -139,38 +145,64 @@ public static class Program
 
     private static IReadOnlyList<Provider> AskProvider(string question)
     {
-        Console.WriteLine($"  {question}\n");
-        Console.WriteLine("    1) Claude Code");
-        Console.WriteLine("    2) Codex");
-        Console.WriteLine("    3) Todos los proveedores soportados");
-        Console.WriteLine("    4) Volver\n");
-        Console.Write("  Opción: ");
+        var choice = Ask(question, ProviderLabel,
+            ProviderChoice.ClaudeCode, ProviderChoice.Codex, ProviderChoice.All, ProviderChoice.Back);
 
-        var choice = Console.ReadLine()?.Trim();
         Console.WriteLine();
-
-        var targets = ProvidersFor(choice);
-        if (targets.Count == 0 && choice is not null and not "4") Error("Opción inválida.");
-
-        return targets;
+        return ProvidersFor(choice);
     }
 
-    /// <summary>La opción del menú, traducida a proveedores. `4`, vacío o inválido no eligen ninguno.</summary>
-    public static IReadOnlyList<Provider> ProvidersFor(string? choice) => choice switch
+    /// <summary>La opción elegida, traducida a proveedores. `Back` no elige ninguno.</summary>
+    public static IReadOnlyList<Provider> ProvidersFor(ProviderChoice choice) => choice switch
     {
-        "1" => [Provider.ClaudeCode()],
-        "2" => [Provider.Codex()],
-        "3" => Provider.All,
+        ProviderChoice.ClaudeCode => [Provider.ClaudeCode()],
+        ProviderChoice.Codex => [Provider.Codex()],
+        ProviderChoice.All => Provider.All,
         _ => []
     };
 
+    /// <summary>
+    /// La confirmación de lo que escribe o borra, también con las flechas. `No`
+    /// va primero porque la primera opción es la marcada al abrir: ese es el
+    /// valor por defecto, y acá tiene que ser el que no toca el disco.
+    /// </summary>
     private static bool Confirm(string question)
     {
-        Console.Write($"\n  {question} [s/N]: ");
-        var answer = Console.ReadLine()?.Trim().ToLowerInvariant();
         Console.WriteLine();
-        return answer is "s" or "si" or "sí" or "y" or "yes";
+        var answer = Ask(question, yes => yes ? "Sí" : "No", false, true);
+        Console.WriteLine();
+        return answer;
     }
+
+    /// <summary>
+    /// El único prompt del CLI: una lista que se recorre con las flechas y se
+    /// elige con Enter. La primera opción es la que está marcada al abrirse.
+    /// </summary>
+    private static T Ask<T>(string question, Func<T, string> label, params T[] choices)
+        where T : notnull =>
+        AnsiConsole.Prompt(
+            new SelectionPrompt<T>()
+                .Title($"  {Markup.Escape(question)}")
+                .HighlightStyle(new Style(foreground: Color.Cyan1))
+                .UseConverter(label)
+                .AddChoices(choices));
+
+    private static string MenuLabel(MenuAction action) => action switch
+    {
+        MenuAction.Install => "Instalar",
+        MenuAction.Uninstall => "Desinstalar",
+        MenuAction.Verify => "Verificar el contenido",
+        MenuAction.Status => "Ver estado",
+        _ => "Salir"
+    };
+
+    private static string ProviderLabel(ProviderChoice choice) => choice switch
+    {
+        ProviderChoice.ClaudeCode => "Claude Code",
+        ProviderChoice.Codex => "Codex",
+        ProviderChoice.All => "Todos los proveedores soportados",
+        _ => "Volver"
+    };
 
     // ── Comandos ───────────────────────────────────────────────────────────────
 

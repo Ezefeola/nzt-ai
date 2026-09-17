@@ -323,17 +323,14 @@ public static class Program
     /// </summary>
     private static void MenuChoiceResolvesTheProvider()
     {
-        Check("la opción 1 es Claude Code",
-            Cli.Program.ProvidersFor("1") is [{ Id: "claude-code" }]);
-        Check("la opción 2 es Codex",
-            Cli.Program.ProvidersFor("2") is [{ Id: "codex" }]);
-        Check("la opción 3 son todos",
-            Cli.Program.ProvidersFor("3").Count == Provider.All.Count);
-        Check("volver, vacío e inválido no eligen ninguno",
-            Cli.Program.ProvidersFor("4").Count == 0
-            && Cli.Program.ProvidersFor("").Count == 0
-            && Cli.Program.ProvidersFor(null).Count == 0
-            && Cli.Program.ProvidersFor("9").Count == 0);
+        Check("Claude Code resuelve a claude-code",
+            Cli.Program.ProvidersFor(Cli.Program.ProviderChoice.ClaudeCode) is [{ Id: "claude-code" }]);
+        Check("Codex resuelve a codex",
+            Cli.Program.ProvidersFor(Cli.Program.ProviderChoice.Codex) is [{ Id: "codex" }]);
+        Check("todos resuelve a todos",
+            Cli.Program.ProvidersFor(Cli.Program.ProviderChoice.All).Count == Provider.All.Count);
+        Check("volver no elige ninguno",
+            Cli.Program.ProvidersFor(Cli.Program.ProviderChoice.Back).Count == 0);
     }
 
     private static SkillFile Skill(string name, string text) =>

@@ -20,10 +20,12 @@ dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
 
 Sin argumentos abre el menú: **instalar, desinstalar, verificar el contenido y ver estado**,
-en un bucle hasta que elegís salir. Primero la acción, después el destino, y las dos que
-escriben **muestran la simulación y recién ahí preguntan**, con `No` por defecto. En scripts
-los identificadores son `claude-code`, `codex` y `all`. Un identificador desconocido aborta
-sin tocar nada.
+en un bucle hasta que elegís salir. **Se navega con ↑ ↓ y se elige con Enter** — no se
+escribe nada, ni números ni `s/n`. Primero la acción, después el destino, y las dos que
+escriben **muestran la simulación y recién ahí preguntan**, con `No` por defecto. Sin una
+terminal —una tubería— el menú no abre: te manda a los comandos y sale. En scripts los
+identificadores son `claude-code`, `codex` y `all`. Un identificador desconocido aborta sin
+tocar nada.
 
 ## Dónde queda instalado
 
@@ -96,7 +98,7 @@ dotnet run --project installer/tests/Nzt.Cli.Checks
 Usa destinos y manifiestos temporales aislados — **nunca toca el HOME real**. Cubre
 instalación, idempotencia, convivencia con texto personal, backup, protección de ediciones,
 huérfanos, colisiones, simulación, desinstalación, bloque roto, aplanado de nombres, paridad
-con el build y las reglas del lint. La validación de esta versión da `PASS: 43 installer
+con el build y las reglas del lint. La validación de esta versión da `PASS: 47 installer
 checks`.
 
 Las comprobaciones no ejecutan conversaciones en los CLIs ni miden selección de skills. Eso

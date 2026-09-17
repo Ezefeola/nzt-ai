@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "updated": "2026-09-17T00:00:00Z",
+  "goal": "El menú del instalador NZT se navega con flechas, sin escribir números, como el de Temper v3",
+  "phase": "build",
+  "approved": true,
+  "units": [
+    { "id": 1, "do": "Spectre.Console 0.49.1 en el csproj y los tres prompts navegables (menú, proveedor, confirmación), con salida limpia si no hay terminal", "status": "done", "detail": "Program.cs: helper Ask<T> con SelectionPrompt, enums MenuAction y ProviderChoice, guarda por Console.IsInputRedirected. El resto de la salida quedó en Console" },
+    { "id": 2, "do": "Actualizar el check que ata la opción del menú al número, ahora que no hay números", "status": "done", "detail": "Ahora prueba ProvidersFor(ProviderChoice); cuatro checks en vez de cinco" },
+    { "id": 3, "do": "Documentos al día: spec §3 (mockup del menú, regla sin-terminal) y §8 (cae la decisión de cero dependencias), README del instalador", "status": "done", "detail": "También se corrigió el PASS del README, que decía 43 y estaba desactualizado desde antes" }
+  ],
+  "autonomy": { "units": [1, 2, 3], "keep_stops": [] },
+  "waiting_on": "Que el usuario corra el menú en una terminal real: la navegación con flechas no se pudo ejercitar desde acá",
+  "notes": [
+    "Verificado: build sin advertencias, PASS 47 installer checks, y con entrada redirigida el menú sale con 0 sin colgarse",
+    "No verificado: el dibujo y las flechas del prompt. No hay terminal interactiva en esta sesión",
+    "Sin commit: no se pidió"
+  ]
+}
