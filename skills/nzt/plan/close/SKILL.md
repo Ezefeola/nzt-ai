@@ -71,7 +71,7 @@ and decide which rows this feature fired.
 | a decision that is expensive to reverse | `Docs/adr/` |
 | the product's objectives, users, modules or scope | `Docs/product.md` |
 | a screen, a shared component or a visual role | the UX documents — read their `update-when` |
-| what the end user does in the product, and the product has a manual | `Docs/manual/` — the chapter of each task this feature changed (`nzt-ux-manual`) |
+| what the end user does, and the manual **already exists** | `Docs/manual/` — the chapter of each task this feature changed (`nzt-ux-manual`). The manual is written at the end of a delivery; a close never creates one |
 | environments, pipeline, rollback | `Docs/deployment.md` |
 | technical work found and deliberately left | `Docs/tech-debt.md` |
 | its own flows, data or integrations | `Plan/specs/<feature>/design/` |

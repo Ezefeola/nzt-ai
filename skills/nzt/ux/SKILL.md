@@ -46,9 +46,9 @@ and even when the rest of the phase was skipped for this feature.
 ## One unit
 
 One screen. A design covering six screens is six units. A mockup of a screen is its own
-unit, and so is a review. **In the manual, the unit is one chapter** — one task the reader
-came to accomplish — except for the coherence pass before it reaches real users, which is
-the only unit whose subject is the whole file.
+unit, and so is a review. **The manual is written at the end of what is being delivered, in
+one stretch whose unit is a chapter** — one task the reader came to accomplish — closing
+with the coherence pass, the only unit whose subject is the whole file.
 
 ## Where it lands
 
@@ -57,7 +57,8 @@ the only unit whose subject is the whole file.
 - Visual direction and the design system → `Docs/design-system.md`; the shared component
   inventory → `Docs/ui-components.md`. Both written and maintained by `nzt-ux-system`
 - The end user's manual, one file per audience → `Docs/manual/<audience>.html`, its images
-  in `Docs/manual/assets/`. On request, and then kept current at every close
+  in `Docs/manual/assets/`. On request, written at the end of what is being delivered, and
+  kept current at every close after that
 
 ## Rules
 

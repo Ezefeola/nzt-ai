@@ -550,8 +550,9 @@ una feature vive con su spec en `Plan/`.
 - **`tech-debt.md` es el único documento con estado abierto/resuelto**, y aun así sin
   checkboxes: una entrada se mueve de sección (D29).
 - **El manual del usuario final es el único artefacto que lee alguien de afuera del equipo**,
-  vive en `Docs/manual/` y es **a pedido**; desde que existe, cada cierre de feature lo pone
-  al día como a cualquier otro documento (D37).
+  vive en `Docs/manual/`, es **a pedido** y **se arma al final de lo que se entrega, no
+  mientras se construye**; desde que existe, cada cierre de feature lo pone al día como a
+  cualquier otro documento (D37).
 - **Los `QT-NN` no tienen archivo propio**: viven en el documento de diseño que los va a
   leer, y al responderse pasan a su sección `Decided` en el mismo archivo, con fecha
   (D27 lo fija junto con los diagramas).
@@ -1086,15 +1087,20 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   identidad se lee como el documento de un tercero sobre tu producto— y su autoridad son los
   criterios verificados. Ship lo publica (una fila más en la lista de alistamiento), verify
   le presta la evidencia de donde salen las capturas.
-  **(2) Cuándo: un capítulo por feature cerrada, no al final del proyecto.** Contra la
-  intuición del usuario, y con razón: al cierre el comportamiento dejó de moverse, él ya lo
-  aceptó y la evidencia tiene días en vez de meses; dejado para el final se escribe de
-  memoria sobre decisiones que nadie recuerda y es lo primero que se recorta cuando el
-  proyecto se atrasa —además de que un producto que sigue saliendo nunca llega al final. El
-  primer cierre crea el armazón (audiencias, índice, camino *empezá acá*) y cada cierre
-  siguiente suma o corrige su capítulo. **Lo que el usuario intuía sí existe, pero es otra
-  cosa**: la pasada de coherencia antes de que el manual llegue a gente real —un release, una
-  entrega, una capacitación—, la única unidad cuyo sujeto es el archivo entero.
+  **(2) Cuándo: al final, no mientras se construye. Decisión del usuario**, sostenida
+  después de que el agente propusiera lo contrario —un capítulo por feature cerrada— y se
+  ejecuta como suya. El momento es el final de lo que se entrega: alcance terminado y
+  aceptado, antes de que llegue a la gente que lo va a usar (una entrega, una capacitación,
+  el release que lo abre a usuarios reales). Lo que hace que eso funcione en NZT y no sea
+  arqueología es que **nada se escribe de memoria**: las historias con sus criterios, la
+  evidencia de pruebas con sus capturas y las palabras del glosario ya están en disco. Se
+  arma en una tanda cortada en unidades —primero el armazón (audiencias, índice, camino
+  *empezá acá*), después un capítulo por tarea, y al final la pasada de coherencia, la única
+  unidad cuyo sujeto es el archivo entero—, **con las capturas tomadas al escribirlo**, que
+  es el riesgo concreto de escribir al final y la única mitigación que hacía falta. Pedido
+  antes, se escribe antes. **Y desde que existe deja de ser un artefacto de final**: la
+  feature que cambia lo que la persona hace pone su capítulo al día al cerrar
+  (`nzt-plan-close` lleva la fila), pero **un cierre nunca crea el manual**.
   **(3) Qué lo hace ameno, escrito como reglas y no como gusto.** Capítulos que son objetivos
   dichos como los diría la persona (*"Cobrar un pedido"*, nunca *"Módulo de cobros"*: un
   manual ordenado como el menú es el índice del sistema, no el de ella); cada capítulo abre
@@ -2495,7 +2501,7 @@ probar, `nzt-verify-performance` y el RFC a pedido. **D36 y D37 son las dos últ
 dos salieron de usar el set**: los datos de prueba, con `nzt-verify-test-data` —mecanismo
 acordado una vez con el usuario y guardado en el opt-in `Test data` del stack, y un setup y
 un teardown por escenario, escritos antes de correr—, y el **manual del usuario final**, con
-`nzt-ux-manual`: hoja de UX, a pedido, un capítulo por feature cerrada y solo sobre
+`nzt-ux-manual`: hoja de UX, a pedido, **armado al final de lo que se entrega** y solo sobre
 comportamiento verificado.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de

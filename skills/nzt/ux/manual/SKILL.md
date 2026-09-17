@@ -6,8 +6,9 @@ description: Use when the end user gets a manual: an interactive HTML guide orga
 # User manual
 
 Produces `Docs/manual/<audience>.html` — one interactive file per audience — with its
-images in `Docs/manual/assets/`. **It is written on request.** Once it exists it stops
-being optional: it is a document of the product, and every close keeps it current.
+images in `Docs/manual/assets/`. **It is written on request, at the end of what is being
+delivered.** Once it exists it stops being optional: it is a document of the product, and
+every close keeps it current.
 
 If you did not arrive here from `nzt-ux`, load it first.
 
@@ -24,22 +25,27 @@ whoever builds. That single fact decides most of what follows:
   system validates that…"* never appears.
 - The product is for this person. The manual is where that is either true or a slogan.
 
-## When each chapter is written
+## When it is written
 
-**At the close of its feature, not at the end of the project** — `nzt-plan-close` carries
-the row that fires it.
+**At the end, not while the product is being built.** It is written once the scope being
+delivered is finished and accepted, before it reaches the people who will use it — a
+hand-over, a training session, the release that opens the product to real users.
 
-- At the close the behavior stopped moving, the user **accepted** it, and the evidence and
-  screenshots are days old instead of months.
-- A manual left for the end is written from memory, about decisions nobody remembers, and
-  it is the first thing cut when the project runs late. A product that keeps shipping never
-  reaches "the end" anyway.
-- **The first close creates the shell**: the audiences, the table of contents, and the
-  *start here* path. Every later close adds or updates its chapters.
-- **Before it reaches real users** — a release, a hand-over, a training session — it gets
-  one **coherence pass**: order, vocabulary, and the whole thing reading as one guide
-  instead of five chapters stapled together. That pass is the only unit whose subject is the
-  entire manual.
+- **Nothing is written from memory**: the material is already on disk — the stories with
+  their criteria, the test evidence with its captures, the words the glossary fixed. That is
+  what makes a manual at the end a reading job instead of an archaeological one.
+- **The screens are captured while writing it**, against the product as it is being
+  delivered. A capture reused from a version three features old is the oldest way a manual
+  lies.
+- **It is one stretch of work, cut into units**: first the shell — the audiences, the table
+  of contents, the *start here* path — then one chapter per task, each reviewable on its
+  own, and a last pass for coherence: order, vocabulary, and the whole thing reading as one
+  guide instead of chapters stapled together.
+- **Asked for earlier, it is written earlier.** The user's request beats the default moment;
+  what is not verified still gets no chapter.
+- **Once it exists it is a document like any other**: a later feature that changes what the
+  person does brings its chapter current when that feature closes (`nzt-plan-close` carries
+  the row). Creating the manual is never the close's job.
 
 ## Organised by what they came to do
 
