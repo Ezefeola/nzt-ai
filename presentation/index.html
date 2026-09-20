@@ -292,11 +292,10 @@
         <div class="proof-grid" data-reveal>
           <article><span class="proof-icon">↓</span><h3>Instalación global</h3><p>Codex, Claude Code o ambos. Simula antes de escribir, conserva backup y respeta contenido existente.</p></article>
           <article><span class="proof-icon">✓</span><h3>47 checks</h3><p>Idempotencia, conflictos, desinstalación, protección de ediciones, lint y paridad del build.</p></article>
-          <article><span class="proof-icon">Δ</span><h3>20 evals</h3><p>Evalúan si se elige la skill correcta, se respeta el stack y se evita activar skills innecesarias.</p></article>
         </div>
         <pre class="command-line" data-reveal><code>dotnet run --project installer/src/Nzt.Cli</code><button class="copy-button" data-copy="dotnet run --project installer/src/Nzt.Cli" type="button">Copiar</button></pre>
       </div>
-      <aside class="speaker-notes"><strong>2 min.</strong> Diferenciá checks determinísticos del instalador y evals conversacionales del comportamiento. No presentar los evals como una garantía absoluta. Evitar activaciones innecesarias significa, por ejemplo, responder una pregunta simple sin iniciar un proceso de desarrollo.</aside>
+      <aside class="speaker-notes"><strong>2 min.</strong> Los checks son determinísticos y cubren el instalador, no el comportamiento del agente: no los presentes como garantía de que el método se sigue. Lo que se puede prometer acá es que la instalación es inspeccionable y reversible.</aside>
     </section>
 
     <section class="slide slide-transition" data-section="Demo" data-title="Del método a la práctica" data-minutes="1">

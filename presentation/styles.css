@@ -218,7 +218,7 @@ h3 { letter-spacing: -.025em; }
 .not-formula { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: 1.4rem; font-size: .75rem; }
 .not-formula span { padding: .42rem .65rem; border: 1px solid var(--line); border-radius: 8px; background: rgba(0,0,0,.18); }.not-formula b { color: var(--warning); }
 
-.proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+.proof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; width: min(720px, 100%); margin-inline: auto; }
 .proof-grid article { min-height: 185px; padding: 1.2rem; border: 1px solid var(--line); border-radius: 17px; background: rgba(255,255,255,.025); }
 .proof-icon { display: grid; place-items: center; width: 34px; height: 34px; margin-inline: auto; border-radius: 10px; background: rgba(115,247,199,.1); color: var(--accent); font-weight: 800; }
 .proof-grid h3 { margin: .8rem 0 .55rem; text-align: center; font-size: 1.05rem; }.proof-grid p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
