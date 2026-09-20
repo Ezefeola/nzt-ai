@@ -4,6 +4,9 @@
 lo limita: le da forma —método, memoria y frenos— para que rinda parejo en vez de a los
 saltos.
 
+El nombre viene de *Limitless*, una película en la que NZT es una pastilla ficticia que le
+permite al protagonista aprovechar al máximo sus capacidades mentales.
+
 En *Limitless*, la pastilla no le enseña nada nuevo a Eddie: le da acceso ordenado a lo que
 ya sabe. Eso es NZT para Claude Code y Codex. **El agente sigue siendo el agente; NZT es la
 disciplina.** Y las consecuencias malas de la película venían de tomarla sin estructura, así
