@@ -1,19 +1,63 @@
 {
   "version": 1,
-  "updated": "2026-09-17T00:00:00Z",
-  "goal": "El menú del instalador NZT se navega con flechas, sin escribir números, como el de Temper v3",
-  "phase": "build",
+  "updated": "2026-09-20T15:19:38Z",
+  "goal": "Simplificar el prompt 01 de slide 19 dejando sólo el pedido del producto",
+  "phase": "verify",
   "approved": true,
   "units": [
-    { "id": 1, "do": "Spectre.Console 0.49.1 en el csproj y los tres prompts navegables (menú, proveedor, confirmación), con salida limpia si no hay terminal", "status": "done", "detail": "Program.cs: helper Ask<T> con SelectionPrompt, enums MenuAction y ProviderChoice, guarda por Console.IsInputRedirected. El resto de la salida quedó en Console" },
-    { "id": 2, "do": "Actualizar el check que ata la opción del menú al número, ahora que no hay números", "status": "done", "detail": "Ahora prueba ProvidersFor(ProviderChoice); cuatro checks en vez de cinco" },
-    { "id": 3, "do": "Documentos al día: spec §3 (mockup del menú, regla sin-terminal) y §8 (cae la decisión de cero dependencias), README del instalador", "status": "done", "detail": "También se corrigió el PASS del README, que decía 43 y estaba desactualizado desde antes" }
+    {
+      "id": 1,
+      "do": "Ajustar orden y textos de las slides actuales 4, 5 y 14 y actualizar README",
+      "status": "done",
+      "detail": "El nombre ahora es slide 2 de Apertura; slide 5 habla de capacidad del modelo; slide 14 explica skills innecesarias y da ejemplo en notas. README ajustado. Conteo estático: 20 slides. Navegación y capturas verificadas en Chrome."
+    },
+    {
+      "id": 2,
+      "do": "Agregar iconos coherentes a los cinco pasos del ciclo y las siete fases",
+      "status": "done",
+      "detail": "12 iconos SVG locales de trazo uniforme: búsqueda, plan, código, escudo, guardado, arquitectura, interfaz, entrega y aprendizaje; conteo verificado. Sin paquetes externos. Capturas revisadas en Chrome a 1366×768."
+    },
+    {
+      "id": 3,
+      "do": "Animar el mapa de capacidades y mejorar sus once etiquetas",
+      "status": "done",
+      "detail": "Once capacidades, sin ADR; Specs y SDD con explicación en notas. Órbita de 100 s, brillo suave, pausa y reanudación, grilla móvil y alternativa estática. Verificado en Chrome: navegación, movimiento, pausa, reducción e impresión; 100 posiciones sin colisiones entre etiquetas."
+    },
+    {
+      "id": 4,
+      "do": "Centrar ciclo y encabezados de fases y medición; renovar título y bajada de slide 15",
+      "status": "done",
+      "detail": "Slide 7 centrada; 10 y 14 con iconos y títulos centrados y párrafos a izquierda; 11 conservada. Slide 15: Del método a la práctica + Veamos cómo NZT guía la construcción de un producto. Chrome verificó alineaciones y ausencia de desbordes a 1366×768 y 1920×1080; cuatro capturas revisadas."
+    },
+    {
+      "id": 5,
+      "do": "Agregar respuesta al mouse, animación ambiental y quitar destacados fijos en slides 3, 6, 7 y 19",
+      "status": "done",
+      "detail": "Hover con brillo y elevación de 4 px en tarjetas; portada con halo, etiquetas derechas y pausa al señalar; slide 15 con arco giratorio y resplandor. Sin destacados fijos en 3, 6, 7 y 19. Botón global de pausa; movimiento reducido e impresión estáticos. Chrome: 18 comprobaciones pasaron y 4 capturas revisadas."
+    },
+    {
+      "id": 6,
+      "do": "Animar los boxes con flotación de 3 px, ciclos de 7 a 9 s y brillo tenue, integrando todas las pausas",
+      "status": "done",
+      "detail": "Flotación CSS hasta 3 px y brillo continuo, ciclos de 7–9 s y desfases por box. Hover y foco interno pausan sin salto; pausa global, slides inactivas, movimiento reducido e impresión contemplados. Órbitas 1 y 11 excluidas. Chrome: 12 comprobaciones pasaron; capturas 3, 7 y 19 revisadas."
+    },
+    {
+      "id": 7,
+      "do": "Quitar instrucciones de método del prompt inicial y sincronizar el guion de demo",
+      "status": "done",
+      "detail": "Se eliminaron Trabajá con NZT en modo acompañado y la instrucción de proponer plan antes de código; sólo queda crear Pulso. HTML y presentation/demo/prompts.md sincronizados; texto exacto y git diff --check verificados."
+    }
   ],
-  "autonomy": { "units": [1, 2, 3], "keep_stops": [] },
-  "waiting_on": "Que el usuario corra el menú en una terminal real: la navegación con flechas no se pudo ejercitar desde acá",
+  "autonomy": {
+    "units": [
+      7
+    ],
+    "keep_stops": []
+  },
+  "waiting_on": null,
   "notes": [
-    "Verificado: build sin advertencias, PASS 47 installer checks, y con entrada redirigida el menú sale con 0 sin colgarse",
-    "No verificado: el dibujo y las flechas del prompt. No hay terminal interactiva en esta sesión",
-    "Sin commit: no se pidió"
+    "Última verificación: 12 comprobaciones en Chrome a 1366×768; sintaxis JS y git diff --check correctos. El comprobador se corrigió para interpretar translate de un solo valor como desplazamiento vertical cero; segunda ejecución completa pasó.",
+    "Capturas: C:/Users/e_feola/AppData/Local/Temp/nzt-float-Mc8Ivx. README actualizado; sin commit. Seis unidades cerradas, varias revisiones visuales acumuladas; no hay porcentaje de contexto del host. Se recomienda sesión nueva para más cambios, con estado actual guardado.",
+    "Pendiente anterior ajeno a este pedido: el usuario debe probar el menú del instalador con flechas en una terminal real; build y 47 checks del instalador ya habían pasado."
   ]
 }

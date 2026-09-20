@@ -16,6 +16,15 @@
   const timerText = document.querySelector("#timerText");
   const toast = document.querySelector("#toast");
 
+  const floatingBoxes = document.querySelectorAll(
+    ".agenda-item, .failure, .quote-card, .compare-card, .layer-card, .loop-step, .stop-card, .code-card, .phase-rail article, .artifact, .not-card, .proof-grid article, .expectation-grid article, .demo-route li, .prompt-card, .closing-actions > div, .route-line > span"
+  );
+  floatingBoxes.forEach((box, index) => {
+    box.classList.add("floating-box");
+    box.style.setProperty("--float-duration", `${7 + (index % 5) * .5}s`);
+    box.style.setProperty("--float-delay", `${-(index % 7) * .8}s`);
+  });
+
   let current = initialSlide();
   let timerSeconds = 0;
   let timerId = null;
@@ -154,6 +163,19 @@
   document.querySelector("#overviewButton").addEventListener("click", () => toggleOverview());
   document.querySelector("#closeOverview").addEventListener("click", () => toggleOverview(false));
   document.querySelector("#fullscreenButton").addEventListener("click", toggleFullscreen);
+  document.querySelector("#motionButton").addEventListener("click", event => {
+    const paused = document.body.classList.toggle("motion-paused");
+    const label = paused ? "Reanudar animaciones ambientales" : "Pausar animaciones ambientales";
+    event.currentTarget.setAttribute("aria-pressed", String(paused));
+    event.currentTarget.setAttribute("aria-label", label);
+    event.currentTarget.title = label;
+    event.currentTarget.textContent = paused ? "▷" : "Ⅱ";
+  });
+  document.querySelector("#capabilityMotion").addEventListener("click", event => {
+    const paused = document.querySelector("#capabilityMap").classList.toggle("is-paused");
+    event.currentTarget.setAttribute("aria-pressed", String(paused));
+    event.currentTarget.textContent = paused ? "Reanudar movimiento" : "Pausar movimiento";
+  });
   timerButton.addEventListener("click", toggleTimer);
   shortcutsDialog.querySelector(".dialog-close").addEventListener("click", () => shortcutsDialog.close());
 

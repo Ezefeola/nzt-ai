@@ -20,6 +20,7 @@
       <button class="icon-button" id="overviewButton" type="button" aria-label="Vista general" title="Vista general (O)">▦</button>
       <button class="icon-button" id="notesButton" type="button" aria-label="Notas del presentador" title="Notas (S)">≡</button>
       <button class="icon-button" id="fullscreenButton" type="button" aria-label="Pantalla completa" title="Pantalla completa (F)">⛶</button>
+      <button class="icon-button" id="motionButton" type="button" aria-label="Pausar animaciones ambientales" aria-pressed="false" title="Pausar animaciones ambientales">Ⅱ</button>
       <button class="timer" id="timerButton" type="button" title="Iniciar o pausar cronómetro">
         <span class="timer-dot"></span><span id="timerText">00:00</span>
       </button>
@@ -52,6 +53,21 @@
       </aside>
     </section>
 
+    <section class="slide" data-section="Apertura" data-title="El nombre" data-minutes="2">
+      <div class="slide-inner split">
+        <div>
+          <p class="eyebrow" data-reveal>DE DÓNDE SALE EL NOMBRE</p>
+          <h2 data-reveal><em>Limitless</em> tiene una pastilla ficticia: <span class="accent-text">NZT.</span></h2>
+          <p class="body-copy" data-reveal>En la película, no le enseña nada nuevo a Eddie: le permite acceder de forma extraordinaria a lo que ya tiene.</p>
+        </div>
+        <blockquote class="quote-card" data-reveal>
+          <span class="quote-mark">“</span>
+          <p>El agente sigue siendo el agente.<br><strong>NZT es la disciplina.</strong></p>
+        </blockquote>
+      </div>
+      <aside class="speaker-notes"><strong>2 min.</strong> La analogía termina acá: las consecuencias de la película venían de usar la pastilla sin estructura; en este proyecto, la estructura es el producto.</aside>
+    </section>
+
     <section class="slide" data-section="Apertura" data-title="El recorrido de la sesión" data-minutes="2">
       <div class="slide-inner narrow">
         <p class="eyebrow" data-reveal>EL RECORRIDO DE LA SESIÓN</p>
@@ -59,7 +75,7 @@
         <div class="agenda" data-reveal>
           <div class="agenda-item"><span>01</span><div><strong>El punto de partida</strong><small>Qué problemas aparecen al trabajar con agentes sin un proceso claro.</small></div><b>10′</b></div>
           <div class="agenda-item"><span>02</span><div><strong>El método NZT</strong><small>Cómo organiza el trabajo, registra decisiones y define puntos de revisión.</small></div><b>20′</b></div>
-          <div class="agenda-item accent"><span>03</span><div><strong>Un proyecto desde cero</strong><small>Construimos una aplicación pequeña y observamos el método en acción.</small></div><b>20′</b></div>
+          <div class="agenda-item"><span>03</span><div><strong>Un proyecto desde cero</strong><small>Construimos una aplicación pequeña y observamos el método en acción.</small></div><b>20′</b></div>
           <div class="agenda-item"><span>04</span><div><strong>Llevarlo al equipo</strong><small>Qué necesitamos para probarlo en nuestro trabajo y evaluar el resultado.</small></div><b>5′</b></div>
         </div>
       </div>
@@ -82,25 +98,10 @@
       <aside class="speaker-notes"><strong>3 min.</strong> Pedí una señal rápida: “¿Cuál de estas cinco ya les pasó?”. No abras debate; usalo para conectar la experiencia del equipo con la propuesta.</aside>
     </section>
 
-    <section class="slide" data-section="El problema" data-title="El nombre" data-minutes="2">
-      <div class="slide-inner split">
-        <div>
-          <p class="eyebrow" data-reveal>DE DÓNDE SALE EL NOMBRE</p>
-          <h2 data-reveal><em>Limitless</em> tiene una pastilla ficticia: <span class="accent-text">NZT.</span></h2>
-          <p class="body-copy" data-reveal>En la película, no le enseña nada nuevo a Eddie: le permite acceder de forma extraordinaria a lo que ya tiene.</p>
-        </div>
-        <blockquote class="quote-card" data-reveal>
-          <span class="quote-mark">“</span>
-          <p>El agente sigue siendo el agente.<br><strong>NZT es la disciplina.</strong></p>
-        </blockquote>
-      </div>
-      <aside class="speaker-notes"><strong>2 min.</strong> La analogía termina acá: las consecuencias de la película venían de usar la pastilla sin estructura; en este proyecto, la estructura es el producto.</aside>
-    </section>
-
     <section class="slide" data-section="El problema" data-title="Qué cambia" data-minutes="3">
       <div class="slide-inner">
         <p class="eyebrow" data-reveal>ANTES / DESPUÉS</p>
-        <h2 data-reveal>No cambia el IQ. Cambia el sistema de trabajo.</h2>
+        <h2 data-reveal>La misma capacidad del modelo.<br><span class="accent-text">Un mejor sistema de trabajo.</span></h2>
         <div class="comparison" data-reveal>
           <article class="compare-card before">
             <header><span class="status-dot"></span>Sin método</header>
@@ -135,7 +136,7 @@
           <article class="layer-card router"><span class="layer-number">02</span><div><h3>Routers</h3><p>Uno por fase. Clasifican el trabajo y eligen la hoja correcta.</p></div><small>7 fases</small></article>
           <article class="layer-card leaves"><span class="layer-number">03</span><div><h3>Hojas</h3><p>Una skill, un trabajo. Instrucciones concretas y acotadas.</p></div><small>≤ 200 líneas</small></article>
         </div>
-        <div class="route-line" data-reveal><span>pedido</span><i>→</i><span>kernel</span><i>→</i><span>router</span><i>→</i><span class="active-node">hoja exacta</span></div>
+        <div class="route-line" data-reveal><span>pedido</span><i>→</i><span>kernel</span><i>→</i><span>router</span><i>→</i><span>hoja exacta</span></div>
       </div>
       <aside class="speaker-notes"><strong>3 min.</strong> Esta es la decisión técnica clave: el ruteo está instruido en una tabla; no depende sólo de que el modelo adivine por descripciones. Las 110 skills no se cargan juntas.</aside>
     </section>
@@ -145,15 +146,15 @@
         <p class="eyebrow" data-reveal>EL CICLO</p>
         <h2 data-reveal>Un mismo ritmo, escalado al pedido.</h2>
         <div class="loop" data-reveal>
-          <div class="loop-step"><b>1</b><span>Entender</span><small>Qué y para qué</small></div>
+          <div class="loop-step"><b>01</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Entender</span><small>Qué y para qué</small></div>
           <div class="loop-arrow">→</div>
-          <div class="loop-step"><b>2</b><span>Proponer</span><small>Unidades y alcance</small></div>
+          <div class="loop-step"><b>02</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/></svg><span>Proponer</span><small>Unidades y alcance</small></div>
           <div class="loop-arrow">→</div>
-          <div class="loop-step"><b>3</b><span>Ejecutar</span><small>Una unidad</small></div>
+          <div class="loop-step"><b>03</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><span>Ejecutar</span><small>Una unidad</small></div>
           <div class="loop-arrow">→</div>
-          <div class="loop-step"><b>4</b><span>Verificar</span><small>Evidencia real</small></div>
+          <div class="loop-step"><b>04</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6Z"/><path d="m8 12 3 3 5-6"/></svg><span>Verificar</span><small>Evidencia real</small></div>
           <div class="loop-arrow">→</div>
-          <div class="loop-step active"><b>5</b><span>Registrar</span><small>Estado persistente</small></div>
+          <div class="loop-step"><b>05</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 3h13l4 4v14H3V3ZM7 3v6h10V3M7 21v-8h10v8"/></svg><span>Registrar</span><small>Estado persistente</small></div>
         </div>
         <p class="takeaway" data-reveal>El cierre no es “terminé de escribir”. Es: guardé un punto seguro, actualicé el estado y dije qué sigue.</p>
       </div>
@@ -207,35 +208,43 @@
         <p class="eyebrow" data-reveal>EL MAPA COMPLETO</p>
         <h2 data-reveal>Siete fases. No siete pasos obligatorios.</h2>
         <div class="phase-rail" data-reveal>
-          <article style="--phase:#73f7c7"><span>01</span><h3>Discovery</h3><p>Qué construir, para quién y bajo qué reglas.</p></article>
-          <article style="--phase:#68d8ff"><span>02</span><h3>Architecture</h3><p>Cómo resolverlo, con qué límites y stack.</p></article>
-          <article style="--phase:#b7a2ff"><span>03</span><h3>UX</h3><p>Pantallas, flujos, sistema y manual.</p></article>
-          <article style="--phase:#ffd166"><span>04</span><h3>Build</h3><p>Código y tests que viajan con él.</p></article>
-          <article style="--phase:#ff8fab"><span>05</span><h3>Verify</h3><p>Escenarios, datos, ejecución y evidencia.</p></article>
-          <article style="--phase:#ffad66"><span>06</span><h3>Ship</h3><p>Versionado, pipeline, deploy y observación.</p></article>
-          <article style="--phase:#e4f46b"><span>07</span><h3>Learn</h3><p>La persona adquiere la habilidad.</p></article>
+          <article style="--phase:#73f7c7"><span>01</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><h3>Discovery</h3><p>Qué construir, para quién y bajo qué reglas.</p></article>
+          <article style="--phase:#68d8ff"><span>02</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="2" width="8" height="6" rx="1"/><rect x="2" y="16" width="7" height="6" rx="1"/><rect x="15" y="16" width="7" height="6" rx="1"/><path d="M12 8v4M5.5 16v-4h13v4"/></svg><h3>Architecture</h3><p>Cómo resolverlo, con qué límites y stack.</p></article>
+          <article style="--phase:#b7a2ff"><span>03</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="17" rx="2"/><path d="M2 8h20M8 8v12M12 12h6M12 16h4"/></svg><h3>UX</h3><p>Pantallas, flujos, sistema y manual.</p></article>
+          <article style="--phase:#ffd166"><span>04</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><h3>Build</h3><p>Código y tests que viajan con él.</p></article>
+          <article style="--phase:#ff8fab"><span>05</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6Z"/><path d="m8 12 3 3 5-6"/></svg><h3>Verify</h3><p>Escenarios, datos, ejecución y evidencia.</p></article>
+          <article style="--phase:#ffad66"><span>06</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 16V2m-5 5 5-5 5 5M3 14v7h18v-7"/></svg><h3>Ship</h3><p>Versionado, pipeline, deploy y observación.</p></article>
+          <article style="--phase:#e4f46b"><span>07</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 6C9 3 5 3 2 4v15c4-1 7-1 10 2 3-3 6-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><h3>Learn</h3><p>La persona adquiere la habilidad.</p></article>
         </div>
         <p class="takeaway" data-reveal>Una fase entra sólo si cambia lo que se va a construir. Omitir es normal; omitir en silencio, no.</p>
       </div>
       <aside class="speaker-notes"><strong>4 min.</strong> Recorré una frase por fase. Learn es un modo alternativo: el agente deja de producir por la persona y pasa a diagnosticar, enseñar, practicar, evaluar y programar repasos.</aside>
     </section>
 
-    <section class="slide" data-section="Cómo funciona" data-title="Profundidad selectiva" data-minutes="3">
+    <section class="slide slide-capabilities" data-section="Cómo funciona" data-title="Profundidad selectiva" data-minutes="3">
       <div class="slide-inner">
         <p class="eyebrow" data-reveal>PROFUNDIDAD SELECTIVA</p>
         <h2 data-reveal>Amplio en cobertura. Preciso en cada tarea.</h2>
-        <div class="capability-map" data-reveal>
-          <div class="capability-hub"><span>NZT</span><small>rutea</small></div>
-          <div class="capability-ring">
-            <span style="--i:0">historias</span><span style="--i:1">ADR</span><span style="--i:2">mockups</span>
-            <span style="--i:3">TDD</span><span style="--i:4">test data</span><span style="--i:5">performance</span>
-            <span style="--i:6">CI/CD</span><span style="--i:7">observabilidad</span><span style="--i:8">tutoría</span>
-            <span style="--i:9">retención</span><span style="--i:10">EF Core</span><span style="--i:11">Blazor</span>
-          </div>
+        <div class="capability-map" id="capabilityMap" data-reveal>
+          <div class="capability-hub"><span>NZT</span><small>coordina</small></div>
+          <ul class="capability-ring" aria-label="Prácticas y capacidades de NZT">
+            <li style="--i:0"><span>Specs</span></li>
+            <li style="--i:1"><span>Mockups</span></li>
+            <li style="--i:2"><span>TDD</span></li>
+            <li style="--i:3"><span>Datos de prueba</span></li>
+            <li style="--i:4"><span>Rendimiento</span></li>
+            <li style="--i:5"><span>CI/CD</span></li>
+            <li style="--i:6"><span>Observabilidad</span></li>
+            <li style="--i:7"><span>Tutoría</span></li>
+            <li style="--i:8"><span>SDD</span></li>
+            <li style="--i:9"><span>EF Core</span></li>
+            <li style="--i:10"><span>Blazor</span></li>
+          </ul>
         </div>
+        <button class="motion-toggle" id="capabilityMotion" type="button" aria-controls="capabilityMap" aria-pressed="false" data-reveal>Pausar movimiento</button>
         <div class="metric-row" data-reveal><div><strong>110</strong><span>skills instaladas</span></div><div><strong>1</strong><span>hoja específica cargada</span></div><div><strong>0</strong><span>subagentes necesarios</span></div></div>
       </div>
-      <aside class="speaker-notes"><strong>3 min.</strong> Las skills de stack se instalan, pero sólo se aplican si el documento de stack eligió esa tecnología. Una carpeta disponible no es autorización.</aside>
+      <aside class="speaker-notes"><strong>3 min.</strong> NZT coordina prácticas, artefactos y capacidades; cada etiqueta representa un ejemplo, no una fase adicional. Specs son especificaciones; SDD significa desarrollo guiado por especificaciones (Spec-Driven Development): construir y verificar a partir del comportamiento acordado. TDD es desarrollo guiado por pruebas. Las skills de stack sólo se aplican si el documento de stack eligió esa tecnología. Una carpeta disponible no es autorización. Podés pausar el movimiento para recorrer las etiquetas.</aside>
     </section>
 
     <section class="slide" data-section="Cómo funciona" data-title="Artefactos útiles" data-minutes="2">
@@ -283,17 +292,19 @@
         <div class="proof-grid" data-reveal>
           <article><span class="proof-icon">↓</span><h3>Instalación global</h3><p>Codex, Claude Code o ambos. Simula antes de escribir, conserva backup y respeta contenido existente.</p></article>
           <article><span class="proof-icon">✓</span><h3>47 checks</h3><p>Idempotencia, conflictos, desinstalación, protección de ediciones, lint y paridad del build.</p></article>
-          <article><span class="proof-icon">Δ</span><h3>20 evals</h3><p>Ruteo correcto, selección exclusiva de stack y restricción frente al sobre-disparo.</p></article>
+          <article><span class="proof-icon">Δ</span><h3>20 evals</h3><p>Evalúan si se elige la skill correcta, se respeta el stack y se evita activar skills innecesarias.</p></article>
         </div>
         <pre class="command-line" data-reveal><code>dotnet run --project installer/src/Nzt.Cli</code><button class="copy-button" data-copy="dotnet run --project installer/src/Nzt.Cli" type="button">Copiar</button></pre>
       </div>
-      <aside class="speaker-notes"><strong>2 min.</strong> Diferenciá checks determinísticos del instalador y evals conversacionales del comportamiento. No presentar los evals como una garantía absoluta.</aside>
+      <aside class="speaker-notes"><strong>2 min.</strong> Diferenciá checks determinísticos del instalador y evals conversacionales del comportamiento. No presentar los evals como una garantía absoluta. Evitar activaciones innecesarias significa, por ejemplo, responder una pregunta simple sin iniciar un proceso de desarrollo.</aside>
     </section>
 
-    <section class="slide slide-transition" data-section="Demo" data-title="Momento demo" data-minutes="1">
+    <section class="slide slide-transition" data-section="Demo" data-title="Del método a la práctica" data-minutes="1">
+      <div class="transition-aura" aria-hidden="true"></div>
       <div class="slide-inner center">
         <p class="eyebrow" data-reveal>HASTA ACÁ, LA IDEA</p>
-        <h2 class="display-small" data-reveal>Ahora veamos<br><span class="gradient-text">dónde frena.</span></h2>
+        <h2 class="display-small" data-reveal>Del método<br><span class="gradient-text">a la práctica.</span></h2>
+        <p class="lead" data-reveal>Veamos cómo NZT guía la construcción de un producto.</p>
         <div class="demo-badge" data-reveal><span class="live-dot"></span> DEMO EN VIVO · 20 MIN</div>
       </div>
       <aside class="speaker-notes"><strong>1 min.</strong> Cambiá de ventana sólo después de explicar el caso. Dejá esta slide visible mientras preparás la terminal.</aside>
@@ -355,9 +366,9 @@
           <div class="demo-clock" data-reveal><span>OBJETIVO</span><strong>11:00</strong></div>
         </div>
         <div class="prompt-grid" data-reveal>
-          <article class="prompt-card featured">
+          <article class="prompt-card">
             <header><span>01 · INICIO</span><button class="copy-button" type="button" data-copy-target="promptStart">Copiar</button></header>
-            <p id="promptStart">Quiero crear desde cero “Pulso”, un tablero web para registrar el estado verde, amarillo o rojo de cada integrante. Trabajá con NZT en modo acompañado. Antes de escribir código, proponé el plan completo y sus puntos de freno.</p>
+            <p id="promptStart">Quiero crear desde cero “Pulso”, un tablero web para registrar el estado verde, amarillo o rojo de cada integrante.</p>
           </article>
           <article class="prompt-card">
             <header><span>02 · RESPUESTAS</span><button class="copy-button" type="button" data-copy-target="promptAnswers">Copiar</button></header>

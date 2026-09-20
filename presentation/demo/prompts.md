@@ -46,8 +46,7 @@ perder la reunión si falla la red o una ejecución tarda.
 Enviar exactamente:
 
 > Quiero crear desde cero “Pulso”, un tablero web para registrar el estado verde, amarillo
-> o rojo de cada integrante. Trabajá con NZT en modo acompañado. Antes de escribir código,
-> proponé el plan completo y sus puntos de freno.
+> o rojo de cada integrante.
 
 ### Qué observar
 
@@ -206,4 +205,3 @@ La demo fue exitosa si el equipo pudo señalar evidencia de estos seis puntos:
 Terminar aunque la aplicación no esté completa. El objetivo de la reunión es evaluar el
 método; una generación veloz pero sin frenos sería una demo fallida aunque produzca una UI
 bonita.
-
