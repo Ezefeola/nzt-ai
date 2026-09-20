@@ -5,9 +5,10 @@ description: Use when the product's technical shape is decided or updated: which
 
 # Product architecture
 
-Produces `Docs/architecture.md`: the components that exist, what each one owns, how they
-talk to each other, and the reasoning that put them there. It is the document every feature
-design is fitted into.
+Produces `Docs/architecture.md` — the components that exist, what each one owns, how they
+talk to each other, and the reasoning that put them there — and
+`Docs/architecture-decisions.md`, the log of the questions that produced it. It is the
+document every feature design is fitted into.
 
 It does **not** write the stack documents — one per component and area,
 `nzt-architecture-stack`'s job — nor the model of the business: the entities and their
@@ -15,7 +16,17 @@ aggregates are `nzt-architecture-domain`'s, and the cut into contexts is
 `nzt-architecture-contexts`'. This file says which components exist and what each one owns;
 an entity listed here is a model growing in two places.
 
-If you did not arrive here from `nzt-architecture`, load it first.
+If you did not arrive here from `nzt-architecture`, load it first: it carries the protocol
+this skill runs — derive the questions, resolve each by its kind, let the user choose the
+mode, and log every answer with where it came from.
+
+**The questions come first, and at this altitude they are the expensive ones**: the stack
+of each component, how the components and the client applications talk to each other, which
+providers are used and what each one allows. Derive them from the product document, the
+specs and their technical notes, write them as open `QT-NN` in
+`Docs/architecture-decisions.md`, and only then say how many there are and ask the mode.
+**The stack's axes go in this same log** — `nzt-architecture-stack` keeps asking them the
+way it always did; what changed is only where the answer is recorded.
 
 ## Before deciding
 
@@ -60,12 +71,8 @@ outbound integration with the billing system. Nothing runs asynchronously today.
 - **Rejected: a separate promotions service.** One team, one database, no independent
   scaling need. Revisit if promotions get their own lifecycle.
 
-## Open
-- QT-02 · Does the support desk need to read orders while billing is down?
-
-## Decided
-- QT-01 · 2026-09-14 · The client never recalculates a total. It shows what the API
-  returned. (ADR-002)
+## Open questions
+Listed by id; they live and get answered in `architecture-decisions.md`: QT-02.
 ```
 
 ## Components
@@ -126,17 +133,18 @@ kind of actor. `nzt-architecture-diagrams` decides and offers;
 `nzt-architecture-diagrams-components` draws them. A picture that repeats the component
 table in boxes is maintenance with no reader.
 
-## Open questions, and the decided ones
+## The log
 
-A technical question that belongs to this phase is written here as `QT-NN` **before** it is
-asked. One that belongs to a later phase is written where that phase will read it and is
-not decided early — deciding a build question during architecture is deciding it with less
-information than whoever gets there will have.
+`Docs/architecture-decisions.md` holds every `QT-NN` of this altitude, in its own series,
+**append-only**: the question, its answer, the date, and the label saying where the answer
+came from. Its shape is the one `nzt-architecture-design-feature` writes out, with the
+product in the title instead of a feature. One that belongs to a later phase is written
+where that phase will read it and is not decided early — deciding a build question during
+architecture is deciding it with less information than whoever gets there will have.
 
-**An answered question moves to `Decided` with its answer and its date; it is never
-deleted.** That section is this document's record of what was settled, and it is what keeps
-a closed question from being reopened every quarter. When the answer earned an ADR, the
-line cites it instead of restating it.
+**`Docs/architecture.md` is the present and gets rewritten; the log is not touched.** A
+superseded answer stays and gets a new entry naming what replaced it. When the answer
+earned an ADR, the line cites it instead of restating it.
 
 ## Done when
 
@@ -146,7 +154,8 @@ something belongs?
 - Every component says what it owns and lists its areas.
 - No two components own the same decision.
 - Every external system has its `INT-NN` and says what happens when it is unavailable.
-- Every answered question is in `Decided`, with its date; none was deleted.
+- The questions were derived and logged before anything was proposed, the user chose the
+  mode, and every entry says where its answer came from.
 - Every non-obvious choice has its reasoning, and every rejected one its trigger.
 - Everything not yet built is marked as planned.
-- Open technical questions are `QT-NN` in the file, not assumptions in the text.
+- Open technical questions are `QT-NN` in the log, not assumptions in the text.

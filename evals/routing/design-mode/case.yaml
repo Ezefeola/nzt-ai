@@ -1,0 +1,50 @@
+schema_version: "1.1"
+name: route-design-mode
+description: >
+  The user asks outright for a feature's technical design, and the feature earns one: it
+  crosses two components and a payment gateway. Measures the rule D41 restored from Temper
+  v3 - the questions are derived from the rules before anything is proposed, and how they
+  get resolved is the user's choice, not the agent's.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-architecture and its feature design leaf, reads the spec and the stacks, and
+  comes back with the technical questions the design has to answer written as QT-NN plus
+  the choice of how to resolve them - proposals, together or dictated - instead of a design
+  whose decisions are already taken.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Dale, hacé el diseño técnico de la confirmación de pedidos con cobro: la Web confirma,
+    la Api cobra contra la pasarela y el pedido queda confirmado sólo si el cobro salió.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: architecture-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture'
+  - name: read-the-feature
+    type: tool_used
+    tool: Read
+    input_match: 'F-001-pedidos'
+  - name: questions-have-ids
+    type: regex
+    pattern: 'QT-0'
+    min: 1
+  - name: derives-then-asks-the-mode
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about the technical design of order confirmation with
+      a charge.
+      PASS if it does both: (a) it lists the technical questions the design has to answer,
+      derived from what the project says - who confirms, what happens when the gateway
+      fails or is slow, what is persisted and when, whether confirming twice is safe -
+      carrying QT ids; and (b) it asks the user how to resolve them, naming the three ways
+      (the agent proposes, they resolve them together, or the user dictates the design).
+      FAIL if it hands over a finished design with the decisions already taken, if it asks
+      the mode without having derived any question, if it asks the user something it could
+      verify itself - such as what the gateway returns on a rejected charge, which is
+      researched, not asked - or if it only offers the design document without deriving
+      anything.

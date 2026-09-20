@@ -27,6 +27,66 @@ Before deciding, read what already binds you: the feature spec and its stories, 
 document of every component you touch, and the existing decision records. Reuse what is
 already loaded — the table below does not mean load every row.
 
+## The questions come before the design
+
+**This phase never decides alone what it could have asked.** Before writing a line of a
+design, derive from the rules, the stories and the stack **every** technical question the
+document has to answer — including what each third party allows and how it fails — and
+write them as open `QT-NN` in the decisions log. An analysis' technical notes are one
+input; the rules are the source.
+
+Then resolve each one **by its kind**, and the kind is not the user's to pick:
+
+| Kind | Example | How it is resolved |
+|---|---|---|
+| Checkable fact | what the gateway returns when it rejects a charge | researched in its authoritative source (`nzt-research`), answered with source and date — **never asked** |
+| Detail inside the agreed scope | how many retries before giving up | the agent decides it, labelled as its own |
+| Tradeoff or material change | validating the licence online or with a signed token | **asked**, with the options, their consequences and a recommendation — in every mode |
+
+A finding that contradicts an agreed rule does not bend the design: it goes back to
+discovery as a question or a change proposal.
+
+## How they get resolved is the user's choice
+
+Once the questions are derived — **never before, or the user chooses blind, not knowing
+whether there are three or twenty-five** — say how many came out and of what kind, and
+offer three ways:
+
+| Mode | What the agent does with the details |
+|---|---|
+| **Proposals** | decides them, labelled, and the user objects to what does not fit |
+| **Together** | asks them too, **grouped into one round**, never one at a time |
+| **Dictated** | the user says how it goes, and the agent writes it |
+
+The mode governs **only the middle row of the table above**. A checkable fact is never
+asked in any mode; a tradeoff is always asked in every one. It is chosen per document, and
+what was chosen goes in the log.
+
+**Dictated does not mean stenography.** What the user dictates is contrasted against the
+spec and the stack, and a contradiction is raised before it is written — otherwise it is
+found in build, by someone with less information than you have now.
+
+## The decisions log
+
+Every `QT-NN` lives in an **append-only log**, beside the document it serves:
+`Docs/architecture-decisions.md` for the product — the stack's axes included — and
+`Plan/specs/<feature>/design/decisions.md` for a feature. One series each.
+
+**The design is the present and gets rewritten; the log is the conversation that produced
+it and is never overwritten.** That is why they are two files: a document rewritten whole
+that also has to be append-only in half its body is a contradiction. A superseded answer is
+marked with what superseded it, never edited away.
+
+Every entry says **where it came from**, and one is never dressed as another:
+
+| Label | What it means |
+|---|---|
+| `usuario` | the user answered it |
+| `agente, dentro del alcance` | the agent decided it; the user can still object |
+| `investigado` | a fact, with its source and the date it was read |
+| `propuesta` | offered, not answered yet |
+| `[TO-DEFINE]` | explicitly out of scope, and it appears in every report until it is resolved |
+
 ## Choose the skill
 
 | The unit is | Load |
@@ -68,8 +128,10 @@ decision record.
 - Decision records → `Docs/adr/` · proposals still being agreed → `Docs/rfc/`, on request ·
   deferred technical work → `Docs/tech-debt.md`
 - One stack document per component and area → `Docs/<area>-stack-<component>.md`
-- A feature's technical design → `Plan/specs/<feature>/design/design.md`, with any contract
-  or diagram it needs beside it in the same folder
+- The technical questions and their answers → `Docs/architecture-decisions.md` for the
+  product, `Plan/specs/<feature>/design/decisions.md` for a feature. Append-only
+- A feature's technical design → `Plan/specs/<feature>/design/design.md`, **offered, not
+  declared**, with any contract or diagram it needs beside it in the same folder
 - A review's findings go in its report, and land where each one belongs: an ADR, an entry
   of deferred work, or a proposal back to the product design. It writes no document of its
   own.
@@ -95,13 +157,13 @@ decision record.
   an RFC first**, and nothing is built while that RFC is open.
 - Respect what exists. In an existing system the current structure is a constraint and a
   source of information, not an accident to correct in passing.
-- A technical question that belongs to this phase is written here with a stable `QT-NN`
-  before it is asked. One that belongs to a later phase is written where that phase will
-  read it, and is not decided early.
-- **An answered `QT-NN` is not deleted: it moves to `Decided`, with its answer and its
-  date, in the same document.** Open and decided together are this phase's record of what
-  was settled; a question that disappears once it is answered leaves the next reader
-  deciding it again, and nothing says it was ever asked.
+- A technical question that belongs to this phase is written in its log with a stable
+  `QT-NN` **before** it is asked or decided. One that belongs to a later phase is written
+  where that phase will read it, and is not decided early.
+- **An answered `QT-NN` is never deleted and never edited**: the log is append-only, and a
+  superseded answer stays with a line saying what superseded it. A question that disappears
+  once it is answered leaves the next reader deciding it again, with nothing saying it was
+  ever asked.
 - A version or a capability is verified in the project's own evidence — the manifest, the
   configuration, the SDK pin — not inferred from what compiles or from what is newest. How
   an external system behaves is verified in its own documentation: `nzt-research`.
@@ -115,6 +177,10 @@ read.
 
 ## Closing checklist
 
+- [ ] The questions were derived from the rules and logged before anything was proposed.
+- [ ] Each one was resolved by its kind, and the user chose the mode for the ones that
+      admit one.
+- [ ] Every entry in the log says where it came from, and none is dressed as another.
 - [ ] Every component touched has a stack document, and it names its areas.
 - [ ] The stack names concepts, not skills.
 - [ ] Every expensive-to-reverse decision has its record with the discarded alternative.

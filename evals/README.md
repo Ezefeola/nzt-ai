@@ -1,13 +1,13 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 20 cases in three groups, and each group measures one of the two failure modes.
+suite is 22 cases in three groups, and each group measures one of the two failure modes.
 
 | Group | Cases | What it measures |
 |---|---|---|
-| `routing/` | 10 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
+| `routing/` | 11 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
 | `stack/` | 6 | **The exclusive axes, and the conventions they carry.** The stack document selects one option per axis, only that leaf loads, and its rules show up in the emitted code |
-| `restraint/` | 4 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned and a repository that is not ours must load nothing |
+| `restraint/` | 5 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for and a repository that is not ours must load nothing |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
 detail: NZT's routing is instructed there (R2), so a run without it measures description
@@ -75,11 +75,16 @@ Run on 2026-09-17: `kernel-loaded`, 3 runs, no ablation arm, 247s, **US$0.94**.
 **with** the baseline arm are roughly **US$38**; with `--ablation none`, half. Run a group at
 a time with `--tag`, not the whole suite at once.
 
-**The seven newest cases have not been run** — `close-feature`, `diagram-offered` and
+**The nine newest cases have not been run** — `close-feature`, `diagram-offered` and
 `no-diagram` came with the second pass over Temper (13.12), `test-data` with D36, `manual`
-with D37, and `entity-shape` and `result-inline` with D38 and D39. They are calibrated the
-way the others were **after** their first run, not before it. Expect the first run of each to
-be a calibration run.
+with D37, `entity-shape` and `result-inline` with D38 and D39, and `design-mode` and
+`design-unasked` with D41. They are calibrated the way the others were **after** their first
+run, not before it. Expect the first run of each to be a calibration run.
+
+**`design-mode` and `design-unasked` are a pair and are read together.** One measures that
+the questions get derived and the mode gets asked; the other, that neither happens when
+nobody asked for a design. A set that passes the first and fails the second has not fixed
+the behaviour — it has moved the over-triggering one step earlier.
 
 ## Adding a case
 

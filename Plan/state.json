@@ -1,63 +1,57 @@
 {
   "version": 1,
-  "updated": "2026-09-20T15:19:38Z",
-  "goal": "Simplificar el prompt 01 de slide 19 dejando sólo el pedido del producto",
+  "updated": "2026-09-20T18:30:00Z",
+  "goal": "Recuperar en NZT el comportamiento de arquitectura de Temper v3: derivar las preguntas tecnicas antes de proponer, triage por tipo, modo elegido por feature y log de decisiones aparte",
   "phase": "verify",
   "approved": true,
   "units": [
     {
       "id": 1,
-      "do": "Ajustar orden y textos de las slides actuales 4, 5 y 14 y actualizar README",
+      "do": "Registrar D41 en specs/nzt-core.md: que de D27 queda superado y el arreglo que queda",
       "status": "done",
-      "detail": "El nombre ahora es slide 2 de Apertura; slide 5 habla de capacidad del modelo; slide 14 explica skills innecesarias y da ejemplo en notas. README ajustado. Conteo estático: 20 slides. Navegación y capturas verificadas en Chrome."
+      "detail": "D41 con sus 5 piezas; D27 marcada como superada en su parte de QT-NN; seccion 8 invertida; arboles de Docs/ y de la feature actualizados; seccion 14 al dia"
     },
     {
       "id": 2,
-      "do": "Agregar iconos coherentes a los cinco pasos del ciclo y las siete fases",
+      "do": "Protocolo compartido en el router nzt-architecture: derivar, triage, modo, etiquetas de origen, log",
       "status": "done",
-      "detail": "12 iconos SVG locales de trazo uniforme: búsqueda, plan, código, escudo, guardado, arquitectura, interfaz, entrega y aprendizaje; conteo verificado. Sin paquetes externos. Capturas revisadas en Chrome a 1366×768."
+      "detail": "189 lineas. Tres secciones nuevas: preguntas antes del diseno, triage por tipo, tabla de 3 modos que solo gobierna la fila del medio, y el log con sus 5 etiquetas. plan/SKILL.md declara el diseno como ofrecido"
     },
     {
       "id": 3,
-      "do": "Animar el mapa de capacidades y mejorar sus once etiquetas",
+      "do": "nzt-architecture-design-feature: cuando se gana el diseno, el ofrecimiento, el modo por feature y su log",
       "status": "done",
-      "detail": "Once capacidades, sin ADR; Specs y SDD con explicación en notas. Órbita de 100 s, brillo suave, pausa y reanudación, grilla móvil y alternativa estática. Verificado en Chrome: navegación, movimiento, pausa, reducción e impresión; 100 posiciones sin colisiones entre etiquetas."
+      "detail": "200 lineas exactas. Criterio afinado despues de escribir el eval: cruza componentes de un modo que las historias no resuelven, no cualquier cruce, porque asi todo se ganaba un diseno"
     },
     {
       "id": 4,
-      "do": "Centrar ciclo y encabezados de fases y medición; renovar título y bajada de slide 15",
+      "do": "nzt-architecture-design-product: el mismo protocolo con su log, y donde quedan los QT-NN del stack",
       "status": "done",
-      "detail": "Slide 7 centrada; 10 y 14 con iconos y títulos centrados y párrafos a izquierda; 11 conservada. Slide 15: Del método a la práctica + Veamos cómo NZT guía la construcción de un producto. Chrome verificó alineaciones y ausencia de desbordes a 1366×768 y 1920×1080; cuatro capturas revisadas."
+      "detail": "161 lineas. Docs/architecture-decisions.md como log del producto, con los ejes del stack adentro. stack/SKILL.md corregido en una linea para no contradecirlo"
     },
     {
       "id": 5,
-      "do": "Agregar respuesta al mouse, animación ambiental y quitar destacados fijos en slides 3, 6, 7 y 19",
+      "do": "Evals: el diseno no se escribe sin ofrecerlo, y al aceptarlo pregunta el modo",
       "status": "done",
-      "detail": "Hover con brillo y elevación de 4 px en tarjetas; portada con halo, etiquetas derechas y pausa al señalar; slide 15 con arco giratorio y resplandor. Sin destacados fijos en 3, 6, 7 y 19. Botón global de pausa; movimiento reducido e impresión estáticos. Chrome: 18 comprobaciones pasaron y 4 capturas revisadas."
+      "detail": "routing/design-mode (deriva QT y pregunta el modo) y restraint/design-unasked (US-012 no se gana diseno ni ronda de preguntas). Son un par y se leen juntos; README al dia con 22 casos. NO EJECUTADOS: solo validados por el build"
     },
     {
       "id": 6,
-      "do": "Animar los boxes con flotación de 3 px, ciclos de 7 a 9 s y brillo tenue, integrando todas las pausas",
+      "do": "Build y verificacion final: install/build.ps1, presupuestos de linea y piso de 8000 chars",
       "status": "done",
-      "detail": "Flotación CSS hasta 3 px y brillo continuo, ciclos de 7–9 s y desfases por box. Hover y foco interno pausan sin salto; pausa global, slides inactivas, movimiento reducido e impresión contemplados. Órbitas 1 y 11 excluidas. Chrome: 12 comprobaciones pasaron; capturas 3, 7 y 19 revisadas."
-    },
-    {
-      "id": 7,
-      "do": "Quitar instrucciones de método del prompt inicial y sincronizar el guion de demo",
-      "status": "done",
-      "detail": "Se eliminaron Trabajá con NZT en modo acompañado y la instrucción de proponer plan antes de código; sólo queda crear Pulso. HTML y presentation/demo/prompts.md sincronizados; texto exacto y git diff --check verificados."
+      "detail": "build exit 0, 22 casos detectados, ninguna skill sobre 200 lineas. Unica advertencia la de R1, previa. Sin secciones Decided huerfanas en el arbol de skills"
     }
   ],
   "autonomy": {
-    "units": [
-      7
-    ],
+    "units": [1, 2, 3, 4, 5, 6],
     "keep_stops": []
   },
-  "waiting_on": null,
+  "waiting_on": "que el usuario reinstale en ~/.claude/skills (se ocupa el) y decida si corre los dos evals nuevos",
   "notes": [
-    "Última verificación: 12 comprobaciones en Chrome a 1366×768; sintaxis JS y git diff --check correctos. El comprobador se corrigió para interpretar translate de un solo valor como desplazamiento vertical cero; segunda ejecución completa pasó.",
-    "Capturas: C:/Users/e_feola/AppData/Local/Temp/nzt-float-Mc8Ivx. README actualizado; sin commit. Seis unidades cerradas, varias revisiones visuales acumuladas; no hay porcentaje de contexto del host. Se recomienda sesión nueva para más cambios, con estado actual guardado.",
-    "Pendiente anterior ajeno a este pedido: el usuario debe probar el menú del instalador con flechas en una terminal real; build y 47 checks del instalador ya habían pasado."
+    "Los dos evals nuevos nunca corrieron. Primera corrida es de calibracion, como todas: bash install/build.sh y luego claude plugin eval dist/plugin --scaffold --case design-mode --ablation none. ~US$0.31 por corrida de un caso",
+    "Decisiones mias sin objetar hasta ahora: nombre design/decisions.md, nombre Docs/architecture-decisions.md, QT del stack al log de producto, y la linea corregida en stack/SKILL.md",
+    "design-feature quedo en 200 lineas y plan en 199, contra un techo de 200: cualquier agregado ahi obliga a recortar primero",
+    "R1 sigue abierto y es previo: listado en 20.765 chars contra el piso de 8.000. Este cambio no agrego ninguna skill",
+    "Pendiente anterior ajeno: el usuario debe probar el menu del instalador con flechas en una terminal real"
   ]
 }

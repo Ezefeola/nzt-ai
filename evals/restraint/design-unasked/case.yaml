@@ -1,0 +1,48 @@
+schema_version: "1.1"
+name: restraint-design-unasked
+description: >
+  A story that is already fully specified and earns no technical design: one list, read
+  through the API the screen already uses, no third party and no states. D41 made the
+  feature design an offered artifact, so writing one here - or stopping the work to run a
+  round of technical questions - is the measurable form of over-triggering it.
+tags: [restraint]
+expected_outcome: >
+  Goes to building US-012 against its criteria, with no technical design written and no
+  question round opened. Saying in one line that this story earns no design is correct;
+  producing one is not.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Implementá US-012, el listado de pedidos por cliente. Los criterios ya están escritos.
+  max_turns: 20
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: no-design-leaf
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture-design'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-qt-ids
+    type: regex
+    pattern: 'QT-0'
+    min: 0
+    max: 0
+    arm: both
+  - name: reads-the-story
+    type: tool_used
+    tool: Read
+    input_match: 'US-012'
+  - name: goes-to-build
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about implementing the order listing of US-012.
+      PASS if it goes at the story - reading its criteria and the stacks, and proposing or
+      starting the work against them. A single line saying this story earns no technical
+      design, or offering one the user can drop, still passes.
+      FAIL if it produces a technical design document, opens a round of technical questions
+      before building, asks the user to choose how the design gets resolved, or treats the
+      design as something required before the story can be built.

@@ -64,8 +64,8 @@ line. Three categories:
 - When you offer one, say what is lost if it is dropped. "Do you want the ADR?" is not
   answerable; "without the ADR this decision gets re-argued in three months with no record
   of what was weighed" is.
-- Mandatory today: the stack document per component and area. A new component gets it when
-  it is designed; an existing one gets it from evidence before its code is touched.
+- Mandatory today: the stack document per component and area, written when the component is
+  designed or from evidence before its code is touched. **Offered: a feature's design.**
 - A document that already exists and that the change affects is kept current as part of the
   work, never offered as optional.
 - Do not ask what you can verify — a version, a capability, a package's maintenance state.

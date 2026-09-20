@@ -81,8 +81,9 @@ the folder tree, so they move.
 
 - An axis is a place where the technology offers **exclusive alternatives** — one domain
   model, one endpoint style, one error-handling shape. Write the one that was taken.
-- An axis with no decision is an **open decision**, not a blank row. Write it as `QT-NN`
-  and say what it blocks.
+- An axis with no decision is an **open decision**, not a blank row. It is asked the way it
+  always was; what changed is where the answer is kept — as `QT-NN` in
+  `Docs/architecture-decisions.md`, saying what it blocks, with the row here citing its id.
 - Two options coexisting in the code is not two rows: it is one row with the option that
   wins plus a `Planned` line saying the other is being retired.
 

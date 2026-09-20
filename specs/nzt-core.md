@@ -494,6 +494,7 @@ una feature vive con su spec en `Plan/`.
 │  ├─ product.md · glossary.md # de discovery, con nombre fijo (D7)
 │  ├─ analysis.md              # entrevista de producto, append-only (D5)
 │  ├─ architecture.md          # componentes, límites, sistemas externos con su INT-NN (D10)
+│  ├─ architecture-decisions.md # log append-only de los QT-NN de producto (D41)
 │  ├─ domain-model.md          # entidades, campos, agregados (D26)
 │  ├─ context-map.md           # contextos, dependencias y eventos — si hay más de uno (D26)
 │  ├─ adr/ADR-NNN-<slug>.md    # una decisión por archivo
@@ -514,7 +515,9 @@ una feature vive con su spec en `Plan/`.
          ├─ change.md          # propuesta de cambio, temporal: se fusiona y se borra (D28)
          ├─ stories/
          │  └─ US-NNN-<slug>.md  # criterios + cobertura por área
-         ├─ design/            # diseño técnico de esta feature
+         ├─ design/            # diseño técnico de esta feature, ofrecido (D41)
+         │  ├─ design.md       # el presente: flujos, datos, fallos, contratos
+         │  └─ decisions.md    # log append-only de sus QT-NN (D41)
          └─ testing/
             ├─ README.md       # índice: última ejecución, bugs abiertos, huecos (T9)
             ├─ <historia>.md   # pruebas: casos, datos, esperado, obtenido
@@ -541,8 +544,9 @@ una feature vive con su spec en `Plan/`.
   reensayo **agrega** una ejecución fechada; nunca pisa la anterior (13.5 #17).
 - El bug lo abre y lo cierra verify aunque lo arregle build, con tres estados: `pendiente`,
   `corregido pendiente de verificación`, `verificado` (T10).
-- `design/` y `testing/` son opcionales por feature: se crean cuando aportan. `README.md`
-  de `testing/` es obligatorio desde la segunda historia con pruebas (T9).
+- `design/` es **ofrecido** por feature, con el criterio de D41; `testing/` se crea cuando
+  aporta. `README.md` de `testing/` es obligatorio desde la segunda historia con pruebas
+  (T9).
 - El inventario exacto de `Docs/` (nombres de archivo y cuándo se crea cada uno) lo define
   el router `nzt-architecture` en la fase 4, no el kernel. **Excepción: los documentos de
   UX** — design system e inventario de componentes compartidos — los define y mantiene
@@ -557,9 +561,11 @@ una feature vive con su spec en `Plan/`.
   vive en `Docs/manual/`, es **a pedido** y **se arma al final de lo que se entrega, no
   mientras se construye**; desde que existe, cada cierre de feature lo pone al día como a
   cualquier otro documento (D37).
-- **Los `QT-NN` no tienen archivo propio**: viven en el documento de diseño que los va a
-  leer, y al responderse pasan a su sección `Decided` en el mismo archivo, con fecha
-  (D27 lo fija junto con los diagramas).
+- **Los `QT-NN` tienen archivo propio y append-only: el log de decisiones técnicas** —
+  `Docs/architecture-decisions.md` a nivel producto, `design/decisions.md` por feature—.
+  El diseño es el presente y se reescribe; el log es la conversación que lo produjo y no se
+  pisa: una respuesta superada se marca, nunca se edita. Los `QT-NN` del stack van al log de
+  producto (D41, que supera esa parte de D27).
 
 ## 9. Estructura de este repositorio
 
@@ -949,7 +955,8 @@ el usuario a partir de los huecos que esa pasada encontró.
   dibujan.** Un diagrama que ya existe se mantiene con el cambio. En la misma decisión entra
   el arreglo de los `QT-NN`: **una pregunta respondida pasa a `Decided` en su mismo
   documento, con fecha, y no se borra** — eso da lo que Temper resolvía con un
-  `design-decisions.md` aparte, sin un archivo más.
+  `design-decisions.md` aparte, sin un archivo más. *(Esta última parte queda superada por
+  D41: el archivo de más se paga. Lo de los diagramas sigue vigente.)*
 - **D28.** **Cambiar una feature que ya existe tiene hoja propia, `nzt-discovery-change`, y
   un archivo temporal `Plan/specs/<feature>/change.md`.** Faltaba el paso previo: el set
   tenía los marcadores `[modify]` y `[remove]` en build, pero **nadie explicaba quién los
@@ -1182,6 +1189,45 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   el adapter, `/clear` en Claude Code). **El agente recomienda, no limpia**: limpiar es del
   usuario, y se aconseja siempre después de persistir, nunca antes. `nzt-plan` se alineó: el
   reporte siempre dice cómo viene, y *aconsejar limpiar* es otra cosa, con su ventana.
+- **D41.** **Arquitectura deriva las preguntas antes de proponer, las resuelve por tipo, y
+  el modo lo elige el usuario por feature.** Hallazgo de usar el set, no de leerlo: el
+  diseño de F-001 del ToDoApp salió con **`Abierto: Nada` y cinco decisiones tomadas por el
+  agente** —contratos compartidos, `Id` como orden, timeout de 10 s, sin índices— marcadas
+  *(mía)* por invención de esa sesión, no por regla. El set conservaba de Temper el
+  `QT-NN` y el *"se resuelve con el usuario"*, pero había perdido **las dos piezas que lo
+  hacían funcionar**: derivar las preguntas **antes** de proponer, y la triage que dice
+  cuál se pregunta. Sin ellas, *"escribí el diseño"* se cumple decidiendo todo solo. Cinco
+  cosas quedan fijadas:
+  **(1) Primero se derivan, después se propone.** De las reglas, las historias y el stack
+  sale **toda** pregunta que el diseño tenga que contestar —incluido qué permite cada
+  tercero y cómo falla— y se escribe como `QT-NN` abierta **antes** de redactar nada. Las
+  notas técnicas son una entrada; la fuente son las reglas.
+  **(2) Cada una se resuelve por su tipo, y el tipo no lo elige el usuario**: un **hecho
+  verificable** se investiga en su fuente autoritativa y se responde con fuente y fecha
+  —nunca se pregunta—; un **detalle dentro del alcance acordado** lo decide el agente y
+  queda etiquetado; un **tradeoff o cambio material** se pregunta con opciones,
+  consecuencias y recomendación —siempre, en cualquier modo—.
+  **(3) El modo gobierna solo la fila del medio, y se elige por feature.** Después de
+  derivar —nunca antes, o el usuario elige a ciegas sin saber si son 3 preguntas o 25— se
+  dice cuántas salieron y de qué tipo, y se ofrecen tres: **propuestas** (el agente decide
+  los detalles y el usuario objeta), **juntos** (los detalles también se preguntan,
+  agrupados en una sola ronda, no sueltos) y **dictado** (el usuario dice cómo va). El
+  dictado **no es taquigrafía**: se contrasta contra la spec y el stack y se levanta la
+  contradicción antes de escribirla.
+  **(4) El log es un archivo aparte y append-only**, con las etiquetas de origen que
+  Temper tenía: respuesta del usuario, decisión del agente dentro del alcance, hecho
+  investigado con su fuente, propuesta pendiente, observación. **El diseño es el presente y
+  se reescribe; el log es la conversación y no se pisa** — un documento que se reescribe
+  entero y además tiene que ser append-only en la mitad del cuerpo es la contradicción que
+  D27 no había visto. `Docs/architecture-decisions.md` a nivel producto —los `QT-NN` del
+  stack incluidos, como en Temper—, `design/decisions.md` por feature, serie propia cada
+  uno. La etiqueta de origen deja de ser invención de sesión y es regla.
+  **(5) El diseño de feature es *ofrecido*, con criterio de cuándo se gana**: cruza
+  componentes, mete un tercero, tiene estados con significado, tiene requisitos que
+  condicionan la solución, o tiene alternativas cuyas consecuencias hay que explicar. Una
+  pantalla derecha no se gana uno. **Lo que no cambia es el stack**: sigue obligatorio y
+  sigue preguntando sus ejes como hasta ahora (D9); lo único que se mueve es dónde queda
+  registrada la respuesta.
 
 ## 13. Revisión contra Temper v3
 
@@ -2575,10 +2621,15 @@ proyecto real: el constructor privado vacío, el orden de los miembros, y el `Re
 en cada return en vez de escondido en un método privado. **D40 sale de la misma corrida, pero
 es de método y no de código**: el estado escrito para contexto cero, y el cierre de cada
 corrida diciendo cómo viene el contexto y si conviene limpiar, recomendándolo **desde el 20%
-consumido y fuerte pasado el 40%**.
+consumido y fuerte pasado el 40%**. **D41 es la última, y sale de la misma clase de
+hallazgo**: usar el set mostró que arquitectura decidía sola lo que tenía que preguntar, así
+que vuelve de Temper v3 lo que NZT había perdido —derivar los `QT-NN` antes de proponer,
+resolverlos por tipo, el modo elegido por feature y el log de decisiones aparte—. Es la
+primera que **revierte una decisión anterior**: supera la parte de D27 que había ahorrado ese
+archivo.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D40. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D41. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 
