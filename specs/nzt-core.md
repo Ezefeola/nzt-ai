@@ -194,7 +194,7 @@ skills/nzt/                      nzt
 │  ├─ remove/                    nzt-build-remove           → barrido de eliminación (T4)
 │  ├─ dependencies/              nzt-build-dependencies     (T4)
 │  ├─ secrets/                   nzt-build-secrets          (T4)
-│  ├─ tests/                     nzt-build-tests            → criterio de test (D32)
+│  ├─ tests/                     nzt-build-tests            → criterio + niveles (D32, D42)
 │  └─ tdd/                       nzt-build-tdd              → opt-in del stack (T4)
 ├─ verify/                       nzt-verify
 │  ├─ test-design/               nzt-verify-test-design
@@ -1228,6 +1228,32 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   pantalla derecha no se gana uno. **Lo que no cambia es el stack**: sigue obligatorio y
   sigue preguntando sus ejes como hasta ahora (D9); lo único que se mueve es dónde queda
   registrada la respuesta.
+- **D42.** **Qué niveles de test se escriben es un opt-in del stack, y un campo ausente no
+  habilita ninguno.** Hallazgo de usar el set: el agente armaba proyecto de integración,
+  motor real y contenedores sin que nadie se lo hubiera pedido. La causa estaba en el
+  contenido, no en el método: el TDD y el E2E ya eran opt-in duro, pero **la franja del
+  medio era regla incondicional** —`nzt-build-tests` mandaba probar la base contra el motor
+  real y tener su proyecto aparte, y la hoja .NET exigía `IntegrationTests`,
+  `WebApplicationFactory` y motor de producción—. El *si hay tests* tampoco se preguntaba:
+  se abría solo con la evidencia del repo, porque bastaba que existiera un proyecto de
+  tests. Cinco cosas quedan fijadas:
+  **(1) Un solo opt-in con niveles, no un eje por nivel**: unit, integración contra motor
+  real, contenedores efímeros, API in-process y E2E, cada uno contestado. Se lee de un
+  vistazo y obliga a contestarlos todos.
+  **(2) Unit también se pregunta.** Que el repo tenga suite no es una decisión de escribir
+  tests, igual que una herramienta instalada nunca fue una decisión de usarla.
+  **(3) El campo ausente no habilita nada, tampoco unit.** El agente escribe el código,
+  dice en una línea qué quedó sin cubrir y sigue: **nunca frena por esto**. Es la misma
+  regla que el E2E ya tenía, ahora pareja para todos los niveles. En un componente que ya
+  existe el caso es de transición y no de régimen, porque el stack es obligatorio y se
+  escribe desde la evidencia **antes** de tocar su código: ahí se pregunta.
+  **(4) El eje `Tests` es solo el framework.** El *si* y el *hasta dónde* viven en el
+  opt-in. Estaban mezclados en la misma fila —`xUnit 3 + Testcontainers`—, y por esa mezcla
+  la infraestructura entraba sin haber sido nunca una pregunta.
+  **(5) La lista de opt-ins se enumera en `nzt-architecture-stack` y es cerrada.** Hasta
+  hoy solo vivía dentro del ejemplo del documento, así que un stack escrito sin mirar el
+  ejemplo no contestaba ninguno. **Lo que no cambia**: el `Test data` (D36) y el E2E siguen
+  como están, y el TDD sigue siendo opt-in aparte porque decide el orden, no el nivel.
 
 ## 13. Revisión contra Temper v3
 
@@ -2626,10 +2652,13 @@ hallazgo**: usar el set mostró que arquitectura decidía sola lo que tenía que
 que vuelve de Temper v3 lo que NZT había perdido —derivar los `QT-NN` antes de proponer,
 resolverlos por tipo, el modo elegido por feature y el log de decisiones aparte—. Es la
 primera que **revierte una decisión anterior**: supera la parte de D27 que había ahorrado ese
-archivo.
+archivo. **D42 es la última, y es del mismo linaje**: usar el set mostró que build armaba
+integración, motor real y contenedores sin que nadie los hubiera pedido, así que **qué
+niveles de test se escriben pasa a ser un opt-in del stack —unit incluido— y un campo
+ausente no habilita ninguno**, con el eje `Tests` reducido al framework.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D41. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D42. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 

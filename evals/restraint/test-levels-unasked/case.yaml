@@ -1,0 +1,61 @@
+schema_version: "1.1"
+name: restraint-test-levels-unasked
+description: >
+  A story that reaches the database, in a component whose stack never wrote a `Test levels`
+  opt-in. D42 made every level an opt-in and an absent field enable none of them, unit
+  included. Building an integration project, a real engine or a container suite here is the
+  measurable form of the old unconditional rule - the one that made the agent pay for
+  infrastructure nobody asked for.
+tags: [restraint]
+expected_outcome: >
+  Implements US-012 and writes no test of any level, saying in one line which levels are off
+  and what that leaves uncovered - or offering to settle the opt-in in the stack. Neither
+  builds the suite nor stops the work waiting for the answer.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Implementá US-012 en el backend, el listado paginado de pedidos de un cliente.
+  max_turns: 25
+  timeout_seconds: 650
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: build-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build'
+  - name: reads-the-stack
+    type: tool_used
+    tool: Read
+    input_match: 'backend-stack-Pedidos\.Api'
+  - name: no-suite-nobody-enabled
+    type: llm
+    arm: both
+    criteria: |
+      The reply is in Spanish and is about implementing the paged order listing of US-012.
+      PASS if it writes no automated test and proposes none as part of the work: no
+      integration project, no test against a real PostgreSQL, no Testcontainers or other
+      container-based suite, no WebApplicationFactory, and no unit tests treated as
+      something that comes automatically with the code. Naming the levels as something the
+      stack has to decide, or offering to add the opt-in, still passes.
+      FAIL if it writes or plans any of those, if it creates a test project, if it adds a
+      test package or a container runtime, or if it justifies an integration test by the
+      story touching the database.
+  - name: says-what-is-uncovered
+    type: llm
+    criteria: |
+      PASS if the reply says, in about a line, that no test level is enabled for this
+      component and what that leaves unproven - the listing, the paging, the data access -
+      and points at the stack's `Test levels` opt-in as where that gets decided. Offering to
+      answer it now passes.
+      FAIL if it says nothing about tests at all, if it reports the story as fully covered,
+      or if it stops the work, marks it blocked or waits for the user to answer before
+      implementing.
+  - name: no-in-memory-fallback
+    type: llm
+    arm: both
+    criteria: |
+      PASS if the data access is left uncovered rather than approximated.
+      FAIL if the reply substitutes the real engine with the EF Core in-memory provider,
+      SQLite in-memory, a fake repository, a mocked DbContext or a hand-rolled in-memory
+      store, in order to test the listing anyway.

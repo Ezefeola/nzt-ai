@@ -1,57 +1,57 @@
 {
   "version": 1,
-  "updated": "2026-09-20T18:30:00Z",
-  "goal": "Recuperar en NZT el comportamiento de arquitectura de Temper v3: derivar las preguntas tecnicas antes de proponer, triage por tipo, modo elegido por feature y log de decisiones aparte",
-  "phase": "verify",
+  "updated": "2026-09-21T07:00:00Z",
+  "goal": "Que los niveles de test se acuerden en el stack: unit incluido, y un campo ausente no habilita ninguno -integracion contra motor real, contenedores, API in-process, E2E-",
+  "phase": "build",
   "approved": true,
   "units": [
     {
       "id": 1,
-      "do": "Registrar D41 en specs/nzt-core.md: que de D27 queda superado y el arreglo que queda",
+      "do": "Registrar D42 en specs/nzt-core.md: opt-in unico de niveles con unit adentro, ausente no habilita nada, se pregunta al escribir el stack",
       "status": "done",
-      "detail": "D41 con sus 5 piezas; D27 marcada como superada en su parte de QT-NN; seccion 8 invertida; arboles de Docs/ y de la feature actualizados; seccion 14 al dia"
+      "detail": "D42 con sus 5 piezas, despues de D41; seccion 14 al dia (D42 es la ultima decision de contenido); el arbol de skills marca tests/ con D32 y D42. El eje Tests queda reducido a framework"
     },
     {
       "id": 2,
-      "do": "Protocolo compartido en el router nzt-architecture: derivar, triage, modo, etiquetas de origen, log",
+      "do": "nzt-architecture-stack: lista cerrada de opt-ins, el opt-in Test levels con su fila unit, y el eje Tests limitado a framework",
       "status": "done",
-      "detail": "189 lineas. Tres secciones nuevas: preguntas antes del diseno, triage por tipo, tabla de 3 modos que solo gobierna la fila del medio, y el log con sus 5 etiquetas. plan/SKILL.md declara el diseno como ofrecido"
+      "detail": "164 lineas. Seccion nueva 'The opt-ins' con los cuatro y el nombre del campo en ingles: Test levels = unit, integration real engine, ephemeral containers, in-process API. E2E queda fuera de esa linea y sigue siendo opt-in propio porque es de verify"
     },
     {
       "id": 3,
-      "do": "nzt-architecture-design-feature: cuando se gana el diseno, el ofrecimiento, el modo por feature y su log",
+      "do": "nzt-build-tests: el disparador, la fila de la base y la seccion Integration tests pasan a leer el opt-in, unit incluido",
       "status": "done",
-      "detail": "200 lineas exactas. Criterio afinado despues de escribir el eval: cruza componentes de un modo que las historias no resuelven, no cualquier cruce, porque asi todo se ganaba un diseno"
+      "detail": "179 lineas. Seccion nueva 'The levels are the stack's decision, not yours' arriba de todo. Dos reglas agregadas que el cambio hacia necesarias: un nivel apagado queda sin cubrir y NUNCA se fakea, y un nivel encendido que no puede correr aca se escribe igual y se reporta como no verificado"
     },
     {
       "id": 4,
-      "do": "nzt-architecture-design-product: el mismo protocolo con su log, y donde quedan los QT-NN del stack",
+      "do": "nzt-build-backend-dotnet-testing: condicionar el proyecto de integracion, el motor real y WebApplicationFactory al opt-in",
       "status": "done",
-      "detail": "161 lineas. Docs/architecture-decisions.md como log del producto, con los ejes del stack adentro. stack/SKILL.md corregido en una linea para no contradecirlo"
+      "detail": "139 lineas. El intro separa las dos cosas: los proyectos del repo son evidencia de COMO se escribe un test, no de que niveles se escriben. Layout, EF Core y APIs condicionados, con la trampa cerrada: sin integracion no se cae al provider in-memory ni se mueve nada al proyecto de unit"
     },
     {
       "id": 5,
-      "do": "Evals: el diseno no se escribe sin ofrecerlo, y al aceptarlo pregunta el modo",
+      "do": "nzt-ship-backend-dotnet-pipeline: el gate de integracion existe solo si el opt-in lo habilita",
       "status": "done",
-      "detail": "routing/design-mode (deriva QT y pregunta el modo) y restraint/design-unasked (US-012 no se gana diseno ni ronda de preguntas). Son un par y se leen juntos; README al dia con 22 casos. NO EJECUTADOS: solo validados por el build"
+      "detail": "69 lineas. Las dos filas de test piden el nivel habilitado como precondicion, mas el parrafo de por que un gate sobre un proyecto vacio es peor que no tenerlo. ship/pipeline (generico) tambien se toco: sus filas de unit e integracion ahora dicen lo mismo que ya decia la de E2E, 79 lineas"
     },
     {
       "id": 6,
-      "do": "Build y verificacion final: install/build.ps1, presupuestos de linea y piso de 8000 chars",
+      "do": "Eval de restraint: stack sin el opt-in y una historia que toca la base, y el agente no crea IntegrationTests ni Testcontainers",
       "status": "done",
-      "detail": "build exit 0, 22 casos detectados, ninguna skill sobre 200 lineas. Unica advertencia la de R1, previa. Sin secciones Decided huerfanas en el arbol de skills"
+      "detail": "evals/restraint/test-levels-unasked, con scaffold propio que reescribe el stack del backend sin opt-in y con el eje Tests ya en forma. 4 graders, dos con arm both. README al dia: 23 casos, restraint 6. NO EJECUTADO: el usuario dijo que no se corre"
+    },
+    {
+      "id": 7,
+      "do": "Build y verificacion: install/build.ps1, presupuesto de lineas y conteo de casos en el README de evals",
+      "status": "done",
+      "detail": "build.ps1 exit 0, 23 casos detectados (el case.yaml y su scaffold pasan la validacion), 110 skills, CLAUDE.md y AGENTS.md en 183. Tocadas: stack 164, build/tests 179, dotnet/testing 139, dotnet/pipeline 69, ship/pipeline 79. Cross-check con 'dotnet run -- lint': 0 problemas. Unica advertencia la de R1, previa"
     }
   ],
-  "autonomy": {
-    "units": [1, 2, 3, 4, 5, 6],
-    "keep_stops": []
-  },
-  "waiting_on": "que el usuario reinstale en ~/.claude/skills (se ocupa el) y decida si corre los dos evals nuevos",
+  "waiting_on": "que el usuario recompile el instalador y reinstale en ~/.claude/skills: el contenido va embebido, asi que el nzt compilado sigue teniendo las skills viejas",
   "notes": [
-    "Los dos evals nuevos nunca corrieron. Primera corrida es de calibracion, como todas: bash install/build.sh y luego claude plugin eval dist/plugin --scaffold --case design-mode --ablation none. ~US$0.31 por corrida de un caso",
-    "Decisiones mias sin objetar hasta ahora: nombre design/decisions.md, nombre Docs/architecture-decisions.md, QT del stack al log de producto, y la linea corregida en stack/SKILL.md",
-    "design-feature quedo en 200 lineas y plan en 199, contra un techo de 200: cualquier agregado ahi obliga a recortar primero",
-    "R1 sigue abierto y es previo: listado en 20.765 chars contra el piso de 8.000. Este cambio no agrego ninguna skill",
-    "Pendiente anterior ajeno: el usuario debe probar el menu del instalador con flechas en una terminal real"
+    "D42 cerrado en las 7 unidades. Tres evals nunca corridos: design-mode, design-unasked y test-levels-unasked, que el usuario decidio no correr",
+    "test-levels-unasked mide solo la mitad de restraint de D42: que el stack PREGUNTE los niveles al escribirse no lo mide ningun caso",
+    "Observacion fuera de alcance: las reglas de lint estan escritas tres veces -build.ps1, build.sh y Linter.cs- y hoy coinciden; candidata a deuda tecnica"
   ]
 }

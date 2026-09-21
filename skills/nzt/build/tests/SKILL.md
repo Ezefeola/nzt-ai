@@ -12,16 +12,31 @@ leaf's, which names this one in its load line.
 
 If you did not arrive here from `nzt-build`, load it first.
 
+## The levels are the stack's decision, not yours
+
+**Read the `Test levels` opt-in of the component's stack before writing a single test.** It
+answers each level separately — unit, integration against the real engine, ephemeral
+containers, in-process API — and **a level it does not enable is not written**, whatever
+this file says is good practice.
+
+- **A level not written in the opt-in is disabled, and that includes unit.** A test project
+  sitting in the repository is not a decision to write tests. **Say in one line which levels
+  are off and what that leaves uncovered, and go on** — this never stops a unit, and it is
+  not relitigated inside one.
+- **No stack document is not the same as no decision.** The stack is mandatory before a
+  component's code is touched, so the missing document is the thing to raise
+  (`nzt-architecture-stack`), in the plan, not in passing.
+- Adopting a level, or the framework that runs it, is a decision of the stack and a
+  dependency decision (`nzt-build-dependencies`). **Never install one in passing.**
+
 ## When a change earns tests
 
-- **Every change that creates or alters behavior**, when the component has a test project or
-  its stack's `Tests:` axis names a framework.
+Within the levels the stack enabled:
+
+- **Every change that creates or alters behavior.**
 - **A defect earns the test that reproduces it**, and that test stays as the regression. A
-  fix with no failing test before it is a fix nobody can prove.
-- **`Tests: no` in the stack is a decision to respect.** Say what is left uncovered and move
-  on; do not relitigate it inside a unit.
-- **No test project and no decision: propose it in the plan.** Never install a framework in
-  passing — that is a dependency decision (`nzt-build-dependencies`).
+  fix with no failing test before it is a fix nobody can prove. If the level that would
+  catch it is off, say so — that is the cost of the level being off, in that one line.
 - **A pure refactor leans on the tests that exist**, and adds coverage only where the
   behavior it touches is unprotected. If it needed new behavior tested, it was not a
   refactor.
@@ -52,7 +67,7 @@ suite of false alarms stops being read, which costs more than having no suite.
 | The dependency | In the test |
 |---|---|
 | out-of-process and not ours — payments, mail, bus, third-party API | substituted; assert the interaction only when sending **is** the contract |
-| our own database | the real engine, in an integration test — never a fake of the data access |
+| our own database | the real engine, in an integration test **where the stack enabled that level** — never a fake of the data access |
 | time, randomness, identifiers, culture | injected and controlled |
 | in-process collaborators of the same behavior | the real ones |
 
@@ -61,6 +76,10 @@ suite of false alarms stops being read, which costs more than having no suite.
   *the confirmation is sent exactly once*.
 - **Never substitute what the project owns** in place of the real thing. What comes back then
   is the test's own opinion about its own code.
+- **A level that is off is uncovered, never faked.** With integration disabled, the behavior
+  that depends on the database stays untested and is reported as such. Faking the data access
+  to get a green unit test is the worst of the three outcomes: the cost of the real engine
+  was avoided and a false assurance was bought with it.
 - **Call a double by what it does**: a stub supplies data, a mock is asserted on, a fake is a
   working lightweight implementation. A misnamed double misleads the next reader about what
   the test verifies.
@@ -92,14 +111,24 @@ The same result on every run, on any machine, in any order.
 - **Each test creates its own data**, and nothing depends on another test having run first.
 - **Wait on an observable condition, never on a fixed sleep.**
 
-## Integration tests
+## Integration tests, when the stack enabled them
 
-Behavior that depends on the database, serialization, the HTTP pipeline or configuration is
-proven against the real piece. They live in **their own project**, so the fast suite stays
-fast and free of infrastructure — the day the unit suite needs a container, nobody runs it.
+**This whole section applies only where the opt-in enabled the level**, and each level is
+separate: proving the database against the real engine, running that engine in an ephemeral
+container, and exercising the HTTP pipeline in process are three decisions, not one. What is
+off is not built and not approximated.
+
+Where they are on: behavior that depends on the database, serialization, the HTTP pipeline or
+configuration is proven against the real piece. They live in **their own project**, so the
+fast suite stays fast and free of infrastructure — the day the unit suite needs a container,
+nobody runs it.
 
 Each test owns its data, or runs inside a reset strategy. **A shared mutable fixture is how a
 suite starts depending on order**, and that failure looks like flakiness for weeks.
+
+**An enabled level that cannot run here is not a skipped level.** No container runtime on this
+machine means the tests are written and the report says they could not be executed — that is
+an unverified result, not a reason to delete them or to lower them to unit.
 
 ## Discipline
 
@@ -120,7 +149,8 @@ suite starts depending on order**, and that failure looks like flakiness for wee
 ## Report what ran
 
 The commands and their real results: which tests were added, the failure observed before the
-fix when there was one, and what could not run. **Static inspection is not a passing suite**,
+fix when there was one, what could not run, and **the one line naming the levels that are off
+and what they leave uncovered**. **Static inspection is not a passing suite**,
 and code that compiles is not code that works. Anything with no execution evidence is
 reported as not verified, and the criterion's area stays unmarked.
 
@@ -138,7 +168,9 @@ reported as not verified, and the criterion's area stays unmarked.
 
 Rehearse it: would every test you wrote fail if the behavior broke — and only then?
 
-- Every changed behavior has its tests, or the plan says why it does not.
+- The `Test levels` opt-in was read, no level was written that it does not enable, and the
+  levels that are off were named with what they leave uncovered.
+- Every changed behavior has its tests **at the enabled levels**, or the plan says why not.
 - The tests go through the public surface and survive a refactor that changes no behavior.
 - Only what the project does not own was substituted, and state was preferred to interaction.
 - One Act per test, names that state scenario and result, no logic inside.

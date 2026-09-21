@@ -23,10 +23,10 @@ Three readers, and each one needs something different from it:
   frontend —`). An area with no stack document does not exist.
 - **The area skills select by axis.** Where a technology offers exclusive alternatives,
   this file says which one was taken, and only that one is ever loaded.
-- **Build and verify read the opt-ins.** Whether this component is written test-first, gets
-  automated end-to-end tests, or how its application tests obtain their data, is decided
-  here and nowhere else. The opt-in is the user's answer, written once so no phase asks it
-  again — `nzt-verify-test-data` has what the data one is choosing between.
+- **Build and verify read the opt-ins.** Which levels of test ship with the code, whether
+  it is written test-first, whether there is an end-to-end tool and how application tests
+  get their data, is decided here and nowhere else. The opt-in is the user's answer,
+  written once so no phase asks it again. The list is below, and it is closed.
 
 ## The file
 
@@ -44,9 +44,12 @@ component: Pedidos.Api · area: backend
 | Persistence | EF Core 10 against PostgreSQL 17 | 2026-09 |
 | Endpoints | minimal APIs | 2026-09 |
 | Error handling | result pattern | 2026-09 |
-| Tests | xUnit 3 + Testcontainers | 2026-09 |
+| Tests | xUnit 3 | 2026-09 |
 
 ## Opt-ins
+- **Test levels:** unit yes · integration against the real engine: yes · ephemeral
+  containers: yes, Testcontainers · in-process API: no. Revisit the API one when the
+  contract stops changing every week.
 - **Test-first:** yes, for business rules. Not for wiring and configuration.
 - **Automated end-to-end tests:** no. Revisit when there is a second client.
 - **Test data:** SQL scripts, run by the agent against `dev`. Setup and teardown per
@@ -86,6 +89,36 @@ the folder tree, so they move.
   `Docs/architecture-decisions.md`, saying what it blocks, with the row here citing its id.
 - Two options coexisting in the code is not two rows: it is one row with the option that
   wins plus a `Planned` line saying the other is being retired.
+- **The `Tests` axis is the framework and nothing else.** Whether tests are written, and
+  how deep they go, is an opt-in — a runner and a container runtime are not the same
+  decision, and writing them in one row is how the second one gets adopted without ever
+  having been asked.
+
+## The opt-ins
+
+Four, and the list is closed. **Every one is answered, including the ones that are `no`.**
+
+| Opt-in | What it settles | Read by |
+|---|---|---|
+| **Test levels** | which levels of automated test ship with the code | `nzt-build-tests` and its area leaf |
+| **Test-first** | whether the test comes before the code, and for what | `nzt-build-tdd` |
+| **Test data** | how an application test gets the data it needs | `nzt-verify-test-data`, which has the mechanisms |
+| **Automated end-to-end tests** | the tool, named, or `no` | `nzt-verify-automate` |
+
+**Test levels** is one line with every level answered: *unit · integration against the real
+engine · ephemeral containers · in-process API*. End-to-end is not one of them — it is its
+own opt-in, because it is derived from approved scenarios and belongs to verify.
+
+- **A level that is not written is not enabled, and that includes unit.** A test project
+  already in the repository is not a decision to write tests, the same way an installed
+  tool was never a decision to use it. Build says in one line what is left uncovered and
+  goes on: **it never stops over this**.
+- **Ask them when this document is written** — once per component and area, which is the
+  cheap moment. Ask with what each level costs: a container runtime on every machine and
+  on CI, and minutes on every run. It is a tradeoff, so it is asked in every mode.
+- **An existing component gets this document from evidence before its code is touched**, so
+  that is where its levels are answered too — never in the middle of a build unit.
+- A level adopted later is a change to this document, in the unit that adopts it.
 
 ## Versions come from evidence
 
@@ -125,5 +158,7 @@ file and the specs?
 - Its area and component are named at the top.
 - Every axis has one choice, or a `QT-NN` saying it is open.
 - Every version traces to a file named in **Evidence**.
-- The opt-ins are answered explicitly, including the ones that are `no`.
+- The four opt-ins are answered explicitly, including the ones that are `no`, and **Test
+  levels** answers every level it lists — unit among them.
+- The `Tests` axis names a framework, not the test infrastructure.
 - Nothing in **Adopted** is aspirational, and nothing names a skill.

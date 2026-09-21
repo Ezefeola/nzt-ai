@@ -22,12 +22,15 @@ Each one says what it proves. Earlier gates fail faster and cost less:
 | Restore with dependencies locked | The build uses the versions the project pinned |
 | Format and lint | The diff is about the change, not about style |
 | Build in release configuration | It compiles the way it ships |
-| Unit tests | The rules behave |
-| Integration tests | The parts agree, against real dependencies |
+| Unit tests, **at the levels the stack enabled** | The rules behave |
+| Integration tests, **idem** | The parts agree, against real dependencies |
 | Technology checks | Model changes have their migration, and the like |
 | End-to-end regression, **if the stack adopted it** | The approved scenarios still pass |
 | Versioned artifact, **built once** | What is deployed is what was verified |
 
+- **A test gate exists only for a level the component adopted**, read from the `Test levels`
+  opt-in of its stack. One written for a level nobody enabled passes over an empty project,
+  which is exactly the gate that buys trust it does not earn.
 - **Build once and promote the same artifact** between environments, tagged with the commit
   SHA and, for releases, its semantic version.
 - **A gate that only exists in CI and cannot be run locally is a future surprise.** Use the
