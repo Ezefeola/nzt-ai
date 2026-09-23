@@ -5,7 +5,7 @@ description: Use when code changes: implementing a story, changing or removing b
 
 # Build — writing the code
 
-This phase turns a story into working code, and marks its criteria as it goes.
+This phase turns a story into working code, and marks its criteria's areas as it goes.
 
 ## Boundaries
 
@@ -16,7 +16,10 @@ and the coverage marks on the criteria of the story being implemented.
 (`nzt-architecture`), the application-level test plan and its evidence (`nzt-verify`). The
 boundary on tests: the ones that travel with the code are yours — `nzt-build-tests` says what
 makes one worth keeping, whatever the stack — and the ones derived from an
-approved test-plan scenario are `nzt-verify`'s.
+approved test-plan scenario are `nzt-verify`'s. **Build never designs, scripts or runs
+application tests**: no test plan, no manual script, no test data. What the stack's test
+levels cannot reach is reported as *not covered until QA*, and QA runs after the increment
+is built.
 
 ## Required guidance
 
@@ -53,12 +56,13 @@ conventions already there. Never impose another project's conventions on this on
 
 ## One unit
 
-**One story.** Its criteria, with their area coverage (`backend ✓ · frontend —`), are its
-closing list. If a story is too big for one unit, cut it by behavior, never by file or by
-area.
+**One story.** Its criteria, with their area coverage (`backend ✓ · frontend — · qa —`), are
+its closing list — the areas, never `qa`, which is `nzt-verify`'s. If a story is too big for
+one unit, cut it by behavior, never by file or by area.
 
-Project setup — solution, projects, dependencies, foundations — is **authorised work**
-before the first story. Do not invent a story to justify it.
+Project setup — solution, projects, the dependencies the stack lists, foundations — is
+**authorised work** before the first story. Do not invent a story to justify it. **A package
+the stack does not list is not setup**: the user confirms it first (`nzt-build-dependencies`).
 
 ## Where it lands
 
@@ -129,17 +133,18 @@ They apply to every unit of this phase, so they live here and not in a leaf.
 
 ## Done when
 
-The affected code compiles, the verifications the change justifies were **run**, the
-coverage of every verified criterion is marked by area, and anything with no evidence of
-execution is reported as **not verified** — never as green. Committing happens only if
+The affected code compiles, the tests the stack enables were **run**, every criterion built
+has its area marked, and what those tests cannot reach is reported as **not covered until
+QA** — never as green. Committing happens only if
 asked, and deploying is never an implicit step of implementing.
 
 ## Closing checklist
 
 - [ ] Affected code compiles.
-- [ ] The checks this change justifies were executed, not just written.
-- [ ] Area coverage marked on every criterion actually verified.
-- [ ] Everything without execution evidence reported as not verified.
+- [ ] The tests the stack enables for this change were executed, not just written.
+- [ ] Area coverage marked on every criterion built; `qa` left to `nzt-verify`.
+- [ ] What those tests cannot reach reported as not covered until QA, with no test plan
+      or manual script written for it here.
 - [ ] Stack document current with what the change adopted.
 - [ ] No commented-out code and no comment that is no longer true.
 - [ ] Change markers left as they are, for the feature close to sweep.

@@ -9,7 +9,8 @@ A value object is **a value that has rules**: an email, an amount with its curre
 range, a tax id. It has no identity and no life of its own — **two with the same content are
 the same thing.**
 
-Only in projects whose domain axis is DDD. The mapping belongs to
+Only in projects whose domain axis is DDD **and whose stack says *value objects yes*** in its
+DDD line. Without it, none is written. The mapping belongs to
 `nzt-build-backend-dotnet-ef-core-domain`.
 
 Load `nzt-build-backend-dotnet` before applying this.

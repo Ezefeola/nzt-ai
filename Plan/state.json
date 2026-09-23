@@ -1,57 +1,58 @@
 {
   "version": 1,
-  "updated": "2026-09-21T07:00:00Z",
-  "goal": "Que los niveles de test se acuerden en el stack: unit incluido, y un campo ausente no habilita ninguno -integracion contra motor real, contenedores, API in-process, E2E-",
+  "updated": "2026-09-22T16:00:00Z",
+  "goal": "D44: ningun paquete entra sin confirmacion del usuario, el stack pasa a ser una ficha liviana, y hasta donde llega DDD es un opt-in del stack",
   "phase": "build",
   "approved": true,
+  "autonomy": { "units": [1, 2, 3, 4, 5, 6, 7], "keep_stops": [] },
   "units": [
     {
       "id": 1,
-      "do": "Registrar D42 en specs/nzt-core.md: opt-in unico de niveles con unit adentro, ausente no habilita nada, se pregunta al escribir el stack",
+      "do": "Registrar D44 en specs/nzt-core.md: paquetes confirmados por el usuario, stack liviano, opt-in de piezas DDD",
       "status": "done",
-      "detail": "D42 con sus 5 piezas, despues de D41; seccion 14 al dia (D42 es la ultima decision de contenido); el arbol de skills marca tests/ con D32 y D42. El eje Tests queda reducido a framework"
+      "detail": "D44 con sus 3 piezas despues de D43; seccion 14 al dia (D44 es la ultima)"
     },
     {
       "id": 2,
-      "do": "nzt-architecture-stack: lista cerrada de opt-ins, el opt-in Test levels con su fila unit, y el eje Tests limitado a framework",
+      "do": "nzt-build-dependencies (y nzt-build/implement si lo nombran): todo paquete nuevo se propone con alternativa y se confirma antes de instalar",
       "status": "done",
-      "detail": "164 lineas. Seccion nueva 'The opt-ins' con los cuatro y el nombre del campo en ingles: Test levels = unit, integration real engine, ephemeral containers, in-process API. E2E queda fuera de esa linea y sigue siendo opt-in propio porque es de verify"
+      "detail": "Seccion 'The user confirms every new package' sin excepcion para lo tecnico; una pregunta por unidad; pausa solo lo dependiente. build e implement: setup autorizado cubre solo los paquetes que el stack lista"
     },
     {
       "id": 3,
-      "do": "nzt-build-tests: el disparador, la fila de la base y la seccion Integration tests pasan a leer el opt-in, unit incluido",
+      "do": "nzt-architecture-stack: plantilla liviana (Eje/Eleccion/Cuando, opt-ins de una linea, Paquete/Para que/Cuando usarlo, convenciones de una linea) y que queda afuera",
       "status": "done",
-      "detail": "179 lineas. Seccion nueva 'The levels are the stack's decision, not yours' arriba de todo. Dos reglas agregadas que el cambio hacia necesarias: un nivel apagado queda sin cubrir y NUNCA se fakea, y un nivel encendido que no puede correr aca se escribe igual y se reporta como no verificado"
+      "detail": "Reescrita, 190 lineas. Cinco bloques y ninguno mas; tabla 'What does not go here' (fuentes e historia al log de decisiones, estructura a la hoja de arquitectura); evidencia en una linea; se va Since"
     },
     {
       "id": 4,
-      "do": "nzt-build-backend-dotnet-testing: condicionar el proyecto de integracion, el motor real y WebApplicationFactory al opt-in",
+      "do": "Opt-in DDD: nzt-architecture-stack lo pregunta; architecture-domain, dotnet router, domain-ddd y value-objects lo leen",
       "status": "done",
-      "detail": "139 lineas. El intro separa las dos cosas: los proyectos del repo son evidencia de COMO se escribe un test, no de que niveles se escriben. Layout, EF Core y APIs condicionados, con la trampa cerrada: sin integracion no se cae al provider in-memory ni se mueve nada al proyecto de unit"
+      "detail": "Quinto opt-in. domain-ddd quedo en 211 y se recorto a 200 (seccion condensada, dos frases redundantes fuera). Domain events 'yes' no tiene hoja .NET: queda sin guia de construccion"
     },
     {
       "id": 5,
-      "do": "nzt-ship-backend-dotnet-pipeline: el gate de integracion existe solo si el opt-in lo habilita",
+      "do": "Fixtures de evals: los stacks sembrados pasan al formato nuevo y declaran su linea DDD",
       "status": "done",
-      "detail": "69 lineas. Las dos filas de test piden el nivel habilitado como precondicion, mas el parrafo de por que un gate sobre un proyecto vacio es peor que no tenerlo. ship/pipeline (generico) tambien se toco: sus filas de unit e integracion ahora dicen lo mismo que ya decia la de E2E, 79 lineas"
+      "detail": "project.sh (back y front), node-project.sh, test-levels-unasked y qa-unasked. Test data queda SIN contestar a proposito en project.sh: routing/test-data mide que se pregunte"
     },
     {
       "id": 6,
-      "do": "Eval de restraint: stack sin el opt-in y una historia que toca la base, y el agente no crea IntegrationTests ni Testcontainers",
+      "do": "Eval de restraint (ofrecido): story que necesita enviar email, y el agente propone el paquete con alternativa en vez de instalarlo",
       "status": "done",
-      "detail": "evals/restraint/test-levels-unasked, con scaffold propio que reescribe el stack del backend sin opt-in y con el eje Tests ya en forma. 4 graders, dos con arm both. README al dia: 23 casos, restraint 6. NO EJECUTADO: el usuario dijo que no se corre"
+      "detail": "evals/restraint/package-unasked con story US-020 y plan aprobado. 4 graders. README: 25 casos, restraint 8. NO EJECUTADO"
     },
     {
       "id": 7,
-      "do": "Build y verificacion: install/build.ps1, presupuesto de lineas y conteo de casos en el README de evals",
+      "do": "Build y verificacion: install/build.ps1, presupuesto de lineas, lint, checks del instalador y conteo de casos",
       "status": "done",
-      "detail": "build.ps1 exit 0, 23 casos detectados (el case.yaml y su scaffold pasan la validacion), 110 skills, CLAUDE.md y AGENTS.md en 183. Tocadas: stack 164, build/tests 179, dotnet/testing 139, dotnet/pipeline 69, ship/pipeline 79. Cross-check con 'dotnet run -- lint': 0 problemas. Unica advertencia la de R1, previa"
+      "detail": "build.ps1 exit 0 con 25 casos; lint 0 problemas (aviso R1 previo); PASS 47 installer checks"
     }
   ],
-  "waiting_on": "que el usuario recompile el instalador y reinstale en ~/.claude/skills: el contenido va embebido, asi que el nzt compilado sigue teniendo las skills viejas",
+  "waiting_on": "que el usuario recompile el instalador y reinstale en ~/.claude/skills: lo instalado sigue sin D42, D43 ni D44",
   "notes": [
-    "D42 cerrado en las 7 unidades. Tres evals nunca corridos: design-mode, design-unasked y test-levels-unasked, que el usuario decidio no correr",
-    "test-levels-unasked mide solo la mitad de restraint de D42: que el stack PREGUNTE los niveles al escribirse no lo mide ningun caso",
-    "Observacion fuera de alcance: las reglas de lint estan escritas tres veces -build.ps1, build.sh y Linter.cs- y hoy coinciden; candidata a deuda tecnica"
+    "D43 y D44 cerrados 2026-09-22, sin commit. Evals qa-unasked y package-unasked nunca corridos",
+    "Hueco conocido: domain events 'yes' no tiene hoja .NET que diga como construirlos; nadie lo pidio todavia",
+    "Fuera de alcance: migrar licensys (state.json viejo, verification/ -> testing/, marcas qa, stack al formato liviano con linea DDD) en una sesion en ese proyecto"
   ]
 }

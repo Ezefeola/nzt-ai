@@ -15,11 +15,16 @@ true about a thing is enforced by the thing itself, not by whoever happens to be
 
 Load `nzt-build-backend-dotnet` before applying this.
 
+**The stack's DDD line decides how far this goes** — *aggregates · value objects · domain
+events · typed ids*. A piece that is not `yes` is not built, and a missing line builds none:
+no value object (the field stays primitive, checked by the entity), no domain event (a
+reaction elsewhere is the use case's job), no id wrapper.
+
 ## Entity, aggregate, root
 
 An **entity** has identity: two with the same values are still different things. **The id is a
-primitive** — `int` or `Guid`. Wrapping it in its own type prevents mixing ids up but charges
-a conversion at every boundary, every single time.
+primitive** — `int` or `Guid` — unless the stack says *typed ids yes*: wrapping it charges a
+conversion at every boundary, every single time.
 
 An **aggregate** is one or more entities that change together and must stay consistent
 together. One of them is the **root**, and it is the only one the outside world names: an
@@ -141,8 +146,7 @@ if (order is null)
 }
 ```
 
-Checking for null is what keeps the compiler happy about nullability, so **no `!` is ever
-needed**.
+Checking for null keeps the compiler happy about nullability, so **no `!` is ever needed**.
 
 ## Changing: methods return the errors
 
@@ -177,13 +181,10 @@ Two ways out, and they are not equivalent:
 2. **Load the collection whole** — only when there is no more performant way to get the
    answer.
 
-Loading forty thousand lines to check one total is the same mistake as reading a whole table
-to paginate it in memory.
-
 ## Closing checklist
 
-- [ ] The id is a primitive; the entity is `sealed`, with private setters and read-only
-      collections.
+- [ ] Only the DDD pieces the stack says `yes` to; the id is a primitive unless typed ids
+      are; the entity is `sealed`, with private setters and read-only collections.
 - [ ] References to other aggregates are **the id only**; navigations inside are fine.
 - [ ] Every business value and message is in the entity's `Rules` and `Errors`, and no other
       layer declares its own.

@@ -23,29 +23,43 @@ Un comercio carga pedidos, los confirma y sigue su estado. Dos componentes:
 `Pedidos.Api` (backend) y `Pedidos.Web` (frontend).
 MD
 
+# Both stacks leave the `Test data` opt-in unanswered on purpose: routing/test-data
+# measures that the mechanism gets asked, and an answered opt-in would skip the question.
 cat > "$ws/Docs/backend-stack-Pedidos.Api.md" <<'MD'
 # Backend stack — Pedidos.Api
 component: Pedidos.Api · area: backend
 
-## Adopted
-| Axis | Choice | Since |
+| Axis | Choice | When |
 |---|---|---|
-| Runtime | .NET 10.0.2 | 2026-09 |
-| Language | C# 14 | 2026-09 |
-| Architecture | vertical-slice | 2026-09 |
-| Domain model | ddd | 2026-09 |
-| Persistence | repositories with unit of work | 2026-09 |
-| ORM | EF Core 10 against PostgreSQL 17 | 2026-09 |
-| Endpoints | minimal-apis | 2026-09 |
-| Error handling | result pattern | 2026-09 |
-| Result to HTTP | result-extensions | 2026-09 |
-| Tests | xUnit 3 + Testcontainers | 2026-09 |
+| Runtime | .NET 10.0.2 | — |
+| Language | C# 14 | — |
+| Database | PostgreSQL 17 | — |
+| Architecture | vertical-slice | — |
+| Domain model | ddd | entities and aggregates protect the order rules |
+| Persistence | repositories with unit of work | every write goes through the unit of work |
+| ORM | EF Core 10 | every access to PostgreSQL |
+| Endpoints | minimal-apis | every HTTP endpoint |
+| Error handling | result pattern | expected failures; exceptions stay exceptional |
+| Result to HTTP | result-extensions | endpoints translate Result to payload or ProblemDetails |
+| Tests | xUnit 3 | — |
 
 ## Opt-ins
-- **Test-first:** no.
-- **Automated end-to-end tests:** no.
+- **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
+- **Test levels:** unit yes · integration against the real engine: yes · ephemeral
+  containers: yes · in-process API: no
+- **Test-first:** no
+- **Automated end-to-end tests:** no
 
-## Evidence
+## Packages
+| Package | What for | When to use it |
+|---|---|---|
+| Npgsql.EntityFrameworkCore.PostgreSQL 10.0.0 | EF Core provider for PostgreSQL | persistence and migrations |
+| xunit.v3 3.0.0 | test framework | every automated test |
+| Testcontainers.PostgreSql 4.6.0 | disposable PostgreSQL for tests | integration tests against the real engine |
+
+## Conventions
+- Secrets live outside the repository; in development, in user secrets.
+
 Versions read on 2026-09-17 from `global.json` and `Directory.Packages.props`.
 MD
 
@@ -53,19 +67,20 @@ cat > "$ws/Docs/frontend-stack-Pedidos.Web.md" <<'MD'
 # Frontend stack — Pedidos.Web
 component: Pedidos.Web · area: frontend
 
-## Adopted
-| Axis | Choice | Since |
+| Axis | Choice | When |
 |---|---|---|
-| Framework | Blazor (.NET 10.0.2) | 2026-09 |
-| Architecture | vertical-slice | 2026-09 |
-| Render mode | auto | 2026-09 |
-| Component organisation | code-behind | 2026-09 |
-| Prerendering | enabled | 2026-09 |
+| Framework | Blazor (.NET 10.0.2) | — |
+| Architecture | vertical-slice | — |
+| Render mode | auto | every interactive page |
+| Component organisation | code-behind | every component with logic |
+| Prerendering | enabled | every page |
 
 ## Opt-ins
-- **Automated end-to-end tests:** no.
+- **Test levels:** unit no · integration against the real engine: no · ephemeral
+  containers: no · in-process API: no
+- **Test-first:** no
+- **Automated end-to-end tests:** no
 
-## Evidence
 Versions read on 2026-09-17 from `global.json`.
 MD
 
@@ -92,11 +107,11 @@ Como operador quiero ver los pedidos de un cliente para revisar su historial.
 
 ## Criterios de aceptación
 - **CA-01.** Dado un cliente con pedidos, cuando abro su historial, veo una página de 20
-  pedidos ordenados del más reciente al más antiguo. `backend — · frontend —`
+  pedidos ordenados del más reciente al más antiguo. `backend — · frontend — · qa —`
 - **CA-02.** Dado un cliente sin pedidos, veo el estado vacío con su mensaje.
-  `backend — · frontend —`
+  `backend — · frontend — · qa —`
 - **CA-03.** Dado un `pageSize` mayor al máximo del proyecto, la operación responde con el
-  error de validación. `backend — · frontend —`
+  error de validación. `backend — · frontend — · qa —`
 
 ## Reglas que aplica
 - RN-02.

@@ -37,13 +37,13 @@ Como operador quiero ver los pedidos de un cliente para revisar su historial.
 
 ## Criterios de aceptación
 - [x] **CA-01.** Dado un cliente con pedidos, cuando abro su historial, veo una página de
-  20 pedidos ordenados del más reciente al más antiguo. `backend ✓ · frontend ✓`
+  20 pedidos ordenados del más reciente al más antiguo. `backend ✓ · frontend ✓ · qa ✓`
 - [x] **CA-02.** Dado un cliente sin pedidos, veo el estado vacío con su mensaje.
-  `backend ✓ · frontend ✓`
+  `backend ✓ · frontend ✓ · qa ✓`
 - [x] **CA-03.** Dado un `pageSize` mayor al máximo del proyecto, la operación responde con
-  el error de validación. `backend ✓ · frontend ✓`
+  el error de validación. `backend ✓ · frontend ✓ · qa ✓`
 - [x] **CA-04.** · [modify] Dado un cliente con pedidos anulados, cuando abro su historial,
-  **no** los veo. `backend ✓ · frontend ✓`
+  **no** los veo. `backend ✓ · frontend ✓ · qa ✓`
 
 ## Reglas que aplica
 - RN-02, RN-03.

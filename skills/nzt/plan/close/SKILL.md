@@ -18,7 +18,8 @@ five times.
 
 The feature closes when **the user has accepted the work**, not when the code compiles:
 
-- Every criterion of every story is `[x]`, with every area of the story marked `✓`.
+- Every criterion of every story is `[x]`, with every area of the story and its `qa` marked
+  `✓`.
 - The user accepted them. Your verification and their acceptance are different things, and
   only the second one closes.
 - `Plan/specs/<feature>/testing/README.md` has no open bug, and no criterion sitting without

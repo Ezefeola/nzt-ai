@@ -145,7 +145,8 @@ decision record.
   `Architecture: vertical-slice`, not the skill that implements it. The concept survives a
   rename and can be read without opening anything.
 - **The stack declares which areas exist** in this project. That list is closed, and it is
-  the same list acceptance criteria use to mark coverage (`backend ✓ · frontend —`).
+  the same list acceptance criteria use to mark coverage (`backend ✓ · frontend — · qa —`,
+  where `qa` is verify's mark and never an area).
 - Distinguish what is planned from what is adopted, until it is adopted.
 - Design against the spec, not against the request. If the spec does not say it, it is not
   a requirement — go back to discovery instead of inventing one.

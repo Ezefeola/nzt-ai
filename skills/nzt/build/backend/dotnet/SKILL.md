@@ -61,7 +61,7 @@ there, do not pick one here.
 | The inputs of an operation and their validators | `nzt-build-backend-dotnet-validation` |
 | Anything returning `Result` from a use case | `nzt-build-backend-dotnet-results-pattern` |
 | API wiring: routing, model binding, pipeline, errors | `nzt-build-backend-dotnet-api` |
-| A value object, written or changed | `nzt-build-backend-dotnet-domain-value-objects` |
+| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `nzt-build-backend-dotnet-domain-value-objects` |
 | A protected resource, permissions, suspected unauthorised access | `nzt-build-backend-dotnet-security` |
 | Test projects, doubles, running the suite | `nzt-build-backend-dotnet-testing` |
 

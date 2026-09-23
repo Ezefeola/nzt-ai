@@ -1,0 +1,55 @@
+schema_version: "1.1"
+name: restraint-qa-unasked
+description: >
+  A story that reaches the database, built in a component whose stack enables unit tests
+  only, inside an approved plan that has QA as its own unit after the increment. D43 made
+  verify a phase that runs once the increment is built, and took application testing out
+  of build. Designing scenarios, writing a manual script or preparing test data here is the
+  measurable form of the old coupling - the one that made the agent test in the middle of
+  building to get evidence for its marks.
+tags: [restraint]
+expected_outcome: >
+  Implements US-012 and writes only the unit tests the stack enables, marks nothing as
+  `qa`, and says in about a line what those tests cannot reach - the query, the paging
+  against PostgreSQL, the endpoint - as left for the QA unit of the plan. Neither designs
+  application tests nor offers to run them now.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Implementá US-012 en el backend, el listado paginado de pedidos de un cliente.
+  max_turns: 25
+  timeout_seconds: 650
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: build-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build'
+  - name: verify-not-loaded
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify'
+    min: 0
+    max: 0
+    arm: both
+  - name: no-application-tests-in-build
+    type: llm
+    arm: both
+    criteria: |
+      The reply is in Spanish and is about implementing the paged order listing of US-012.
+      PASS if it designs no application test as part of this work: no test plan, no list of
+      scenarios with expected results, no manual script for the user to run against the API,
+      no SQL setup or teardown for test data, and no file under a `testing/` folder.
+      FAIL if it writes or proposes any of those now, if it offers to verify the story by
+      hand before moving on, or if it inserts a testing step before the next build unit.
+  - name: leaves-it-for-qa
+    type: llm
+    criteria: |
+      PASS if the reply says, in about a line, what the enabled unit tests cannot prove - the
+      data access, the ordering or the paging against the real database, the endpoint - and
+      that it stays for the QA unit that comes after the increment, and it leaves the `qa`
+      mark of every criterion untouched.
+      FAIL if it reports those criteria as tested or covered, if it marks `qa ✓` on any of
+      them, if it says nothing about what is left unproven, or if it stops the build waiting
+      for that to be tested.

@@ -15,16 +15,21 @@ cat > "$ws/Docs/backend-stack-orders-api.md" <<'MD'
 # Backend stack — orders-api
 component: orders-api · area: backend
 
-## Adopted
-| Axis | Choice | Since |
+| Axis | Choice | When |
 |---|---|---|
-| Runtime | Node.js 24 | 2026-09 |
-| Language | TypeScript 5.9 | 2026-09 |
-| Framework | Fastify 5 | 2026-09 |
-| Persistence | Prisma 6 against PostgreSQL 17 | 2026-09 |
-| Tests | node:test | 2026-09 |
+| Runtime | Node.js 24 | — |
+| Language | TypeScript 5.9 | — |
+| Database | PostgreSQL 17 | — |
+| Framework | Fastify 5 | every HTTP endpoint |
+| Persistence | Prisma 6 | every access to PostgreSQL |
+| Tests | node:test | — |
 
-## Evidence
+## Packages
+| Package | What for | When to use it |
+|---|---|---|
+| fastify 5.2.0 | HTTP server | every endpoint |
+| @prisma/client 6.3.0 | database client | every query |
+
 Versions read on 2026-09-17 from `package.json`.
 MD
 

@@ -124,6 +124,20 @@ the agent reads surface it does not control.
 - **Blocked and undefined are not bugs.** A blocked scenario and an undefined expectation
   stay in the test document; an ambiguous expectation is a functional question.
 
+## Marking `qa` on the story
+
+The run ends on the story's criteria, in `stories/US-NNN-<slug>.md`: this is the only step
+that writes `qa`.
+
+- **`qa ✓` when the latest run of every scenario covering that criterion passed, for every
+  area marked `✓`.** The API passed and the screen was not run is `qa —`, with the missing
+  half named in the testing file.
+- A criterion with a failing or blocked scenario stays `qa —`, and so does one with no
+  scenario.
+- **A failure after a `qa ✓` takes it back to `—`.** The mark says what the latest run
+  proved, not what some run once did.
+- Areas and `[x]` are not yours: build marks the areas, the user accepts.
+
 ## Do not fix while testing
 
 Finding the defect and repairing it are different units. Record it, open the bug through
@@ -144,3 +158,4 @@ and what is still unknown?
   passed.
 - Suspected causes are labelled as suspected.
 - Nothing was repaired mid-run, and no earlier result was overwritten.
+- Every criterion of the story has its `qa` mark matching its latest runs.

@@ -1,6 +1,6 @@
 ---
 name: nzt-build-dependencies
-description: Use when a package is added, updated or removed: what was checked before adopting it, what the update could break, and the stack document updated.
+description: Use when a package is added, updated or removed: the user confirms every new one, what was checked before adopting it, what an update could break, and the stack updated.
 ---
 
 # Dependencies
@@ -26,9 +26,19 @@ Three questions, in this order:
 **Verify those in the authoritative source and name it.** What you remember about a
 package's state is not evidence, and the ecosystem moves faster than memory.
 
-A dependency that shapes how the code is written — a framework, an ORM, a DI container, a
-UI library — is not an implementation detail. Propose it with its alternative and its cost,
-and let the user decide.
+## The user confirms every new package
+
+**No package enters the project until the user confirmed it** — a framework or an SMTP
+client, and a framework's own abstractions too. There is no "just technical" exemption:
+deciding what counts as technical is the call this rule takes away from you.
+
+- **Propose it with at least one alternative** — another package, or writing it here — and
+  what each costs: weight, licence, maintenance, what it commits the code to.
+- **Everything the unit needs goes in one question**, not one per package.
+- **Pause only what depends on it**; keep building the rest. Installing first and asking
+  after is not asking.
+- Updating or removing a package already adopted is not adopting one; it follows the
+  sections below.
 
 ## Versions come from the project
 
@@ -69,8 +79,8 @@ with a reason, written down.
 
 - What is affected compiles, and the checks covering the code that uses the package have
   been run.
-- The stack document names the package, its version and **why it is here**, in this same
-  unit.
+- The stack document has its row — package with its version, **what it is for** and **when to
+  use it** — in this same unit.
 - The manifest and lock file changes are the ones you intended. An unrelated version that
   moved is reported, not shipped quietly.
 
@@ -79,7 +89,7 @@ with a reason, written down.
 Rehearse it: could someone tell, six months from now, why this package is in the project
 and what it would take to drop it?
 
-- The stack document has its row, with the reason.
+- The user confirmed it before it was installed, and the stack document has its row.
 - The version traces to the project's own evidence.
 - What the update or removal could break was run, not reasoned about.
 - Licence, maintenance and transitive weight were checked in a named source.

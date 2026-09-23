@@ -67,8 +67,8 @@ exists for, and they all pass at the end without any of them having been watched
 ## Closing
 
 The same close as any build unit: what is affected compiles, the tests have been **run**,
-coverage is marked only for criteria with execution evidence, and anything unverified is
-named as unverified.
+the area is marked only on criteria whose tests pass, and what they cannot reach is named
+as not covered until QA.
 
 ## Done when
 

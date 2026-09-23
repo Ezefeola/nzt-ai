@@ -1,11 +1,11 @@
 ---
 name: nzt-build-implement
-description: Use when a story is being built: working code for its criteria, rules enforced where the design says, coverage marks, and a close that reports what ran.
+description: Use when a story is being built: working code for its criteria, rules enforced where the design says, area marks, and a close that reports what ran and what is left for QA.
 ---
 
 # Implement a story
 
-Produces working code for **one story**, and the coverage marks on that story's criteria.
+Produces working code for **one story**, and the area marks on that story's criteria.
 The criteria are the definition of done; nothing else is.
 
 If you did not arrive here from `nzt-build`, load it first.
@@ -25,8 +25,10 @@ the change lands on code nobody can describe from memory, the survey comes first
   discrepancy is reported. Versions are not inferred from what compiles or from what is
   newest, and **a version is never raised to make an example compile**: that is a stack
   change and goes through the stack's own door.
-- Project setup — solution, projects, dependencies, foundations — is **authorised work**
-  before the first story. Do not invent a story to justify it.
+- Project setup — solution, projects, the dependencies the stack lists, foundations — is
+  **authorised work** before the first story. Do not invent a story to justify it.
+- **A package the stack does not list is never installed without the user's confirmation**
+  — `nzt-build-dependencies` asks it. Pause what depends on it and build the rest.
 
 ## The work
 
@@ -34,12 +36,11 @@ the change lands on code nobody can describe from memory, the survey comes first
    done.
 2. Implement each one **where the design says the rule is enforced**. If the design does
    not say, and the answer is structural, that is a design gap: raise it, do the rest.
-3. Verify what you changed. Compile what is affected, and run the checks the change
-   justifies. **Behavior that changed earns its automated tests** — `nzt-build-tests` says
-   which and what makes them worth keeping — unless the stack decided against them, and then
-   say what is left uncovered.
-4. Mark coverage on the criteria you built **and ran**.
-5. Report what exists now, what is left, and what you could not verify.
+3. Check what you changed. Compile what is affected. **Behavior that changed earns its
+   automated tests at the levels the stack enables** — `nzt-build-tests` says which and what
+   makes them worth keeping — and those tests are run.
+4. Mark the area on the criteria you built.
+5. Report what exists now, what is left, and what is not covered until QA.
 
 ## Marking coverage
 
@@ -47,11 +48,15 @@ The coverage line lives on each criterion in
 `Plan/specs/<feature>/stories/US-NNN-<slug>.md`. **That is the only place progress is read
 from.**
 
-- Mark your area `✓` when it is built **and there is evidence it ran**. Static inspection
-  is not a test run, and code that compiles is not code that works.
-- Anything without execution evidence is reported as **not verified**. Never green.
-- Turning the criterion to `[x]` is not yours: every area has to be `✓` **and the user has
-  to accept it**.
+- Mark your area `✓` when it is built: **it compiles and the tests the stack enables for it
+  pass**. A failing test is not a `✓`.
+- **What those tests cannot reach is not yours to prove.** A rule that only shows through
+  the API, a row that only a real engine confirms, a screen nobody drove: report it as
+  *not covered until QA* and keep building. **Never write a test plan, a manual script or
+  test data to get evidence for it** — that is `nzt-verify`, and it runs once the increment
+  is built, against the whole of it.
+- `qa` is not yours, and neither is `[x]`: `nzt-verify` marks `qa`, and only the user
+  accepts.
 
 ## Write it the way this code is written
 
@@ -104,7 +109,8 @@ whole:
 2. Fix it where the cause is, not where it surfaced.
 3. **Verify the regression**: reproduce the original case and show it now behaves, and run
    what else that code covers.
-4. Mark the criterion the defect violated, if the story has one.
+4. Mark the area of the criterion the defect violated, if the story has one. Its `qa`
+   waits for `nzt-verify`'s re-run.
 
 The bug file itself belongs to `nzt-verify`: it opens it and it closes it, even when you
 are the one who fixed it. Report the fix and let that phase move its state.
@@ -122,9 +128,10 @@ are the one who fixed it. Report the fix and let that phase move its state.
 Measurable, in this order:
 
 1. What is affected compiles.
-2. The checks the change justifies have been run, and their result is what you report.
-3. Coverage marked on every criterion that is built and ran.
-4. What has no execution evidence is named as not verified, with why.
+2. The tests the stack enables have been run, and their result is what you report.
+3. The area marked on every criterion that is built and whose tests pass.
+4. What those tests cannot reach is named as not covered until QA — a list, never a test
+   plan.
 
 - **Do not commit unless the user asked.** `nzt-ship-vcs` owns that.
 - **Deploying is never an implicit step of implementing.**
@@ -134,7 +141,8 @@ Measurable, in this order:
 Rehearse it: could the user try this story right now, from what you are about to report?
 
 - Every criterion is implemented, or explicitly listed as not done.
-- Every criterion you built has its area marked, and only with execution evidence.
+- Every criterion you built has its area marked, and none with a failing test.
 - No rule is enforced in two places by accident.
 - Every marker you emitted is still in the file for whoever closes the feature.
-- The report says what ran, what failed and what was not verified.
+- The report says what ran, what failed and what is left for QA — and nothing under
+  `testing/` was written.

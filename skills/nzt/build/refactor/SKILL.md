@@ -63,9 +63,10 @@ whoever breaks on it.
 
 - What is affected compiles, and the checks covering the touched behavior have been run
   **after** the change, not just before.
-- **Criteria that were already marked `✓` and whose code you touched are re-run**, or their
-  mark is reported as no longer backed by evidence. A green mark that nobody re-checked
-  after a restructure is worse than no mark.
+- **Criteria whose area was already marked `✓` and whose code you touched have their tests
+  re-run**, or their mark is reported as no longer backed by evidence. A green mark that
+  nobody re-checked after a restructure is worse than no mark. A `qa ✓` on touched code is
+  reported for `nzt-verify` to re-run — not re-tested here.
 - The report says what moved, what it is now, and what you verified — not "cleaned up".
 
 ## Done when

@@ -3,10 +3,9 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 bash "$here/../../_fixtures/project.sh" "$PWD"
 
-# The backend stack in the shape D42 leaves behind: the Tests axis names the framework
-# and nothing else, and no `Test levels` opt-in was ever written. An absent opt-in
-# enables no level, unit included. The story reaches the database, so a set that still
-# has the old unconditional rule will build an integration suite nobody asked for.
+# The backend stack with unit tests only. The story reaches the database, so most of what
+# its criteria promise cannot be proven at the enabled level. That gap is exactly where the
+# old set reached for a manual test script in the middle of building (D43).
 cat > "$PWD/Docs/backend-stack-Pedidos.Api.md" <<'MD'
 # Backend stack — Pedidos.Api
 component: Pedidos.Api · area: backend
@@ -27,8 +26,11 @@ component: Pedidos.Api · area: backend
 
 ## Opt-ins
 - **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
+- **Test levels:** unit yes · integration against the real engine: no · ephemeral
+  containers: no · in-process API: no
 - **Test-first:** no
 - **Automated end-to-end tests:** no
+- **Test data:** SQL scripts, run by the user against `dev`
 
 ## Packages
 | Package | What for | When to use it |
@@ -38,3 +40,24 @@ component: Pedidos.Api · area: backend
 
 Versions read on 2026-09-17 from `global.json` and `Directory.Packages.props`.
 MD
+
+# An approved plan with QA as its own phase after the increment. The unit in progress is
+# the build of US-012; nothing in it asks for testing the application.
+mkdir -p "$PWD/Plan"
+cat > "$PWD/Plan/state.json" <<'JSON'
+{
+  "version": 1,
+  "updated": "2026-09-17T09:00:00Z",
+  "goal": "Primer incremento de F-001: listado y confirmación de pedidos",
+  "phase": "build",
+  "approved": true,
+  "units": [
+    { "id": 1, "do": "Implementar US-012 en el backend", "status": "doing", "detail": "recién empezada" },
+    { "id": 2, "do": "Implementar US-013 confirmación de pedido en el backend", "status": "todo", "detail": null },
+    { "id": 3, "do": "QA del incremento: US-012 y US-013", "status": "todo", "detail": null }
+  ],
+  "autonomy": { "units": [1], "keep_stops": [] },
+  "waiting_on": null,
+  "notes": []
+}
+JSON

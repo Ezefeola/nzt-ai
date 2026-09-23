@@ -5,14 +5,26 @@ description: Use when built behavior needs evidence: test scenarios from a story
 
 # Verify — evidence that it works
 
-This phase produces evidence, not opinions. Every story gets a testing file saying what was
-tried, with what data, what was expected, and what actually happened.
+This phase is QA, and it produces evidence, not opinions. Every story gets a testing file
+saying what was tried, with what data, what was expected, and what actually happened.
+
+## When it runs
+
+**After build has finished the increment** — the stretch the plan delivers together, or
+the whole product if there is only one. Not story by story as each one is built, and not
+between two build units, unless the user asked for it: a test set written before the rest
+is built gets written against what cannot run yet. A reported bug and the two readings
+below are the exceptions — they need no finished increment.
+
+If you arrived here in the middle of a build phase with no such request, say so and stop:
+the next build unit is the work.
 
 ## Boundaries
 
 **Owns:** the application-level test plan, its execution, the recorded evidence, the
-defects found, the end-to-end regression derived from approved scenarios, and the two
-readings that need no run: code read for defects, and documents measured against the code.
+**`qa` mark on each criterion**, the defects found, the end-to-end regression derived from
+approved scenarios, and the two readings that need no run: code read for defects, and
+documents measured against the code.
 
 **Does not own:** the automated tests that ship with the code (`nzt-build-tests`), and fixing
 a defect — both are `nzt-build`. This phase finds it, records it, and is the one that closes
@@ -143,12 +155,15 @@ before it starts.
 ## Done when
 
 Every criterion of the story has a scenario or is listed as having none; every scenario has
-a closed status with its evidence; every failure has its bug file; and everything that could
-not be run is reported as not run, with its reason.
+a closed status with its evidence; every criterion has its `qa` mark matching its latest
+runs; every failure has its bug file; and everything that could not be run is reported as
+not run, with its reason.
 
 ## Closing checklist
 
+- [ ] Run after the increment was built, or interleaved because the user asked.
 - [ ] Plan written and approved before execution, naming each scenario's target.
+- [ ] `qa ✓` only where every built area's scenarios passed on their latest run.
 - [ ] Data mechanism agreed with the user and recorded in the stack document.
 - [ ] Every scenario that needed data has its setup and teardown scripts, and every teardown
       that did not run is recorded as data debt.

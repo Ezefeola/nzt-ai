@@ -22,7 +22,7 @@ that is not the output language.
    document. Show it in your reply and write it into `Plan/state.json`. Do not execute
    until they approve it and `approved` is `true`.
 3. **Execute.** One unit at a time, marking progress in the spec the unit belongs to.
-4. **Verify.** Test what you built and record the evidence.
+4. **Verify.** Check what the unit built with the checks its phase owns, and record them.
 5. **Record.** Update `Plan/state.json`. Then stop.
 
 ## Entry point
@@ -113,7 +113,7 @@ continuing inside a phase whose router is already loaded in this session.
 | How to solve it: components, stack, technical design | `nzt-architecture` |
 | Screens, flows, visual design, and the end user's manual | `nzt-ux` |
 | Writing or changing code against specs | `nzt-build` |
-| Designing or running tests, recording evidence | `nzt-verify` |
+| QA once the increment is built: test plans, runs, evidence, bugs | `nzt-verify` |
 | Versioning, CI/CD, releasing, deploying | `nzt-ship` |
 | Teaching the user a skill instead of doing it for them | `nzt-learn` |
 

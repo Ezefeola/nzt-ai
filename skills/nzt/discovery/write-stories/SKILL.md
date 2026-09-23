@@ -1,12 +1,12 @@
 ---
 name: nzt-discovery-write-stories
-description: Use when writing or changing one user story: declarative criteria with concrete data, the unhappy path, and per-area coverage marks.
+description: Use when writing or changing one user story: declarative criteria with concrete data, the unhappy path, and the coverage marks per area and for QA.
 ---
 
 # User story
 
 Produces one file: `Plan/specs/<feature>/stories/US-NNN-<slug>.md`. It carries the
-acceptance criteria of one story and the coverage marks per area. **This is the only place
+acceptance criteria of one story and their coverage marks. **This is the only place
 progress is read from** — the story index in `spec.md` has no checkboxes.
 
 If you did not arrive here from `nzt-discovery`, load it first.
@@ -32,12 +32,12 @@ so I do not confirm an order expecting a discount.
 - [ ] **An expired coupon leaves the total untouched.** (RN-cupon-vencido)
   When I apply `INVIERNO20`, expired on 2026-05-01, to an order of $10.000, the total
   stays $10.000 and the coupon is reported as expired.
-  backend ✓ · frontend —
+  backend ✓ · frontend — · qa —
 
 - [ ] **A coupon already used by me is rejected.** (RN-un-uso-por-cliente)
   When I apply `VERANO25`, which I already redeemed, the total stays $10.000 and the
   coupon is reported as already used.
-  backend — · frontend —
+  backend — · frontend — · qa —
 
 ## Notes
 - Q-13 · Does a refund return the coupon? Does not block these criteria.
@@ -62,23 +62,32 @@ Each criterion is one observable outcome, and it has three parts: **the statemen
   bad case is what gets invented later if nobody wrote it down.
 - If a criterion needs a paragraph to state, it is more than one criterion.
 
-## Coverage per area
+## Coverage per area, and QA
 
 The coverage line goes on the criterion itself, never in a separate table:
 
 ```
-backend ✓ · frontend —
+backend ✓ · frontend ✓ · qa —
 ```
 
 - The areas are the ones the project's stack documents declare. Write **all** of them on
   every criterion, including the ones that do not apply — `frontend —` and a missing
-  `frontend` read the same to the next reader, and only one of them is true.
-- `✓` means that area is built **and verified**. `—` means it is not.
-- **The criterion turns `[x]` when every area is `✓` and the user has accepted it.** Your
-  own verification is not acceptance. An unmarked `[ ]` with no coverage line says nothing
-  about which half is missing, which is the whole reason the line exists.
-- You do not fill these marks here. `nzt-build` marks what it implements and `nzt-verify`
-  what it verifies; this skill writes the line so they have somewhere to mark.
+  `frontend` read the same to the next reader, and only one of them is true. **`qa` closes
+  every line**, whatever the areas are.
+- **Three marks, three owners, three questions:**
+
+  | Mark | Set by | It means |
+  |---|---|---|
+  | area `✓` | `nzt-build` | built: it compiles and the tests the stack enables pass |
+  | `qa ✓` | `nzt-verify` | the scenarios of **every** area marked `✓` passed |
+  | `[x]` | the user | accepted — only once every area and `qa` are `✓` |
+
+  `—` means not yet. What is missing to build, to test and to accept reads off one line.
+- `qa ✓` is all the built areas or nothing: an API that passed with a screen still untested
+  is `qa —`, and the story's testing file says which half is missing.
+- You do not fill these marks here: this skill writes the line so the others have somewhere
+  to mark. An unmarked `[ ]` with no coverage line says nothing about which part is missing,
+  which is the whole reason the line exists.
 
 ## One story is one story
 
@@ -96,8 +105,9 @@ and by the agreed plan; a second ranking contradicts the first one the day they 
 
 ## Changing a story
 
-- **A rewritten criterion returns to `[ ]` only if what is observed changed.** Rewording
-  keeps its marks — resetting them throws away verification that is still valid.
+- **A rewritten criterion returns to `[ ]` only if what is observed changed**, and then its
+  `qa` returns to `—` too. Rewording keeps its marks — resetting them throws away
+  verification that is still valid.
 - A criterion that no longer applies is removed, with its reason recorded where the
   decision was made. It is not left ticked "for history".
 - A new criterion arrives as `[ ]` with the full coverage line, whatever state the rest of
@@ -109,7 +119,7 @@ Rehearse it: could someone build this story, and someone else verify it, without
 anything?
 
 - Every criterion is declarative, has one `When` and uses concrete data.
-- Every criterion carries its coverage line with all the project's areas.
+- Every criterion carries its coverage line with all the project's areas and `qa`.
 - At least one unhappy path, or the written reason there is none.
 - No criterion names a technology, a screen widget or an endpoint.
 - Every rule is cited by slug, and no rule text is copied into this file.

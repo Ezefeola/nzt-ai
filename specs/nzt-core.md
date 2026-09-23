@@ -514,7 +514,7 @@ una feature vive con su spec en `Plan/`.
          ├─ analysis.md        # entrevista append-only con sus Q-NN
          ├─ change.md          # propuesta de cambio, temporal: se fusiona y se borra (D28)
          ├─ stories/
-         │  └─ US-NNN-<slug>.md  # criterios + cobertura por área
+         │  └─ US-NNN-<slug>.md  # criterios + cobertura por área y qa (D43)
          ├─ design/            # diseño técnico de esta feature, ofrecido (D41)
          │  ├─ design.md       # el presente: flujos, datos, fallos, contratos
          │  └─ decisions.md    # log append-only de sus QT-NN (D41)
@@ -1254,6 +1254,63 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   hoy solo vivía dentro del ejemplo del documento, así que un stack escrito sin mirar el
   ejemplo no contestaba ninguno. **Lo que no cambia**: el `Test data` (D36) y el E2E siguen
   como están, y el TDD sigue siendo opt-in aparte porque decide el orden, no el nivel.
+- **D43.** **Verify es QA: una fase aparte que corre después de implementar el incremento,
+  y el criterio gana una marca `qa` que solo pone verify.** Hallazgo de usar el set: en un
+  proyecto con solo unit (D42), el agente, en plena fase IMPLEMENT, cargó `nzt-verify` y
+  escribió un guion manual de 16 escenarios con sus scripts SQL, en vez de seguir con la
+  funcionalidad pendiente — que además era la que desbloqueaba la mitad de esos criterios.
+  **La causa estaba en el contenido**: el orden de fases decía *build siempre, verify
+  siempre*, pero no *cuándo*; el análisis va primero porque todo depende de él, y verify
+  no tiene esa dependencia que lo empuje al final. Y la misma `✓` la marcaban dos fases,
+  con implement obligado a no ponerla sin evidencia de ejecución: con los niveles apagados,
+  la única evidencia posible era una prueba de aplicación. Cuatro cosas quedan fijadas:
+  **(1) Verify corre después de implementar el incremento**, no story por story. El
+  incremento es el tramo que el plan entrega junto —si no tiene más de uno, el producto—.
+  El plan no intercala unidades de verify entre las de build **salvo que el usuario lo
+  pida**; un bug reportado sigue su propio camino (reproducir, arreglar, verificar). El
+  kernel cambia dos líneas por esto: el paso *Verify* del bucle pasa a ser *los chequeos que
+  su fase posee* —decía *Test what you built*, y leído por unidad mandaba a testear en
+  build— y la fila de `nzt-verify` en el ruteo dice *QA una vez construido el incremento*.
+  **(2) La línea de cobertura suma `qa`**: `backend ✓ · frontend ✓ · qa —`. El área
+  significa *construido*: compila y los tests que el stack habilitó pasan. `qa ✓` significa
+  que pasaron los escenarios de **todas** las áreas con `✓` — si solo se probó la API, queda
+  `qa —` y el archivo de testing dice qué falta. Una sola marca y no una por área porque se
+  lee de un vistazo, y la regla de que una pantalla nunca pasa con evidencia de la API ya
+  vive en el archivo de testing.
+  **(3) Implement no diseña ni corre pruebas de aplicación.** Lo que los niveles del stack
+  no cubren queda dicho como *no cubierto hasta QA* y el trabajo sigue: nada de guiones
+  manuales, carpeta `testing/` ni datos de prueba en build.
+  **(4) `[x]` pide áreas `✓`, `qa ✓` y la aceptación del usuario.** Tres dueños para tres
+  preguntas: qué falta construir, qué falta probar, qué falta aceptar. **Lo que no cambia**:
+  los tests que viajan con el código siguen siendo de build (D32, D42), y verify sigue
+  diseñando antes de correr, con su plan aprobado y sus datos acordados (D36). Lo mide
+  `evals/restraint/qa-unasked`: story que toca la base, stack con solo unit, plan con QA
+  como unidad propia, y ni `nzt-verify` carga ni aparece un guion.
+- **D44.** **Ningún paquete entra sin que el usuario lo confirme, el stack es una ficha
+  liviana, y hasta dónde llega DDD es un opt-in.** Tres hallazgos de leer el stack que NZT
+  generó en un proyecto real. **(1) Paquetes.** `nzt-build-dependencies` solo pedía
+  decisión para lo que *cambia cómo se escribe el código*; el resto lo evaluaba e
+  instalaba el agente — un cliente SMTP entró así. Ahora **todo paquete nuevo se propone
+  con al menos una alternativa y su costo, y se instala recién confirmado**, técnicos
+  incluidos (las abstracciones del framework también): eximir *lo técnico* le devuelve al
+  agente la frontera que se quería sacarle. Para que no sea pesado, **los que necesita una
+  unidad van en una sola pregunta**, y lo que no depende de ellos sigue. Actualizar o
+  quitar un paquete ya adoptado no cambia: no es adoptar uno nuevo.
+  **(2) Stack liviano.** El documento había crecido a documento de arquitectura: URLs de
+  fuentes, fechas de soporte, la historia de un proyecto de tests borrado, la estructura de
+  carpetas. La plantilla queda en cinco bloques: **tabla de ejes** (*Eje · Elección ·
+  Cuándo*), **opt-ins de una línea**, **tabla de paquetes** (*Paquete · Para qué · Cuándo
+  usarlo*, con la versión junto al nombre), **convenciones de una línea** y **una línea de
+  evidencia**. Lo que sale tiene destino: fuentes e historia al log de decisiones con la
+  `QT-NN` que respaldan, la estructura a la hoja de la arquitectura elegida. Se va la
+  columna *Since* y la sección *Planned* se mantiene solo si tiene algo.
+  **(3) Opt-in de DDD.** `nzt-architecture-domain` ya decía *value objects solo si el stack
+  los adoptó*, pero el stack no tenía dónde decirlo. Con el eje de dominio en `ddd`, el
+  stack pregunta **agregados · value objects · domain events · ids tipados**, cada uno con
+  su costo, en una línea. **Lo que no está escrito no se usa**, igual que los niveles de
+  test (D42). Es el quinto opt-in de la lista cerrada. Lo mide
+  `evals/restraint/package-unasked`: una story que necesita mandar un email y el agente
+  propone el paquete en vez de instalarlo.
 
 ## 13. Revisión contra Temper v3
 
@@ -2655,10 +2712,17 @@ primera que **revierte una decisión anterior**: supera la parte de D27 que hab�
 archivo. **D42 es la última, y es del mismo linaje**: usar el set mostró que build armaba
 integración, motor real y contenedores sin que nadie los hubiera pedido, así que **qué
 niveles de test se escriben pasa a ser un opt-in del stack —unit incluido— y un campo
-ausente no habilita ninguno**, con el eje `Tests` reducido al framework.
+ausente no habilita ninguno**, con el eje `Tests` reducido al framework. **D43 es la última,
+y sale de la misma corrida**: con los niveles apagados, implement buscaba su evidencia
+escribiendo guiones manuales en medio de la construcción, así que **verify pasa a ser QA,
+una fase que corre después de implementar el incremento**, y el criterio gana una marca
+`qa` que solo pone verify: `backend ✓ · frontend ✓ · qa —`. **D44 es la última**, de leer
+el stack que ese proyecto generó: **ningún paquete entra sin confirmación del usuario**, el
+stack vuelve a ser una ficha liviana de cinco bloques, y **hasta dónde llega DDD** —value
+objects, domain events, ids tipados— pasa a ser un opt-in donde lo no escrito no se usa.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D42. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D44. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 

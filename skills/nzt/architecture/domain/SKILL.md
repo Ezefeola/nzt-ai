@@ -113,8 +113,8 @@ optional case. Those two words say the two sides agree **eventually**, which rai
 question that belongs in the feature design: *while the other side is stale, what does the
 user see?*
 
-**Value objects only if the stack adopted them.** Then a field with rules of its own and no
-identity is marked with one word — *value* — and explained like any other. The moment it
+**Value objects only if the stack's DDD line says *value objects yes*.** Then a field with
+rules of its own and no identity is marked with one word — *value* — and explained like any other. The moment it
 matters *which one* it is, it is an entity.
 
 ## Writing it

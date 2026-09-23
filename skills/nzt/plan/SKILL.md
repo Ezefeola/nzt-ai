@@ -29,7 +29,8 @@ is produced: the plan says what it delivers, not which files will end up existin
 
 1. Take the phases chosen by `nzt` — or choose them yourself if the work is small and
    obvious.
-2. Turn each phase into its units, in dependency order.
+2. Turn each phase into its units, in dependency order. **Verify's units go after the
+   increment's last build unit, never between two**, unless the user asks for it.
 3. Write `goal`, `phase`, `units` and `approved: false` to `Plan/state.json`.
 4. Show the plan in the reply and ask for approval. Stop.
 

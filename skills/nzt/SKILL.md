@@ -53,7 +53,10 @@ changes what gets built:
 - **Architecture** — new components, a stack choice, or cross-component interaction.
 - **UX** — a person will look at a screen that does not exist yet.
 - **Build** — always, if code changes.
-- **Verify** — always, if behavior changes.
+- **Verify** — always, if behavior changes. **It is QA, and it runs after build has
+  finished the increment** — the stretch the plan delivers together, or the whole product
+  if there is only one. Not story by story, and never interleaved with build unless the
+  user asked for it.
 - **Ship** — the user asked for a release, a pipeline or a deploy.
 
 Be able to say in one line why you skipped each phase you skipped. A one-line change needs
