@@ -72,7 +72,7 @@ estos efectos de movimiento; la impresión queda estática.
 
 ## Preparación de la demo
 
-La demo usa **Pulso**, un tablero mínimo de estado del equipo. El guion completo, las
+La demo usa **Radar**, un tablero mínimo de estado del equipo. El guion completo, las
 respuestas preparadas, los resultados esperados y el plan de contingencia están en
 [`demo/prompts.md`](demo/prompts.md).
 

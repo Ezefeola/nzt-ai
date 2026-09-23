@@ -17,7 +17,13 @@ public sealed record CreateOrderRequestDto
 {
     public string CustomerId { get; set; } = string.Empty;
     public DateOnly DeliveryDate { get; set; }
-    public List<OrderLineRequestDto> Lines { get; set; } = [];
+    public List<OrderLineDto> Lines { get; set; } = [];
+
+    public sealed record OrderLineDto
+    {
+        public string Sku { get; set; } = string.Empty;
+        public int Units { get; set; }
+    }
 }
 ```
 
@@ -33,16 +39,22 @@ into. **A use case never declares its own paging wrapper.**
 
 ## The name says what it is for; the suffix says what it is
 
-**The suffix is mandatory: `RequestDto` or `ResponseDto`.** No other suffix, and never none.
+**A top-level DTO ends in `RequestDto` or `ResponseDto`; a nested DTO ends in `Dto`.**
 
-The rest of the name describes **the purpose, not the shape**: `CreateOrderRequestDto`,
+For a top-level DTO, the name describes **the purpose, not the shape**: `CreateOrderRequestDto`,
 `OrderSummaryResponseDto`. `OrderDto` or `DataDto` says nothing about which use case it
 serves, which is the only thing the reader needs.
 
 ## A DTO that belongs to another is declared inside it
 
 A line, a nested object, a collection item — **that type is declared inside the parent**, not
-in its own file and not beside it.
+in its own file and not beside it. **Properties come first; nested DTO declarations follow**,
+recursively. This overrides the general C# member order for DTOs.
+
+**Each parent declares its own children, even when their fields match another parent's.**
+Do not extract a child to the feature root, a `Dtos` or `Shared` folder, or another parent
+just to avoid repeated properties. The generic paging wrapper remains the only exception;
+its item DTO belongs to the use case and is never shared between use cases.
 
 ```csharp
 public sealed record OrderSummaryResponseDto
@@ -61,11 +73,14 @@ public sealed record OrderSummaryResponseDto
 
 It is reached as `OrderSummaryResponseDto.OrderLineDto`, **and that is the point**: the
 nested type has no life of its own. It exists because the parent needs it and changes when
-the parent changes, and **nesting is what makes it impossible to reuse somewhere else by
-accident** — the same rule as *one DTO per use case*, one level down.
+the parent changes. **Do not reuse it from another parent or use case**: nesting expresses
+ownership; the convention forbids sharing.
 
 **A nested DTO drops the `Request`/`Response` half and keeps `Dto`.** The parent already said
-which of the two it is.
+which of the two it is. Name the child after the concept it represents, without repeating
+the operation or collection role: `ListApplicationsResponseDto.ApplicationDto`, not
+`ApplicationListItemDto` or `ListApplicationsApplicationDto`. Request and response parents
+may each have their own `ApplicationDto`; matching fields do not make it a shared contract.
 
 ## Mapping
 
@@ -105,9 +120,12 @@ it.** What is decided here is the mapper's name and what goes inside it.
 
 - [ ] Every DTO is a `record` with `get; set;` — not positional, no `init`, no primary
       constructor.
-- [ ] The suffix is `RequestDto` or `ResponseDto`, and no DTO is without one.
-- [ ] The name describes what it is for, not the entity it resembles.
-- [ ] No DTO is reused by two use cases.
+- [ ] Top-level DTOs end in `RequestDto` or `ResponseDto`; nested DTOs end in `Dto`.
+- [ ] Top-level names express the use case; child names express the concept, without its
+      operation or collection role.
+- [ ] Each parent owns its child DTOs, even with repeated fields; none are extracted to a
+      feature root or shared folder. Only the generic paging wrapper is shared.
+- [ ] Properties precede nested DTO declarations at every nesting level.
 - [ ] Every DTO belonging to another is declared inside it, ending in `Dto` without
       repeating `Request`/`Response`.
 - [ ] Mapping is in `<Entity>MappingExtensions.cs`, `static`, with `To<DtoName>` methods.

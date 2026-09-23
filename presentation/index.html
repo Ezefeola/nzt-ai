@@ -190,7 +190,7 @@
           </ul>
         </div>
         <pre class="code-card" data-reveal><code>{
-  <span class="code-key">"goal"</span>: <span class="code-string">"Crear Pulso"</span>,
+  <span class="code-key">"goal"</span>: <span class="code-string">"Crear Radar"</span>,
   <span class="code-key">"phase"</span>: <span class="code-string">"build"</span>,
   <span class="code-key">"approved"</span>: <span class="code-bool">true</span>,
   <span class="code-key">"units"</span>: [
@@ -309,22 +309,22 @@
       <aside class="speaker-notes"><strong>1 min.</strong> Cambiá de ventana sólo después de explicar el caso. Dejá esta slide visible mientras preparás la terminal.</aside>
     </section>
 
-    <section class="slide" data-section="Demo" data-title="El producto: Pulso" data-minutes="2">
+    <section class="slide" data-section="Demo" data-title="El producto: Radar" data-minutes="2">
       <div class="slide-inner split">
         <div>
           <p class="eyebrow" data-reveal>PRODUCTO DE DEMOSTRACIÓN</p>
-          <h2 data-reveal>Pulso</h2>
+          <h2 data-reveal>Radar</h2>
           <p class="lead compact" data-reveal>Un tablero mínimo para que un equipo vea quién está bien, quién necesita atención y quién está bloqueado.</p>
           <div class="scope-tags" data-reveal><span>1 pantalla</span><span>1 formulario</span><span>1 lista</span><span>1 regla real</span></div>
         </div>
-        <div class="pulse-ui" data-reveal aria-label="Mockup de Pulso">
-          <div class="pulse-head"><div><small>PULSO DEL EQUIPO</small><strong>Hoy, 09:42</strong></div><button>+ Registrar</button></div>
-          <div class="pulse-row red"><i></i><div><strong>Lucía</strong><small>Bloqueada por acceso a staging</small></div><span>ROJO</span></div>
-          <div class="pulse-row yellow"><i></i><div><strong>Martín</strong><small>Necesita revisar el alcance</small></div><span>AMARILLO</span></div>
+        <div class="pulse-ui" data-reveal aria-label="Mockup de Radar">
+          <div class="pulse-head"><div><small>RADAR DEL EQUIPO</small><strong>Hoy, 09:42</strong></div><button>+ Registrar</button></div>
+          <div class="pulse-row red"><i></i><div><strong>Sabrina</strong><small>Bloqueada por acceso a staging</small></div><span>ROJO</span></div>
+          <div class="pulse-row yellow"><i></i><div><strong>Pepe</strong><small>Necesita revisar el alcance</small></div><span>AMARILLO</span></div>
           <div class="pulse-row green"><i></i><div><strong>Sofía</strong><small>Sin bloqueos</small></div><span>VERDE</span></div>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>2 min.</strong> Regla de negocio para disparar análisis y tests: amarillo o rojo exige una nota de 1–140 caracteres; verde puede ir sin nota. Un nuevo pulso reemplaza el actual de esa persona.</aside>
+      <aside class="speaker-notes"><strong>2 min.</strong> Regla de negocio para disparar análisis y tests: amarillo o rojo exige una nota de 1–140 caracteres; verde puede ir sin nota. Un nuevo estado reemplaza el actual de esa persona.</aside>
     </section>
 
     <section class="slide" data-section="Demo" data-title="La primera prueba" data-minutes="2">
@@ -367,11 +367,11 @@
         <div class="prompt-grid" data-reveal>
           <article class="prompt-card">
             <header><span>01 · INICIO</span><button class="copy-button" type="button" data-copy-target="promptStart">Copiar</button></header>
-            <p id="promptStart">Quiero crear desde cero “Pulso”, un tablero web para registrar el estado verde, amarillo o rojo de cada integrante.</p>
+            <p id="promptStart">Quiero crear desde cero “Radar”, un tablero web para registrar el estado verde, amarillo o rojo de cada integrante.</p>
           </article>
           <article class="prompt-card">
             <header><span>02 · RESPUESTAS</span><button class="copy-button" type="button" data-copy-target="promptAnswers">Copiar</button></header>
-            <p id="promptAnswers">Usuarios: un solo equipo interno. Amarillo y rojo requieren una nota de 1 a 140 caracteres; verde no. Cada persona tiene un único pulso vigente y uno nuevo reemplaza al anterior. Sin login ni historial en esta demo.</p>
+            <p id="promptAnswers">Usuarios: un solo equipo interno. Amarillo y rojo requieren una nota de 1 a 140 caracteres; verde no. Cada persona tiene un único estado vigente y uno nuevo reemplaza al anterior. Sin login ni historial en esta demo.</p>
           </article>
           <article class="prompt-card">
             <header><span>03 · APROBACIÓN</span><button class="copy-button" type="button" data-copy-target="promptApprove">Copiar</button></header>

@@ -1,4 +1,4 @@
-# Guion de demo — Pulso desde cero
+# Guion de demo — Radar desde cero
 
 Este guion prueba NZT como método, no la velocidad del modelo. Está diseñado para que la
 parte en vivo dure **20 minutos como máximo** y para poder continuar aunque una generación
@@ -6,12 +6,12 @@ o compilación demore.
 
 ## Qué vamos a construir
 
-**Pulso** permite que integrantes de un único equipo registren su estado actual:
+**Radar** permite que integrantes de un único equipo registren su estado actual:
 
 - `verde`: sin bloqueo; la nota es opcional;
 - `amarillo`: necesita atención; exige una nota de 1–140 caracteres;
 - `rojo`: está bloqueado; exige una nota de 1–140 caracteres;
-- cada integrante tiene un solo pulso vigente; registrar otro reemplaza el anterior;
+- cada integrante tiene un solo estado vigente; registrar otro reemplaza el anterior;
 - la demo no incluye autenticación, historial, notificaciones ni equipos múltiples.
 
 Stack propuesto para el prototipo: **.NET 10, Blazor Web App y persistencia en memoria**.
@@ -24,8 +24,8 @@ Crear una carpeta vacía y abrir el proveedor desde ahí. No copiar este guion d
 carpeta: el objetivo es que NZT clasifique un proyecto nuevo a partir del pedido.
 
 ```powershell
-New-Item -ItemType Directory pulso-demo
-Set-Location pulso-demo
+New-Item -ItemType Directory radar-demo
+Set-Location radar-demo
 codex
 ```
 
@@ -45,7 +45,7 @@ perder la reunión si falla la red o una ejecución tarda.
 
 Enviar exactamente:
 
-> Quiero crear desde cero “Pulso”, un tablero web para registrar el estado verde, amarillo
+> Quiero crear desde cero “Radar”, un tablero web para registrar el estado verde, amarillo
 > o rojo de cada integrante.
 
 ### Qué observar
@@ -65,14 +65,14 @@ la skill/ruta elegida es parte de evaluar NZT.
 Cuando empiece la unidad de análisis, responder:
 
 > Usuarios: un solo equipo interno. Amarillo y rojo requieren una nota de 1 a 140
-> caracteres; verde no. Cada persona tiene un único pulso vigente y uno nuevo reemplaza al
+> caracteres; verde no. Cada persona tiene un único estado vigente y uno nuevo reemplaza al
 > anterior. Sin login ni historial en esta demo.
 
 Si pregunta por orden o experiencia, usar estas decisiones:
 
 > Mostrar primero rojo, después amarillo y por último verde; dentro de cada grupo, ordenar
 > por nombre. La pantalla debe cubrir carga, vacío y error. El éxito es que una persona
-> registre su pulso y el tablero muestre inmediatamente el estado vigente.
+> registre su estado y el tablero muestre inmediatamente el estado vigente.
 
 ### Qué observar
 
@@ -154,11 +154,11 @@ Después autorizar:
 | Caso | Entrada | Resultado esperado |
 |---|---|---|
 | Verde válido | `Sofía`, verde, sin nota | Se registra y aparece en el tablero |
-| Amarillo válido | `Martín`, amarillo, `Necesita revisar alcance` | Se registra con la nota |
-| Amarillo inválido | `Martín`, amarillo, nota vacía | Se rechaza con mensaje concreto |
-| Reemplazo | `Sofía` pasa de verde a rojo con nota | Queda un único pulso, rojo |
-| Orden | Lucía rojo, Martín amarillo, Sofía verde | Se muestran en ese orden |
-| Estado vacío | Sin pulsos | La pantalla explica cómo registrar el primero |
+| Amarillo válido | `Pepe`, amarillo, `Necesita revisar alcance` | Se registra con la nota |
+| Amarillo inválido | `Pepe`, amarillo, nota vacía | Se rechaza con mensaje concreto |
+| Reemplazo | `Sofía` pasa de verde a rojo con nota | Queda un único estado, rojo |
+| Orden | Sabrina rojo, Pepe amarillo, Sofía verde | Se muestran en ese orden |
+| Estado vacío | Sin estados | La pantalla explica cómo registrar el primero |
 
 La evidencia de API no prueba la UI. Si no hay herramienta de navegador, los escenarios de
 pantalla deben quedar `blocked` o ser ejecutados por la persona que presenta y luego
@@ -184,7 +184,7 @@ Enviar:
 Learn no forma parte del pipeline del producto; es el modo en el que la persona aprende en
 vez de delegar. Mostrarlo verbalmente con este prompt, sin ejecutarlo en la sesión principal:
 
-> Quiero aprender a diseñar criterios de aceptación como los de Pulso. No los escribas por
+> Quiero aprender a diseñar criterios de aceptación como los de Radar. No los escribas por
 > mí: diagnosticá primero mi nivel con un caso corto y ayudame a adquirir la habilidad.
 
 El comportamiento esperado es una prueba breve antes de enseñar, objetivos observables,

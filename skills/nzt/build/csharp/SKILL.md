@@ -53,6 +53,8 @@ appending to the file.**
 
 The domain model fixes its own order on top of this, and inside an entity or a value object
 that one wins: `nzt-build-backend-dotnet-domain-ddd`.
+DTOs also override this order: **properties first, then nested DTO declarations**,
+recursively, as defined in `nzt-build-csharp-dtos`.
 
 ## Never a primary constructor
 
@@ -179,7 +181,7 @@ not yours.
       something inherits.
 - [ ] No folder named after a type.
 - [ ] Members in order with each group contiguous, and nothing appended at the end of the
-      file.
+      file; DTOs put properties before nested DTOs, and domain types use their own order.
 - [ ] No primary constructors; dependencies are `readonly` fields set in a constructor.
 - [ ] No `var`.
 - [ ] No `global using`, `using static`, alias usings or qualified names in the body, and

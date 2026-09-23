@@ -1312,6 +1312,19 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `evals/restraint/package-unasked`: una story que necesita mandar un email y el agente
   propone el paquete en vez de instalarlo.
 
+- **D45.** **DTOs hijos propios de cada padre, con nombres simples y propiedades primero.**
+  El usuario mostró un `ApplicationListItemDto` separado de `ListApplicationsResponseDto`
+  y reportó otro DTO compartido en la raíz de una feature. La regla de anidación y de no
+  compartir entre casos de uso ya existía; se refuerza sin atribuir el fallo a una causa
+  no verificada. **Cada padre declara sus propios hijos aunque repitan campos**: no se
+  extraen a la raíz, a `Dtos`, a `Shared` ni a otro padre para reutilizarlos. El contenedor
+  genérico de paginación conserva su excepción; sus ítems pertenecen al caso de uso.
+  **Primero las propiedades, después las declaraciones de DTOs anidados**, recursivamente:
+  excepción explícita al orden general de C#. El padre termina en `RequestDto` o
+  `ResponseDto`; el hijo, en concepto + `Dto`, sin repetir operación ni rol de colección:
+  `ListApplicationsResponseDto.ApplicationDto`, no `ApplicationListItemDto`. Se corrigen
+  el ejemplo de request y el checklist para que enseñen la misma regla.
+
 ## 13. Revisión contra Temper v3
 
 Temper v3 (`../temper-ai-v3`) es un set SDD maduro y funcionando. NZT no lo copia: se
@@ -2716,13 +2729,15 @@ ausente no habilita ninguno**, con el eje `Tests` reducido al framework. **D43 e
 y sale de la misma corrida**: con los niveles apagados, implement buscaba su evidencia
 escribiendo guiones manuales en medio de la construcción, así que **verify pasa a ser QA,
 una fase que corre después de implementar el incremento**, y el criterio gana una marca
-`qa` que solo pone verify: `backend ✓ · frontend ✓ · qa —`. **D44 es la última**, de leer
+`qa` que solo pone verify: `backend ✓ · frontend ✓ · qa —`. **D44 surge**, de leer
 el stack que ese proyecto generó: **ningún paquete entra sin confirmación del usuario**, el
 stack vuelve a ser una ficha liviana de cinco bloques, y **hasta dónde llega DDD** —value
 objects, domain events, ids tipados— pasa a ser un opt-in donde lo no escrito no se usa.
+**D45 es la última**: DTOs hijos exclusivos del padre, nombres simples, propiedades antes
+de tipos anidados y excepción explícita en el orden general de C#.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D44. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D45. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 
