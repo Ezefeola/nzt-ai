@@ -41,16 +41,16 @@ URL conserva el número de slide (`#/14`), por lo que se puede volver a un punto
 
 | Bloque | Slides | Tiempo acumulado | Objetivo |
 |---|---:|---:|---|
-| Apertura | 1–3 | 6 min | Presentar NZT, el origen del nombre y la agenda |
-| El problema | 4–5 | 12 min | Mostrar por qué velocidad no equivale a control |
-| Cómo funciona | 6–12 | 30 min | Explicar capas, ciclo, frenos, estado, fases y artefactos |
-| Confianza | 13–14 | 34 min | Guardrails, límites, instalación y medición |
-| Demo | 15–19 | 52 min | Observar NZT sobre un producto desde cero |
-| Cierre | 20 | 55 min | Proponer una adopción pequeña y medible |
+| Apertura | 1 | 2 min | Presentar NZT |
+| El problema | 2–3 | 8 min | Mostrar por qué velocidad no equivale a control |
+| Cómo funciona | 4–10 | 26 min | Explicar capas, ciclo, frenos, estado, fases y artefactos |
+| Confianza | 11 | 28 min | Guardrails y límites |
+| Demo | 12–14 | 42 min | Observar NZT sobre un producto desde cero |
+| Cierre | 15 | 45 min | Proponer una adopción pequeña y medible |
 
 El cronómetro de la barra superior no arranca solo: hacer clic o presionar `T` al comenzar.
 
-La slide 11 muestra once capacidades alrededor de NZT, con una órbita lenta y un brillo
+La slide 9 muestra once capacidades alrededor de NZT, con una órbita lenta y un brillo
 suave. **Pausar movimiento** detiene la órbita y la iluminación; el mismo botón permite
 reanudarlas. Las etiquetas permanecen horizontales. Con movimiento reducido se muestra
 una composición estática; en pantallas angostas, las capacidades se ordenan en una grilla.
@@ -62,12 +62,12 @@ por especificaciones) y **TDD** (desarrollo guiado por pruebas).
 Los boxes flotan suavemente hasta 3 px en ciclos de 7–9 segundos, con pequeños desfases
 y una iluminación tenue que nunca se apaga. Al pasar el mouse o enfocar un control dentro
 del box, se detienen en su posición y aumenta su brillo para facilitar la lectura.
-Las slides 3, 6, 7 y 19 no tienen un box destacado por defecto.
+Las slides 4, 5 y 14 no tienen un box destacado por defecto.
 En la portada, NZT tiene un halo suave y las etiquetas orbitales se mantienen derechas;
 al pasar el mouse por la órbita, esta se pausa para poder señalar cada etiqueta.
-La slide 15 tiene un arco luminoso que gira y un resplandor suave detrás del título.
+La slide 12 tiene un arco luminoso que gira y un resplandor suave detrás del título.
 El botón **Ⅱ** de la barra superior pausa o reanuda las animaciones ambientales, incluida
-la flotación, el brillo de los boxes y la slide 11. Su pausa local se conserva. La preferencia de movimiento reducido desactiva
+la flotación, el brillo de los boxes y la slide 9. Su pausa local se conserva. La preferencia de movimiento reducido desactiva
 estos efectos de movimiento; la impresión queda estática.
 
 ## Preparación de la demo
