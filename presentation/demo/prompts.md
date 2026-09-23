@@ -1,22 +1,26 @@
 # Guion de demo — Radar desde cero
 
 Este guion prueba NZT como método, no la velocidad del modelo. Está diseñado para que la
-parte en vivo dure **20 minutos como máximo** y para poder continuar aunque una generación
+parte en vivo dure **unos 25 minutos** y para poder continuar aunque una generación
 o compilación demore.
 
 ## Qué vamos a construir
 
-**Radar** permite que integrantes de un único equipo registren su estado actual:
+**Radar** permite registrar el estado actual de cada integrante de un único equipo:
 
+- el equipo es fijo y viene cargado al iniciar: Ana, María y Arnold;
+- sin login: cualquiera registra o cambia el estado de cualquiera de las tres personas;
 - `verde`: sin bloqueo; la nota es opcional;
 - `amarillo`: necesita atención; exige una nota de 1–140 caracteres;
 - `rojo`: está bloqueado; exige una nota de 1–140 caracteres;
 - cada integrante tiene un solo estado vigente; registrar otro reemplaza el anterior;
+- los estados viven en memoria: al reiniciar, las tres personas vuelven sin estado;
 - la demo no incluye autenticación, historial, notificaciones ni equipos múltiples.
 
-Stack propuesto para el prototipo: **.NET 10, Blazor Web App y persistencia en memoria**.
+Stack propuesto para el prototipo: **.NET 10, una API ASP.NET Core y un front Blazor Web App
+separados, vertical slice, dominio anémico y EF Core directo sobre el proveedor en memoria**.
 Esto mantiene la demo pequeña y activa las convenciones específicas del stack sin sumar una
-base de datos o infraestructura externa.
+base de datos o infraestructura externa. En local, el front llama a la API por HTTP.
 
 ## Preparación — antes de la reunión
 
@@ -60,19 +64,39 @@ Enviar exactamente:
 Si escribe código, no esconderlo: señalar que la primera prueba falló. Revisar el estado y
 la skill/ruta elegida es parte de evaluar NZT.
 
-## Momento 2 — discovery: reglas y límites (3 min)
+## Momento 2 — aprobación del plan (1 min)
 
-Cuando empiece la unidad de análisis, responder:
+Con el plan visible y `approved: false` mostrado al equipo, autorizar de forma explícita:
 
-> Usuarios: un solo equipo interno. Amarillo y rojo requieren una nota de 1 a 140
-> caracteres; verde no. Cada persona tiene un único estado vigente y uno nuevo reemplaza al
-> anterior. Sin login ni historial en esta demo.
+> Apruebo el plan. Mantené modo acompañado y frená al terminar cada unidad.
 
-Si pregunta por orden o experiencia, usar estas decisiones:
+### Qué observar
 
-> Mostrar primero rojo, después amarillo y por último verde; dentro de cada grupo, ordenar
-> por nombre. La pantalla debe cubrir carga, vacío y error. El éxito es que una persona
-> registre su estado y el tablero muestre inmediatamente el estado vigente.
+- `Plan/state.json` pasa a `approved: true`.
+- No aparece `autonomy`: aprobar el plan no selecciona el modo en lote.
+- Arranca la primera unidad del plan (discovery), no el código.
+
+## Momento 3 — discovery: la definición funcional (4 min)
+
+La unidad de análisis arranca sola y el agente empieza a preguntar. Responder con toda la
+definición funcional de una vez, cerrando el alcance:
+
+> Este es el requerimiento completo y no hay nada más: no agregues reglas, pantallas ni
+> capacidades que no estén acá; lo que no esté escrito queda fuera de alcance. Sin login: el
+> equipo son siempre las mismas tres personas, Ana, María y Arnold, que ya están cargadas al
+> iniciar; no se agregan ni se quitan. Cualquiera puede registrar o cambiar el estado de
+> cualquiera de las tres, sin importar quién sea. Amarillo y rojo requieren una nota de 1 a
+> 140 caracteres; en verde la nota es opcional. Cada persona tiene un único estado vigente y
+> uno nuevo reemplaza al anterior, sin historial. Mostrar primero rojo, después amarillo,
+> después verde y al final quienes todavía no tienen estado; dentro de cada grupo, por
+> nombre. La pantalla cubre carga, error y vacío (nadie registró todavía). El tablero
+> muestra el cambio apenas se guarda; otra pestaña lo ve al recargar. Los estados no se
+> conservan: al reiniciar la aplicación, las tres vuelven sin estado.
+
+Este texto ya responde las preguntas que el agente hizo en el ensayo: de dónde salen las
+personas, si verde admite nota, qué significa "de inmediato" y si el estado se conserva. Si
+advierte que sin login cualquiera puede pisar el estado de otro, es correcto: es una
+decisión explícita de la demo y debería quedar registrada como tal.
 
 ### Qué observar
 
@@ -82,26 +106,37 @@ Si pregunta por orden o experiencia, usar estas decisiones:
 - Hay al menos un camino no feliz: intentar amarillo o rojo sin nota.
 - Al cerrar la unidad, el estado se actualiza antes del reporte y el agente espera.
 
-## Momento 3 — aprobación y decisiones técnicas (3 min)
+## Momento 4 — arquitectura y UX: decisiones técnicas (4 min)
 
-Volver al plan y autorizar de forma explícita:
+Cuando empiece la unidad de arquitectura, responder todas las decisiones técnicas en un solo
+mensaje para que no abra una ronda larga de preguntas:
 
-> Apruebo el plan. Mantené modo acompañado y frená al terminar cada unidad. Para el
-> prototipo usá .NET 10, Blazor y persistencia en memoria.
+> Estas son todas las decisiones técnicas; no agregues nada más, tiene que ser una
+> aplicación mínima. Dos componentes separados, ambos en .NET 10: una API ASP.NET Core y un
+> front Blazor Web App con render interactivo en servidor. API: vertical slice, minimal
+> APIs, dominio anémico, EF Core directo con el proveedor en memoria y data seeding de Ana,
+> María y Arnold al iniciar (sin base de datos ni migraciones) y Result convertido a HTTP con extensiones. Front: vertical slice,
+> componentes inline, MudBlazor como librería de componentes; llama a la API con un cliente HTTP
+> tipado cuya URL base apunta a la API local. Tests: unitarios con xUnit para las reglas de
+> negocio; sin integración, sin test-first y sin end-to-end. Sin autenticación, Docker ni
+> paquetes extra: se levanta en local con un `dotnet run` por proyecto.
 
-Si el plan ya había sido aprobado para iniciar discovery, esta frase confirma el stack; no
-debería interpretarse como autonomía en lote.
+Esta frase decide el stack; no amplía la autorización ni debería interpretarse como
+autonomía en lote. Con render en servidor, el front llama a la API desde el servidor, así
+que no hace falta configurar CORS.
 
 ### Qué observar
 
-- Existe un documento de stack antes del código.
+- Pregunta sólo lo que el mensaje no respondió; si pregunta algo ya contestado, anotarlo.
+- Existe un documento de stack por componente (API y front) antes del código.
+- Cada eje queda con una sola elección y los opt-ins de tests quedan escritos.
 - El stack registra conceptos adoptados, no nombres de skills.
 - UX define loading, empty y error además del estado con datos.
 - Una carpeta de skills instalada no decide el stack: lo decide el documento.
 
 ### Atajo de tiempo
 
-Si quedan menos de 13 minutos, cambiar a `checkpoint-02-spec`, abrir una sesión nueva y
+Si quedan menos de 15 minutos, cambiar a `checkpoint-02-spec`, abrir una sesión nueva y
 pedir:
 
 > Retomá el trabajo desde el estado persistido. Decime dónde quedó, qué evidencia tenés y
@@ -109,25 +144,27 @@ pedir:
 
 Este atajo prueba otra capacidad importante: retomar sin depender del chat anterior.
 
-## Momento 4 — build: una historia, no todo el producto (5 min)
+## Momento 5 — build: implementar lo definido (6 min)
 
-Autorizar únicamente la historia principal que ya figure en el plan:
+Autorizar el build sin agregar instrucciones: limitarse a las specs, correr los checks y
+frenar ya lo hace NZT por defecto.
 
-> Continuá con la unidad de build de la historia principal. Implementá sólo lo que pide su
-> spec, ejecutá los checks que correspondan y frená al cerrar la unidad.
+> Implementá todo.
 
 ### Qué observar
 
+- Aunque el pedido diga "todo", no va más allá de lo que definen las specs.
+- Corre build y tests sin que se lo pidan.
 - Lee spec, historia, diseño y stack antes de escribir.
 - Implementa la regla de nota requerida donde vive la regla de negocio.
 - Incluye los tests automatizados que viajan con el código.
 - No agrega autenticación, historial ni otras capacidades “útiles”.
 - Reporta build y tests realmente ejecutados. Lo no ejecutado queda “no verificado”.
 
-No esperar una generación larga delante del equipo. Si a los 4 minutos sigue trabajando,
+No esperar una generación larga delante del equipo. Si a los 5 minutos sigue trabajando,
 mostrar `Plan/state.json`, explicar el límite de la unidad y pasar a `checkpoint-03-build`.
 
-## Momento 5 — verify: el plan de prueba también frena (4 min)
+## Momento 6 — verify: el plan de prueba también frena (4 min)
 
 Enviar:
 
@@ -153,18 +190,18 @@ Después autorizar:
 
 | Caso | Entrada | Resultado esperado |
 |---|---|---|
-| Verde válido | `Sofía`, verde, sin nota | Se registra y aparece en el tablero |
-| Amarillo válido | `Pepe`, amarillo, `Necesita revisar alcance` | Se registra con la nota |
-| Amarillo inválido | `Pepe`, amarillo, nota vacía | Se rechaza con mensaje concreto |
-| Reemplazo | `Sofía` pasa de verde a rojo con nota | Queda un único estado, rojo |
-| Orden | Sabrina rojo, Pepe amarillo, Sofía verde | Se muestran en ese orden |
-| Estado vacío | Sin estados | La pantalla explica cómo registrar el primero |
+| Verde válido | `Ana`, verde, sin nota | Se registra y aparece en el tablero |
+| Amarillo válido | `María`, amarillo, `Necesita revisar alcance` | Se registra con la nota |
+| Amarillo inválido | `María`, amarillo, nota vacía | Se rechaza con mensaje concreto |
+| Reemplazo | `Ana` pasa de verde a rojo con nota | Queda un único estado, rojo |
+| Orden | Arnold rojo, María amarillo, Ana sin estado | Se muestran en ese orden |
+| Estado vacío | Aplicación recién iniciada | Las tres personas sin estado y la pantalla explica cómo registrar el primero |
 
 La evidencia de API no prueba la UI. Si no hay herramienta de navegador, los escenarios de
 pantalla deben quedar `blocked` o ser ejecutados por la persona que presenta y luego
 registrados honestamente.
 
-## Momento 6 — ship sin despliegue implícito (3 min)
+## Momento 7 — ship sin despliegue implícito (4 min)
 
 Enviar:
 
