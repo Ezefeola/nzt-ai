@@ -116,7 +116,7 @@
       const minutes = Math.floor(timerSeconds / 60);
       const seconds = timerSeconds % 60;
       timerText.textContent = `${pad(minutes)}:${pad(seconds)}`;
-      timerButton.classList.toggle("is-over", minutes >= 55);
+      timerButton.classList.toggle("is-over", minutes >= 35);
     }, 1000);
   }
 
@@ -170,11 +170,6 @@
     event.currentTarget.setAttribute("aria-label", label);
     event.currentTarget.title = label;
     event.currentTarget.textContent = paused ? "▷" : "Ⅱ";
-  });
-  document.querySelector("#capabilityMotion").addEventListener("click", event => {
-    const paused = document.querySelector("#capabilityMap").classList.toggle("is-paused");
-    event.currentTarget.setAttribute("aria-pressed", String(paused));
-    event.currentTarget.textContent = paused ? "Reanudar movimiento" : "Pausar movimiento";
   });
   timerButton.addEventListener("click", toggleTimer);
   shortcutsDialog.querySelector(".dialog-close").addEventListener("click", () => shortcutsDialog.close());
