@@ -1,7 +1,6 @@
 # Presentación de NZT
 
-Deck HTML autocontenido para una sesión profesional de **55 minutos**: 34 minutos de
-concepto, 18 minutos de demo y 3 minutos de cierre. No descarga fuentes, librerías ni
+Deck HTML autocontenido para una sesión profesional de **35 minutos**: 10 minutos de presentación (incluidos la introducción a la demo y el cierre) y 25 minutos de demo. No descarga fuentes, librerías ni
 recursos externos; alcanza con abrir `index.html` en un navegador moderno.
 
 ## Cómo abrirla
@@ -35,39 +34,31 @@ con `file://`.
 | Home / End | Primera / última diapositiva |
 
 Los cuatro prompts de la diapositiva **Cabina de demo** tienen botón para copiarlos. La
-URL conserva el número de slide (`#/14`), por lo que se puede volver a un punto exacto.
+URL conserva el número de slide (`#/12`), por lo que se puede volver a un punto exacto.
 
 ## Timing sugerido
 
 | Bloque | Slides | Tiempo acumulado | Objetivo |
 |---|---:|---:|---|
-| Apertura | 1 | 2 min | Presentar NZT |
-| El problema | 2–3 | 8 min | Mostrar por qué velocidad no equivale a control |
-| Cómo funciona | 4–10 | 26 min | Explicar capas, ciclo, frenos, estado, fases y artefactos |
-| Confianza | 11 | 28 min | Guardrails y límites |
-| Demo | 12–14 | 42 min | Observar NZT sobre un producto desde cero |
-| Cierre | 15 | 45 min | Proponer una adopción pequeña y medible |
+| Apertura | 1 | 0:30 min | Presentar NZT |
+| El problema | 2–3 | 2 min | Mostrar por qué velocidad no equivale a control |
+| Cómo funciona | 4–8 | 6 min | Explicar ciclo, frenos, estado, fases y artefactos |
+| Confianza | 9 | 6:30 min | Qué no hace NZT |
+| Introducción a la demo | 10–11 | 7:30 min | Presentar Radar |
+| Demo en vivo | 12 | 32:30 min | Observar NZT sobre un producto desde cero |
+| Cierre | 13 | 33:30 min | Proponer una adopción pequeña y medible |
 
 El cronómetro de la barra superior no arranca solo: hacer clic o presionar `T` al comenzar.
-
-La slide 9 muestra once capacidades alrededor de NZT, con una órbita lenta y un brillo
-suave. **Pausar movimiento** detiene la órbita y la iluminación; el mismo botón permite
-reanudarlas. Las etiquetas permanecen horizontales. Con movimiento reducido se muestra
-una composición estática; en pantallas angostas, las capacidades se ordenan en una grilla.
-La impresión también conserva una versión estática sin el botón.
-
-Las notas de esa slide explican **Specs** (especificaciones), **SDD** (desarrollo guiado
-por especificaciones) y **TDD** (desarrollo guiado por pruebas).
 
 Los boxes flotan suavemente hasta 3 px en ciclos de 7–9 segundos, con pequeños desfases
 y una iluminación tenue que nunca se apaga. Al pasar el mouse o enfocar un control dentro
 del box, se detienen en su posición y aumenta su brillo para facilitar la lectura.
-Las slides 4, 5 y 14 no tienen un box destacado por defecto.
+Las slides 4 y 12 no tienen un box destacado por defecto.
 En la portada, NZT tiene un halo suave y las etiquetas orbitales se mantienen derechas;
 al pasar el mouse por la órbita, esta se pausa para poder señalar cada etiqueta.
-La slide 12 tiene un arco luminoso que gira y un resplandor suave detrás del título.
+La slide 10 tiene un arco luminoso que gira y un resplandor suave detrás del título.
 El botón **Ⅱ** de la barra superior pausa o reanuda las animaciones ambientales, incluida
-la flotación, el brillo de los boxes y la slide 9. Su pausa local se conserva. La preferencia de movimiento reducido desactiva
+la flotación y el brillo de los boxes. La preferencia de movimiento reducido desactiva
 estos efectos de movimiento; la impresión queda estática.
 
 ## Preparación de la demo
