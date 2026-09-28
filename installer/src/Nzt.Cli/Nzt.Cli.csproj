@@ -15,6 +15,19 @@
   </PropertyGroup>
 
   <!--
+    Publicar con un RID es el binario del release (D46): un solo archivo que no
+    necesita .NET. Sin trimming: el linker advierte sobre System.Text.Json y
+    Spectre.Console, y nada prueba el menú recortado. Sin RID, `dotnet run` y
+    las comprobaciones siguen como siempre.
+  -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <!--
     La única dependencia, y es del menú: los prompts navegables con flechas.
     El reporte sigue siendo Console, sin markup.
   -->

@@ -78,7 +78,39 @@ de aplicarse.
 
 ## Instalación
 
-Global, para toda la máquina, con .NET 10:
+Global, para toda la máquina, con **una línea por proveedor**. No hace falta clonar el repo
+ni tener .NET, y no queda ningún instalador en tu PC: queda NZT en Claude Code o en Codex.
+
+**Claude Code**
+
+```powershell
+# Windows
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.ps1 | iex"
+```
+
+```bash
+# macOS y Linux
+curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.sh | sh
+```
+
+**Codex**
+
+```powershell
+# Windows
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.ps1 | iex"
+```
+
+```bash
+# macOS y Linux
+curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh | sh
+```
+
+Cada línea baja el instalador a una carpeta temporal, verifica su SHA256, instala NZT en ese
+proveedor —el bloque en `CLAUDE.md` o `AGENTS.md` y las skills— y lo borra. **Para
+actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
+`$env:NZT_UNINSTALL='1'; irm … | iex` en Windows o `curl … | NZT_UNINSTALL=1 sh` en el resto.
+
+Desde el repo, con .NET 10, está el instalador completo:
 
 ```bash
 dotnet run --project installer/src/Nzt.Cli
@@ -118,7 +150,7 @@ skills/      el árbol de skills (anidado acá, plano al instalarse)
 specs/       nzt-core.md — la spec fundacional, y la del instalador
 installer/   el CLI que instala, con sus comprobaciones
 evals/       la suite que mide si dispara la skill correcta
-install/     build.sh / build.ps1 — el loop de desarrollo
+install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
 **110 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda

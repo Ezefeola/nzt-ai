@@ -1,0 +1,99 @@
+# Release de NZT (D46, specs/nzt-installer.md sección 10.1).
+#
+# Un tag vX.Y.Z publica los seis binarios self-contained, SHA256SUMS y los
+# cuatro comandos de una línea: install-claude e install-codex, en .ps1 y .sh. Antes corren las mismas puertas que en local: si una
+# falla, no hay release.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # I3: el tag y el <Version> del .csproj son la misma versión.
+      - name: Tag coincide con la versión del CLI
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' installer/src/Nzt.Cli/Nzt.Cli.csproj)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "El tag es $GITHUB_REF_NAME y el .csproj dice $version." >&2
+            exit 1
+          fi
+
+      - name: Build del set
+        run: bash install/build.sh
+
+      - name: Comprobaciones del instalador
+        run: dotnet run --project installer/tests/Nzt.Cli.Checks
+
+      - name: Lint del contenido embebido
+        run: dotnet run --project installer/src/Nzt.Cli -- verify
+
+  publish:
+    needs: gates
+    strategy:
+      matrix:
+        include:
+          - { rid: win-x64, os: ubuntu-latest, ext: .exe }
+          - { rid: win-arm64, os: ubuntu-latest, ext: .exe }
+          - { rid: linux-x64, os: ubuntu-latest, ext: '' }
+          - { rid: linux-arm64, os: ubuntu-latest, ext: '' }
+          # En macOS: ahí el SDK firma ad-hoc el ejecutable, que Apple Silicon exige.
+          - { rid: osx-x64, os: macos-latest, ext: '' }
+          - { rid: osx-arm64, os: macos-latest, ext: '' }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publicar ${{ matrix.rid }}
+        run: |
+          dotnet publish installer/src/Nzt.Cli/Nzt.Cli.csproj -c Release -r ${{ matrix.rid }} -o out
+          mkdir -p assets
+          mv "out/nzt${{ matrix.ext }}" "assets/nzt-${{ matrix.rid }}${{ matrix.ext }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nzt-${{ matrix.rid }}
+          path: assets/*
+          if-no-files-found: error
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          pattern: nzt-*
+          merge-multiple: true
+
+      # Un comando por proveedor, generado de las dos fuentes de install/.
+      - name: Hashes y comandos por proveedor
+        run: |
+          cd assets
+          sha256sum nzt-* > SHA256SUMS
+          cat SHA256SUMS
+          sh ../install/variants.sh .
+
+      - name: Publicar el release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" assets/* --verify-tag --generate-notes --title "NZT $GITHUB_REF_NAME"

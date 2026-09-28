@@ -106,9 +106,39 @@ es la suite de `evals/`.
 
 ## Distribución
 
-Se usa desde el repositorio con .NET 10. No se publica en NuGet. Se puede publicar un binario
-self-contained para distribuirlo sin el SDK:
+**Para el usuario es una línea por proveedor**, y este CLI no le queda instalado (D46,
+sección 10 de `specs/nzt-installer.md`):
+
+| | Windows (`irm … \| iex`) | macOS / Linux (`curl -fsSL … \| sh`) |
+|---|---|---|
+| Claude Code | `releases/latest/download/install-claude.ps1` | `releases/latest/download/install-claude.sh` |
+| Codex | `releases/latest/download/install-codex.ps1` | `releases/latest/download/install-codex.sh` |
+
+Cada comando baja el binario de la plataforma a una carpeta temporal, verifica su SHA256
+contra `SHA256SUMS`, corre `install --provider <id>` sin menú y borra la carpeta. El script
+no escribe nada del proveedor: eso lo hace el CLI, con las reglas de siempre.
+`NZT_UNINSTALL=1` desinstala y `NZT_DRY_RUN=1` simula; el resto de las variables está en
+la sección 10.3 de la spec. **El repositorio tiene que ser público** para que la descarga
+anónima funcione.
+
+Las cuatro variantes salen de `install/install.ps1` e `install/install.sh`:
+`install/variants.sh <carpeta>` reemplaza la línea marcada `# nzt:provider` por el
+proveedor fijo. Para probar una fuente sin generar variantes, `NZT_PROVIDER` hace de
+proveedor.
+
+**Publicar una versión:**
+
+1. Subir `<Version>` en `Nzt.Cli.csproj`.
+2. Commit, y `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. `.github/workflows/release.yml` corre el build, las comprobaciones y el lint, publica
+   los seis binarios —`win`, `linux` y `osx`, en `x64` y `arm64`— y crea el release con
+   `SHA256SUMS` y los cuatro comandos. Si el tag no coincide con `<Version>`, falla sin publicar.
+
+Un binario local se arma igual que en CI. Con un RID, el `.csproj` ya lo publica
+self-contained, en un solo archivo y comprimido (~38 MB, sin trimming):
 
 ```powershell
-dotnet publish installer/src/Nzt.Cli -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+dotnet publish installer/src/Nzt.Cli/Nzt.Cli.csproj -c Release -r win-x64 -o out
 ```
+
+No se publica en NuGet.

@@ -180,8 +180,9 @@ installer/
   simulación, `status` y el lint siguen siendo `Console`, sin markup.
 - Multiplataforma: las rutas salen de `Environment.SpecialFolder.UserProfile`, nunca de
   concatenar strings.
-- Distribución: se usa desde el repo con .NET 10. Un binario self-contained es una opción, no
-  una necesidad todavía.
+- Distribución: **un binario self-contained por plataforma, publicado en GitHub Releases** y
+  que un comando de una línea por proveedor baja, corre una vez y borra (sección 10, D46). Desde el repo sigue funcionando con
+  .NET 10, que es el loop de desarrollo.
 
 ## 9. Decisiones
 
@@ -194,3 +195,106 @@ installer/
   `dist/CLAUDE.md` que emitió el build, y si se separan, falla.
 - ~~**I3. Versionado.**~~ **Cerrada**: sale del `<Version>` del `.csproj`, que es lo que
   termina en `nztVersion` del manifiesto y en el encabezado del CLI.
+- ~~**I5. Distribución sin .NET.**~~ **Cerrada por D46**: un comando de una línea por
+  proveedor, que instala NZT directo usando el CLI como herramienta de un solo uso (sección 10).
+
+## 10. Instalación de una línea
+
+El usuario no clona el repo, no instala .NET **y no instala el instalador**. Pega una línea
+**por proveedor**, igual que con Codex, y lo que queda en la máquina es NZT en ese proveedor:
+
+| | Windows | macOS / Linux |
+|---|---|---|
+| Claude Code | `powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.ps1 \| iex"` | `curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.sh \| sh` |
+| Codex | `powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.ps1 \| iex"` | `curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh \| sh` |
+
+**El CLI es la herramienta, no el producto.** El script lo baja a una carpeta temporal, lo
+corre una vez con el proveedor fijo y lo borra. No queda ningún ejecutable, no se toca el
+PATH y no se abre el menú: el menú sigue siendo la vía de quien trabaja desde el repo.
+
+**Precondición: el repositorio tiene que ser público.** Un release de un repo privado
+devuelve 404 a una descarga anónima, y `irm` no manda credenciales.
+
+### 10.1 Qué publica cada release
+
+Un tag `vX.Y.Z` dispara `.github/workflows/release.yml`, que publica en el release:
+
+| Asset | Qué es |
+|---|---|
+| `nzt-win-x64.exe`, `nzt-win-arm64.exe` | binario de Windows |
+| `nzt-linux-x64`, `nzt-linux-arm64` | binario de Linux |
+| `nzt-osx-x64`, `nzt-osx-arm64` | binario de macOS |
+| `SHA256SUMS` | el hash de cada binario, formato `sha256sum` |
+| `install-claude.ps1`, `install-codex.ps1` | los comandos de Windows, uno por proveedor |
+| `install-claude.sh`, `install-codex.sh` | los comandos de macOS y Linux, uno por proveedor |
+
+**Las cuatro variantes salen de dos fuentes.** En el repo están solo `install/install.ps1` e
+`install/install.sh`, con una línea marcada `# nzt:provider` que lee el proveedor de
+`NZT_PROVIDER`. `install/variants.sh` —el mismo que corre CI— reemplaza esa línea por el
+proveedor fijo y falla si la marca no está: la lógica existe una sola vez.
+
+- **El tag tiene que coincidir con el `<Version>` del `.csproj`** (I3). Si no coincide, el
+  workflow falla antes de publicar: un binario que se llama 0.2.0 y dice 0.1.0 rompe
+  `status` y el manifiesto.
+- **Antes de publicar corren las mismas puertas que en local**: `install/build.sh`, las
+  comprobaciones del instalador y `nzt verify`. Si una falla, no hay release.
+- `releases/latest/download/<asset>` es la URL estable: siempre apunta al último release,
+  y los scripts del release N bajan los binarios del release N.
+- **Self-contained, un solo archivo, comprimido y sin trimming**: ~38 MB en `win-x64`. Con
+  trimming baja a ~12 MB, pero el linker advierte sobre `System.Text.Json` en el manifiesto y
+  sobre Spectre.Console, y el menú no tiene comprobación automática que lo cubra. Se reabre
+  si el tamaño molesta: manifiesto con `JsonSerializerContext` y el menú probado a mano en el
+  binario recortado.
+
+### 10.2 Qué hace el script
+
+El script **no escribe nada del proveedor.** Todo lo que toca `CLAUDE.md`, `AGENTS.md` o las
+carpetas de skills lo hace el CLI, con las reglas de la sección 7, así que la línea no
+puede saltearse el manifiesto, los marcadores ni el backup.
+
+1. **Detecta la plataforma** y elige el asset. Una combinación sin binario aborta
+   diciendo cuál es.
+2. **Baja el binario y `SHA256SUMS`** del release pedido, a una carpeta temporal propia.
+3. **Verifica el hash.** Si no coincide, aborta sin correr nada.
+4. **Corre `install --provider <id>`** con el proveedor de la variante, **sin menú ni
+   confirmación**, como el instalador de Codex. Es seguro porque las reglas son del CLI: un
+   archivo ajeno corta la instalación sin escribir, y una edición del usuario se conserva.
+   Con `NZT_UNINSTALL=1` corre `uninstall` en su lugar.
+5. **Borra la carpeta temporal**, haya salido bien o mal. En la máquina queda NZT en el
+   proveedor y el manifiesto, nada más.
+
+- **Correr la misma línea otra vez es actualizar.** El manifiesto vive en
+  `%LOCALAPPDATA%/nzt/manifests` o `~/.local/share/nzt/manifests` (sección 5), fuera del
+  binario, así que un CLI recién bajado reconoce lo que instaló el anterior.
+- **Cada corrida baja el binario entero** (~38 MB). Es el precio de no dejar nada instalado;
+  lo que lo baja es el trimming de 10.1.
+- En `install.sh` el código de salida es el del CLI. `install.ps1` **nunca llama a `exit`**
+  —pegado en una consola abierta le cerraría la ventana al usuario— y corre dentro de un
+  bloque `& { }` para no dejar variables ni funciones en la sesión; el código del CLI queda
+  en `$LASTEXITCODE`. Sus textos van sin tildes por precaución: en PowerShell 7 un asset
+  sin charset se decodifica bien (probado), pero en Windows PowerShell 5.1 —el que abre
+  `powershell`— **no está verificado** y el riesgo es texto ilegible, no una falla.
+- Sin menú no hace falta terminal: `curl | sh` funciona igual en CI o en un contenedor.
+
+### 10.3 Variables
+
+| Variable | Efecto | Por defecto |
+|---|---|---|
+| `NZT_UNINSTALL` | `1` desinstala NZT de ese proveedor en vez de instalarlo | apagado |
+| `NZT_DRY_RUN` | `1` agrega `--dry-run`: muestra qué haría sin escribir | apagado |
+| `NZT_VERSION` | tag a instalar, por ejemplo `v0.2.0` | el último release |
+| `NZT_DOWNLOAD_BASE` | URL base de los assets, para un espejo o para probar | la del release |
+| `NZT_PROVIDER` | solo en las fuentes de `install/`, para probarlas; las variantes lo fijan | — |
+
+En PowerShell una variable se pasa así:
+`$env:NZT_UNINSTALL='1'; irm .../install-claude.ps1 | iex`. En shell:
+`curl -fsSL .../install-claude.sh | NZT_UNINSTALL=1 sh`.
+
+### 10.4 Lo que no hace
+
+- **No deja el CLI instalado.** Quien quiera `nzt status` o el menú lo corre desde el repo
+  con .NET 10 (sección 3).
+- **No instala en los dos proveedores a la vez.** Son dos líneas, una por proveedor; correr
+  las dos es lo mismo que elegir *Todos* en el menú.
+- **No firma los binarios.** Si Windows SmartScreen, un antivirus o Gatekeeper los frenan,
+  no está verificado. Firmar es lo que se agrega si pasa.

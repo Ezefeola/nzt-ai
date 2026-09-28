@@ -1325,6 +1325,28 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `ListApplicationsResponseDto.ApplicationDto`, no `ApplicationListItemDto`. Se corrigen
   el ejemplo de request y el checklist para que enseñen la misma regla.
 
+- **D46.** **NZT se instala con una línea por proveedor, sin clonar el repo, sin .NET y sin
+  dejar el instalador en la máquina.** El usuario lo pidió con el comando de Codex como
+  modelo (`irm .../install.ps1 | iex`) y eligió, entre tres opciones, **un binario
+  self-contained por plataforma publicado en GitHub Releases**. Las otras dos quedaron
+  descartadas: una *global tool* de NuGet exige el SDK de .NET 10 a quien solo usa Codex o
+  Claude, y un script que copie las skills él mismo reescribe en dos lenguajes el
+  manifiesto, los marcadores y el backup, la misma divergencia que I2 contuvo con una
+  comprobación. **Corregida antes de publicarse**: la primera versión instalaba el CLI en el
+  PATH y abría el menú, y el usuario aclaró que el producto es NZT en un proveedor, no el
+  instalador. Quedan **cuatro comandos** —`install-claude` e `install-codex`, en `.ps1` y
+  `.sh`— que bajan el binario a una carpeta temporal, verifican el SHA256, corren
+  `install --provider <id>` sin menú ni confirmación y lo borran; `NZT_UNINSTALL=1`
+  desinstala con la misma línea. Las variantes salen de dos fuentes con
+  `install/variants.sh`, y todo lo que se escribe en el proveedor sigue pasando por el CLI y
+  sus reglas. Un tag `vX.Y.Z` que coincide con el `<Version>` del `.csproj` dispara el
+  workflow que corre las mismas puertas que en local y publica seis binarios, `SHA256SUMS` y
+  los cuatro scripts. **Sin trimming**: 38 MB contra 12 MB, porque el linker advierte sobre
+  el manifiesto y sobre Spectre.Console y nada prueba el menú recortado; como cada corrida
+  baja el binario entero, es lo primero a reabrir si el tamaño molesta. **Precondición
+  abierta, del usuario: el repositorio tiene que ser público.** Detalle en la sección 10 de
+  `specs/nzt-installer.md`.
+
 ## 13. Revisión contra Temper v3
 
 Temper v3 (`../temper-ai-v3`) es un set SDD maduro y funcionando. NZT no lo copia: se
@@ -2733,8 +2755,11 @@ una fase que corre después de implementar el incremento**, y el criterio gana u
 el stack que ese proyecto generó: **ningún paquete entra sin confirmación del usuario**, el
 stack vuelve a ser una ficha liviana de cinco bloques, y **hasta dónde llega DDD** —value
 objects, domain events, ids tipados— pasa a ser un opt-in donde lo no escrito no se usa.
-**D45 es la última**: DTOs hijos exclusivos del padre, nombres simples, propiedades antes
-de tipos anidados y excepción explícita en el orden general de C#.
+**D45** son los DTOs hijos exclusivos del padre, con nombres simples, las propiedades antes
+de los tipos anidados y una excepción explícita al orden general de C#. **D46 es la última,
+y no es de contenido sino de distribución**: NZT se instala con una línea por proveedor
+—`irm | iex` o `curl | sh`— que baja de GitHub Releases un binario self-contained, verifica
+su hash, instala NZT en Claude Code o en Codex y borra el binario. Queda pendiente del usuario hacer público el repositorio.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
 riesgos) están cerradas, y la última decisión de contenido la cerró D45. Lo que puede reabrir
