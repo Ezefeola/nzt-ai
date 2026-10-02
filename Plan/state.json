@@ -7,7 +7,7 @@
   "units": [],
   "waiting_on": null,
   "notes": [
-    "v0.2.0: tag empujado para disparar .github/workflows/release.yml; el resultado del workflow y el release en GitHub no se verificaron desde esta sesión (sin gh). v0.1.0 ya estaba publicado y el repo es público.",
+    "v0.2.0 publicado el 2026-10-02 desde 555a32c: el workflow release terminó en success y el release tiene los 6 binarios, SHA256SUMS y los 4 scripts. No se probó instalar desde ese release.",
     "Sin verificar: .ps1 en PowerShell 5.1, SmartScreen/Gatekeeper con binarios sin firmar, evals sin correr; la reinstalación en esta máquina la hace el usuario.",
     "Fuera de alcance, sin hacer: migrar proyectos que ya tienen design/ (licensys), medir R1 en Codex, guía .NET de domain events."
   ]
