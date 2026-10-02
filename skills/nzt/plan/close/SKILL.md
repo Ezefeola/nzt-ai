@@ -75,7 +75,7 @@ and decide which rows this feature fired.
 | what the end user does, and the manual **already exists** | `Docs/manual/` — the chapter of each task this feature changed (`nzt-ux-manual`). The manual is written at the end of a delivery; a close never creates one |
 | environments, pipeline, rollback | `Docs/deployment.md` |
 | technical work found and deliberately left | `Docs/tech-debt.md` |
-| its own flows, data or integrations | `Plan/specs/<feature>/design/` |
+| its own flows, data or integrations | `Plan/specs/<feature>/tech-design/` |
 
 Each one is updated with **its own skill**, and a stack document describes what was actually
 adopted, never what was planned.

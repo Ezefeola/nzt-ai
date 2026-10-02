@@ -70,7 +70,7 @@ found in build, by someone with less information than you have now.
 
 Every `QT-NN` lives in an **append-only log**, beside the document it serves:
 `Docs/architecture-decisions.md` for the product — the stack's axes included — and
-`Plan/specs/<feature>/design/decisions.md` for a feature. One series each.
+`Plan/specs/<feature>/tech-design/decisions.md` for a feature. One series each.
 
 **The design is the present and gets rewritten; the log is the conversation that produced
 it and is never overwritten.** That is why they are two files: a document rewritten whole
@@ -129,8 +129,8 @@ decision record.
   deferred technical work → `Docs/tech-debt.md`
 - One stack document per component and area → `Docs/<area>-stack-<component>.md`
 - The technical questions and their answers → `Docs/architecture-decisions.md` for the
-  product, `Plan/specs/<feature>/design/decisions.md` for a feature. Append-only
-- A feature's technical design → `Plan/specs/<feature>/design/design.md`, **offered, not
+  product, `Plan/specs/<feature>/tech-design/decisions.md` for a feature. Append-only
+- A feature's technical design → `Plan/specs/<feature>/tech-design/design.md`, **offered, not
   declared**, with any contract or diagram it needs beside it in the same folder
 - A review's findings go in its report, and land where each one belongs: an ADR, an entry
   of deferred work, or a proposal back to the product design. It writes no document of its

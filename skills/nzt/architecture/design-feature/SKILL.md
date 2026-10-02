@@ -5,8 +5,8 @@ description: Use when one feature needs its technical design before it is built:
 
 # Feature design
 
-Produces `Plan/specs/<feature>/design/design.md` — how this feature is solved across the
-components that already exist — and `design/decisions.md`, the log of the questions that
+Produces `Plan/specs/<feature>/tech-design/design.md` — how this feature is solved across the
+components that already exist — and `tech-design/decisions.md`, the log of the questions that
 produced it. One feature per unit.
 
 If you did not arrive here from `nzt-architecture`, load it first: it carries the protocol

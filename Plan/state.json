@@ -1,28 +1,14 @@
 {
   "version": 1,
-  "updated": "2026-09-28T22:10:00Z",
-  "goal": "D46: un comando de una línea por proveedor (install-claude / install-codex) que instala NZT directo, sin dejar el CLI en la PC",
+  "updated": "2026-10-02T14:00:00Z",
+  "goal": "Sin corrida abierta. La última fue D47 (carpetas ux-ui/ y tech-design/ por feature), commiteada y publicada con el tag v0.2.0.",
   "phase": "ship",
-  "approved": true,
-  "autonomy": { "units": [8, 9, 10, 11, 12], "keep_stops": [] },
-  "units": [
-    { "id": 1, "do": "Spec: sección de distribución en specs/nzt-installer.md y D46 en specs/nzt-core.md", "status": "done", "detail": "Superada en parte por la unidad 8: la primera versión instalaba el CLI en el PATH." },
-    { "id": 2, "do": "csproj: publicación self-contained single-file por RID y medir tamaño", "status": "done", "detail": "PropertyGroup condicionado a RuntimeIdentifier; win-x64 38 MB, linux-x64 40 MB, osx-arm64 37 MB; trimming descartado (12 MB con advertencias IL2026/IL2104)." },
-    { "id": 3, "do": "install/install.ps1: baja binario, verifica SHA256, instala en %LOCALAPPDATA%\\nzt\\bin y corre nzt", "status": "done", "detail": "Reescrito en la unidad 9." },
-    { "id": 4, "do": "install/install.sh: ídem para macOS/Linux, menú leyendo /dev/tty", "status": "done", "detail": "Reescrito en la unidad 9." },
-    { "id": 5, "do": ".github/workflows/release.yml: en tag v*, checks + publish 6 RIDs + SHA256SUMS + scripts al release", "status": "done", "detail": "osx en macos-latest por la firma ad-hoc (no verificado). Nunca corrió." },
-    { "id": 6, "do": "README e installer/README: el comando de una línea primero", "status": "done", "detail": "Reescrito en la unidad 11." },
-    { "id": 7, "do": "Verificar: publish local y correr ambos scripts contra un servidor local en dry-run", "status": "done", "detail": "PASS: 47 checks tras el cambio de csproj; build.sh exit 0." },
-    { "id": 8, "do": "Corregir D46 y sección 10 de nzt-installer.md: un comando por proveedor, binario temporal, sin PATH ni menú", "status": "done", "detail": "D46 corregida en el lugar (no se publicó nunca); sección 10 reescrita; sección 8 e I5 alineadas." },
-    { "id": 9, "do": "install.ps1/install.sh: binario en temp, install --provider directo, NZT_UNINSTALL, borrar al terminar", "status": "done", "detail": "Línea marcada '# nzt:provider'; ps1 en & { } sin exit ni variables filtradas; sh con trap que borra temp." },
-    { "id": 10, "do": "release.yml: generar install-claude/install-codex .ps1/.sh anteponiendo el proveedor", "status": "done", "detail": "install/variants.sh reemplaza la marca y falla si falta; probado también con fuente CRLF. El workflow lo llama." },
-    { "id": 11, "do": "README e installer/README con los cuatro comandos", "status": "done", "detail": "README raíz con los cuatro comandos y desinstalar; installer/README con tabla y variants.sh." },
-    { "id": 12, "do": "Reverificar en WSL y PowerShell 7: instala, no deja binario ni PATH, desinstala", "status": "done", "detail": "WSL: 6 casos OK (instala, actualiza, codex, uninstall, hash alterado, sin proveedor), 0 restos. PS7: codex y uninstall en dry-run, hash alterado, 0 restos, sin variables filtradas." }
-  ],
-  "waiting_on": "Usuario: hacer público github.com/Ezefeola/nzt-ai (hoy 404 anónimo), commitear, y publicar el tag v0.1.0 para que el workflow cree el primer release.",
+  "approved": false,
+  "units": [],
+  "waiting_on": null,
   "notes": [
-    "Sin verificar: comandos .ps1 en Windows PowerShell 5.1 (el SO bloquea powershell.exe a este proceso), el workflow en GitHub Actions, SmartScreen/Gatekeeper con binarios sin firmar.",
-    "Observado en dry-run: Claude Code y Codex ya están instalados en esta máquina y al día (111 sin cambios cada uno).",
-    "Pendientes previos fuera de alcance: medir R1 en Codex, evals sin correr, guía .NET de domain events, migración de licensys."
+    "v0.2.0: tag empujado para disparar .github/workflows/release.yml; el resultado del workflow y el release en GitHub no se verificaron desde esta sesión (sin gh). v0.1.0 ya estaba publicado y el repo es público.",
+    "Sin verificar: .ps1 en PowerShell 5.1, SmartScreen/Gatekeeper con binarios sin firmar, evals sin correr; la reinstalación en esta máquina la hace el usuario.",
+    "Fuera de alcance, sin hacer: migrar proyectos que ya tienen design/ (licensys), medir R1 en Codex, guía .NET de domain events."
   ]
 }

@@ -5,7 +5,7 @@ description: Use when one screen has to be designed or updated: its task, region
 
 # Screen design
 
-Produces `Plan/specs/<feature>/design/screen-<slug>.md`: one screen, described well enough
+Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.md`: one screen, described well enough
 to be built and reviewed, and traceable back to the criteria it serves. One screen per
 unit.
 

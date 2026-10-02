@@ -515,9 +515,12 @@ una feature vive con su spec en `Plan/`.
          ├─ change.md          # propuesta de cambio, temporal: se fusiona y se borra (D28)
          ├─ stories/
          │  └─ US-NNN-<slug>.md  # criterios + cobertura por área y qa (D43)
-         ├─ design/            # diseño técnico de esta feature, ofrecido (D41)
+         ├─ tech-design/       # diseño técnico de esta feature, ofrecido (D41, D47)
          │  ├─ design.md       # el presente: flujos, datos, fallos, contratos
          │  └─ decisions.md    # log append-only de sus QT-NN (D41)
+         ├─ ux-ui/             # diseños de pantalla de esta feature (D47)
+         │  ├─ screen-<slug>.md    # una pantalla por archivo
+         │  └─ screen-<slug>.html  # su mockup, a pedido
          └─ testing/
             ├─ README.md       # índice: última ejecución, bugs abiertos, huecos (T9)
             ├─ <historia>.md   # pruebas: casos, datos, esperado, obtenido
@@ -544,8 +547,9 @@ una feature vive con su spec en `Plan/`.
   reensayo **agrega** una ejecución fechada; nunca pisa la anterior (13.5 #17).
 - El bug lo abre y lo cierra verify aunque lo arregle build, con tres estados: `pendiente`,
   `corregido pendiente de verificación`, `verificado` (T10).
-- `design/` es **ofrecido** por feature, con el criterio de D41; `testing/` se crea cuando
-  aporta. `README.md` de `testing/` es obligatorio desde la segunda historia con pruebas
+- `tech-design/` es **ofrecido** por feature, con el criterio de D41; `ux-ui/` se crea con
+  la primera pantalla que se diseña; `testing/` se crea cuando aporta. **Diseño técnico y
+  diseño de pantalla nunca comparten carpeta** (D47). `README.md` de `testing/` es obligatorio desde la segunda historia con pruebas
   (T9).
 - El inventario exacto de `Docs/` (nombres de archivo y cuándo se crea cada uno) lo define
   el router `nzt-architecture` en la fase 4, no el kernel. **Excepción: los documentos de
@@ -562,7 +566,7 @@ una feature vive con su spec en `Plan/`.
   mientras se construye**; desde que existe, cada cierre de feature lo pone al día como a
   cualquier otro documento (D37).
 - **Los `QT-NN` tienen archivo propio y append-only: el log de decisiones técnicas** —
-  `Docs/architecture-decisions.md` a nivel producto, `design/decisions.md` por feature—.
+  `Docs/architecture-decisions.md` a nivel producto, `tech-design/decisions.md` por feature—.
   El diseño es el presente y se reescribe; el log es la conversación que lo produjo y no se
   pisa: una respuesta superada se marca, nunca se edita. Los `QT-NN` del stack van al log de
   producto (D41, que supera esa parte de D27).
@@ -1220,8 +1224,8 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   se reescribe; el log es la conversación y no se pisa** — un documento que se reescribe
   entero y además tiene que ser append-only en la mitad del cuerpo es la contradicción que
   D27 no había visto. `Docs/architecture-decisions.md` a nivel producto —los `QT-NN` del
-  stack incluidos, como en Temper—, `design/decisions.md` por feature, serie propia cada
-  uno. La etiqueta de origen deja de ser invención de sesión y es regla.
+  stack incluidos, como en Temper—, `design/decisions.md` por feature *(carpeta renombrada
+  a `tech-design/` por D47)*, serie propia cada uno. La etiqueta de origen deja de ser invención de sesión y es regla.
   **(5) El diseño de feature es *ofrecido*, con criterio de cuándo se gana**: cruza
   componentes, mete un tercero, tiene estados con significado, tiene requisitos que
   condicionan la solución, o tiene alternativas cuyas consecuencias hay que explicar. Una
@@ -1346,6 +1350,17 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   baja el binario entero, es lo primero a reabrir si el tamaño molesta. **Precondición
   abierta, del usuario: el repositorio tiene que ser público.** Detalle en la sección 10 de
   `specs/nzt-installer.md`.
+
+- **D47.** **El diseño técnico y el diseño de pantalla de una feature viven en carpetas
+  separadas: `tech-design/` y `ux-ui/`.** Hasta acá los dos caían en
+  `Plan/specs/<feature>/design/`, y el nombre no decía cuál de los dos había adentro: un
+  `design.md` de flujos y contratos al lado de un `screen-<slug>.md` y su mockup. El usuario
+  pidió separarlos para que la carpeta diga qué contiene. **Siguen a nivel feature** y **los
+  nombres de archivo no cambian**: `tech-design/design.md` y `tech-design/decisions.md` los
+  escribe `nzt-architecture`; `ux-ui/screen-<slug>.md` y su `.html` los escribe `nzt-ux`.
+  Los documentos de producto no se mueven: `Docs/architecture.md`, `Docs/design-system.md` y
+  `Docs/ui-components.md` siguen donde estaban. **No migra proyectos existentes**: uno que
+  ya tiene `design/` lo renombra a mano o en su próxima corrida.
 
 ## 13. Revisión contra Temper v3
 
@@ -2756,13 +2771,15 @@ el stack que ese proyecto generó: **ningún paquete entra sin confirmación del
 stack vuelve a ser una ficha liviana de cinco bloques, y **hasta dónde llega DDD** —value
 objects, domain events, ids tipados— pasa a ser un opt-in donde lo no escrito no se usa.
 **D45** son los DTOs hijos exclusivos del padre, con nombres simples, las propiedades antes
-de los tipos anidados y una excepción explícita al orden general de C#. **D46 es la última,
-y no es de contenido sino de distribución**: NZT se instala con una línea por proveedor
+de los tipos anidados y una excepción explícita al orden general de C#. **D46 no es de
+contenido sino de distribución**: NZT se instala con una línea por proveedor
 —`irm | iex` o `curl | sh`— que baja de GitHub Releases un binario self-contained, verifica
-su hash, instala NZT en Claude Code o en Codex y borra el binario. Queda pendiente del usuario hacer público el repositorio.
+su hash, instala NZT en Claude Code o en Codex y borra el binario. Queda pendiente del usuario hacer público el repositorio. **D47 es la
+última**: los diseños de una feature dejan de compartir `design/` y pasan a `tech-design/`
+—diseño técnico y su log— y `ux-ui/` —pantallas y mockups—.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D45. Lo que puede reabrir
+riesgos) están cerradas, y la última decisión de contenido la cerró D47. Lo que puede reabrir
 una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
 más urgente del roadmap**.
 

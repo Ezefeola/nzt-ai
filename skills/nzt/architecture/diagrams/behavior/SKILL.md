@@ -5,7 +5,7 @@ description: Use when drawing a feature's flow as a sequence, an entity's busine
 
 # The three pictures of a feature design
 
-All three live in `Plan/specs/<feature>/design/design.md`, beside the flow they explain.
+All three live in `Plan/specs/<feature>/tech-design/design.md`, beside the flow they explain.
 
 Load `nzt-architecture` and `nzt-architecture-diagrams` before applying this.
 

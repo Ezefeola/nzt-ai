@@ -53,7 +53,7 @@ with the coherence pass, the only unit whose subject is the whole file.
 ## Where it lands
 
 - One screen design, with its mockup beside it if there is one →
-  `Plan/specs/<feature>/design/`
+  `Plan/specs/<feature>/ux-ui/`
 - Visual direction and the design system → `Docs/design-system.md`; the shared component
   inventory → `Docs/ui-components.md`. Both written and maintained by `nzt-ux-system`
 - The end user's manual, one file per audience → `Docs/manual/<audience>.html`, its images

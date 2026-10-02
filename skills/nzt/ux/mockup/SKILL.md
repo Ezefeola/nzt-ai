@@ -5,7 +5,7 @@ description: Use when the user asked for a visual reference of a designed screen
 
 # Screen mockup
 
-Produces `Plan/specs/<feature>/design/screen-<slug>.html`, beside the screen design it
+Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.html`, beside the screen design it
 comes from. **Only when the user asked for one.** It is a reference to look at, never code
 to copy into the project.
 
