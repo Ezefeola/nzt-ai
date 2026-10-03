@@ -156,3 +156,7 @@ install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / insta
 **110 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
 abierto están en la sección 14 de [`specs/nzt-core.md`](specs/nzt-core.md), que es el punto
 de retomada: si volvés al proyecto después de un tiempo, se empieza por ahí.
+
+## Licencia
+
+[MIT](LICENSE).
