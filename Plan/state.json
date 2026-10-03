@@ -1,14 +1,29 @@
 {
   "version": 1,
-  "updated": "2026-10-02T14:00:00Z",
-  "goal": "Sin corrida abierta. La última fue D47 (carpetas ux-ui/ y tech-design/ por feature), commiteada y publicada con el tag v0.2.0.",
-  "phase": "ship",
-  "approved": false,
-  "units": [],
+  "updated": "2026-10-03T14:30:00Z",
+  "goal": "Corregir en las skills .NET de NZT las causas del código de FarmaPedia: try/catch y clasificadores de excepciones en los casos de uso, y MappingExtensions copiados por operación.",
+  "phase": "build",
+  "approved": true,
+  "units": [
+    { "id": 1, "do": "Cambiar el comando de Windows a `irm <url> | iex` en specs/nzt-installer.md (sección 10), README.md, installer/README.md y el encabezado de install/install.ps1", "status": "dropped", "detail": "Descartada por el usuario 2026-10-03." },
+    { "id": 2, "do": "Cambiar el mismo comando en la web nzt-ai.com/docs/instalacion (Claude Code y Codex)", "status": "dropped", "detail": "Descartada por el usuario 2026-10-03." },
+    { "id": 3, "do": "Publicar un release para que el encabezado del .ps1 publicado quede al día", "status": "dropped", "detail": "Descartada por el usuario 2026-10-03." },
+    { "id": 4, "do": "Skill nueva de manejo global de excepciones .NET (GlobalExceptionHandler único, ProblemDetails, tabla de categorías, logs, detalle solo en Development)", "status": "done", "detail": "skills/nzt/build/backend/dotnet/exceptions/SKILL.md (nzt-build-backend-dotnet-exceptions) y D48 escritos." },
+    { "id": 5, "do": "Registrar la skill nueva en el router nzt-build-backend-dotnet y apuntarle las menciones a 'centralised handling' (writes, persistence/direct, persistence/repositories, results/extensions, results/filter)", "status": "done", "detail": "Fila nueva en el router. La skill nueva cubre también result-filter (forma Result, no ProblemDetails)." },
+    { "id": 6, "do": "ef-core/writes: quitar el reconocimiento del conflicto al guardar y el clasificador; queda pre-check + índice, sin try/catch, y la concurrencia va al handler global", "status": "done", "detail": "Sección 'Check before saving, never catch the save' reemplaza la de reconocimiento." },
+    { "id": 7, "do": "ef-core/indexes: 'three parts' pasa a pre-check + índice único; reescribir la prueba de la carrera según el handler global", "status": "done", "detail": "Dos partes; la prueba afirma un registro y que el save perdedor lanza." },
+    { "id": 8, "do": "use-cases: try/catch solo en casos excepcionales (con criterio verificable), quitar la regla de la violación concurrente", "status": "done", "detail": "try/catch solo para compensar un efecto fuera de la transacción (y throw;) o para una excepción documentada de una dependencia externa con respuesta de negocio en la spec; cada catch con comentario. Fila de mapping intacta (<Entity>MappingExtensions)." },
+    { "id": 9, "do": "persistence/direct y persistence/repositories: quitar el clasificador de errores del proveedor y la traducción a conflicto tipado", "status": "done", "detail": "Sin clasificador, sin try/catch alrededor de persistencia, UoW.SaveChangesAsync no captura." },
+    { "id": 10, "do": "csharp/dtos: reforzar un solo <Entity>MappingExtensions.cs por entidad, nunca copiado por operación", "status": "done", "detail": "El usuario corrigió el plan: era por entidad, no por caso. Lo escrito al revés se revirtió. D49 registrada." },
+    { "id": 11, "do": "architecture vertical-slice, clean y hexagonal: declarar el mapper de la entidad como excepción a 'lo que no es Domain/Persistence/Contracts se escribe dos veces'; agregar el rol Exceptions/Handlers/", "status": "done", "detail": "Handler en Exceptions/Handlers/ del proyecto host (decisión del usuario); en hexagonal es el cruce declarado (nombra tipos de EF Core en Adapter.Api)." },
+    { "id": 12, "do": "api, endpoints/controllers y endpoints/minimal: cambiar `<Entity>MappingExtensions` por `<Operation>MappingExtensions`", "status": "dropped", "detail": "Ya decían <Entity>MappingExtensions, que es lo correcto." },
+    { "id": 13, "do": "Barrido y verificación: grep sin referencias viejas en skills/, specs/ y evals/, regenerar dist/ con install/build, revisar el diff y actualizar la sección 14 de specs/nzt-core.md", "status": "done", "detail": "Grep limpio; dist regenerado (111 skills, sin warnings de líneas/chars); sección 14 y README a 111. Nada commiteado." },
+    { "id": 14, "do": "Versión, changelog y release con estos cambios", "status": "done", "detail": "Commits 1ec82c9 (D48/D49) y 7401201 (0.3.0) en main; workflow en success; release NZT v0.3.0 publicado 2026-10-03 con 11 assets. Las notas son las autogeneradas: no hay CHANGELOG en el repo." },
+    { "id": 15, "do": "Evaluar con el usuario: un SaveChangesAsync propio (override o wrapper) que devuelva Result con el try/catch adentro", "status": "done", "detail": "No se adopta (decisión del usuario 2026-10-03); registrado como alternativa descartada en D48." }
+  ],
   "waiting_on": null,
   "notes": [
-    "v0.2.0 publicado el 2026-10-02 desde 555a32c: el workflow release terminó en success y el release tiene los 6 binarios, SHA256SUMS y los 4 scripts. No se probó instalar desde ese release.",
-    "Sin verificar: .ps1 en PowerShell 5.1, SmartScreen/Gatekeeper con binarios sin firmar, evals sin correr; la reinstalación en esta máquina la hace el usuario.",
-    "Fuera de alcance, sin hacer: migrar proyectos que ya tienen design/ (licensys), medir R1 en Codex, guía .NET de domain events."
+    "Decidido por el usuario 2026-10-03, excepciones: try/catch en el caso de uso solo en casos excepcionales, no prohibido; los errores esperados van por pre-check + Result; un único GlobalExceptionHandler: DbUpdateConcurrencyException -> 412, DbUpdateException -> 500 con mensaje claro sin código, resto -> 500; sin librerías ni códigos numéricos (2601/2627/547) ni parseo de mensajes; siempre loguea la excepción completa (SuppressDiagnosticsCallback false); el detalle técnico (InnerException.Message) solo en Development; los textos finales se acuerdan en cada proyecto.",
+    "Decidido por el usuario 2026-10-03, mapping: UN <Entity>MappingExtensions.cs por entidad a nivel feature (ej. Features/Areas/AreaMappingExtensions.cs) con todos los To<DtoName>; nunca uno por operación. Causa: vertical-slice dice que lo no compartible en Domain/Persistence/Contracts se escribe dos veces. Origen: FarmaPedia; su código lo corrige el usuario."
   ]
 }
