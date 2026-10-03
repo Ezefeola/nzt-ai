@@ -9,7 +9,7 @@
     <RootNamespace>Nzt.Cli</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
     <!-- De acá sale nztVersion en el manifiesto: una sola fuente (I3). -->
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <!-- El contenido canónico vive en la raíz del repositorio, tres niveles arriba. -->
     <ContentRoot>$(MSBuildProjectDirectory)\..\..\..\</ContentRoot>
   </PropertyGroup>
