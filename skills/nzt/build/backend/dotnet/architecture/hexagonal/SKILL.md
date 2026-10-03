@@ -54,7 +54,8 @@ Core/                          at its root, its registration file
     Entities/<AggregatePlural>/  the whole aggregate: root and child entities
       Enums/                     the enums only this aggregate uses
     Common/                      what several aggregates share, with its Enums/
-  Features/<AggregatePlural>/  the aggregate's mapping, shared by its operations
+  Features/<AggregatePlural>/  the aggregate's one mapping file, shared by its
+                               operations and never copied into them
     <Operation>/               all that only this operation uses: the use case,
                                its interface, its validator and its DTOs
 
@@ -74,6 +75,9 @@ Adapter.Api/                   at its root, Program.cs — the only executable
                                folder is named after the model in use
   Results/                     the HTTP translation of a result, and the
                                response filter if there is one
+  Exceptions/
+    Handlers/                  the global exception handler — never exception
+                               classes of the project's own
 
 CompositionRoot/               at its root, the one file that wires the system
 ```
@@ -97,6 +101,14 @@ entities, because mapping them is their job.
 
 **The transaction boundary has no folder where it is implemented**: it sits at the root of
 `Adapter.Persistence/`, beside the handle. Its *interface* does get one.
+
+**The global exception handler is the one declared crossing.** It lives in `Adapter.Api`
+and names the ORM's exception types, which belong to the persistence adapter's technology:
+the host is the only place that answers for every failure. **Nothing else in `Adapter.Api`
+names them**, and the handler references no type of another adapter's own.
+
+**The feature level holds the aggregate's single `<Entity>MappingExtensions`**, with the
+mapping to every operation's DTOs — never a copy in each operation folder.
 
 ## Dependency injection
 
@@ -135,7 +147,10 @@ reference would turn around and `Core` would know an adapter.** It is not an ext
 - [ ] Every folder name is a plural except the operation folder, and no folder that nothing
       fills.
 - [ ] Every contract in `Core/Contracts/` — except the use case's interface, beside its class.
-- [ ] One folder per operation, with the aggregate's mapping one level up.
+- [ ] One folder per operation, with the aggregate's single mapping file one level up and no
+      copy of it in any operation folder.
+- [ ] The global exception handler in `Adapter.Api/Exceptions/Handlers/`, the only file there
+      naming the ORM's exception types, with no exception classes of the project's own.
 - [ ] The persistence handle and the transaction boundary at the root of `Adapter.Persistence`.
 - [ ] No entity named anywhere in `Adapter.Api`.
 - [ ] One public registration method per project, the composition root calling them all, and

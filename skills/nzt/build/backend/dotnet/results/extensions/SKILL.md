@@ -67,8 +67,9 @@ body, same output** — only the framework type changes.
 **This extension owns the translation of failed use-case Results.** Not the endpoint, not a
 middleware, not a second copy for the one case that felt different.
 
-Host-level failures — authentication, routing, an unexpected exception — keep the project's
-centralised handling, and **this rule does not forbid their own `ProblemDetails`**. What it
+Host-level failures — authentication, routing — keep the project's centralised handling, an
+unexpected exception goes to the global handler (`nzt-build-backend-dotnet-exceptions`), and
+**this rule does not forbid their own `ProblemDetails`**. What it
 forbids is a use-case `Result` being translated in two places, because the two stop agreeing
 and nobody notices until a client depends on the difference.
 

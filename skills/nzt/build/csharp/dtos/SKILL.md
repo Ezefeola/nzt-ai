@@ -88,6 +88,11 @@ may each have their own `ApplicationDto`; matching fields do not make it a share
 `OrderMappingExtensions.cs` — in a `static` class, which the compiler already seals.
 **The method is named `To<DtoName>`**, after the DTO it produces.
 
+**One file per entity, holding the mapping to every use case's DTOs.** The DTOs are not
+shared, but their mapper is: **never a copy of `OrderMappingExtensions` in each operation
+folder**, and never a mapper per use case. A second class with the same name in another
+namespace is the sign that it was copied.
+
 ```csharp
 public static class OrderMappingExtensions
 {
@@ -128,5 +133,6 @@ it.** What is decided here is the mapper's name and what goes inside it.
 - [ ] Properties precede nested DTO declarations at every nesting level.
 - [ ] Every DTO belonging to another is declared inside it, ending in `Dto` without
       repeating `Request`/`Response`.
-- [ ] Mapping is in `<Entity>MappingExtensions.cs`, `static`, with `To<DtoName>` methods.
+- [ ] Mapping is in `<Entity>MappingExtensions.cs`, `static`, with `To<DtoName>` methods —
+      one file per entity, never copied into each operation folder.
 - [ ] No mapper decides HTTP or `Result`, validates, or throws for a business reason.

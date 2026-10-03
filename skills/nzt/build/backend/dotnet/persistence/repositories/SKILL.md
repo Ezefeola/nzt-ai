@@ -105,10 +105,11 @@ trade, and it comes with one discipline: **a use case touches the repositories i
 needs and no others.** Reaching for a third aggregate *while we are here* is how an operation
 quietly grows a scope nobody asked it to have.
 
-The unit of work **holds no logic**. Its implementation may recognise a known provider
-constraint violation and expose it as a typed persistence conflict — **that is translation, not
-a decision**: the use case chooses the message and the status. Unknown failures keep their
-technical meaning and reach centralised handling; **no catch around each repository call.**
+The unit of work **holds no logic and translates no failure**: its `SaveChangesAsync` does not
+catch, and no repository or unit of work turns a provider error into a typed conflict. What
+the save could reject is checked before it, through a repository method returning a boolean;
+whatever escapes reaches the global handler (`nzt-build-backend-dotnet-exceptions`). **No catch
+around each repository call.**
 
 ## Closing checklist
 
@@ -120,6 +121,6 @@ technical meaning and reach centralised handling; **no catch around each reposit
       token.
 - [ ] The use case injects `IUnitOfWork` only, and repositories are properties of it sharing
       one handle.
-- [ ] `SaveChangesAsync` exists only here and is called once, at the end.
+- [ ] `SaveChangesAsync` exists only here, is called once at the end, and catches nothing.
 - [ ] No explicit transaction unless two writes cannot be one save.
 - [ ] The use case used only the repositories its operation needs.

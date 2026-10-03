@@ -58,11 +58,26 @@ fails right there with the message that lives on its entity.
   normalisation, null semantics, active or deleted rows. **On an update it excludes the
   record being updated.** Account for query filters, so they do not hide rows the unique
   constraint still covers.
-- **Two requests can both pass the check**, so the database constraint stays. An identified
-  violation of it returns **the same failure as the pre-check**, with the same message and
-  status. **An unknown write error is never classified as a duplicate** — recognising the
-  provider's error belongs to the persistence boundary, and it does not choose the business
-  response.
+- **Two requests can both pass the check**, so the database constraint stays. **The loser is
+  not caught here**: its exception reaches the global handler
+  (`nzt-build-backend-dotnet-exceptions`), which answers with a clear message. The same holds
+  for a version compared before saving and for dependants counted before a delete.
+
+## `try/catch` is the exception, and it says why
+
+**Expected failures are checks that return a `Result`, never caught exceptions.** A
+`try/catch` in a use case is allowed in two cases only:
+
+| Case | What the catch does |
+|---|---|
+| The operation already caused a side effect **outside its database transaction** — a file stored, a message sent — and has to undo it if a later step fails | Compensates, then `throw;` — the failure still reaches the global handler |
+| An **external dependency** signals an outcome the spec gives a business response to **only through an exception** — a payment declined by a provider SDK | Catches that one documented exception type and returns the failed `Result` |
+
+- **Each catch carries a one-line comment naming its case.** A catch that fits neither is
+  removed.
+- **Never around `SaveChangesAsync` or a query** to turn a database error into a `Result` —
+  no `catch … when`, no provider-error classifier.
+- **Never to log and rethrow, and never to swallow.** The global handler logs once.
 
 ## The status code is decided here
 
@@ -85,6 +100,7 @@ will catch.
 | Throw for an expected failure | Nobody: it returns a failed `Result` |
 | Reach persistence its own way | The persistence axis of the stack |
 | Map entity to DTO by hand | `<Entity>MappingExtensions` |
+| Catch a database error to build a `Result` | Nobody: a check before writing, and the global handler for the race |
 | Read `HttpContext` | Who is calling arrives as an injected dependency |
 
 **A caller's identity is never taken from what the client asserted.** It arrives as trusted
@@ -105,8 +121,10 @@ is the same one: at a return, the status and the message are what the reader cam
       `Result`.
 - [ ] Uniqueness is checked with `AnyAsync` through the selected persistence, outside the
       validator, with the token, and the predicate excludes self on updates.
-- [ ] A known concurrent uniqueness violation returns the same `Result` as the pre-check, and
-      unrelated errors are not converted into it.
+- [ ] The database constraint stays, and its race is left to the global handler — nothing
+      catches it here.
+- [ ] Any `try/catch` is one of the two allowed cases, with its comment; none wraps the save
+      or a query, logs and rethrows, or swallows.
 - [ ] The status code is set here and matches how the project already answers that kind of
       failure.
 - [ ] Every `Result` built at its own return, with no private helper returning one.

@@ -153,7 +153,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**110 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
+**111 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
 abierto están en la sección 14 de [`specs/nzt-core.md`](specs/nzt-core.md), que es el punto
 de retomada: si volvés al proyecto después de un tiempo, se empieza por ahí.
 

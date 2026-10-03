@@ -51,7 +51,8 @@ Each line is a **role**: what belongs there, never what it is called.
       UnitOfWork/              the transaction boundary interface — only with
                                the pattern in use
     Integrations/<System>/     the interface of one external system
-  Features/<AggregatePlural>/  the aggregate's mapping, shared by its operations
+  Features/<AggregatePlural>/  the aggregate's one mapping file, shared by its
+                               operations and never copied into them
     <Operation>/               all that only this operation uses: the use case,
                                its interface, its validator and its DTOs
 
@@ -71,6 +72,9 @@ Each line is a **role**: what belongs there, never what it is called.
                                folder is named after the model in use
   Results/                     the HTTP translation of a result, and the
                                response filter if there is one
+  Exceptions/
+    Handlers/                  the global exception handler — never exception
+                               classes of the project's own
 ```
 
 **This is a catalogue of roles, not folders to create up front.** A folder exists when
@@ -97,8 +101,12 @@ something fills it. **An empty folder invites something unrelated into it.**
   anywhere in `Api` means a mapping was skipped.
 - **The HTTP translation of a result is in `Api`**, never in `Application`: it depends on
   ASP.NET Core, and the layer that runs the operation must not know it is reached over HTTP.
+- **The global exception handler is in `Api`**, and it is the one file there besides
+  `Program.cs` that may name the ORM's exception types: the host is the only place that sees
+  the whole system.
 - **One folder per operation, nothing shared inside it.** What two operations of a feature
-  share sits one level up; what two features share sits in `Domain` or `Contracts`.
+  share sits one level up — the aggregate's single `<Entity>MappingExtensions`, never a copy
+  per operation; what two features share sits in `Domain` or `Contracts`.
 
 ## Dependency injection
 
@@ -129,7 +137,10 @@ extension point — nothing else will ever implement it.
       contract.
 - [ ] Interfaces in `Application/Contracts/`, implementations in `Infrastructure/`, and an
       unused pattern with **no folder on either side**.
-- [ ] One folder per operation, with the aggregate's mapping one level up.
+- [ ] One folder per operation, with the aggregate's single mapping file one level up and no
+      copy of it in any operation folder.
+- [ ] The global exception handler in `Api/Exceptions/Handlers/`, with no exception classes of
+      the project's own beside it.
 - [ ] The persistence handle and the transaction boundary at the root of
       `Infrastructure/Persistence/`.
 - [ ] No entity named anywhere in `Api`, and the result's HTTP translation in `Api/Results/`.

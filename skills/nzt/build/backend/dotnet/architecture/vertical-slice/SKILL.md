@@ -38,9 +38,13 @@ Each line is a **role**: what belongs there, never what it is called.
     Common/                      what several aggregates share, with its Enums/
   Features/                    at its root, the registration file of the folder
     <AggregatePlural>/         the endpoint class of the feature, and the
-                               aggregate's mapping, shared by its operations
+                               aggregate's one mapping file, shared by its
+                               operations and never copied into them
       <Operation>/             all that only this operation uses: the use case,
                                its interface, its validator and its DTOs
+  Exceptions/
+    Handlers/                  the global exception handler — never exception
+                               classes of the project's own
   Integrations/<System>/       what talks to that system
   Persistence/                 at its root, the registration file of the folder,
                                the persistence handle and the transaction
@@ -81,6 +85,12 @@ the operation folder holds **only what would disappear with that operation**.
 A file inside an operation folder **never references anything under another operation or
 another feature**. What is genuinely shared lives in `Domain/`, `Persistence/` or
 `Contracts/` — and **what belongs in none of those is written twice**.
+
+**The feature level is not another slice.** What sits there — the endpoint class and the
+aggregate's `<Entity>MappingExtensions` — is shared by the feature's operations on purpose:
+**one mapping file per aggregate, holding the mapping to every operation's DTOs, never a copy
+in each operation folder.** The rule above is about helpers between operations, not about
+these two.
 
 **The duplicate is the cheap problem.** The shared helper between two slices is the expensive
 one: the second caller always needs one more column, the first gets an optional parameter,
@@ -130,10 +140,13 @@ Without this, `Program.cs` is the one file every new operation would have to tou
 - [ ] Every folder name is a plural except the operation folder, and none matches a type name.
 - [ ] No folder that nothing fills.
 - [ ] The feature folder is the aggregate in plural, holding the endpoint class and the
-      aggregate's mapping.
+      aggregate's single `<Entity>MappingExtensions`, with no copy in any operation folder.
 - [ ] One folder per operation, holding only what that operation uses.
 - [ ] **No reference from one slice to another**; shared goes up, otherwise it is duplicated.
 - [ ] Aggregate children and their enums inside the aggregate folder.
-- [ ] The persistence handle and the transaction boundary at the root of `Persistence/`.
+- [ ] The persistence handle and the transaction boundary at the root of `Persistence/`, and
+      nothing there that classifies provider errors.
+- [ ] The global exception handler in `Exceptions/Handlers/`, and no exception classes of the
+      project's own beside it.
 - [ ] One registration file per root folder, one private method per feature, and `Program.cs`
       calling only the public ones.

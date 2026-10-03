@@ -39,8 +39,9 @@ it exposes.
 - **An unexecuted query does not leave either.** It is built, executed and materialised inside
   the use case; what comes out is a DTO.
 
-A focused classifier of provider errors is allowed where the ORM skill defines it: it only
-inspects the failure, and never receives a handle, executes a query or wraps persistence.
+- **No classifier of provider errors** — no static helper that inspects a database exception
+  to decide what it meant. What the save could reject is checked before it; the rest goes to
+  the global handler.
 
 ## The use case is the transactional unit
 
@@ -49,10 +50,10 @@ here, so **the use case is the unit of work** — which is precisely why this ax
 type. How the save is written, and the one case that needs an explicit transaction, is the ORM
 skill's.
 
-**Do not wrap every persistence call in a try/catch.** Translate a recognised conflict at the
-save boundary when the use case needs a business response, and let unexpected failures reach
-centralised handling. Transaction cleanup follows the ORM's disposal pattern, with no
-rollback-only catch.
+**No `try/catch` around persistence calls, the save included.** A business response comes
+from a check before the write, never from catching its failure; whatever escapes reaches the
+global handler (`nzt-build-backend-dotnet-exceptions`). Transaction cleanup follows the ORM's
+disposal pattern, with no rollback-only catch.
 
 ## Where the queries live
 
@@ -68,7 +69,10 @@ one column more.**
 
 - [ ] The use case takes the handle in a `readonly` field with an explicit constructor, and no
       interface over it unless the architecture declares one.
-- [ ] **No repository, no unit of work, no query helper** — not even for one aggregate.
+- [ ] **No repository, no unit of work, no query helper, no provider-error classifier** — not
+      even for one aggregate.
+- [ ] No `try/catch` around persistence calls; business failures come from checks before the
+      write.
 - [ ] Neither the handle nor an unexecuted query leaves the use case.
 - [ ] Everything the operation changes is committed once, at the end.
 - [ ] A query shared with another use case was written twice rather than extracted.

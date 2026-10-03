@@ -1362,6 +1362,53 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `Docs/ui-components.md` siguen donde estaban. **No migra proyectos existentes**: uno que
   ya tiene `design/` lo renombra a mano o en su próxima corrida.
 
+- **D48.** **Las excepciones que escapan de un caso de uso terminan en un único
+  `GlobalExceptionHandler`, reconocidas solo por tipo.** Salió de leer FarmaPedia: cinco
+  casos de uso con `catch (DbUpdateException) when (e.IsViolationOf(...))` y dos
+  clasificadores en la raíz de `Persistence/` que comparaban `SqlException.Number` y
+  buscaban el nombre del índice en el texto del mensaje. **No fue un desvío del modelo:**
+  `ef-core-writes`, `ef-core-indexes`, `use-cases` y `persistence-direct` lo exigían ("the
+  rule needs three parts"), y la regla se contradecía, porque prohibía el texto del mensaje
+  y SQL Server no expone el nombre de la constraint en otro lado (verificado en la
+  referencia de `SqlException` y en los mensajes 2601/2627). Además NZT nombraba
+  *centralised handling* cinco veces sin decir cómo se construye. **Queda así:** lo
+  esperado se chequea antes de escribir y vuelve como `Result` (unicidad con `AnyAsync`,
+  versión comparada, dependientes contados), y la constraint de la base se queda; la
+  carrera, la base caída y los bugs van a `nzt-build-backend-dotnet-exceptions`, una
+  sola clase con un `switch` por tipo: `DbUpdateConcurrencyException` → 412,
+  `DbUpdateException` → 500 con "no se pudo guardar", el resto → 500. **El usuario
+  descartó** reconocer por códigos (2601/2627/547) por hardcodeados y una librería
+  clasificadora (`EntityFrameworkCore.Exceptions`) por no depender de un tercero, y aceptó
+  que la carrera de unicidad responda 500 con un mensaje claro en vez de 409. **También
+  pidió** el texto de la excepción en la respuesta; quedó **solo en Development**, porque el
+  mensaje útil es el del `InnerException` y expone tablas, constraints y valores, y Microsoft
+  pide no mostrar detalle de excepciones en producción. La respuesta tiene la forma de un
+  `Result` fallido (`Extensions["errors"]`), los textos base se acuerdan en cada proyecto, y
+  `SuppressDiagnosticsCallback = _ => false` es obligatorio en .NET 10, que si no deja de
+  loguear lo que un handler resolvió. **El try/catch en un caso de uso no se prohíbe**: el
+  usuario lo quiere para casos excepcionales, nunca para traducir errores de base.
+  **Descartado después, con el usuario: un `SaveChangesAsync` que devuelva `Result`.** Un
+  override no puede cambiar `Task<int>`, y un método nuevo que capture adentro repite las
+  dos respuestas del handler sin mejorar el mensaje (sin códigos no sabe qué constraint
+  falló), suma un `if` de reenvío en cada caso de uso, y se traga la excepción antes de que
+  el handler la loguee. Lo único que ganaba —reaccionar a un save fallido— ya lo cubre el
+  catch de compensación que relanza. Se reabre solo con un caso que el handler no resuelva.
+
+- **D49.** **Un solo `<Entity>MappingExtensions.cs` por entidad, a nivel feature, con el
+  mapping a los DTOs de todas sus operaciones.** FarmaPedia tenía una copia de
+  `AreaMappingExtensions` dentro de cada carpeta de operación (dos clases con el mismo
+  nombre en namespaces distintos, y tres de `PageMappingExtensions`). **La regla ya era la
+  correcta** —`csharp-dtos` nombra el archivo por la entidad y los tres árboles de
+  arquitectura lo ponen un nivel arriba de la operación—, pero `vertical-slice` la
+  contradecía en la misma página: *"lo compartido vive en `Domain/`, `Persistence/` o
+  `Contracts/`, y lo que no entra en ninguno se escribe dos veces"*. El mapper no está en
+  ninguno de esos tres, así que el modelo aplicó "se escribe dos veces". **Queda así:** el
+  mapper de la entidad es la excepción declarada a esa regla, junto al endpoint de la
+  feature, y `csharp-dtos` prohíbe copiarlo por operación o partirlo por caso de uso. En
+  esta corrida se llegó a escribir el criterio opuesto (un mapper por caso de uso) por una
+  lectura equivocada del pedido; el usuario lo corrigió antes de cerrarse la unidad y se
+  revirtió.
+
 ## 13. Revisión contra Temper v3
 
 Temper v3 (`../temper-ai-v3`) es un set SDD maduro y funcionando. NZT no lo copia: se
@@ -2733,7 +2780,7 @@ curiosidad.
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
-**Dónde estamos, en una línea:** **el roadmap está construido entero — 110 skills, la suite
+**Dónde estamos, en una línea:** **el roadmap está construido entero — 111 skills, la suite
 de evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La
 revisión contra Temper terminó (ocho fases, 22 tensiones), su fase de aplicación también, la
 capa de stack se cerró con sus tres áreas, y **la segunda pasada (13.12) cerró los seis
@@ -2774,14 +2821,20 @@ objects, domain events, ids tipados— pasa a ser un opt-in donde lo no escrito 
 de los tipos anidados y una excepción explícita al orden general de C#. **D46 no es de
 contenido sino de distribución**: NZT se instala con una línea por proveedor
 —`irm | iex` o `curl | sh`— que baja de GitHub Releases un binario self-contained, verifica
-su hash, instala NZT en Claude Code o en Codex y borra el binario. Queda pendiente del usuario hacer público el repositorio. **D47 es la
-última**: los diseños de una feature dejan de compartir `design/` y pasan a `tech-design/`
-—diseño técnico y su log— y `ux-ui/` —pantallas y mockups—.
+su hash, instala NZT en Claude Code o en Codex y borra el binario. Queda pendiente del usuario hacer público el repositorio. **D47**:
+los diseños de una feature dejan de compartir `design/` y pasan a `tech-design/` —diseño
+técnico y su log— y `ux-ui/` —pantallas y mockups—. **D48 y D49 son las últimas, y salen de
+leer el código que NZT generó en FarmaPedia**: D48 saca de los casos de uso los
+`catch … when` y los clasificadores de errores del proveedor, y agrega la skill 111,
+`nzt-build-backend-dotnet-exceptions` —un único `GlobalExceptionHandler` en
+`Exceptions/Handlers/` que reconoce solo por tipo—; D49 deja un solo
+`<Entity>MappingExtensions` por entidad a nivel feature y saca de `vertical-slice` la
+contradicción que hacía copiarlo en cada operación.
 
 **No queda ninguna decisión abierta**: I1 (D18), I2 e I3 (D24) e I4 (D25 de la numeración de
-riesgos) están cerradas, y la última decisión de contenido la cerró D47. Lo que puede reabrir
-una es la medición de la fase 9, y con el catálogo en 110 skills **esa medición pasó a ser lo
-más urgente del roadmap**.
+riesgos) están cerradas, y la última decisión de contenido la cerró D49 (el `SaveChangesAsync`
+que devuelve `Result` se evaluó y quedó descartado dentro de D48). Lo que puede reabrir una es la medición de la fase 9, y con el catálogo
+en 111 skills **esa medición pasó a ser lo más urgente del roadmap**.
 
 **Lo que falta, en orden, al 2026-09-17:**
 
@@ -3114,7 +3167,9 @@ skills/nzt/ship/backend/dotnet/  → nzt-ship-backend-dotnet (51) — router de 
 segunda pasada (13.12, D25–D35): +17 skills, ninguna de stack
 108 skills · 20.467 chars de listado  ← 2,6× el piso
 D36: +1 (nzt-verify-test-data) · D37: +1 (nzt-ux-manual)
-110 skills · 20.765 chars de listado  ← el número de hoy, 2,6× el piso
+110 skills · 20.765 chars de listado  ← 2,6× el piso
+D48: +1 (nzt-build-backend-dotnet-exceptions)
+111 skills · ~21.035 chars de listado  ← el número de hoy, 2,6× el piso
 ```
 
 **Modo de trabajo acordado (opción B):** primero se revisa **todo** contra Temper v3 fase

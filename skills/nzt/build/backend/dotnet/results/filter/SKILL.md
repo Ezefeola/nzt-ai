@@ -9,8 +9,9 @@ description: Use when the stack selects result-filter and a Result reaches HTTP 
 failure, same shape, serialised as it is. **The `Result` is the response contract**, so it is
 never converted into `ProblemDetails` and never unwrapped by an extension.
 
-Host-level failures keep the project's centralised handling; **do not force them into a
-use-case `Result`**.
+Host-level failures keep the project's centralised handling, and an exception that escapes
+a use case goes to the global handler (`nzt-build-backend-dotnet-exceptions`), which answers
+in this same shape; **do not force them into a use-case `Result`**.
 
 Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-results-pattern` before
 applying this.

@@ -56,7 +56,7 @@ When a rule says *there cannot be two of these*, **the unique index is the only 
 actually enforces it**: two requests read *no duplicate* at the same time and both write, and
 only the index stops the second.
 
-The rule needs three parts, and it is not enforced with fewer:
+The rule needs two parts, and it is not enforced with fewer:
 
 - **The `AnyAsync` pre-check before writing**, so an existing value comes back as the operation's
   own message instead of a database error.
@@ -64,16 +64,17 @@ The rule needs three parts, and it is not enforced with fewer:
   has to match the query's**: tenant, normalisation, collation, null semantics, and any
   active-or-deleted condition. A constraint scoped differently from the check enforces a
   different rule than the one that was specified.
-- **Recognition of that known violation** at the persistence boundary
-  (`nzt-build-backend-dotnet-ef-core-writes`), turned into the **same** `Result` the pre-check
-  returns. An unknown error or a different constraint never becomes this conflict.
+
+**The loser of that race is not caught at the save.** Its exception reaches the global
+handler (`nzt-build-backend-dotnet-exceptions`), which answers with a clear message by type —
+never by error number, constraint name or message text.
 
 **Verify it with two independent contexts on the real relational provider**: synchronise them
-after both pre-checks return false, then let both save, and assert one record and the agreed
-conflict for the loser. Bounded synchronisation, not sleeps. **The in-memory provider cannot
+after both pre-checks return false, then let both save, and assert one record and that the
+loser's save throws. Bounded synchronisation, not sleeps. **The in-memory provider cannot
 prove relational constraint behaviour** — a test that passes there proves nothing here. Also
-check an update that leaves the unique value unchanged, an already-taken value, the scope cases,
-and that an unrelated failure is not reported as a duplicate.
+check an update that leaves the unique value unchanged, an already-taken value and the scope
+cases.
 
 If the uniqueness holds only under a condition — unique **among the active ones** — that is a
 **filtered index**, with the condition declared in the index. Without the filter the constraint
@@ -100,8 +101,8 @@ how important the column looks.
       rule.
 - [ ] Composites put equality first and the range or ordering last, and no index is the left
       prefix of another.
-- [ ] A uniqueness rule has its pre-check, its unique index with matching scope, and recognition
-      of only its own violation.
+- [ ] A uniqueness rule has its pre-check and its unique index with matching scope, and the
+      race is left to the global handler, not caught at the save.
 - [ ] Concurrency was verified with two contexts on the real provider, or the verification is
       reported as pending.
 - [ ] Conditional uniqueness uses a **filtered index**, with the condition in the index.

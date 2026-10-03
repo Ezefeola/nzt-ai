@@ -49,30 +49,28 @@ await transaction.CommitAsync(cancellationToken);
 
 An uncommitted relational transaction **rolls back when `await using` disposes it**. Do not add
 a catch just to call `RollbackAsync`, log and rethrow: that is three lines whose only effect is
-to make the failure path longer. Unexpected failures propagate to centralised handling. **Never
+to make the failure path longer. Unexpected failures propagate to the global handler. **Never
 commit after a failure, and never commit each step on its own** — a later failure would leave
 half the work done.
 
-## Recognise the known write conflict, hide nothing else
+## Check before saving, never catch the save
 
-The uniqueness pre-check (`AnyAsync`) and the unique index both stay: the check gives the
-caller a real message, the index is what makes the rule true. **A competing write can still
-pass the check**, so the violation is recognised at save and turned into the operation's
-agreed `Result`.
+**What the save could reject is checked before it, and fails as a `Result`**: a value already
+taken with `AnyAsync`, a stale version against the one the client sent, dependants before a
+delete. The constraint in the database stays — it is what makes the rule true.
 
-- **Use the provider's documented codes and the constraint identity.** A generic duplicate code
-  alone may not say *which* rule failed, and **matching on the message text breaks the day the
-  server is installed in another language**. Where identification stays ambiguous, keep the
-  technical error rather than guessing.
-- **With direct persistence**, catch at the save boundary in the use case and keep the provider
-  recognition in a focused classifier that does not query and does not wrap the context.
-- **With a unit of work**, the recognition lives in its persistence implementation and comes
-  out as a typed conflict; **the use case still owns the business `Result`.**
+**`SaveChangesAsync` is not wrapped in a `try/catch`.** A competing write can still pass the
+check; when it does, the exception propagates to the global handler
+(`nzt-build-backend-dotnet-exceptions`), which answers with a clear message by exception type.
 
-**Not every `DbUpdateException` is a duplicate.** Connection failures, other constraints,
-cancellation and unknown errors keep their own handling. A uniqueness violation is
-provider-specific and is **not** `DbUpdateConcurrencyException`; optimistic concurrency and
-idempotency are their own policy, decided per operation.
+- **No `catch (DbUpdateException) when (…)`** to turn the race into the pre-check's `Result`.
+- **No classifier of provider errors**: no error numbers, no constraint names, no matching on
+  the message text.
+- **`DbUpdateConcurrencyException` is not caught either.** With a concurrency token, the
+  version is compared before saving; the token only catches the race, and the race goes to
+  the handler.
+
+Idempotency is its own policy, decided per operation.
 
 ## Closing checklist
 
@@ -82,6 +80,7 @@ idempotency are their own policy, decided per operation.
 - [ ] One `SaveChangesAsync` at the end, with the token, and no manual transaction around it.
 - [ ] An explicit transaction exists only for an unavoidable multi-write, commits only after
       success, and is disposed on failure without a catch that only rethrows.
-- [ ] The uniqueness pre-check and the index are both in place, and the known violation is
-      recognised by code and constraint, never by message text.
-- [ ] Unknown failures kept their meaning and reached centralised handling.
+- [ ] What the save could reject was checked before it and failed as a `Result`, with the
+      database constraint still in place.
+- [ ] `SaveChangesAsync` is not inside a `try/catch`; races and unknown failures reach the
+      global handler, and nothing classifies provider errors.
