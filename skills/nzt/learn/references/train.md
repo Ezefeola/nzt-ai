@@ -1,8 +1,3 @@
----
-name: nzt-learn-train
-description: Use when the person already does something and wants to get better: one component per session, at the edge of their level, corrected every repetition.
----
-
 # Train — deliberate practice on something they already do
 
 Produces one **training session** and the rows it leaves in `Learn/<topic>/progress.md`.
@@ -11,8 +6,6 @@ corrected with `nzt-learn-tutor`.
 
 **Entry condition: they already do this.** Someone who cannot produce it at all is not
 training, they are learning it — that is `nzt-learn-teach`, in the same topic.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## Isolate one component, and say it out loud
 

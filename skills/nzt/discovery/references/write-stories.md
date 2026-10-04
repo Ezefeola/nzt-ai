@@ -1,15 +1,18 @@
----
-name: nzt-discovery-write-stories
-description: Use when writing or changing one user story: declarative criteria with concrete data, the unhappy path, and the coverage marks per area and for QA.
----
-
 # User story
+
+## Contents
+- Before writing
+- The file
+- Writing a criterion
+- Coverage per area, and QA
+- One story is one story
+- No priorities
+- Changing a story
+- Done when
 
 Produces one file: `Plan/specs/<feature>/stories/US-NNN-<slug>.md`. It carries the
 acceptance criteria of one story and their coverage marks. **This is the only place
 progress is read from** — the story index in `spec.md` has no checkboxes.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## Before writing
 

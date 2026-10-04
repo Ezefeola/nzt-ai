@@ -28,8 +28,7 @@ graders:
   - name: no-mermaid-drawn
     type: regex
     pattern: 'flowchart |sequenceDiagram|stateDiagram'
-    min: 0
-    max: 0
+    match: not_contains
     arm: both
   - name: reads-the-stack
     type: tool_used

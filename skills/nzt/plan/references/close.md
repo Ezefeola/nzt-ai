@@ -1,14 +1,16 @@
----
-name: nzt-plan-close
-description: Use when the user accepted every story of a feature: sweep its change markers, bring its affected documents current, and write its history entry.
----
-
 # Closing a feature
+
+## Contents
+- What has to be true before it starts
+- Read the two signals first
+- 1 · Sweep the markers
+- 2 · Bring the affected documents current
+- 3 · Write the history entry
+- 4 · Stop the way every unit stops
+- Done when
 
 Produces a feature nobody has to interpret again: no marker left over, every document it
 touched current, and one entry in `Docs/history.md` saying what changed and why.
-
-If you did not arrive here from `nzt-plan`, load it first.
 
 **One pass over the whole feature, never one per story.** The documents and the history are
 transversal to all of its stories, and closing story by story would write the same entry

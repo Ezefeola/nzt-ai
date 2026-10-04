@@ -64,7 +64,13 @@ build and verify, nothing else. Skipping is normal; skipping silently is not.
 
 ## 5. Hand off
 
-- The request is about learning a skill → load `nzt-learn` and stop here.
+- The request is about learning a skill → load `nzt-learn` and stop here. So is one that
+  continues a topic in `Learn/<topic>/` — a delivery to correct, an assessment, a review that
+  is due: its state is `progress.md`, not `Plan/state.json`.
+- The user accepted a feature and wants it closed → load `nzt-plan` and stop here: closing
+  is its unit. Change markers still in the spec are what the close sweeps, not a new
+  change — changing a feature through `nzt-discovery` is for a change that has not been
+  agreed yet.
 - Work spans more than one unit → load `nzt-plan` and stop here.
 - Single unit → load the phase skill for it, per the routing table in your instructions,
   and do it. Report and stop when it is done.

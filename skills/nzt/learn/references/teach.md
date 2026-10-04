@@ -1,9 +1,13 @@
----
-name: nzt-learn-teach
-description: Use when one OA-NN objective has to be taught from not knowing it: the attempt before the explanation, one idea per lesson, scaffolding that fades.
----
-
 # Teach — one objective, one idea, until they do it unaided
+
+## Contents
+- Make them try before you explain
+- The lesson carries one idea
+- The file
+- The scaffolding fades in three steps
+- Close with retrieval, not a summary
+- What closes the objective
+- Done when
 
 Produces `Learn/<topic>/lessons/OA-NN-<slug>.md` and the state it leaves in
 `progress.md`. The brief for each practice step is written by `nzt-learn-exercises`; what
@@ -12,8 +16,6 @@ comes back is corrected with `nzt-learn-tutor`.
 **Start from an objective that is already in `curriculum.md`, with its *Closes with*.** If
 you have to ask the person something before you can write the lesson, the objective was
 badly formed: fix it there, not here.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## Make them try before you explain
 

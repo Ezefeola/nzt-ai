@@ -3,10 +3,11 @@ name: route-close-feature
 description: >
   A feature the user accepts, with its change markers still in the spec. Closing is a unit
   of its own, and it is the one that sweeps them: the route is nzt-plan and its close leaf.
-  Without it the markers stay forever and the spec quietly becomes a lie.
+  Without it the markers stay forever and the spec quietly becomes a lie. Since D50 the
+  leaf is nzt-plan's references/close.md, graded as a Read; baseline 0.50 (haiku judge).
 tags: [routing]
 expected_outcome: >
-  Loads nzt-plan and nzt-plan-close, reads the story and the spec, and proposes the close -
+  Loads nzt-plan, reads its references/close.md, the story and the spec, and proposes the close -
   markers swept, the removed rule gone from the spec, the history entry written - without
   offering to delete the regression that proves the absence.
 context:
@@ -20,12 +21,12 @@ execution:
 graders:
   - name: close-fired
     type: tool_used
-    tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan-close"'
+    tool: Read
+    input_match: 'nzt-plan[/\\]+references[/\\]+close\.md'
   - name: router-before-leaf
     type: tool_order
     before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan"' }
-    after: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan-close"' }
+    after: { tool: Read, input_match: 'nzt-plan[/\\]+references[/\\]+close\.md' }
   - name: read-the-spec
     type: tool_used
     tool: Read

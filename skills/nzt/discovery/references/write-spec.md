@@ -1,15 +1,19 @@
----
-name: nzt-discovery-write-spec
-description: Use when writing or changing a feature specification: scope in both directions, business rules with stable slugs, and its story index.
----
-
 # Feature specification
+
+## Contents
+- Before writing
+- The file
+- Business rules
+- Scope, in both directions
+- Non-functional requirements
+- Story index
+- The spec describes the present
+- Stay on your side of the line
+- Done when
 
 Produces `Plan/specs/F-NNN-<slug>/spec.md`: the cross-cutting document of one feature. It
 holds what the whole feature is — scope, rules, non-functional requirements — and indexes
 the stories that carry the criteria. **The rules live here and nowhere else.**
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## Before writing
 

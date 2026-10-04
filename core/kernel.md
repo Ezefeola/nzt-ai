@@ -108,14 +108,14 @@ continuing inside a phase whose router is already loaded in this session.
 | The work is about | Load |
 |---|---|
 | Starting, resuming, or an unclear phase | `nzt` |
-| Building, changing or executing the plan | `nzt-plan` |
-| Functional analysis: requirements, business rules, scope, specs | `nzt-discovery` |
+| Building, changing or executing the plan, or closing a feature the user accepted | `nzt-plan` |
+| Functional analysis: requirements, business rules, scope, specs and stories, the product and its vocabulary, changing what an existing feature does, specs from existing code | `nzt-discovery` |
 | How to solve it: components, stack, technical design | `nzt-architecture` |
-| Screens, flows, visual design, and the end user's manual | `nzt-ux` |
+| Screens, flows, visual design, mockups, the design system and shared components, usability and accessibility reviews, and the end user's manual | `nzt-ux` |
 | Writing or changing code against specs | `nzt-build` |
 | QA once the increment is built: test plans, runs, evidence, bugs | `nzt-verify` |
 | Versioning, CI/CD, releasing, deploying | `nzt-ship` |
-| Teaching the user a skill instead of doing it for them | `nzt-learn` |
+| Teaching the user a skill instead of doing it for them, or continuing a topic in `Learn/`: a lesson, practice, a correction, an assessment, a review | `nzt-learn` |
 
 Routers name the leaf skills they can hand off to. Load a leaf directly only when the user
 named it. Each router says where its artifacts land; the kernel does not keep a copy.

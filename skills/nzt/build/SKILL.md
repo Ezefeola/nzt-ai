@@ -110,8 +110,8 @@ They apply to every unit of this phase, so they live here and not in a leaf.
 - **Change markers have fixed meaning**: `[modify]` replaces the old behavior instead of
   adding a parallel path, `[remove]` takes it out, and `[SPEC-CONFLICT]` is what you emit
   when the spec contradicts itself while you are building. The first two are put there by
-  `nzt-discovery-change`, when the user approved the change; they survive until
-  `nzt-plan-close` sweeps them, and whoever implements does not clean them up.
+  the change reference of `nzt-discovery`, when the user approved the change; they survive
+  until the close of `nzt-plan` sweeps them, and whoever implements does not clean them up.
 - **Technical work you find and do not do is reported, and it becomes an entry in
   `Docs/tech-debt.md` when the user decides to defer it** — never a comment in the code and
   never a silent omission.

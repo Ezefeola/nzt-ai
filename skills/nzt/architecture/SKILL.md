@@ -18,7 +18,7 @@ which documents exist and when each one is created.
 
 **Does not own:** business rules (`nzt-discovery`), screen design (`nzt-ux`), writing the
 code (`nzt-build`). Two sets of `Docs/` files are not yours either: the UX documents —
-design system and shared component inventory — belong to `nzt-ux-system`, and
+design system and shared component inventory — belong to `nzt-ux`, and
 `product.md`, `glossary.md` and `analysis.md` belong to discovery.
 
 ## Required guidance

@@ -24,17 +24,24 @@ Before writing, read what this unit depends on: the feature's `analysis.md` if i
 the product definition, and the glossary. Reuse what is already loaded — the table below
 does not mean load every row.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| Interviewing the user and recording answers under stable `Q-NN` | `nzt-discovery-analysis` |
-| Product objectives, users, modules, scope | `nzt-discovery-product` |
-| Domain vocabulary and what each term means here | `nzt-discovery-glossary` |
-| A feature: scope, business rules, non-functional requirements | `nzt-discovery-write-spec` |
-| One story: acceptance criteria with area coverage | `nzt-discovery-write-stories` |
-| A functional change to a feature that already exists | `nzt-discovery-change` |
-| Behavior that exists only as code | `nzt-discovery-reverse` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
+
+| The unit is | Read | Read with |
+|---|---|---|
+| Interviewing the user and recording answers under stable `Q-NN` | `references/analysis.md` | — |
+| Product objectives, users, modules, scope | `references/product.md` | — |
+| Domain vocabulary and what each term means here | `references/glossary.md` | — |
+| A feature: scope, business rules, non-functional requirements | `references/write-spec.md` | — |
+| One story: acceptance criteria with area coverage | `references/write-stories.md` | — |
+| A functional change to a feature that already exists | `references/change.md` | `references/write-spec.md`, `references/write-stories.md` |
+| Behavior that exists only as code | `references/reverse.md` | `references/analysis.md` |
+
+The references, and other phases, still name these by their old skill names
+(`nzt-discovery-change` is `references/change.md`): those are this table's rows, never skills
+to load.
 
 ## One unit
 

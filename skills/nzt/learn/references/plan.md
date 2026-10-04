@@ -1,9 +1,14 @@
----
-name: nzt-learn-plan
-description: Use when a topic needs its starting point measured with probes, its OA-NN objectives agreed, and its curriculum and progress record created.
----
-
 # Curriculum — the real starting point and the objectives
+
+## Contents
+- Probe before you write anything
+- Ask only what only they can answer
+- Objectives
+- curriculum.md
+- progress.md
+- Agree it before the first lesson
+- Resuming a topic
+- Done when
 
 Produces the two files a topic lives by: `Learn/<topic>/curriculum.md` — purpose, starting
 point, what was agreed, and the `OA-NN` objectives — and `Learn/<topic>/progress.md`, the
@@ -12,8 +17,6 @@ never changes once the folder exists.
 
 Nothing else in the branch runs before these exist: a lesson without an objective teaches
 whatever came to mind, and it is measured against nothing.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## Probe before you write anything
 

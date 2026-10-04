@@ -1,8 +1,3 @@
----
-name: nzt-learn-assess
-description: Use when measuring what the person actually acquired: mixed forms on a case they have not seen, and one of five verdicts per objective.
----
-
 # Assess — measure the ability, not the sensation
 
 Produces `Learn/<topic>/assessments/<YYYY-MM-DD>.md` and the verdicts it writes into
@@ -11,8 +6,6 @@ Produces `Learn/<topic>/assessments/<YYYY-MM-DD>.md` and the verdicts it writes 
 
 Not how the lessons went. A topic where every lesson landed and nothing was measured is a
 topic nobody can report on.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## Build it from the objective
 

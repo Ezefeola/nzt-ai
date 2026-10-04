@@ -1,14 +1,18 @@
----
-name: nzt-discovery-change
-description: Use when a feature that already exists has to change: the proposal written before the spec is touched, and its merge into the rules, stories and markers.
----
-
 # Changing a feature that exists
+
+## Contents
+- The two signals
+- Before writing it
+- Type the change first
+- The file
+- The cycle
+- The merge
+- Removing is where this goes wrong
+- What travels with the merge
+- Done when
 
 Produces `Plan/specs/<feature>/change.md` — the proposal — and, once the user approves it,
 the edited `spec.md` and stories with their change markers. Then the proposal is deleted.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 It exists for one reason: **editing a spec is destructive and there is no cheap undo.** The
 proposal is where the user approves before the source of truth is touched.

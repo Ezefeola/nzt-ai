@@ -1,15 +1,8 @@
----
-name: nzt-learn-retain
-description: Use when scheduling or running the reviews that keep a topic from fading: growing intervals per OA-NN, and retrieval on a new case.
----
-
 # Retain — reviews, because forgetting is the default
 
 Produces the review dates in `Learn/<topic>/progress.md` and the short sessions that run
 them. A lesson with no follow-up is time spent at a loss, and the loss is invisible for
 about a week.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## The ladder
 

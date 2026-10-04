@@ -1,8 +1,3 @@
----
-name: nzt-ux-review
-description: Use when a design, a mockup or a built screen is judged: the tasks first, then the heuristics and WCAG 2.2 AA, with findings by severity.
----
-
 # Usability review
 
 Produces a report of findings about one screen, each with its severity and its **type** —
@@ -11,8 +6,6 @@ and the type is what says where the finding goes next.
 **This is an expert review, and the report says so.** It finds many problems cheaply. It
 **does not replace testing with users**, and wherever a conclusion depends on how people
 actually behave, that is stated in the finding.
-
-If you did not arrive here from `nzt-ux`, load it first.
 
 ## What your input can and cannot prove
 

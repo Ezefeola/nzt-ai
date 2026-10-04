@@ -1,9 +1,13 @@
----
-name: nzt-learn-tutor
-description: Use when correcting what the person produced or unblocking them: confidence asked before looking, and one hint rung per request.
----
-
 # Tutor — correct without producing, unblock without solving
+
+## Contents
+- Ask for confidence before you look
+- One hint rung per request
+- Point at the place and its consequence
+- After the fix, they explain why it works
+- When they ask for the solution
+- What you write
+- Done when
 
 Produces no file of its own. It produces the correction in the conversation and the rows it
 leaves in `Learn/<topic>/progress.md`: the state of the objective, one calibration row, one
@@ -11,8 +15,6 @@ log line.
 
 Two situations, one procedure: **a delivery that came back** and **a person stuck halfway**.
 Both start with confidence and climb the same ladder.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## Ask for confidence before you look
 

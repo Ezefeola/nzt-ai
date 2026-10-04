@@ -1,8 +1,3 @@
----
-name: nzt-ship-backend-dotnet-pipeline
-description: Use when writing or repairing the CI gates of a .NET solution - the command each gate runs, what it needs to mean anything, and the gates that pass silently without their precondition.
----
-
 # .NET gates in CI
 
 `nzt-ship-pipeline` decides **which gates exist and what they mean**. This gives the .NET
@@ -11,8 +6,6 @@ commands and what each one needs to actually be a gate.
 **Prefer the commands the repository already runs locally** — a script, a `Makefile`, a Cake or
 Nuke build — over retyping them in CI. Two definitions of the same check drift, and the one in
 CI is the one nobody runs before pushing.
-
-Load `nzt-ship-backend-dotnet` and `nzt-ship-pipeline` before applying this.
 
 ## The SDK
 

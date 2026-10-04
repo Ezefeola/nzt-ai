@@ -1,16 +1,9 @@
----
-name: nzt-ship-backend-dotnet-migrations
-description: Use when EF Core migrations have to reach a deployed environment - which artifact, built in CI from the same commit, applied once before the new version with a deployment identity.
----
-
 # Getting migrations into an environment
 
 **Generating a migration is build work** (`nzt-build-backend-dotnet-ef-core-migrations`), which
 already separates generating from applying. This is what happens after: turning migrations into
 a deployment artifact and applying it to an environment, **under the authorisation rules of the
 release** — the one that names the environment.
-
-Load `nzt-ship-backend-dotnet` and `nzt-ship-release` before applying this.
 
 ## Choose the artifact
 

@@ -29,8 +29,7 @@ graders:
   - name: no-qt-ids
     type: regex
     pattern: 'QT-0'
-    min: 0
-    max: 0
+    match: not_contains
     arm: both
   - name: reads-the-story
     type: tool_used

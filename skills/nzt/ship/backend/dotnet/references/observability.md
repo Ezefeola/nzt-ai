@@ -1,14 +1,7 @@
----
-name: nzt-ship-backend-dotnet-observability
-description: Use when adding or reviewing health checks, telemetry or structured logging in an ASP.NET Core component - what the platform already emits, and what only has to be collected.
----
-
 # Observability in ASP.NET Core
 
 `nzt-ship-observability` decides **what has to be observable and why**. This is how ASP.NET Core
 provides it — and most of it is already there, waiting to be collected.
-
-Load `nzt-ship-backend-dotnet` and `nzt-ship-observability` before applying this.
 
 ## Health checks
 

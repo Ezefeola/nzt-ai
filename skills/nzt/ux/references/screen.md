@@ -1,15 +1,18 @@
----
-name: nzt-ux-screen
-description: Use when one screen has to be designed or updated: its task, regions, elements with their origin, every state, navigation, and narrow screens.
----
-
 # Screen design
+
+## Contents
+- Order of work
+- The file
+- Elements and their origin
+- States
+- Regions, not pixels
+- A design made elsewhere
+- Keeping it current
+- Done when
 
 Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.md`: one screen, described well enough
 to be built and reviewed, and traceable back to the criteria it serves. One screen per
 unit.
-
-If you did not arrive here from `nzt-ux`, load it first.
 
 ## Order of work
 

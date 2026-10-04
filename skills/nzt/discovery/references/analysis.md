@@ -1,15 +1,18 @@
----
-name: nzt-discovery-analysis
-description: Use when interviewing the user to establish what to build, and recording it in the append-only analysis file with stable Q-NN questions.
----
-
 # Functional analysis — the interview and its record
+
+## Contents
+- The file
+- Append-only
+- Running the interview
+- Technical notes get no identifier
+- Dismissed objections are part of the answer
+- Two altitudes
+- Playback
+- Done when
 
 Produces the interview record: `Plan/specs/<feature>/analysis.md` for a feature,
 `Docs/analysis.md` for the product. Everything the rest of discovery writes is read from
 this file, and it is the only place where a question survives a cleared context.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## The file
 

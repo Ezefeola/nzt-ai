@@ -1,9 +1,11 @@
----
-name: nzt-learn-exercises
-description: Use when writing the brief the person will work on, and its solution afterwards - a separate file created only once the delivery exists.
----
-
 # Exercises — the brief now, the solution afterwards
+
+## Contents
+- The brief
+- The file
+- One brief per step
+- The solution is another file, written after delivery
+- Done when
 
 Produces `Learn/<topic>/exercises/EX-NN.md`, and later `Learn/<topic>/solutions/EX-NN.md`:
 **same name, different folder**. `EX-NN` is sequential per topic and never reused, like
@@ -11,8 +13,6 @@ Produces `Learn/<topic>/exercises/EX-NN.md`, and later `Learn/<topic>/solutions/
 
 Every brief serves one objective and one step. If you cannot name which, there is nothing
 to correct against and the delivery will be judged on taste.
-
-If you did not arrive here from `nzt-learn`, load it first.
 
 ## The brief
 

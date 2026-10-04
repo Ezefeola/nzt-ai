@@ -1,11 +1,4 @@
----
-name: nzt-ship-backend-dotnet-containers
-description: Use when a .NET component is packaged as a container image - which build path, the image configured in the project file, and what an image never carries.
----
-
 # Packaging a .NET component as a container
-
-Load `nzt-ship-backend-dotnet` and `nzt-ship-release` before applying this.
 
 ## Choose the build path
 

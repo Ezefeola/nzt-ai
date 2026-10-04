@@ -75,6 +75,28 @@ if [ -d "$root/skills" ]; then
       status=1
     fi
 
+    # references (D50): the same 200-line budget, a contents list past 100 lines,
+    # and a row in this router's table — a reference without a row is read by nobody.
+    if [ -d "$(dirname "$file")/references" ]; then
+      while IFS= read -r ref; do
+        rname="$(basename "$ref")"
+        rlines="$(wc -l < "$ref" | tr -d ' ')"
+        printf '  %-44s %4s lines\n' "references/$rname" "$rlines"
+        if [ "$rlines" -gt 200 ]; then
+          echo "WARNING: $rel/references/$rname : over the 200-line budget ($rlines lines)." >&2
+          status=1
+        fi
+        if [ "$rlines" -gt 100 ] && ! grep -q '^## Contents' "$ref"; then
+          echo "WARNING: $rel/references/$rname : over 100 lines and no '## Contents'." >&2
+          status=1
+        fi
+        if ! grep -qF "references/$rname" "$file"; then
+          echo "WARNING: $rel/references/$rname : no row in the router's table." >&2
+          status=1
+        fi
+      done < <(find "$(dirname "$file")/references" -maxdepth 1 -name '*.md' | sort)
+    fi
+
     # flattened copy, exactly as the installer lays it out (9.1): the skill's own
     # files, plus sibling asset folders — never a child skill's folder.
     src="$(dirname "$file")"

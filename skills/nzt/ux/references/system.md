@@ -1,9 +1,11 @@
----
-name: nzt-ux-system
-description: Use when cross-screen UI decisions are written or changed: the visual direction, the design system's roles, and the shared component inventory.
----
-
 # Design system and shared components
+
+## Contents
+- The document names; the code defines
+- Visual direction
+- Shared components
+- Changing it
+- Done when
 
 Produces two documents in `Docs/`, one per unit:
 
@@ -12,8 +14,6 @@ Produces two documents in `Docs/`, one per unit:
 
 They are separate because they rot at different speeds: the direction and its roles are
 stable, the component list changes with every second screen.
-
-If you did not arrive here from `nzt-ux`, load it first.
 
 ## The document names; the code defines
 

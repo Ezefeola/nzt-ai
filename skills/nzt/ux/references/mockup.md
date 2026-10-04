@@ -1,15 +1,8 @@
----
-name: nzt-ux-mockup
-description: Use when the user asked for a visual reference of a designed screen: one self-contained HTML file with every state and honest placeholders.
----
-
 # Screen mockup
 
 Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.html`, beside the screen design it
 comes from. **Only when the user asked for one.** It is a reference to look at, never code
 to copy into the project.
-
-If you did not arrive here from `nzt-ux`, load it first.
 
 ## What makes it a mockup and not half-built code
 

@@ -1,16 +1,21 @@
----
-name: nzt-ux-manual
-description: Use when the end user gets a manual: an interactive HTML guide organised by what they came to do, built only from verified behavior.
----
-
 # User manual
+
+## Contents
+- Who reads it, and what that settles
+- When it is written
+- Organised by what they came to do
+- Tone: competent person, not a suspect
+- It looks like the product, not like a template
+- Interactive where it helps, inert where it does not
+- Only what exists, and only what was verified
+- Measure, do not trust
+- If it will not be maintained, do not create it
+- Done when
 
 Produces `Docs/manual/<audience>.html` — one interactive file per audience — with its
 images in `Docs/manual/assets/`. **It is written on request, at the end of what is being
 delivered.** Once it exists it stops being optional: it is a document of the product, and
 every close keeps it current.
-
-If you did not arrive here from `nzt-ux`, load it first.
 
 ## Who reads it, and what that settles
 

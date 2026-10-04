@@ -1,15 +1,19 @@
----
-name: nzt-discovery-product
-description: Use when defining or updating what the product is: objectives, users, modules, constraints and scope. Written from the interview, never from the repository.
----
-
 # Product definition
+
+## Contents
+- It is the minutes, not the source
+- The file
+- Objectives
+- Users
+- Modules
+- Constraints
+- Scope, in both directions
+- Keep it current
+- Done when
 
 Produces `Docs/product.md`: what the product is, for whom, and what it will not be. It is
 the document every feature is checked against — a feature that serves none of its
 objectives is a feature nobody should be building.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## It is the minutes, not the source
 

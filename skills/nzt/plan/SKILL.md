@@ -191,9 +191,9 @@ are still unclear, and do not redo finished work without a reason.
 - Never do two units in one turn without explicit authorisation for that batch.
 - Never leave a unit `doing` at the end of a turn without a `detail` line.
 - Never rewrite history: a unit that was dropped is `dropped`, not deleted.
-- **A feature is closed by the user's acceptance, and closing it is a unit**: load
-  `nzt-plan-close`, which sweeps its markers, brings its documents current and writes its
-  history entry. A feature with markers left in its spec is not done.
+- **A feature is closed by the user's acceptance, and closing it is a unit**: read
+  `references/close.md` in this skill's folder, which sweeps its markers, brings its documents
+  current and writes its history entry. A feature with markers left in its spec is not done.
 - The state holds the continuation and the plan; progress lives in the artifacts. Keep it
   to one line per unit, or it stops being state and becomes a document.
 - The plan serves the work. If it stops describing reality, fix the plan; do not follow it

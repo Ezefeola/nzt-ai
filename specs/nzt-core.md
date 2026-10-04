@@ -62,7 +62,9 @@ Decisiones de diseño que no son opinión, salen de cómo funciona cada herramie
 | Límite | objetivo < 200 líneas (adherencia cae) | cap duro 32 KiB combinados |
 | Skills | `.claude/skills/<n>/SKILL.md`, `~/.claude/skills/` | `.agents/skills/<n>/SKILL.md`, `~/.agents/skills/` |
 | Invocación explícita | `/skill-name` | `$skill` |
-| Presupuesto del listado de skills | descripción truncada a 1536 chars | listado total ≤ 8000 chars o 2% del contexto |
+| Presupuesto del listado de skills | listado ≤ 1% de la ventana de contexto; al pasarse, quita las descriptions de las skills menos usadas; `description` + `when_to_use` truncadas a 1536 chars (releído 2026-10-03) | listado total ≤ 8000 chars o 2% del contexto |
+| Archivos de soporte | se leen solo cuando la SKILL.md los enlaza y la tarea los pide; no cuentan en el listado | `references/`, `scripts/`, `assets/`, ídem |
+| Compactación | re-adjunta cada skill invocada (primeros 5.000 tokens, 25.000 en total); un archivo leído no se re-adjunta | sin verificar |
 | Tamaño de SKILL.md | recomendado < 500 líneas | ídem |
 | Frontmatter portable | `name`, `description` (+ `license`, `compatibility`, `allowed-tools`) | `name`, `description` |
 
@@ -81,6 +83,9 @@ Consecuencias directas:
   (`nzt`, los seis de fase, `nzt-learn` y los tres de área): las hojas las nombra su router,
   no el listado. Lo que **no** está verificado es si una skill omitida del listado se puede
   seleccionar igual por nombre; esa es la pregunta concreta de la fase 9.
+  **Desde D50 la pregunta pierde peso**: el listado son 14 skills y unos 2.600 chars, debajo
+  del piso de 8.000. Y **el presupuesto ya no es solo de Codex**: Claude Code lo topea al 1 %
+  del contexto (fila de arriba, releída el 2026-10-03).
 - **C3.** `CLAUDE.md` y `AGENTS.md` ≤ 200 líneas cada uno, y comparten una fuente única
   para no divergir.
 - **C4.** Las rutas de skills difieren por proveedor ⇒ hace falta un instalador que copie
@@ -107,14 +112,15 @@ Consecuencias directas:
 Tres capas, con carga progresiva (progressive disclosure):
 
 ```
-Capa 0 — Kernel        CLAUDE.md / AGENTS.md      siempre en contexto   ≤200 líneas
-Capa 1 — Routers       nzt, nzt-<fase>            se cargan por fase    ≤200 líneas
-Capa 2 — Hojas         nzt-<procedimiento>        se cargan por tarea   ≤200 líneas
-Capa 3 — Referencias   references/*.md            se leen si hacen falta  libre
+Capa 0 — Kernel        CLAUDE.md / AGENTS.md            siempre en contexto   ≤200 líneas
+Capa 1 — Routers       nzt, nzt-<fase>, routers de área  se cargan por fase    ≤200 líneas
+Capa 2 — Hojas         <router>/references/<hoja>.md     se leen por tarea     ≤200 líneas
 ```
 
-La capa 3 está declarada pero **NZT no la usa** (D4): existe en el estándar y queda
-disponible, pero el desborde de una skill se resuelve partiéndola, no mudándola ahí.
+**Desde D50 las hojas no son skills: son archivos de referencia de su router**, y la tabla
+del router es lo único que las nombra. El listado de skills queda en las 14 que son routers
+o que nombra el kernel. Hasta D50 las hojas eran skills y `references/` estaba declarada y
+sin uso (D4, derogada).
 
 ### 4.1 Kernel (Capa 0)
 
@@ -153,6 +159,11 @@ hacer la selección determinista en vez de dejarla al matching de descripciones.
 Procedimientos concretos. Catálogo tentativo de v1 (se cierra en la fase de
 implementación, con el presupuesto de C2 como techo). En el repo viven anidados; el
 nombre de la skill sale del path (sección 9.1):
+
+> **Desde D50 este árbol se lee con una regla de traducción**: una hoja `nzt-<router>-<x>` es
+> el archivo `references/<x>.md` de la carpeta de su router (`nzt-build-implement` →
+> `skills/nzt/build/references/implement.md`). Los nombres se conservan para trazabilidad;
+> lo que deja de existir es la entrada en el listado.
 
 ```
 skills/nzt/                      nzt
@@ -273,7 +284,12 @@ Reglas de esta capa:
   instalación global pasa a ser el único filtro que hay.
 - **El costo lo paga R1, no el ruteo**, y por eso el **tamaño de esta capa es una decisión de
   presupuesto** y no solo de cohesión: cada skill acá se paga en cada proyecto, incluso en
-  los que nunca la van a usar.
+  los que nunca la van a usar. **Desde D50 un área cuesta una sola entrada** —su router—, y
+  sus hojas son referencias que no se pagan hasta leerse.
+- **Debajo de esta capa hay un piso genérico (D51)**: `nzt-build` lleva las prácticas de
+  backend y frontend que valen en cualquier stack, y `nzt-architecture` los ejes del
+  documento de stack con opciones genéricas. Un componente sin router de área para su
+  tecnología lee ese piso en vez de quedarse sin guía.
 - El contenido base sale del set de skills que ya tiene el usuario; se porta y se adapta
   a las convenciones de autoría de la sección 10, no se copia tal cual.
 
@@ -583,7 +599,8 @@ nzt-ai/
 ├─ skills/
 │  └─ nzt/                      # árbol anidado por cohesión (ver 4.3)
 │     ├─ SKILL.md
-│     └─ <fase>/SKILL.md ...    # cada carpeta con SKILL.md es una skill
+│     ├─ <fase>/SKILL.md ...    # cada carpeta con SKILL.md es una skill
+│     └─ <fase>/references/     # las hojas de ese router (D50)
 ├─ install/
 │  └─ build.ps1 / build.sh      # loop de desarrollo: genera dist/ y valida el árbol
 ├─ installer/                   # fase 10: el que instala de verdad (D24)
@@ -613,6 +630,10 @@ y mantiene la cohesión. El instalador aplana:
   valida y falla si no coincide: evita que el árbol y los nombres se desincronicen.
 - Los archivos hermanos (`references/`, `assets/`) se copian dentro de la carpeta aplanada,
   manteniendo sus rutas relativas intactas.
+- **`references/` es donde viven las hojas** (D50). El build les aplica el mismo tope de 200
+  líneas que a una SKILL.md, y falla si una referencia no tiene fila en la tabla de su router.
+- Instaladas, todas las skills son carpetas hermanas, así que un router lee la referencia de
+  otro por ruta relativa: `../nzt-build/references/tests.md`.
 
 ### 9.2 Build e instalación
 
@@ -643,9 +664,10 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    **apuntando a ~130 en una hoja y ~170 en un router** (D17). El techo es el límite, no el
    objetivo: la description es el disparador, no el resumen de la skill, y cada char que
    sobra se paga en el presupuesto de R1 multiplicado por todo el catálogo.
-3. **Conciseness.** ≤ 200 líneas por archivo, **sin excepción** (D3). Una skill más larga
-   deja de ser legible, que es el punto. Si no entra, **es más de un trabajo: se parte en
-   dos skills** (regla 1). No se esconde el excedente en otro archivo.
+3. **Conciseness.** ≤ 200 líneas por archivo, **sin excepción** (D3), sea SKILL.md o
+   referencia. Uno más largo deja de ser legible, que es el punto. Si no entra, **es más de
+   un trabajo: se parte en dos hojas** (regla 1), que desde D50 son dos referencias, no dos
+   skills.
 4. **Instrucciones, no narrativa.** Decir qué hacer; no explicar por qué en tres párrafos.
 5. **Frontmatter portable** (C1): solo `name` y `description`.
 6. **Sin dependencias de agentes**: ninguna skill puede asumir subagentes ni forks.
@@ -662,8 +684,27 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    la tabla del kernel y la tabla de hojas de su router — y ese ruteo está **instruido, no
    librado al matching de `description`**. Una sección *when to use* dentro del cuerpo solo
    se puede leer cuando la skill ya está cargada, o sea cuando la decisión que explicaba ya
-   se tomó. La hoja abre con **qué produce y cómo se hace**. Lo único que conserva sobre
-   ruteo es la línea de R2: *si no venís del router, cargalo*.
+   se tomó. La hoja abre con **qué produce y cómo se hace**. Desde D50 tampoco lleva la línea
+   de R2: una referencia solo se alcanza desde la tabla de su router.
+12. **Referencias a un solo nivel** (D50). Una referencia **nunca manda a leer otra**: la
+   nombra como mención, y es la tabla del router —columna *Read with*— la que dice qué se lee
+   junto con qué. Si lo que hace falta es de otra skill, el router lo lee por su ruta.
+13. **El archivo se llama como la hoja sin el prefijo de su router**
+   (`nzt-build-backend-dotnet-ef-core-queries` → `build/backend/dotnet/references/ef-core-queries.md`),
+   y **toda referencia tiene una fila en la tabla de su router**. Una referencia sin fila no
+   la carga nadie.
+14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
+   secciones. Protege contra la lectura parcial (`head -100`) que documenta la guía de
+   Anthropic.
+15. **Una práctica escrita en un área y en el piso genérico (D51) se cambia en los dos.**
+   Cada línea genérica nombra la referencia de área que la implementa, para que la revisión
+   no dependa de acordarse.
+16. **El disparador de una hoja vive en la cadena instruida, nunca en una descripción**
+   (D53). Al mover una hoja, lo que su `description` decía que la disparaba tiene que estar
+   cubierto en los tres eslabones: la fila del kernel que lleva a su router, el *hand off*
+   de `nzt` cuando la petición entra por el punto de entrada, y la fila de la tabla del
+   router que lleva a la referencia; si falta, se amplía el texto de esos eslabones. La descripción del
+   router no se agranda para cubrirlo.
 
 ## 11. Roadmap
 
@@ -715,8 +756,14 @@ que se tira.
   de *"el set no entra"* a *"las hojas pueden no aparecer listadas, y hay que comprobar que
   su router las pueda cargar igual"*. **Esa comprobación es la fase 9** y sigue siendo la que
   decide.
-  **Del lado de Claude Code R1 no existe**: 122 skills de Temper instaladas midieron 17.022
-  chars y pesan 0,8% del contexto de una sesión. El riesgo es específicamente Codex.
+  ~~**Del lado de Claude Code R1 no existe**: 122 skills de Temper instaladas midieron 17.022
+  chars y pesan 0,8% del contexto de una sesión. El riesgo es específicamente Codex.~~
+  **Corregido el 2026-10-03:** la documentación actual de Claude Code topea el listado al
+  **1 % de la ventana** y, al pasarse, quita descriptions empezando por las menos usadas.
+  Medido en una sesión con 1M de ventana: las skills ocupaban **9,9k tokens = 1,0 %**, justo
+  en el tope. **R1 aplica a los dos proveedores.**
+  **Mitigación adoptada: D50.** Las hojas pasan a referencias y el listado queda en 14 skills,
+  unos 2.600 chars, que entran en cualquiera de los dos presupuestos.
 - **R2.** Los routers pueden no dispararse y el modelo ir directo a una hoja. Mitigación:
   la tabla de ruteo del kernel, y hojas que digan "si no venís del router, cargalo".
 - **R3.** Duplicación de disciplina entre kernel y skills ⇒ instrucciones contradictorias.
@@ -735,8 +782,9 @@ que se tira.
   y es **más estricta que la plataforma a propósito**: Anthropic recomienda < 500 (sección
   3). La razón es legibilidad — una skill de 500 líneas deja de leerse — y se suma a la del
   presupuesto de contexto. El desborde se resuelve **partiendo la skill**, nunca subiendo el
-  techo.
-- **D4.** **`references/` queda como capa declarada y sin uso.** Sigue en la arquitectura
+  techo. *Desde D50, partir una hoja es partirla en dos referencias, y el techo aplica igual a
+  cada referencia.*
+- **D4.** *(Derogada por D50, 2026-10-03.)* **`references/` queda como capa declarada y sin uso.** Sigue en la arquitectura
   (4.3) porque es parte del estándar abierto que los tres proveedores implementan, pero NZT
   **no la adopta como herramienta de rutina**. La razón la fija D3: si una hoja no entra en
   200 líneas, es más de un trabajo. Y el argumento de que "es la misma apuesta que cargar
@@ -852,7 +900,8 @@ que se tira.
   `endpoints-minimal`, no `endpoints-minimal-apis`): el nombre lo dicta el path (regla 8) y
   cada segmento se paga en el listado 26 veces. **EF Core no lleva sub-router**: sus ocho
   hojas se listan en la tabla del router de área, para que el ruteo siga siendo un salto.
-- **D20.** **La línea de R2 de una hoja nombra todo lo que hay que cargar, no solo el
+- **D20.** *(Obsoleta desde D50: las referencias no llevan línea de R2, y lo que se lee junto
+  lo dice la columna* Read with *de la tabla del router.)* **La línea de R2 de una hoja nombra todo lo que hay que cargar, no solo el
   router.** Las ocho hojas de EF Core abren con *Load `nzt-build-backend-dotnet` and
   `nzt-build-backend-dotnet-ef-core` before applying this*, y `pagination` nombra además
   `…-ef-core-queries`. Es la consecuencia directa de que EF Core **no tenga sub-router**
@@ -1408,6 +1457,55 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   esta corrida se llegó a escribir el criterio opuesto (un mapper por caso de uso) por una
   lectura equivocada del pedido; el usuario lo corrigió antes de cerrarse la unidad y se
   revirtió.
+- **D50.** **Las hojas son archivos de referencia de su router, y el listado son 14 skills.**
+  Deroga D4 y deja obsoleta D20. Lo que la forzó: la doc de Claude Code (releída el
+  2026-10-03) topea el listado al 1 % de la ventana, y una sesión real medía 1,0 %; con 111
+  skills y 21.257 chars de listado, R1 dejó de ser un riesgo solo de Codex. Quedan como skill
+  `nzt`, `nzt-plan`, `nzt-research`, los seis routers de fase, `nzt-learn` y los cuatro
+  routers de área (`build-backend-dotnet`, `build-frontend-blazor`, `build-csharp`,
+  `ship-backend-dotnet`); `build-csharp` queda porque la usan dos áreas, y `research` porque
+  la nombra el guardrail del kernel. **La objeción de D4 sigue siendo cierta** —un puntero a
+  un archivo es una lectura que puede no ocurrir— y se cubre así: la lectura es una fila de
+  la tabla del router, tan instruida como el *load* de antes; las referencias van a un solo
+  nivel (regla 12); y los evals pasan a medir la lectura del archivo en vez del disparo de la
+  skill. **Lo que se pierde a cambio:** una hoja ya no se invoca como comando `/`, y el
+  usuario decidió que no hace falta (el agente trabaja solo con skills). **Cómo se migra
+  sin perder contenido:** cada hoja se mueve con cuatro cambios mecánicos —sin frontmatter,
+  sin línea de R2, citas a otras hojas como mención, `## Contents` si pasa de 100 líneas— y
+  un script falla si cambió cualquier otra línea. Opción descartada: mover solo la capa de
+  stack (68 skills, ~11.500 chars), que seguía arriba del piso de Codex y no escalaba al
+  sumar stacks. Decidido por el usuario; detalle en `Plan/mejoras/04-propuesta.md`.
+- **D51.** **Hay un piso genérico de prácticas, liviano, debajo de la capa de stack.**
+  `nzt-build/references/practices-backend.md` y `practices-frontend.md` llevan una línea por
+  práctica con su porqué, sin código ni librerías: operación con una sola entrada, validar
+  la forma en el borde, fallas esperadas como valor y excepciones a un manejador global,
+  chequeo previo más restricción única, un solo guardado, paginar con orden único, la
+  autoridad desde el servidor, componentes con parámetros que entran y eventos que salen,
+  un envío que no corre dos veces, lo que llega al navegador es público, entre otras.
+  `nzt-architecture/references/stack-axes.md` da los ejes del documento de stack con
+  opciones genéricas. **Se leen cuando el componente no tiene router de área** para su
+  tecnología; las referencias de .NET y Blazor no se tocan. Lo que la forzó: fuera de .NET el
+  agente recibía método pero ninguna práctica, y la regla *seguí el código vecino* no ayuda
+  en un proyecto nuevo. El riesgo es la deriva entre la línea genérica y la de área (R3), y
+  lo cubre la regla 15. Decidido por el usuario.
+- **D52.** **Una referencia leída no sobrevive a la compactación, y el kernel lo dice.** La
+  doc de Claude Code documenta que al compactar se re-adjuntan las skills invocadas; un
+  archivo leído es un resultado de herramienta y no vuelve. El kernel suma una línea: después
+  de una compactación, volver a leer las referencias que usa la unidad en curso. Es la
+  inversa de *no recargues una skill que ya tenés*, que sigue valiendo para las skills.
+- **D53.** **Los disparadores de las hojas pasan a la cadena instruida: fila del kernel y
+  fila del router.** Lo que la forzó: al migrar `plan-close`, "cerremos la feature" dejó de
+  llegar a la guía de cierre (1 de 3 corridas), porque lo único que lo llevaba ahí era la
+  descripción de la hoja, y ninguna fila del kernel cubría cerrar una feature. Antes de D50
+  la hoja se alcanzaba 3 de 3, pero **siempre salteando el router**: funcionaba por
+  description matching, que es justo de lo que el ruteo instruido (R2) existe para no
+  depender. Opción descartada: agrandar la descripción del router (dio 3 de 3, pero vuelve a
+  apoyar el ruteo en el matching y no escala a routers con 28 hojas en 250 chars). Con la
+  fila del kernel ampliada: 5 de 6. Las trazas de las que fallaban mostraron el eslabón
+  faltante: entraban por `nzt`, veían los marcadores de la spec y saltaban a
+  `nzt-discovery-change` por su descripción, porque el *hand off* de `nzt` no nombraba el
+  cierre. Con una línea ahí: **6 de 6 por `nzt` → `nzt-plan` → `close.md`**, verificado en
+  las trazas. Regla 16 de §10. Decidido por el usuario el 2026-10-03.
 
 ## 13. Revisión contra Temper v3
 
@@ -2779,6 +2877,14 @@ curiosidad.
 ## 14. Estado de la construcción
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
+
+> **En curso (2026-10-03), rama `marco-trabajo-mejoras`:** D50–D52 decididas y escritas en
+> esta spec. **Migrados:** `ship-backend-dotnet` (piloto, 4 hojas), `nzt-plan` (`close.md`),
+> `nzt-learn` (7 hojas), `nzt-discovery` (7 hojas) y `nzt-ux` (5 hojas) tienen sus hojas en
+> `references/` (87 skills); `install/check-references.sh` prueba que cada referencia es su hoja menos los
+> cambios mecánicos, y el build mide referencias (200 líneas, `## Contents` pasadas las 100,
+> fila en la tabla). El resto de los routers sigue como lo describe esta sección. Línea base
+> de evals en `Plan/mejoras/05-linea-base.md`; plan y dónde quedó en `Plan/state.json`.
 
 **Dónde estamos, en una línea:** **el roadmap está construido entero — 111 skills, la suite
 de evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La

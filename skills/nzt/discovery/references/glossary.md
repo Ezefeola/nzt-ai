@@ -1,15 +1,8 @@
----
-name: nzt-discovery-glossary
-description: Use when the domain vocabulary has to be fixed: what each term means here and its single name in code. Meaning only, never modelling.
----
-
 # Glossary
 
 Produces `Docs/glossary.md`: the terms this product's domain uses, what each one means
 **here**, and the one name it gets in code. It exists so the spec, the screens, the code
 and the user are talking about the same thing.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## What earns an entry
 

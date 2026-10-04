@@ -1,15 +1,8 @@
----
-name: nzt-discovery-reverse
-description: Use when behavior exists only as code and has to be turned into specifications, cut by product capability, without declaring business rules yourself.
----
-
 # Reverse engineering
 
 Produces findings about behavior that exists only as code, written into
 `Plan/specs/<feature>/analysis.md` under `R-NN`. The user rules on each one; only then does
 it become a rule in `spec.md` with `origin: reverse (R-NN)`.
-
-If you did not arrive here from `nzt-discovery`, load it first.
 
 ## Never declare a business rule
 

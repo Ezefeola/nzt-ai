@@ -4,10 +4,12 @@ description: >
   The hardest routing decision in the set: the request names a technical topic inside a
   .NET project, so every signal points at build, and the one word that changes everything
   is "aprender". T18 says the learning request is recognised before the work is classified.
+  Since D50 the curriculum leaf is nzt-learn's references/plan.md, graded as a Read; baseline
+  1.00 (haiku judge) had no grader on it.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-learn, not nzt-build or the EF Core leaves, and starts by finding out what the
-  person already knows.
+  Loads nzt-learn, not nzt-build or the EF Core leaves, reads its references/plan.md, and
+  starts by finding out what the person already knows.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -22,6 +24,10 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-learn'
+  - name: curriculum-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-learn[/\\]+references[/\\]+plan\.md'
   - name: did-not-route-to-build
     type: tool_used
     tool: Skill

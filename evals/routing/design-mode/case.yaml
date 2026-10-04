@@ -32,7 +32,6 @@ graders:
   - name: questions-have-ids
     type: regex
     pattern: 'QT-0'
-    min: 1
   - name: derives-then-asks-the-mode
     type: llm
     criteria: |
