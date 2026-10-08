@@ -44,8 +44,8 @@ offer, and no definition questions.
 ### How the plan is shown
 
 - **Markdown, never inside a code block**, so the table renders.
-- One row per step, saying **what it produces and why**. The *why* is what lets the user
-  judge the approach instead of only the order.
+- One row per step, saying **what it produces and why**: the *why* lets the user judge the
+  approach, not only the order. Analysis produces the glossary, the spec and its stories.
 - Under the table, three declarations: **where it stops**, **what it leaves out**, and what
   it covers beyond the minimum so the user can drop it. *"I am leaving out coupon
   administration: that is F-009 and you did not ask for it"* is what makes scope reviewable.
@@ -62,11 +62,11 @@ line. Three categories:
 | **Offered** | Appears as a line of the plan; the user can drop it |
 | **On request** | Does not appear unless the user asks for it |
 
-- When you offer one, say what is lost if it is dropped. "Do you want the ADR?" is not
-  answerable; "without the ADR this decision gets re-argued in three months with no record
-  of what was weighed" is.
-- Mandatory today: the stack document per component and area, written when the component is
-  designed or from evidence before its code is touched. **Offered: a feature's design.**
+- Offering one, say what dropping it loses: not *"do you want the ADR?"* but *"without it,
+  this decision gets re-argued in three months with no record of what was weighed"*.
+- **Mandatory:** the stack per component and area, designed with it or read from evidence
+  before its code is touched; the product definition and the glossary, from Analysis on, the
+  glossary updated by every unit that adds or changes a term. **Offered: feature design.**
 - A document that already exists and that the change affects is kept current as part of the
   work, never offered as optional.
 - Do not ask what you can verify — a version, a capability, a package's maintenance state.
@@ -191,9 +191,9 @@ are still unclear, and do not redo finished work without a reason.
 - Never do two units in one turn without explicit authorisation for that batch.
 - Never leave a unit `doing` at the end of a turn without a `detail` line.
 - Never rewrite history: a unit that was dropped is `dropped`, not deleted.
-- **A feature is closed by the user's acceptance, and closing it is a unit**: load
-  `nzt-plan-close`, which sweeps its markers, brings its documents current and writes its
-  history entry. A feature with markers left in its spec is not done.
+- **A feature is closed by the user's acceptance, and closing it is a unit**: read
+  `references/close.md` in this skill's folder, which sweeps its markers, brings its documents
+  current and writes its history entry. A feature with markers left in its spec is not done.
 - The state holds the continuation and the plan; progress lives in the artifacts. Keep it
   to one line per unit, or it stops being state and becomes a document.
 - The plan serves the work. If it stops describing reality, fix the plan; do not follow it

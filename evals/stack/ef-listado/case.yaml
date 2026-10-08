@@ -6,7 +6,7 @@ description: >
   code, ordering that ends in a unique column included.
 tags: [stack]
 expected_outcome: >
-  Loads the .NET area router and the EF Core leaves it selects, and writes a projected,
+  Loads the .NET area router and reads the EF Core references it selects, and writes a projected,
   ordered, paginated query through the repository the stack adopted.
 context:
   scaffold_script: scaffold.sh
@@ -22,14 +22,26 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet"'
-  - name: ef-core-leaves-fired
+  - name: ef-core-base-read
     type: tool_used
-    tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-ef-core'
-  - name: wrong-persistence-axis-not-loaded
+    tool: Read
+    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+ef-core\.md'
+  - name: ef-core-pagination-read
     type: tool_used
-    tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-persistence-direct"'
+    tool: Read
+    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+ef-core-pagination\.md'
+  - name: ef-core-queries-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+ef-core-queries\.md'
+  - name: dtos-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-build-csharp[/\\]+references[/\\]+dtos\.md'
+  - name: wrong-persistence-axis-not-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+persistence-direct\.md'
     min: 0
     max: 0
     arm: both

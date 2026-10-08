@@ -3,11 +3,12 @@ name: route-discovery
 description: >
   A request that is functional analysis, phrased the way a user phrases it - nothing named,
   no skill mentioned. The kernel's routing table should land on nzt-discovery, and the
-  phase should not be confused with build.
+  phase should not be confused with build. Since D50 the interview leaf is nzt-discovery's
+  references/analysis.md, graded as a Read; baseline 0.67 (haiku judge) had no grader on it.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-discovery (possibly through nzt) and works on the rules and the spec of the
-  feature, not on code.
+  Loads nzt-discovery (possibly through nzt), reads its references/analysis.md, and works on
+  the rules and the spec of the feature, not on code.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -22,6 +23,10 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-discovery'
+  - name: interview-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-discovery[/\\]+references[/\\]+analysis\.md'
   - name: not-routed-to-build
     type: tool_used
     tool: Skill

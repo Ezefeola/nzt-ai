@@ -24,15 +24,18 @@ graders:
   - name: architecture-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture"'
+  - name: design-feature-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-architecture[/\\]+references[/\\]+design-feature\.md'
   - name: read-the-feature
     type: tool_used
     tool: Read
-    input_match: 'F-001-pedidos'
+    input_match: 'F-002-cobro'
   - name: questions-have-ids
     type: regex
     pattern: 'QT-0'
-    min: 1
   - name: derives-then-asks-the-mode
     type: llm
     criteria: |
@@ -47,4 +50,6 @@ graders:
       the mode without having derived any question, if it asks the user something it could
       verify itself - such as what the gateway returns on a rejected charge, which is
       researched, not asked - or if it only offers the design document without deriving
-      anything.
+      anything. Saying that a gateway fact could not be verified in this session (no network,
+      only the provider's excerpt in Docs/integrations/), marking it unverified, and asking
+      for access to the source is not asking the fact - that is the research rule.

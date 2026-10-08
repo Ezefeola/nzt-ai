@@ -1,12 +1,12 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 25 cases in three groups, and each group measures one of the two failure modes.
+suite is 26 cases in three groups, and each group measures one of the two failure modes.
 
 | Group | Cases | What it measures |
 |---|---|---|
 | `routing/` | 11 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
-| `stack/` | 6 | **The exclusive axes, and the conventions they carry.** The stack document selects one option per axis, only that leaf loads, and its rules show up in the emitted code |
+| `stack/` | 7 | **The exclusive axes, and the conventions they carry.** The stack document selects one option per axis, only that leaf loads, and its rules show up in the emitted code. Since D50 a leaf that moved to `references/` is graded as a `Read` of its file, not a `Skill` call |
 | `restraint/` | 8 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a

@@ -22,7 +22,11 @@ graders:
   - name: verify-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify"'
+  - name: test-design-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-verify[/\\]+references[/\\]+test-design\.md'
   - name: scenarios-come-from-criteria
     type: llm
     criteria: |

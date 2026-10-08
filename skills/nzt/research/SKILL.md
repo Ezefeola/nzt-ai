@@ -31,7 +31,7 @@ site.
 
 **The project first**: the package version in the manifest or lockfile, the API version in
 the configuration or the client code, the contract already recorded in
-`Docs/architecture.md`. Research the version the project uses, or the current one for
+`Docs/Architecture/architecture.md`. Research the version the project uses, or the current one for
 something new, and **say which one you read**. A fact that is true in the next major version
 is a wrong answer.
 
@@ -103,7 +103,7 @@ documentation in the repository, the contract already written — and label ever
 - **In the conversation**: the answer, its labelled claims with sources, and what it means
   for the decision, with the options when there is a real tradeoff.
 - **In a technical decision**: the `QT-NN` of the design cites the sources it rests on.
-- **In an integration**: the external systems table of `Docs/architecture.md` and the
+- **In an integration**: the external systems table of `Docs/Architecture/architecture.md` and the
   feature's design **reference** the provider's documentation; they never transcribe it.
 - **A provider's capability is not a business rule.** What the product promises is agreed in
   the spec, by the user.

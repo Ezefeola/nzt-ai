@@ -85,6 +85,29 @@ if (Test-Path $skillsRoot) {
             $failed = $true
         }
 
+        # references (D50): the same 200-line budget, a contents list past 100 lines,
+        # and a row in this router's table — a reference without a row is read by nobody.
+        $refDir = Join-Path $file.Directory.FullName 'references'
+        if (Test-Path $refDir) {
+            foreach ($ref in Get-ChildItem $refDir -File -Filter '*.md' | Sort-Object Name) {
+                $refText = Get-Content $ref.FullName -Raw
+                $refLines = ($refText.TrimEnd() -split "`n").Count
+                Write-Host ("  {0,-44} {1,4} lines" -f "references/$($ref.Name)", $refLines)
+                if ($refLines -gt 200) {
+                    Write-Warning "$rel/references/$($ref.Name) : over the 200-line budget ($refLines lines)."
+                    $failed = $true
+                }
+                if ($refLines -gt 100 -and $refText -notmatch '(?m)^## Contents') {
+                    Write-Warning "$rel/references/$($ref.Name) : over 100 lines and no '## Contents'."
+                    $failed = $true
+                }
+                if (-not $text.Contains("references/$($ref.Name)")) {
+                    Write-Warning "$rel/references/$($ref.Name) : no row in the router's table."
+                    $failed = $true
+                }
+            }
+        }
+
         # flattened copy, exactly as the installer lays it out (9.1): the skill's own
         # files, plus sibling asset folders — never a child skill's folder.
         $dest = Join-Path $plugin "skills/$expected"

@@ -1,0 +1,46 @@
+schema_version: "1.1"
+name: route-ux-review
+description: >
+  A usability and accessibility review of a built screen. It names a .razor file and asks
+  for a review, so it reads as a code review (nzt-verify) or as frontend work (nzt-build);
+  what the person asks about is whether people can use it. Before D50 only the review leaf's
+  description carried this; since D50 it is the kernel row, and the guide is nzt-ux's
+  references/review.md, graded as a Read. New case, no baseline (sonnet judge).
+tags: [routing]
+expected_outcome: >
+  Loads nzt-ux, reads its references/review.md, and reviews the screen from the person's
+  task, with findings by severity and what it could not run, without rewriting the component.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    ¿Podés revisar si la pantalla de detalle del pedido (OrderDetail.razor) es fácil de usar
+    y accesible para los operadores?
+  max_turns: 25
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: ux-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ux"'
+  - name: review-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-ux[/\\]+references[/\\]+review\.md'
+  - name: not-routed-to-verify-or-build
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-(?:verify|build)'
+    min: 0
+    max: 0
+    arm: both
+  - name: usability-not-code
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about the order detail screen.
+      PASS if it judges the screen from what the operator came to do there, gives findings
+      with a severity, and says what it could not check from the source alone (for example
+      contrast or focus without rendering it) instead of reporting it as passed.
+      FAIL if it reviews code quality instead of usability, if it reports unchecked items as
+      passing, or if it rewrites the component.

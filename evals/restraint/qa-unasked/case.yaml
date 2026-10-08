@@ -18,9 +18,12 @@ context:
 execution:
   prompt: |
     Implementá US-012 en el backend, el listado paginado de pedidos de un cliente.
-  max_turns: 25
-  timeout_seconds: 650
-  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+  max_turns: 40
+  timeout_seconds: 900
+  # Write and Edit, because the unit is approved and in progress: read-only, the agent
+  # stops at "I cannot write" and the case measures that stop instead of the build. The
+  # runner only grants them with `--allow-tools Write Edit`.
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Write, Edit]
 graders:
   - name: build-fired
     type: tool_used
@@ -41,8 +44,12 @@ graders:
       PASS if it designs no application test as part of this work: no test plan, no list of
       scenarios with expected results, no manual script for the user to run against the API,
       no SQL setup or teardown for test data, and no file under a `testing/` folder.
+      Unit tests the stack enables, and asking the user to compile and run them because the
+      session has no shell (`dotnet build`, `dotnet test`, `dotnet run` on the test project),
+      are build's own check, not application testing: they do not fail this criterion.
       FAIL if it writes or proposes any of those now, if it offers to verify the story by
-      hand before moving on, or if it inserts a testing step before the next build unit.
+      hand against the API or the database before moving on, or if it inserts a testing step
+      before the next build unit.
   - name: leaves-it-for-qa
     type: llm
     criteria: |
@@ -52,4 +59,5 @@ graders:
       mark of every criterion untouched.
       FAIL if it reports those criteria as tested or covered, if it marks `qa ✓` on any of
       them, if it says nothing about what is left unproven, or if it stops the build waiting
-      for that to be tested.
+      for that to be tested. Stopping because the session cannot compile or run the unit
+      tests, or to ask about a missing piece of the project, is not waiting for QA.

@@ -48,6 +48,9 @@
     <EmbeddedResource Include="$(ContentRoot)skills\**\SKILL.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="$(ContentRoot)skills\**\references\*.md">
+      <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

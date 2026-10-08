@@ -26,8 +26,8 @@ the next build unit is the work.
 approved scenarios, and the two readings that need no run: code read for defects, and
 documents measured against the code.
 
-**Does not own:** the automated tests that ship with the code (`nzt-build-tests`), and fixing
-a defect — both are `nzt-build`. This phase finds it, records it, and is the one that closes
+**Does not own:** the automated tests that ship with the code, and fixing a defect — both
+are `nzt-build`. This phase finds it, records it, and is the one that closes
 it.
 
 ## Required guidance
@@ -36,19 +36,25 @@ Before designing or running anything, read the story with its criteria, the feat
 rules, and the feature's `testing/README.md` if it exists. Reuse what is already loaded —
 the table below does not mean load every row.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| Deriving the scenarios a story needs, before running any | `nzt-verify-test-design` |
-| Creating the data a scenario needs, and undoing it afterwards | `nzt-verify-test-data` |
-| Running scenarios and recording what happened | `nzt-verify-test-run` |
-| Exploring under a charter to find what scripted cases miss | `nzt-verify-explore` |
-| Measuring whether it is fast enough for the user, and where the time goes | `nzt-verify-performance` |
-| Automating an approved scenario that already passed by hand — **stack opt-in** | `nzt-verify-automate` |
-| Reading code for defects nobody specified a case for | `nzt-verify-review` |
-| Checking whether the documents still match the code | `nzt-verify-audit` |
-| Recording a defect: reproduction, evidence, impact | `nzt-verify-bug` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
+
+| The unit is | Read | Read with |
+|---|---|---|
+| Deriving the scenarios a story needs, before running any — the test plan | `references/test-design.md` | `references/test-data.md` |
+| Creating the data a scenario needs, and undoing it afterwards | `references/test-data.md` | — |
+| Running scenarios and recording what happened | `references/test-run.md` | `references/test-data.md`, `references/bug.md` |
+| Exploring under a charter to find what scripted cases miss | `references/explore.md` | `references/bug.md` |
+| Measuring whether it is fast enough for the user, and where the time goes | `references/performance.md` | `references/test-data.md` |
+| Automating an approved scenario that already passed by hand — **stack opt-in** | `references/automate.md` | — |
+| Reading code for defects nobody specified a case for | `references/review.md` | — |
+| Checking whether the documents still match the code | `references/audit.md` | — |
+| Recording a defect: reproduction, evidence, impact | `references/bug.md` | — |
+
+Wherever a file names `nzt-verify-<name>`, it means `references/<name>.md` in this folder
+(`nzt-verify-bug` → `references/bug.md`): read that file — it is not a skill.
 
 The last three need no running application: they read. The others are the plan, its
 execution and its evidence, and they do not start before the two stops below.
@@ -92,7 +98,14 @@ unknown destination or a missing authorisation blocks that scenario; the rest co
 running SQL against the engine yourself, or handing the user a script to run are different
 costs and different risks, and which one this project wants is the user's decision — asked
 with the plan, recorded in the component's stack document, and read from then on.
-`nzt-verify-test-data` has the options and what each one cannot reach.
+`references/test-data.md` has the options and what each one cannot reach.
+
+**The questions travel with the plan, never instead of it.** The first reply to a request
+to test is the draft plan: read `references/test-design.md` and `references/test-data.md`,
+derive the scenarios from the criteria split by target, recommend a target, and write each
+scenario's setup and teardown as far as the code lets you. The target, the data mechanism
+and whatever the criteria leave open are asked in that same reply. A reply that only asks
+gives the user nothing to approve.
 
 ## One unit
 

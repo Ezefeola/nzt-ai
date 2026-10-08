@@ -10,7 +10,12 @@ public sealed record SkillFile(string Name, string RepoPath, string Text)
     public int ListingChars => Name.Length + (FrontMatter.Get("description")?.Length ?? 0);
 
     public int LineCount => Text.Replace("\r\n", "\n").TrimEnd('\n').Split('\n').Length;
+
+    /// <summary>Los archivos de `references/` de su carpeta: viajan con la skill y no entran al listado.</summary>
+    public IReadOnlyList<ReferenceFile> References { get; init; } = [];
 }
+
+public sealed record ReferenceFile(string FileName, string Text);
 
 /// <summary>
 /// El contenido canónico, leído de los recursos embebidos en el ejecutable: el
@@ -51,6 +56,7 @@ public sealed class ContentCatalog
         var kernel = string.Empty;
         var adapters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var skills = new List<SkillFile>();
+        var references = new Dictionary<string, List<ReferenceFile>>(StringComparer.Ordinal);
 
         foreach (var resource in assembly.GetManifestResourceNames())
         {
@@ -74,12 +80,31 @@ public sealed class ContentCatalog
                 var repoPath = relative["skills/".Length..^"/SKILL.md".Length];
                 skills.Add(new SkillFile(repoPath.Replace('/', '-'), repoPath, text));
             }
+            else if (relative.StartsWith("skills/", StringComparison.Ordinal)
+                     && relative.LastIndexOf("/references/", StringComparison.Ordinal) is var at and > 0)
+            {
+                var repoPath = relative["skills/".Length..at];
+                if (!references.TryGetValue(repoPath, out var list))
+                    references[repoPath] = list = [];
+                list.Add(new ReferenceFile(relative[(at + "/references/".Length)..], text));
+            }
         }
 
         if (string.IsNullOrWhiteSpace(kernel))
             throw new InvalidOperationException("No se encontró core/kernel.md en el contenido embebido.");
 
+        // Una referencia sin SKILL.md en su carpeta no tiene router que la nombre.
+        var owners = skills.Select(s => s.RepoPath).ToHashSet(StringComparer.Ordinal);
+        var stray = references.Keys.FirstOrDefault(k => !owners.Contains(k));
+        if (stray is not null)
+            throw new InvalidOperationException(
+                $"skills/{stray}/references/ no tiene SKILL.md en su carpeta.");
+
         return new ContentCatalog(kernel, adapters,
-            [.. skills.OrderBy(s => s.Name, StringComparer.Ordinal)]);
+            [.. skills
+                .Select(s => references.TryGetValue(s.RepoPath, out var refs)
+                    ? s with { References = [.. refs.OrderBy(r => r.FileName, StringComparer.Ordinal)] }
+                    : s)
+                .OrderBy(s => s.Name, StringComparer.Ordinal)]);
     }
 }

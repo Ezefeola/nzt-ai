@@ -23,6 +23,9 @@ public static class Program
         BacksUpAnExistingInstructionsFileOnce();
         DoesNotOverwriteALocallyEditedSkill();
         RemovesAnOrphanButNotAnEditedOne();
+        InstallsReferencesInsideTheirSkill();
+        RemovesOrphanReferencesAndEmptyFolders();
+        EmbedsEveryReferenceOfTheRepo();
         RefusesWhenASkillFileIsNotOurs();
         RefusesWhenMarkersExistWithoutAManifest();
         DryRunWritesNothing();
@@ -151,6 +154,60 @@ public static class Program
             !Directory.Exists(Path.GetDirectoryName(gone)!));
         Check("no borra la huérfana que el usuario editó", File.Exists(edited));
     });
+
+    private static void InstallsReferencesInsideTheirSkill() => InTemp(home =>
+    {
+        var (provider, catalog, manifests) = Setup(home);
+        var withReferences = WithReferences(catalog, "nzt-build", "implement.md", "tests.md");
+
+        Installer.Install(provider, withReferences, "0.1.0", manifestDirectory: manifests);
+
+        Check("copia la referencia dentro de la carpeta de su skill",
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references", "implement.md")));
+        // Instrucciones + tres skills + dos referencias.
+        Check("registra las referencias en el manifiesto",
+            Manifest.Load(provider.Id, manifests)!.Files.Count == 6);
+    });
+
+    private static void RemovesOrphanReferencesAndEmptyFolders() => InTemp(home =>
+    {
+        var (provider, catalog, manifests) = Setup(home);
+        Installer.Install(provider, WithReferences(catalog, "nzt-build", "implement.md"),
+            "0.1.0", manifestDirectory: manifests);
+        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+
+        Check("borra la referencia que salió del set y su carpeta vacía",
+            !Directory.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references")));
+        Check("conserva la skill cuya referencia salió",
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "SKILL.md")));
+
+        Installer.Uninstall(provider, manifestDirectory: manifests);
+        Check("desinstalar no deja carpetas vacías",
+            !Directory.Exists(provider.SkillsDirectory)
+            || !Directory.EnumerateFileSystemEntries(provider.SkillsDirectory).Any());
+    });
+
+    /// <summary>
+    /// El .csproj es el que decide qué viaja: si su patrón no cubre una referencia
+    /// del repo, el router se instala nombrando un archivo que no existe.
+    /// </summary>
+    private static void EmbedsEveryReferenceOfTheRepo()
+    {
+        var root = RepoRoot();
+        if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
+
+        var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*.md", SearchOption.AllDirectories)
+            .Count(f => Path.GetFileName(Path.GetDirectoryName(f)) == "references");
+        var embedded = ContentCatalog.Load().Skills.Sum(s => s.References.Count);
+
+        Check($"embebe las {onDisk} referencias del repo", onDisk > 0 && embedded == onDisk);
+    }
+
+    private static ContentCatalog WithReferences(ContentCatalog catalog, string skillName, params string[] files) =>
+        ContentCatalog.From(catalog.Kernel, catalog.Adapters.ToDictionary(),
+            catalog.Skills.Select(s => s.Name == skillName
+                ? s with { References = [.. files.Select(f => new ReferenceFile(f, $"# {f}\n"))] }
+                : s));
 
     private static void RefusesWhenASkillFileIsNotOurs() => InTemp(home =>
     {

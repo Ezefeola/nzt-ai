@@ -25,15 +25,21 @@ Before designing, read the story and its acceptance criteria, the design system,
 shared component inventory. Reuse what is already loaded — the table below does not mean
 load every row.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| One screen: layout, content, states, navigation | `nzt-ux-screen` |
-| An HTML mockup of a designed screen — only if the user asked for it | `nzt-ux-mockup` |
-| The end user's manual: an interactive HTML guide of the product — on request | `nzt-ux-manual` |
-| The design system, shared components, or the visual direction | `nzt-ux-system` |
-| Judging a design, a mockup or a built screen against its task | `nzt-ux-review` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
+
+| The unit is | Read | Read with |
+|---|---|---|
+| One screen: layout, content, states, navigation | `references/screen.md` | — |
+| An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | — |
+| The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | — |
+| The design system, shared components, or the visual direction | `references/system.md` | — |
+| Judging a design, a mockup or a built screen against its task | `references/review.md` | — |
+
+Wherever a file names `nzt-ux-<name>`, it means `references/<name>.md` in this folder
+(`nzt-ux-system` → `references/system.md`): read that file — it is not a skill.
 
 ## When to skip this phase
 
@@ -50,14 +56,20 @@ unit, and so is a review. **The manual is written at the end of what is being de
 one stretch whose unit is a chapter** — one task the reader came to accomplish — closing
 with the coherence pass, the only unit whose subject is the whole file.
 
+**A request for the manual is therefore more than one unit: load `nzt-plan` with it.** The
+first reply is the plan — the file it will be (one HTML that opens from disk, per
+`references/manual.md`), the chapters named as the reader's tasks, and what gets no chapter
+and why. What you still need to ask is the plan's first step, never a reason to hold the
+plan back.
+
 ## Where it lands
 
 - One screen design, with its mockup beside it if there is one →
   `Plan/specs/<feature>/ux-ui/`
-- Visual direction and the design system → `Docs/design-system.md`; the shared component
-  inventory → `Docs/ui-components.md`. Both written and maintained by `nzt-ux-system`
-- The end user's manual, one file per audience → `Docs/manual/<audience>.html`, its images
-  in `Docs/manual/assets/`. On request, written at the end of what is being delivered, and
+- Visual direction and the design system → `Docs/UX/design-system.md`; the shared component
+  inventory → `Docs/UX/ui-components.md`. Both written and maintained per `references/system.md`
+- The end user's manual, one file per audience → `Docs/Manual/<audience>.html`, its images
+  in `Docs/Manual/assets/`. On request, written at the end of what is being delivered, and
   kept current at every close after that
 
 ## Rules

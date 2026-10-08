@@ -4,10 +4,11 @@ description: >
   The end user's manual (D37). It is UX work, not documentation of the system: the route is
   nzt-ux, the chapters are the tasks the person came to do, and nothing gets a chapter that
   no verified criterion supports. The failure modes are a module-by-module tour of the
-  screens and a manual describing behavior nobody verified.
+  screens and a manual describing behavior nobody verified. Since D50 the manual leaf is
+  nzt-ux's references/manual.md, graded as a Read; the baseline had no grader on it.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-ux, proposes an interactive self-contained HTML manual organised by the
+  Loads nzt-ux, reads its references/manual.md, proposes an interactive self-contained HTML manual organised by the
   operator's tasks, sourced from the story's verified criteria and its evidence, and stops
   for approval before writing it.
 context:
@@ -24,11 +25,18 @@ graders:
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ux'
+  - name: manual-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-ux[/\\]+references[/\\]+manual\.md'
   - name: organised-by-task
     type: llm
     criteria: |
       The reply is in Spanish and proposes a user manual for the operators of the orders
       product.
+      Judge the chapters it names, not the steps of its plan: steps such as building the
+      shell (front page, index, search) or a final coherence pass are work units, not
+      chapters. One chapter is a valid answer when only one task is verified.
       PASS if its chapters are things the operator wants to accomplish, named the way they
       would say them, and the manual is one self-contained HTML file that opens without a
       server or a network.

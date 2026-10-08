@@ -41,10 +41,18 @@ public static class Installer
 
         // El nombre plano es toda la ruta relativa a skills/ unida con guiones (9.1).
         // Es la misma identidad que valida el build y que nombran los routers.
+        // Las referencias van dentro de la carpeta plana de su skill, donde los
+        // routers las nombran por ruta relativa.
         foreach (var skill in catalog.Skills)
+        {
             planned.Add(new PlannedFile(
                 Path.Combine(provider.SkillsDirectory, skill.Name, "SKILL.md"),
                 skill.Text));
+            foreach (var reference in skill.References)
+                planned.Add(new PlannedFile(
+                    Path.Combine(provider.SkillsDirectory, skill.Name, "references", reference.FileName),
+                    reference.Text));
+        }
 
         return planned;
     }
@@ -280,21 +288,21 @@ public static class Installer
     }
 
     /// <summary>
-    /// Borra `<skills>/<nombre>/` si quedó vacía. Nunca sube más allá de la
-    /// carpeta de skills del proveedor.
+    /// Borra las carpetas que quedaron vacías, de `references/` hacia arriba hasta
+    /// `<skills>/<nombre>/`: el orden del manifiesto puede borrar el SKILL.md antes
+    /// que sus referencias. Nunca sube más allá de la carpeta de skills del proveedor.
     /// </summary>
     private static void RemoveEmptyParent(string filePath, Provider provider)
     {
-        var parent = Path.GetDirectoryName(filePath);
-        if (parent is null) return;
-
         var skillsRoot = Path.GetFullPath(provider.SkillsDirectory);
-        if (!Path.GetFullPath(parent).StartsWith(
-                skillsRoot.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar,
-                StringComparison.OrdinalIgnoreCase)) return;
-        if (string.Equals(Path.GetFullPath(parent), skillsRoot, StringComparison.OrdinalIgnoreCase)) return;
+        var inside = skillsRoot.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
-        if (Directory.Exists(parent) && !Directory.EnumerateFileSystemEntries(parent).Any())
+        for (var parent = Path.GetDirectoryName(Path.GetFullPath(filePath));
+             parent is not null && parent.StartsWith(inside, StringComparison.OrdinalIgnoreCase);
+             parent = Path.GetDirectoryName(parent))
+        {
+            if (!Directory.Exists(parent) || Directory.EnumerateFileSystemEntries(parent).Any()) return;
             Directory.Delete(parent);
+        }
     }
 }

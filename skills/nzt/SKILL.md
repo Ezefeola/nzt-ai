@@ -40,7 +40,8 @@ objective and with review dates, and has no entry in `Plan/state.json`.
 For an existing project not on NZT, the request decides:
 
 - **Small change** → do the work; write only the spec for what you touch.
-- **New feature** → analysis for that feature only. Do not back-fill the whole product.
+- **New feature** → analysis for that feature, plus the product definition and the glossary
+  if they are missing — the glossary with this feature's terms. Do not back-fill other features.
 - **Reported bug** → reproduce, fix, verify. No specs, no plan, no ceremony.
 - **"Put this project in order"** → adoption: reverse engineering.
 
@@ -64,7 +65,13 @@ build and verify, nothing else. Skipping is normal; skipping silently is not.
 
 ## 5. Hand off
 
-- The request is about learning a skill → load `nzt-learn` and stop here.
+- The request is about learning a skill → load `nzt-learn` and stop here. So is one that
+  continues a topic in `Learn/<topic>/` — a delivery to correct, an assessment, a review that
+  is due: its state is `progress.md`, not `Plan/state.json`.
+- The user accepted a feature and wants it closed → load `nzt-plan` and stop here: closing
+  is its unit. Change markers still in the spec are what the close sweeps, not a new
+  change — changing a feature through `nzt-discovery` is for a change that has not been
+  agreed yet.
 - Work spans more than one unit → load `nzt-plan` and stop here.
 - Single unit → load the phase skill for it, per the routing table in your instructions,
   and do it. Report and stop when it is done.

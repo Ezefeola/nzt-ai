@@ -14,8 +14,8 @@ and the coverage marks on the criteria of the story being implemented.
 
 **Does not own:** deciding what to build (`nzt-discovery`), deciding how it is structured
 (`nzt-architecture`), the application-level test plan and its evidence (`nzt-verify`). The
-boundary on tests: the ones that travel with the code are yours — `nzt-build-tests` says what
-makes one worth keeping, whatever the stack — and the ones derived from an
+boundary on tests: the ones that travel with the code are yours — `references/tests.md` says
+what makes one worth keeping, whatever the stack — and the ones derived from an
 approved test-plan scenario are `nzt-verify`'s. **Build never designs, scripts or runs
 application tests**: no test plan, no manual script, no test data. What the stack's test
 levels cannot reach is reported as *not covered until QA*, and QA runs after the increment
@@ -24,23 +24,32 @@ is built.
 ## Required guidance
 
 Before writing code, read the stack document of every area you touch, the story with its
-criteria, and the feature's business rules. Reuse what is already loaded — the tables below
-do not mean load every row. **A small edit in an established place follows the convention
+criteria, the feature's business rules and the glossary. Reuse what is already loaded — the
+tables below do not mean load every row. **A domain term with no glossary entry stops the
+code that names it**: the entry is written in `nzt-discovery` first, never coined here. **A small edit in an established place follows the convention
 next to it, with no guidance reloaded.**
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| Surveying existing code the change will run into | `nzt-build-recon` |
-| Implementing specified behavior | `nzt-build-implement` |
-| Repairing a reported defect | `nzt-build-implement` |
-| Changing structure without changing behavior | `nzt-build-refactor` |
-| Removing a behavior that exists | `nzt-build-remove` |
-| Adding, updating or removing a package | `nzt-build-dependencies` |
-| Credentials or sensitive configuration | `nzt-build-secrets` |
-| Writing the automated tests that ship with the change | `nzt-build-tests` |
-| Writing the test first, **only if the stack selected TDD** | `nzt-build-tdd` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
+
+| The unit is | Read | Read with |
+|---|---|---|
+| Surveying existing code the change will run into, before changing it | `references/recon.md` | — |
+| Implementing specified behavior: a story and its criteria | `references/implement.md` | `references/tests.md` |
+| Repairing a reported defect | `references/implement.md` | `references/tests.md` |
+| Changing structure without changing behavior | `references/refactor.md` | — |
+| Removing a behavior that exists | `references/remove.md` | — |
+| Adding, updating or removing a package | `references/dependencies.md` | — |
+| Credentials or sensitive configuration | `references/secrets.md` | — |
+| Writing the automated tests that ship with the change | `references/tests.md` | — |
+| Writing the test first, **only if the stack selected TDD** | `references/tdd.md` | `references/tests.md`, `references/implement.md` |
+
+Wherever a file names `nzt-build-<name>`, it means `references/<name>.md` in this folder
+(`nzt-build-tests` → `references/tests.md`): read that file — it is not a skill. The area
+routers below, `nzt-build-backend-dotnet` and `nzt-build-frontend-blazor`, and
+`nzt-build-csharp` are skills.
 
 If the component's stack selected one of these areas, load its area router — it is
 the only thing that knows that technology's leaves:
@@ -62,7 +71,7 @@ one unit, cut it by behavior, never by file or by area.
 
 Project setup — solution, projects, the dependencies the stack lists, foundations — is
 **authorised work** before the first story. Do not invent a story to justify it. **A package
-the stack does not list is not setup**: the user confirms it first (`nzt-build-dependencies`).
+the stack does not list is not setup**: the user confirms it first (`references/dependencies.md`).
 
 ## Where it lands
 
@@ -110,10 +119,10 @@ They apply to every unit of this phase, so they live here and not in a leaf.
 - **Change markers have fixed meaning**: `[modify]` replaces the old behavior instead of
   adding a parallel path, `[remove]` takes it out, and `[SPEC-CONFLICT]` is what you emit
   when the spec contradicts itself while you are building. The first two are put there by
-  `nzt-discovery-change`, when the user approved the change; they survive until
-  `nzt-plan-close` sweeps them, and whoever implements does not clean them up.
+  the change reference of `nzt-discovery`, when the user approved the change; they survive
+  until the close of `nzt-plan` sweeps them, and whoever implements does not clean them up.
 - **Technical work you find and do not do is reported, and it becomes an entry in
-  `Docs/tech-debt.md` when the user decides to defer it** — never a comment in the code and
+  `Docs/Architecture/tech-debt.md` when the user decides to defer it** — never a comment in the code and
   never a silent omission.
 - A refactor changes structure and nothing else. If behavior changed, it was not a
   refactor: it needs its own spec and its own verification. A refactor still needs the

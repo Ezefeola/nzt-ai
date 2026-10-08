@@ -16,16 +16,23 @@ see repositories that are not its own.
 Load this before any area skill applies. If you did not arrive here from an area router,
 load that router too.
 
+| When the code touches | Read, in this skill's folder, before writing it |
+|---|---|
+| A DTO or its mapping extensions: what a use case returns, what a typed client sends | `references/dtos.md` |
+| A collection read, transformed or checked in memory (EF Core execution is the area's) | `references/linq.md` |
+
+A file naming `nzt-build-csharp-<name>` means `references/<name>.md` here — not a skill.
+
 ## Everything you write is in English
 
 Type names, members, parameters, locals, files, folders and comments, whatever language the
 spec is in. The specs, the glossary and the artifacts in `Plan/` stay in the project's
 language: **you are the boundary where the term lands in English code.**
 
-- **The translation is not yours to invent.** `Docs/glossary.md` carries the code name of
-  every domain term; if it is there, that is the name. If it is missing, look for the
-  established name first and ask before coining one. A translation invented here and a
-  different one invented next month are the same term with two names.
+- **The translation is not yours to invent.** `Docs/Domain/glossary.md` carries the code
+  name of every domain term; if it is there, that is the name. If it is missing and the code
+  has none, it is a glossary entry `nzt-discovery` writes before the code uses it — never a
+  name coined here. Two translations of one term are the same term with two names.
 - What is not a domain term — a local, a helper, a private method — you name yourself.
 - **The one exception is text the user reads**: labels, messages and validation copy come
   from the story, in the story's language, and are never translated.
@@ -52,9 +59,9 @@ usually written in the same edit as the method that needed it. **Adding a member
 appending to the file.**
 
 The domain model fixes its own order on top of this, and inside an entity or a value object
-that one wins: `nzt-build-backend-dotnet-domain-ddd`.
+that one wins: `../nzt-build-backend-dotnet/references/domain-ddd.md`.
 DTOs also override this order: **properties first, then nested DTO declarations**,
-recursively, as defined in `nzt-build-csharp-dtos`.
+recursively, as defined in `references/dtos.md`.
 
 ## Never a primary constructor
 
@@ -161,7 +168,7 @@ something too.
 
 `record` for data types, **with explicit properties, never positional**, and `struct` where
 value semantics apply. Where the file lives and what it is allowed to carry is not decided
-here: that is `nzt-build-csharp-dtos`.
+here: that is `references/dtos.md`.
 
 ## Reflection is exceptional
 
@@ -175,7 +182,7 @@ not yours.
 ## Closing checklist
 
 - [ ] Every identifier, file, folder and comment in English, with domain terms taking the
-      name `Docs/glossary.md` gives them.
+      name `Docs/Domain/glossary.md` gives them.
 - [ ] User-facing text in the story's language, as the story wrote it.
 - [ ] File-scoped namespace, one top-level type, file named after it, `sealed` unless
       something inherits.

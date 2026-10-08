@@ -36,17 +36,24 @@ when it is genuinely ambiguous; otherwise assume the light one.
 A learning plan proposes **learning phases, never software artifacts**. Nothing observable
 is being built here.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| Objectives, the real starting point, the curriculum, and the record the rest writes into | `nzt-learn-plan` |
-| Teaching one objective: lesson and its practice | `nzt-learn-teach` |
-| Deliberate practice on something they already do | `nzt-learn-train` |
-| Correcting what they produced, or unblocking them | `nzt-learn-tutor` |
-| Measuring what was actually acquired | `nzt-learn-assess` |
-| Scheduling and running the reviews | `nzt-learn-retain` |
-| Writing an exercise brief, or its solution afterwards | `nzt-learn-exercises` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is. A new topic starts at the first row: nothing else runs
+before its curriculum and progress record exist.
+
+| The unit is | Read | Read with |
+|---|---|---|
+| Objectives, the real starting point, the curriculum, and the record the rest writes into | `references/plan.md` | — |
+| Teaching one objective: lesson and its practice | `references/teach.md` | `references/exercises.md` |
+| Deliberate practice on something they already do | `references/train.md` | `references/exercises.md` |
+| Correcting what they produced, or unblocking them | `references/tutor.md` | — |
+| Measuring what was actually acquired | `references/assess.md` | — |
+| Scheduling and running the reviews | `references/retain.md` | — |
+| Writing an exercise brief, or its solution afterwards | `references/exercises.md` | — |
+
+Wherever a file names `nzt-learn-<name>`, it means `references/<name>.md` in this folder
+(`nzt-learn-tutor` → `references/tutor.md`): read that file — it is not a skill.
 
 ## One unit
 

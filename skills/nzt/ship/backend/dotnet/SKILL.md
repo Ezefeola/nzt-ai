@@ -1,11 +1,11 @@
 ---
 name: nzt-ship-backend-dotnet
-description: Use when the component being shipped is .NET, before packaging it, changing its CI gates, applying its migrations or instrumenting it: the table that turns the release-facing unit into the one skill to load.
+description: Use when the component being shipped is .NET, before packaging it, changing its CI gates, applying its migrations or instrumenting it: the table that turns the release-facing unit into the one reference to read.
 ---
 
 # Shipping a .NET backend — selection by unit
 
-This router loads nothing by itself. It turns the release-facing unit into **the one skill**
+This router loads nothing by itself. It turns the release-facing unit into **the one reference**
 that unit needs, on top of the generic practice it belongs to.
 
 If you did not arrive here from `nzt-ship`, load it first.
@@ -22,16 +22,23 @@ If you did not arrive here from `nzt-ship`, load it first.
 - **Version-dependent behaviour is read from the project**, not from an example here: the
   manifest, `global.json`, the lock files, the pipeline that already runs.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load, with | And |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is. `../nzt-ship/` is the generic practice the row belongs
+to; if `nzt-ship` already had you read it in this session, do not read it again.
+
+| The unit is | Read | Read with |
 |---|---|---|
-| Packaging the component as a container image | `nzt-ship-release` | `nzt-ship-backend-dotnet-containers` |
-| Getting migrations into an environment | `nzt-ship-release` | `nzt-ship-backend-dotnet-migrations` |
-| Writing or repairing the CI gates | `nzt-ship-pipeline` | `nzt-ship-backend-dotnet-pipeline` |
-| Health checks, telemetry, structured logging | `nzt-ship-observability` | `nzt-ship-backend-dotnet-observability` |
+| Packaging the component as a container image | `references/containers.md` | `../nzt-ship/references/release.md` |
+| Getting migrations into an environment | `references/migrations.md` | `../nzt-ship/references/release.md` |
+| Writing or repairing the CI gates | `references/pipeline.md` | `../nzt-ship/references/pipeline.md` |
+| Health checks, telemetry, structured logging | `references/observability.md` | `../nzt-ship/references/observability.md` |
 
-**Reuse what is already loaded**, and load only the row the unit is. A deployment that also
+Wherever a reference here names `nzt-build-dependencies` or `nzt-build-secrets`, it means
+`../nzt-build/references/<name>.md`: read that file — it is not a skill.
+
+**Reuse what is already loaded**, and read only the row the unit is. A deployment that also
 carries a schema change is two rows, and that is the one combination that happens often.
 
 ## What this area never decides
@@ -39,13 +46,13 @@ carries a schema change is two rows, and that is the one combination that happen
 - **Whether to deploy, and where.** The authorisation names the environment, and that rule lives
   in `nzt-ship`. Nothing here creates permission to touch an environment.
 - **Whether a migration exists.** Generating one is build work
-  (`nzt-build-backend-dotnet-ef-core-migrations`); this area only packages and applies what is
+  (`../nzt-build-backend-dotnet/references/ef-core-migrations.md`); this area only packages and applies what is
   already in the repository.
-- **What the pipeline's gates are.** `nzt-ship-pipeline` decides that; these skills give the
+- **What the pipeline's gates are.** `../nzt-ship/references/pipeline.md` decides that; these references give the
   .NET commands and what each one needs to work.
 
 ## Closing checklist
 
-- [ ] The row loaded matches the unit, together with its generic practice.
+- [ ] The reference read matches the unit, together with its generic practice.
 - [ ] The SDK used is the pinned one, and nothing was upgraded to get a pass.
 - [ ] The stack or deployment document was updated in this unit if what it declares changed.
