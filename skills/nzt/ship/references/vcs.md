@@ -1,14 +1,7 @@
----
-name: nzt-ship-vcs
-description: Use when committing, branching, tagging or writing the changelog: the repository's own rules first, and one logical change per commit.
----
-
 # Version control
 
 Produces commits, branches, tags and changelog entries. **Only when the user asked**:
 finishing a unit is not an instruction to commit.
-
-If you did not arrive here from `nzt-ship`, load it first.
 
 ## The repository's rules win
 

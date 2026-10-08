@@ -1,15 +1,8 @@
----
-name: nzt-build-frontend-blazor-forms
-description: Use when writing or changing a form and its submission - EditForm bound to a model of its own, shape validated here and business rules answered by the backend, and a post that cannot run twice.
----
-
 # Forms
 
 A form is a component with a model, a submission and two kinds of validation that must not be
 confused. Everything in `nzt-build-frontend-blazor-components` still applies — this is what the
 form adds.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## The model belongs to the form
 

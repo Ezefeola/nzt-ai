@@ -1,17 +1,18 @@
----
-name: nzt-architecture-rfc
-description: Use when a decision has to be agreed by people outside this conversation before it is taken: the problem, the options, who it affects, and the objections they raised.
----
-
 # Request for comments
+
+## Contents
+- RFC or ADR
+- What earns one
+- The file
+- The rules
+- When it closes
+- Done when
 
 Produces `Docs/rfc/RFC-NNN-<slug>.md`: a decision **proposed** so the people it affects can
 object before anyone commits to it.
 
 **On request.** It appears in the plan only when the user asks for one, because it buys a
 review window, and a window only pays when there are people to convince.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## RFC or ADR
 

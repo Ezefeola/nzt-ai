@@ -1,15 +1,8 @@
----
-name: nzt-build-backend-dotnet-api
-description: Use when writing ASP.NET Core API code, whichever endpoint model the stack selected - an endpoint that binds, calls and returns, with explicit binding attributes and no decision of its own.
----
-
 # The API layer
 
 What holds **whichever endpoint model the project uses**. How each one is written is in its
 own skill — minimal APIs or controllers — and the endpoints axis of the stack says which one
 this project has.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The endpoint decides nothing
 

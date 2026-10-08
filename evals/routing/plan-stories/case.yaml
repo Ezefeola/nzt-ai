@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: route-plan-stories
+description: >
+  A new product in an empty directory. The plan has an analysis step, and since D55 that
+  row names the spec and its stories: stories belong to analysis, one unit each, and
+  their number is set by the spec. Forced by real use, where the row named only the spec
+  and the stories came back later as a change to the plan.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-plan (possibly through nzt) and shows a plan whose analysis step produces the
+  feature spec and its user stories, without writing either and without definition
+  questions in the plan message.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero hacer una app chiquita para anotar mis tareas pendientes: escribo una tarea y la
+    veo en una lista. Arranquemos.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Write, Edit]
+graders:
+  - name: plan-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan"'
+  - name: analysis-names-stories
+    type: llm
+    criteria: |
+      The reply is in Spanish and shows a plan for the task app.
+      PASS if the analysis step (or the steps before architecture and build) says it
+      produces the feature spec AND its user stories (historias), even without saying how
+      many.
+      FAIL if the analysis step names only the spec, or if stories appear nowhere in the
+      plan, or if the reply reports specs or stories already written instead of a plan
+      waiting for approval.

@@ -1,8 +1,3 @@
----
-name: nzt-build-frontend-blazor-render-static
-description: Use when the stack selects static server rendering and the work touches rendering - no live .NET handlers, so everything the user changes travels as a navigation or a form post.
----
-
 # Static server rendering
 
 The server renders HTML per request, **without a live interactive .NET circuit or runtime for
@@ -11,8 +6,6 @@ mean the page is dead.
 
 How a component is written does not change — that is
 `nzt-build-frontend-blazor-components`. This is only what having no interactivity changes.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## What does not exist here
 

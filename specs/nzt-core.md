@@ -695,7 +695,11 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    la carga nadie.
 14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
    secciones. Protege contra la lectura parcial (`head -100`) que documenta la guía de
-   Anthropic.
+   Anthropic. **Si con el índice pasa de 200, se parte** (la regla 3, no subir el techo):
+   `<x>.md` sigue con el principio y `<x>-<parte>.md` lo continúa con un título propio, y la
+   fila del router lee las dos. El script de migración compara la hoja vieja contra las
+   partes juntas. Primer caso: `domain-ddd` (200 en `main`, 203 con índice), decidido por el
+   usuario en la unidad 19.
 15. **Una práctica escrita en un área y en el piso genérico (D51) se cambia en los dos.**
    Cada línea genérica nombra la referencia de área que la implementa, para que la revisión
    no dependa de acordarse.
@@ -1506,6 +1510,26 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `nzt-discovery-change` por su descripción, porque el *hand off* de `nzt` no nombraba el
   cierre. Con una línea ahí: **6 de 6 por `nzt` → `nzt-plan` → `close.md`**, verificado en
   las trazas. Regla 16 de §10. Decidido por el usuario el 2026-10-03.
+- **D54.** **Cómo se lee una referencia lo dice el kernel una vez, no cada router.** Cuatro
+  reglas en la sección Routing, cada una con la traza que la forzó: **(1)** la fila y toda su
+  columna *Read with* se leen antes de la primera respuesta de la fase, aunque sea una
+  pregunta (unidades 14 y 28: corridas que preguntaban sin haber leído la referencia; unidad
+  20: 2 de 3 leían la fila y salteaban la base de EF Core); **(2)** se leen desde la carpeta
+  de la skill, nunca buscándolas en el workspace con Glob; **(3)** un nombre `nzt-<x>` que no
+  es una skill listada es una referencia: su router es el prefijo más largo que sí es skill
+  (los nombres viejos que quedan dentro de las referencias, incluso de otro router, se
+  resuelven así); **(4)** la línea de compactación de D52. Medido en la unidad 21: `tests.md`
+  (*Read with* de `implement`) pasó de 0 de 3 a 3 de 3; `routing/ship` 0.89 → 1.00,
+  `routing/build-story` 0.87 → 0.93. Las notas de nombres de cada router quedan: son la misma
+  regla dicha localmente.
+- **D55.** **La fila de Análisis del plan nombra la spec y sus historias.** Lo que la forzó:
+  en uso real, un plan de producto nuevo puso en Análisis solo "la spec F-001", y al
+  terminarla el agente propuso como cambio de plan dos unidades de historias que el método
+  ya exigía (una unidad por historia). Las historias son parte del Análisis
+  (`nzt-discovery`), no una fase aparte; cuántas son lo fija la spec, así que la fila las
+  anuncia sin numerarlas, y cortarlas en unidades al cerrar la spec es seguir el plan, no
+  apartarse de él. Una línea en *How the plan is shown* de `nzt-plan`. Caso
+  `routing/plan-stories`. Decidido por el usuario el 2026-10-07.
 
 ## 13. Revisión contra Temper v3
 

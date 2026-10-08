@@ -1,8 +1,3 @@
----
-name: nzt-ship-pipeline
-description: Use when the CI pipeline is created, changed or repaired: the gates in order and what each proves, and proving a new gate by making it fail.
----
-
 # Continuous integration
 
 Produces the pipeline and its gates: the place where everything this method asks for is
@@ -10,8 +5,6 @@ enforced on every change, for the person and for the agent alike.
 
 **A gate that can be skipped is a suggestion.** And **a gate that passes without checking
 anything is worse than a missing gate**, because it buys trust it does not earn.
-
-If you did not arrive here from `nzt-ship`, load it first.
 
 ## The gates, in order
 

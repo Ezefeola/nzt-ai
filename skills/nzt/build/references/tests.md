@@ -1,16 +1,23 @@
----
-name: nzt-build-tests
-description: Use when writing the automated tests that ship with a change: what is worth testing, what is substituted, and what makes a test survive a refactor. Whatever the stack is.
----
-
 # Tests that ship with the code
+
+## Contents
+- The levels are the stack's decision, not yours
+- When a change earns tests
+- What is tested, and what is not
+- What makes a test worth keeping
+- What gets substituted
+- The shape
+- Determinism
+- Integration tests, when the stack enabled them
+- Discipline
+- Report what ran
+- Where this stops
+- Done when
 
 Produces the automated tests that travel with the change, and the report of what actually
 ran. **What makes a test worth keeping does not change with the stack, and that is this
 file**; how this project writes one — framework, layout, the clock it injects — is its area
 leaf's, which names this one in its load line.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## The levels are the stack's decision, not yours
 

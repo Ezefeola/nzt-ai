@@ -1,8 +1,3 @@
----
-name: nzt-build-frontend-blazor-prerendering
-description: Use when a screen is prerendered or transfers initial state - persist what the server pass produced instead of fetching it twice, and never rely on initialisation running exactly once.
----
-
 # Prerendering and initial state
 
 With prerendering on, a full page load can create **a server-rendered instance and an
@@ -11,8 +6,6 @@ with prerendering disabled have no server pass; interactive routing normally ski
 enhanced navigation to a static page still renders on the server.
 
 > **Never rely on initialisation running exactly once — nor on it running twice.**
-
-Load `nzt-build-frontend-blazor` and the render mode's skill before applying this.
 
 ## Preserve the initial read
 

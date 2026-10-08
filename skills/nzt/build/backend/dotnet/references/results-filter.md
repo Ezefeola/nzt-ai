@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-results-filter
-description: Use when the stack selects result-filter and a Result reaches HTTP with its status matched by a filter - the endpoint returns the Result as it is, and one global filter sets the status code.
----
-
 # Result to HTTP — the filter
 
 **The endpoint returns the `Result` and that is what the client receives** — success or
@@ -12,9 +7,6 @@ never converted into `ProblemDetails` and never unwrapped by an extension.
 Host-level failures keep the project's centralised handling, and an exception that escapes
 a use case goes to the global handler (`nzt-build-backend-dotnet-exceptions`), which answers
 in this same shape; **do not force them into a use-case `Result`**.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-results-pattern` before
-applying this.
 
 ## What the filter does, and all it does
 

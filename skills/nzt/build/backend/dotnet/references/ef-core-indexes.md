@@ -1,9 +1,11 @@
----
-name: nzt-build-backend-dotnet-ef-core-indexes
-description: Use when a query is added or a uniqueness rule has to be enforced - which index the read earns, the order of a composite, and the unique index that is the only thing making the rule true.
----
-
 # EF Core indexes — which ones, and in what shape
+
+## Contents
+- When a column earns an index
+- In a composite, the order of the columns is the decision
+- Unique indexes: where a business rule becomes real
+- What an index costs
+- Closing checklist
 
 An index is **declared in the entity configuration file** and reaches the database **through a
 generated migration**, like every other mapping change. This is the hard part: which ones.
@@ -11,8 +13,6 @@ generated migration**, like every other mapping change. This is the hard part: w
 > **The query decides the index, not the entity.** An index exists to serve a read the code
 > actually performs. Adding one because a column *looks searchable* pays for a read nobody
 > makes.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## When a column earns an index
 

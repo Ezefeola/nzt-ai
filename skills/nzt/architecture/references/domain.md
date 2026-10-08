@@ -1,15 +1,19 @@
----
-name: nzt-architecture-domain
-description: Use when the domain model is written or updated: entities, fields and relationships, grouped by aggregate when the stack says DDD. Never the schema.
----
-
 # Domain model
+
+## Contents
+- It is the model, not the schema
+- When it is written
+- Two shapes, and the stack decides which
+- The file
+- With DDD, the boundary is found, not invented
+- Writing it
+- What this document is not
+- The diagram
+- Done when
 
 Produces `Docs/domain-model.md`: the things the business is made of, what each one holds and
 how they relate. It exists so every story starts from the same model instead of adding
 attributes one at a time, each one inventing the shape it needs.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## It is the model, not the schema
 

@@ -1,14 +1,7 @@
----
-name: nzt-build-backend-dotnet-ef-core-mappings
-description: Use when configuring the DbContext, an entity mapping, a relationship or a conversion - one context per component, one configuration file per entity, no data annotations, nothing left to convention.
----
-
 # EF Core mappings — the context and its entities
 
 The mapping is where persistence decisions are written down, **in one place per entity**, so
 that nothing about how the model is stored has to be inferred from the domain types.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## The `DbContext`
 

@@ -1,9 +1,13 @@
----
-name: nzt-build-backend-dotnet-architecture-vertical-slice
-description: Use when the backend stack selects vertical-slice and code is added or moved, or its structure is needed - one project, one folder per operation, and no slice reaching into another.
----
-
 # Vertical slice
+
+## Contents
+- One project per component
+- The tree
+- `Features/` — the slice
+- No slice reaches into another slice
+- Two placements that look wrong and are not
+- Dependency injection
+- Closing checklist
 
 **What the model is for:** the unit of organisation is **the operation**, not the technical
 role. Everything one operation needs sits in one folder, so changing an operation touches one
@@ -11,8 +15,6 @@ place and removing it is a deleted folder.
 
 **This skill decides folders, projects and where every file goes — nothing else does.** What
 each file *is* and what it is called comes from its own skill.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## One project per component
 

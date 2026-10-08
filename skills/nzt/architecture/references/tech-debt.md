@@ -1,15 +1,8 @@
----
-name: nzt-architecture-tech-debt
-description: Use when technical work is deferred instead of done, or a deferred entry is resolved: where it is, what it costs, and why it was left.
----
-
 # Technical debt
 
 Produces `Docs/tech-debt.md`: the technical work that was found and deliberately not done.
 It exists because the alternative is losing it — a report in a chat that ended is a decision
 nobody can act on three months later.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 It lives in `Docs/` because it is technical: *"the use case mixes validation with
 persistence"* cannot be written in the user's vocabulary, and in `Plan/` it has no place.

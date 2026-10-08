@@ -1,14 +1,16 @@
----
-name: nzt-build-backend-dotnet-use-cases
-description: Use when adding or changing a .NET operation and its orchestration - one class per operation with a single ExecuteAsync, returning Result, deciding its own status code and checking uniqueness before it writes.
----
-
 # Use cases — one operation of the system
+
+## Contents
+- The shape
+- Validate before you touch anything
+- What the validator cannot answer
+- `try/catch` is the exception, and it says why
+- The status code is decided here
+- What a use case never does
+- Closing checklist
 
 A use case is **one operation, written once and reachable from anywhere**: an endpoint, a
 job, a test. Everything the operation decides — including its status code — is decided here.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The shape
 

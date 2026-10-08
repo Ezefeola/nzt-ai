@@ -1,8 +1,3 @@
----
-name: nzt-build-remove
-description: Use when a behavior that exists has to be taken out: the sweep from the entry point inwards, the data decision kept separate, and the documents updated.
----
-
 # Remove a behavior
 
 Produces a behavior that is **gone**, with nothing left behind that reads as if it were
@@ -11,8 +6,6 @@ still in use.
 **The build catches what you broke. It does not catch what you left.** That is the whole
 reason this is a procedure and not an edit: half a removal is worse than none, because what
 stays compiles, gets maintained, and is read by the next person as live code.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## Sweep from the outside in
 

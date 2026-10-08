@@ -102,7 +102,8 @@ nzt lint | verify
    reemplazado en su lugar; si el archivo existe sin marcadores, el bloque va arriba y su
    contenido queda abajo; si no existe, se crea.
 5. **Aplana y copia las skills**: cada carpeta con `SKILL.md` va a una carpeta plana cuyo
-   nombre es el path relativo con `/` → `-`.
+   nombre es el path relativo con `/` → `-`. Su carpeta `references/` viaja adentro, sin
+   aplanar (D50): los routers la nombran por ruta relativa.
 6. **Retira los huérfanos**: lo que el manifiesto anterior instaló y ya no está en el set.
 7. **Escribe el manifiesto** y **reporta**: creados, actualizados, sin cambios, eliminados,
    conservados, y el tamaño del listado en caracteres (el presupuesto de R1).
@@ -171,7 +172,8 @@ installer/
 └─ tests/Nzt.Cli.Checks/          # comprobaciones con destinos temporales
 ```
 
-- **El contenido se embebe al compilar** (`core/**/*.md` y `skills/**/SKILL.md`): el
+- **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md` y
+  `skills/**/references/*.md`): el
   ejecutable *es* el set, y su versión es la versión del set.
 - **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
   flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de

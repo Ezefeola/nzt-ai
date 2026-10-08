@@ -1,16 +1,21 @@
----
-name: nzt-build-backend-dotnet-ef-core-bulk
-description: Use when an operation updates or deletes many rows by criteria - ExecuteUpdateAsync and ExecuteDeleteAsync, what they bypass, and the two behaviours that change the shape of the use case.
----
-
 # Set-based writes — `ExecuteUpdateAsync` and `ExecuteDeleteAsync`
+
+## Contents
+- `ExecuteUpdateAsync`
+- `ExecuteDeleteAsync`
+- When they are the right tool
+- When they must not be used
+- The two behaviours that change the use case
+- What else does not run
+- What an update cannot do
+- On delete, the cascade is the database's, not EF's
+- Very large deletes
+- Closing checklist
 
 Both turn a query into **one statement in the database**: nothing is materialised, nothing is
 tracked, change detection never runs. Where the alternative is loading N entities to change or
 remove each one, this skips the materialisation. **It is not a promise of fewer round trips** —
 tracked writes can be batched by the provider too; the gain is not paying for the entities.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## `ExecuteUpdateAsync`
 

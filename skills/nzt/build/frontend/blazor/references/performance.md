@@ -1,9 +1,14 @@
----
-name: nzt-build-frontend-blazor-performance
-description: Use when a component repeats at scale, an event fires many times per second, or a small change rerenders a large subtree - and only against a measurement, never a suspicion.
----
-
 # Rendering performance
+
+## Contents
+- What actually causes a rerender
+- Large lists: paging or virtualisation, chosen on evidence
+- Instances and parameters are not free
+- Cascading values
+- Two things that are cheap once and expensive at scale
+- Events that fire tens of times per second
+- An event handler that changes nothing still rerenders
+- Closing checklist
 
 **Most components never need this.** A page, a dialog or a form renders once and then only when
 someone does something: optimising it costs readability and buys nothing measurable.
@@ -18,8 +23,6 @@ subtree**.
 The number the user actually waits for, and the requirement it is measured against, come from
 `nzt-verify-performance`. This leaf is what you do **after** that measurement located the cost
 in the render.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## What actually causes a rerender
 

@@ -1,14 +1,7 @@
----
-name: nzt-build-recon
-description: Use before changing code that already exists: where the behavior lives, who else consumes it, and what breaks. It writes no code.
----
-
 # Survey before touching it
 
 Produces the three fields the plan needs to cut the work: **what already exists**, **what has
 to be built**, and **the risks**. It changes nothing.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 **It is worth a unit when the change lands on code that already exists** and nobody can say
 from memory what consumes it. A small edit in an established place does not get a survey: it

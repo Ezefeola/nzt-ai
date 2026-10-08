@@ -1,14 +1,19 @@
----
-name: nzt-build-implement
-description: Use when a story is being built: working code for its criteria, rules enforced where the design says, area marks, and a close that reports what ran and what is left for QA.
----
-
 # Implement a story
+
+## Contents
+- Before writing code
+- The work
+- Marking coverage
+- Write it the way this code is written
+- Change markers
+- Rules that hold whatever the stack is
+- Repairing a reported defect
+- Do not build what nobody asked for
+- Closing
+- Done when
 
 Produces working code for **one story**, and the area marks on that story's criteria.
 The criteria are the definition of done; nothing else is.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## Before writing code
 

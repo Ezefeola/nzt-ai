@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-endpoints-minimal
-description: Use when the stack selects minimal APIs and an ASP.NET Core endpoint is written or changed - a group per feature, named static handlers, and dependencies declared per handler.
----
-
 # Minimal API endpoints
 
 **What the model is for:** an endpoint is a **function reachable over HTTP**. No class holding
@@ -10,8 +5,6 @@ state, no base type, no attribute ceremony — the route, the verb and the handl
 declaration.
 
 **This project has no controllers, and you do not add one.**
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-api` before applying this.
 
 ## A group per feature, and the routes in it
 

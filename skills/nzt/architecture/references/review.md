@@ -1,15 +1,18 @@
----
-name: nzt-architecture-review
-description: Use when an existing structure has to be judged rather than designed: where changes, defects or load keep hurting, on evidence and never on taste.
----
-
 # Architecture review
+
+## Contents
+- Start from the question and the qualities
+- Read what was declared, first
+- Structural evidence
+- Change-history evidence
+- Runtime evidence
+- The findings
+- What this reading does not do
+- Done when
 
 Produces **findings with proposals**, and changes nothing. Its output is a report whose items
 end up somewhere that survives: a decision record, an entry of deferred work, a guard, or a
 drift verdict.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 Its risk is the opposite of every other reading here: **turning into taste**. That is why
 every finding stands on evidence and on a requirement the product actually has.

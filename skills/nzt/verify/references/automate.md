@@ -1,16 +1,9 @@
----
-name: nzt-verify-automate
-description: Use when approved scenarios that already passed by hand become automated tests: what qualifies, and how a failing test is diagnosed first.
----
-
 # Automated regression
 
 **This applies only where the stack document selected it** — an end-to-end tool, named.
 An absent field does not enable it, and a tool being installed is not a decision to use it.
 
 Produces automated tests for scenarios that are already approved and already passing.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## What qualifies
 

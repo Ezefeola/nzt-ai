@@ -1,15 +1,8 @@
----
-name: nzt-architecture-adr
-description: Use when a decision that is expensive to reverse has to be recorded: what forced it, the options with their cost, and what it commits the project to.
----
-
 # Decision record
 
 Produces `Docs/adr/ADR-NNN-<slug>.md`, one file per decision. It exists so that a decision
 nobody can reconstruct does not get relitigated every few months by someone who cannot tell
 a choice from an accident.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## What earns a record
 

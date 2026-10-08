@@ -39,9 +39,8 @@ row is not the guidance, the file is.
 | A functional change to a feature that already exists | `references/change.md` | `references/write-spec.md`, `references/write-stories.md` |
 | Behavior that exists only as code | `references/reverse.md` | `references/analysis.md` |
 
-The references, and other phases, still name these by their old skill names
-(`nzt-discovery-change` is `references/change.md`): those are this table's rows, never skills
-to load.
+Wherever a file names `nzt-discovery-<name>`, it means `references/<name>.md` in this
+folder (`nzt-discovery-change` → `references/change.md`): read that file — it is not a skill.
 
 ## One unit
 

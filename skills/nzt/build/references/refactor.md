@@ -1,14 +1,7 @@
----
-name: nzt-build-refactor
-description: Use when code structure changes but behavior must not, with evidence that what it touched still does the same thing.
----
-
 # Refactor
 
 Produces a change that leaves behavior **identical** and the evidence that it still is.
 Same inputs, same outputs, same side effects, same errors.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## No new spec, but not no verification
 

@@ -1,9 +1,17 @@
----
-name: nzt-architecture-stack
-description: Use when a component's adopted technologies are recorded or updated - one document per component and area. Mandatory before any code is written.
----
-
 # Stack document
+
+## Contents
+- What this document is for
+- The file
+- What does not go here
+- Record the concept, never the skill
+- One choice per axis
+- The opt-ins
+- Packages are the user's
+- Versions come from evidence
+- An existing component
+- Keeping it current
+- Done when
 
 Produces `Docs/<area>-stack-<component>.md`: what this component is built with, which
 option it took on each axis, what it opted into, and which packages it uses. One document
@@ -11,8 +19,6 @@ per **component and area** — a component with a backend and a frontend has two
 
 **No component gets built without one.** A new component gets it when it is designed; an
 existing one gets it from evidence before its code is touched.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## What this document is for
 

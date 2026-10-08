@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-persistence-direct
-description: Use when the stack selects direct persistence and the operation reaches the database - the handle injected into the use case, nothing wrapping it, and queries written out where they run.
----
-
 # Direct persistence
 
 The persistence axis says direct, which is **the name of a decision, not the absence of one**:
@@ -11,8 +6,6 @@ this project has **no repositories and no unit of work, anywhere**.
 **The persistence handle is whatever the ORM axis names** — the type the data access package
 gives you to read and write with. That skill says what it is called and how to query with it;
 **this one says where it goes and what must not be built around it.**
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The shape
 

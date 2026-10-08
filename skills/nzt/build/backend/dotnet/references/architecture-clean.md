@@ -1,9 +1,12 @@
----
-name: nzt-build-backend-dotnet-architecture-clean
-description: Use when the backend stack selects clean architecture and code is added or moved, or its structure is needed - four projects with every reference pointing inward, and each folder named by the role it holds.
----
-
 # Clean architecture
+
+## Contents
+- Four projects, and every reference points inward
+- The tree
+- The rules the tree does not show
+- Dependency injection
+- With direct persistence, the handle is reached through an interface
+- Closing checklist
 
 **What the model is for:** the unit of organisation is **the layer, and the layer is a
 project** — so what each layer may know is **enforced by the compiler**, not by review.
@@ -11,8 +14,6 @@ project** — so what each layer may know is **enforced by the compiler**, not b
 **This skill decides projects and folders, and names each folder by the role it holds —
 nothing else does.** What fills a role, and what each file is called, comes from its own
 skill.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## Four projects, and every reference points inward
 

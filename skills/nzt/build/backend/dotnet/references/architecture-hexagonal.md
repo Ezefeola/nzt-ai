@@ -1,9 +1,12 @@
----
-name: nzt-build-backend-dotnet-architecture-hexagonal
-description: Use when the backend stack selects hexagonal architecture and code is added or moved, or its structure is needed - a core that knows no adapter, one project per adapter, and a composition root that shows the whole wiring.
----
-
 # Hexagonal architecture
+
+## Contents
+- The projects
+- The tree
+- `Core` keeps every contract in one place
+- Dependency injection
+- With direct persistence, the handle is reached through an interface
+- Closing checklist
 
 **What the model is for:** the unit of organisation is **the adapter**. Everything the
 product knows how to do sits in one project that does not know who asks it or where anything
@@ -12,8 +15,6 @@ noticing.
 
 **This skill decides projects and folders, and names each folder by the role it holds —
 nothing else does.**
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The projects
 

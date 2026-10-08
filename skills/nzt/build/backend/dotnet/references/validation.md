@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-validation
-description: Use when adding, changing or reviewing the inputs of a .NET operation and their validator - the shape of the input checked at the operation boundary, with the rules taken from the contract and never invented.
----
-
 # Validating an operation's input
 
 `<Operation>Validator` — `CreateOrderValidator` — in its own file. The use case invokes it
@@ -11,8 +6,6 @@ before queries, writes or external calls and turns its failure into a failed `Re
 
 **A check in the frontend does not replace this one.** The operation boundary is where input
 is validated, because it is the boundary every caller crosses.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The mechanism comes from the stack
 

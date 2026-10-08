@@ -1,11 +1,12 @@
----
-name: nzt-build-csharp-dtos
-description: Use when writing or changing a C# DTO or its mapping extensions - the DTOs every .NET use case returns and every typed frontend client sends, their shape, their name and what a mapper may never decide.
----
-
 # Writing DTOs
 
-Load `nzt-build-csharp` before applying this.
+## Contents
+- The shape
+- One DTO per use case, and they are never shared
+- The name says what it is for; the suffix says what it is
+- A DTO that belongs to another is declared inside it
+- Mapping
+- Closing checklist
 
 ## The shape
 

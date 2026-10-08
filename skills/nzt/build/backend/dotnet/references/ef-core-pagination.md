@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-ef-core-pagination
-description: Use when a read returns a page of results - one PaginateAsync extension written once, called after the projection, over a query that always ends its ordering in a unique column.
----
-
 # `PaginateAsync` — a page of a listing
 
 Paging is the same three steps in every listing — count, skip, take — so it is written
@@ -20,9 +15,6 @@ It runs **two queries**: `CountAsync` over the query as it arrives — same filt
 and then the page itself, `Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(…)`.
 If the count comes back zero the second query is not run and the items come back empty.
 **`pageNumber` is 1-based**: page 1 is the first page, there is no page 0.
-
-Load `nzt-build-backend-dotnet`, `nzt-build-backend-dotnet-ef-core` and
-`nzt-build-backend-dotnet-ef-core-queries` before applying this.
 
 ## The response
 

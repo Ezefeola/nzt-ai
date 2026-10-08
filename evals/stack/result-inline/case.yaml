@@ -8,7 +8,8 @@ description: >
 tags: [stack]
 expected_outcome: >
   Loads the use-case and Result leaves and writes ExecuteAsync with each failure returning
-  Result<T>.Failure inline, with its status code and the message from the entity's Errors.
+  Result<T>.Failure inline, with its status code and the message from the entity's Errors:
+  404 at the null check, 409 at the error list the entity's Confirm returns.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -19,10 +20,10 @@ execution:
   timeout_seconds: 900
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
-  - name: use-case-leaf-fired
+  - name: use-case-reference-read
     type: tool_used
-    tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-backend-dotnet-use-cases"'
+    tool: Read
+    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+use-cases\.md'
   - name: no-private-method-returning-a-result
     type: regex
     pattern: 'private\s+(static\s+)?(async\s+)?(Task<)?Result<'
@@ -30,10 +31,15 @@ graders:
   - name: builds-the-result-at-every-return
     type: llm
     criteria: |
-      The reply is in Spanish and contains C# for a use case that confirms an order, with
-      three failing branches.
-      PASS if every failing branch returns Result<...>.Failure(...) written at that return,
-      with its own status code and its message taken from the entity's Errors.
-      FAIL if any branch returns through a private helper, a local function or a field that
+      The reply is in Spanish and contains C# for a use case that confirms an order. The
+      story gives 404 when the order does not exist, and 409 for both failures the entity
+      owns - already confirmed, no lines - so in DDD the entity's Confirm method returns its
+      error list and the use case returns it.
+      PASS if every return that fails is Result<...>.Failure(...) written at that return,
+      with its status code and messages from the entity's Errors: the 404 at the null check,
+      and the 409 at the check of the error list Confirm returned (one return for that list
+      is the domain pattern, not a collapse). Checking each entity failure separately, each
+      with its own inline Failure, also passes.
+      FAIL if any failure returns through a private helper, a local function or a field that
       builds the Result - a Rejected(), NotFound() or similar - even if the rest are inline,
-      and FAIL if the repeated failures are collapsed into one shared return.
+      or if the not-found failure is merged with the entity's failures into one return.

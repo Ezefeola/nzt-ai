@@ -1,15 +1,8 @@
----
-name: nzt-build-backend-dotnet-ef-core
-description: Use when the stack selects EF Core and an operation reaches the database - tracking, the context's lifetime and what never happens inside a loop, loaded with whichever EF Core operation applies.
----
-
 # EF Core — what holds for every operation
 
 These are the rules that do not change with the operation. **Load this together with the
 operation's skill**, never instead of it: the query, the write, the mapping and the migration
 each have their own.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## Tracking: the default stays, `AsNoTracking` is written
 

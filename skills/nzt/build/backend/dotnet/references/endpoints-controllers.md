@@ -1,8 +1,3 @@
----
-name: nzt-build-backend-dotnet-endpoints-controllers
-description: Use when the stack selects controllers and an ASP.NET Core endpoint is written or changed - one controller per feature, no constructor, and every action declaring what it needs.
----
-
 # Controller endpoints
 
 **What the model is for:** a controller is a **class that groups the operations of one
@@ -10,8 +5,6 @@ feature**, with routing declared as attributes and the MVC pipeline — binding,
 conventions — around it.
 
 **This project has no minimal API endpoints, and you do not add one.**
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-api` before applying this.
 
 ## One controller per feature
 

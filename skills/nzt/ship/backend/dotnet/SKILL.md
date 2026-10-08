@@ -25,14 +25,18 @@ If you did not arrive here from `nzt-ship`, load it first.
 ## Choose the reference
 
 Paths are relative to this skill's folder. **Read the file before acting on the row** — the
-row is not the guidance, the file is.
+row is not the guidance, the file is. `../nzt-ship/` is the generic practice the row belongs
+to; if `nzt-ship` already had you read it in this session, do not read it again.
 
 | The unit is | Read | Read with |
 |---|---|---|
-| Packaging the component as a container image | `references/containers.md` | `nzt-ship-release` |
-| Getting migrations into an environment | `references/migrations.md` | `nzt-ship-release` |
-| Writing or repairing the CI gates | `references/pipeline.md` | `nzt-ship-pipeline` |
-| Health checks, telemetry, structured logging | `references/observability.md` | `nzt-ship-observability` |
+| Packaging the component as a container image | `references/containers.md` | `../nzt-ship/references/release.md` |
+| Getting migrations into an environment | `references/migrations.md` | `../nzt-ship/references/release.md` |
+| Writing or repairing the CI gates | `references/pipeline.md` | `../nzt-ship/references/pipeline.md` |
+| Health checks, telemetry, structured logging | `references/observability.md` | `../nzt-ship/references/observability.md` |
+
+Wherever a reference here names `nzt-build-dependencies` or `nzt-build-secrets`, it means
+`../nzt-build/references/<name>.md`: read that file — it is not a skill.
 
 **Reuse what is already loaded**, and read only the row the unit is. A deployment that also
 carries a schema change is two rows, and that is the one combination that happens often.
@@ -42,9 +46,9 @@ carries a schema change is two rows, and that is the one combination that happen
 - **Whether to deploy, and where.** The authorisation names the environment, and that rule lives
   in `nzt-ship`. Nothing here creates permission to touch an environment.
 - **Whether a migration exists.** Generating one is build work
-  (`nzt-build-backend-dotnet-ef-core-migrations`); this area only packages and applies what is
+  (`../nzt-build-backend-dotnet/references/ef-core-migrations.md`); this area only packages and applies what is
   already in the repository.
-- **What the pipeline's gates are.** `nzt-ship-pipeline` decides that; these references give the
+- **What the pipeline's gates are.** `../nzt-ship/references/pipeline.md` decides that; these references give the
   .NET commands and what each one needs to work.
 
 ## Closing checklist

@@ -1,15 +1,18 @@
----
-name: nzt-build-backend-dotnet-persistence-repositories
-description: Use when the stack selects repositories with a unit of work and an operation reaches persistence - one repository per aggregate root, reached through the unit of work, which is the only thing that saves.
----
-
 # Repositories and unit of work
+
+## Contents
+- One per aggregate root, with its own interface
+- It returns results, never an `IQueryable`
+- Reads go through it too, projections included
+- What a repository does not do
+- The unit of work is the single door
+- It is the only thing that saves
+- What comes with the single door
+- Closing checklist
 
 The persistence axis says repositories with a unit of work, so **every access to the database
 goes through a repository**, and the repositories are reached **through the unit of work** —
 never injected on their own.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## One per aggregate root, with its own interface
 

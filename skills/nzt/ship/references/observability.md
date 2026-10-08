@@ -1,8 +1,3 @@
----
-name: nzt-ship-observability
-description: Use when health checks, logs, metrics, traces or alerts are added or reviewed, starting from the signals a rollback is decided on.
----
-
 # Observability
 
 Produces the instrumentation that answers two questions — **is it working?** and **where
@@ -11,8 +6,6 @@ and why is it not?** — and nothing else. Not a catalogue of everything measura
 **Start from the signals the release compares to decide a rollback.** If a threshold in
 `Docs/deployment.md` mentions a signal, that signal is instrumented first; otherwise the
 release has a rule it cannot evaluate.
-
-If you did not arrive here from `nzt-ship`, load it first.
 
 ## Health checks
 

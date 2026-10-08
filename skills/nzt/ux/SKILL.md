@@ -38,8 +38,8 @@ row is not the guidance, the file is.
 | The design system, shared components, or the visual direction | `references/system.md` | — |
 | Judging a design, a mockup or a built screen against its task | `references/review.md` | — |
 
-The references, and other phases, still name these by their old skill names (`nzt-ux-system`
-is `references/system.md`): those are this table's rows, never skills to load.
+Wherever a file names `nzt-ux-<name>`, it means `references/<name>.md` in this folder
+(`nzt-ux-system` → `references/system.md`): read that file — it is not a skill.
 
 ## When to skip this phase
 

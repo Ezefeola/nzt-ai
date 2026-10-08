@@ -1,14 +1,7 @@
----
-name: nzt-build-backend-dotnet-ef-core-writes
-description: Use when an operation stages entity changes and saves them - insert, update and delete on tracked entities, one SaveChangesAsync at the end, and the write conflicts worth recognising.
----
-
 # EF Core writes — staging and saving
 
 A write is **changes staged on tracked entities and saved once**. What the save cannot express
 set-based — many rows by criteria — belongs to `nzt-build-backend-dotnet-ef-core-bulk`.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## One entity at a time
 

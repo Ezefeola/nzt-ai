@@ -1,14 +1,7 @@
----
-name: nzt-build-secrets
-description: Use when credentials or sensitive configuration are involved: keeping values out of the chat, code, logs and evidence, and treating exposure as compromise.
----
-
 # Secrets and sensitive configuration
 
 Produces code and configuration where a secret is **referenced and never reproduced**. The
 value lives in the project's own mechanism; everything else names the key.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## The three rules
 

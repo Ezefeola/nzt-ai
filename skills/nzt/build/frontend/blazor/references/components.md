@@ -1,9 +1,16 @@
----
-name: nzt-build-frontend-blazor-components
-description: Use when writing or changing a Blazor component - parameters in and events out, the lifecycle, the typed client that is the only way to the API, and the three states every screen that loads data has.
----
-
 # Writing a Blazor component
+
+## Contents
+- The file, and the order inside it
+- Parameters in, events out
+- Injection follows the chosen organisation
+- The lifecycle
+- Nothing blocks, and the component owns its cancellation
+- The typed client is how a screen reaches the API
+- Every screen that loads data has three states
+- What a component never does
+- Interop and authorisation
+- Closing checklist
 
 A component is **a piece of screen plus the code that drives it**. Everything it needs to do it
 does through a **typed client**; it never talks to the network itself and it never decides a
@@ -12,8 +19,6 @@ business rule.
 **How the project is laid out belongs to the architecture skill, and how it renders to the
 render-mode skill.** This is the component itself. A form has its own:
 `nzt-build-frontend-blazor-forms`.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## The file, and the order inside it
 

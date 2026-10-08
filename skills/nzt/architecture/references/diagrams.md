@@ -1,14 +1,17 @@
----
-name: nzt-architecture-diagrams
-description: Use before drawing any diagram: which of the seven is earned, how it is offered, and the rules all of them obey.
----
-
 # Diagrams — which one, and the rules all of them share
+
+## Contents
+- A diagram is offered, never assumed
+- The catalog
+- `flow` or `sequence` — the boundary
+- `context` or `bounded-contexts` — the boundary
+- The rules every diagram obeys
+- What may never be a node
+- The two that are never drawn
+- Done when
 
 Decides **which diagram is earned** and carries the conventions every one of them obeys, so
 no diagram skill repeats them. It draws nothing by itself.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## A diagram is offered, never assumed
 
@@ -38,10 +41,10 @@ Seven, and it is closed. A picture outside this table is not drawn.
 | `state` | which business states exist and which transition is legal | a feature design | the feature has an entity with states |
 | `flow` | what is decided, in what order | a feature design | the branching lives **entirely inside one component** |
 
-Once a diagram is earned, load the skill that draws it: it carries the node limit and the
-conventions of that picture.
+Once a diagram is earned, the guidance that draws it carries the node limit and the
+conventions of that picture — the router's table says which file goes with this one.
 
-| Load | To draw |
+| Drawn by | To draw |
 |---|---|
 | `nzt-architecture-diagrams-components` | `context` and `components` |
 | `nzt-architecture-diagrams-domain` | `bounded-contexts` and `aggregates` |

@@ -1,14 +1,7 @@
----
-name: nzt-verify-review
-description: Use when code is read for defects instead of executed: forgotten edges, the two-at-once case, impossible states, and what is swallowed silently.
----
-
 # Reading code for defects
 
 Produces findings, ordered by what breaks worst, each one with when it fails and what the
 code does. It changes nothing unless the request was to repair.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 **The difference with running the tests is the whole reason this exists**: a scenario
 measures against the spec and stops where the spec stops. Here you find what is broken **even

@@ -1,15 +1,7 @@
----
-name: nzt-build-backend-dotnet-results-extensions
-description: Use when the stack selects result-extensions and a Result has to become an HTTP response - the payload bare on success, ProblemDetails on failure, and one place that does the translation.
----
-
 # Result to HTTP — the extension
 
 **The `Result` never leaves the process.** What goes out is the payload on success and a
 `ProblemDetails` on failure.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-results-pattern` before
-applying this.
 
 ## The extension
 

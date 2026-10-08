@@ -1,13 +1,13 @@
----
-name: nzt-architecture-diagrams-behavior
-description: Use when drawing a feature's flow as a sequence, an entity's business states, or the decisions inside one component.
----
-
 # The three pictures of a feature design
 
-All three live in `Plan/specs/<feature>/tech-design/design.md`, beside the flow they explain.
+## Contents
+- They show the order and the who, never the rule
+- `sequence` — the order between participants
+- `state` — the life of one entity
+- `flow` — the decisions inside one component
+- Done when
 
-Load `nzt-architecture` and `nzt-architecture-diagrams` before applying this.
+All three live in `Plan/specs/<feature>/tech-design/design.md`, beside the flow they explain.
 
 ## They show the order and the who, never the rule
 

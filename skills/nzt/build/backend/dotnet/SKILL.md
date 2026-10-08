@@ -6,7 +6,8 @@ description: Use when the component's stack selects C# and .NET for the backend,
 # Backend on .NET — selection by stack axis
 
 This router loads nothing by itself. It reads the component's stack document and turns each
-axis into **the one skill** that axis selected.
+axis into **the one reference** that axis selected. Paths are relative to this skill's folder.
+**Read the file before acting on the row** — the row is not the guidance, the file is.
 
 If you did not arrive here from `nzt-build`, load it first.
 
@@ -28,60 +29,73 @@ anything, and before choosing a technology or a pattern.
 ## Required guidance
 
 Load `nzt-build-csharp` before applying any row here. **Reuse what is already loaded: this
-table is a selection, not an order to load every line.** A real task loads three or four.
+table is a selection, not an order to read every line.** A real task reads three or four.
 
-## Exclusive axes — load only what the stack selected
+## Exclusive axes — read only what the stack selected
 
-The stack names the concept; this table turns it into a skill. Never load two rows of the
-same axis.
+The stack names the concept; this table turns it into a reference. Never read two rows of
+the same axis.
 
-| Axis | The stack says | Load |
-|---|---|---|
-| Architecture | `vertical-slice` | `nzt-build-backend-dotnet-architecture-vertical-slice` |
-| | `clean-architecture` | `nzt-build-backend-dotnet-architecture-clean` |
-| | `hexagonal-architecture` | `nzt-build-backend-dotnet-architecture-hexagonal` |
-| Endpoints | `minimal-apis` | `nzt-build-backend-dotnet-endpoints-minimal` |
-| | `controllers` | `nzt-build-backend-dotnet-endpoints-controllers` |
-| Domain model | `ddd` | `nzt-build-backend-dotnet-domain-ddd` |
-| | `anemic` | `nzt-build-backend-dotnet-domain-anemic` |
-| Persistence | `repositories` | `nzt-build-backend-dotnet-persistence-repositories` |
-| | `direct` | `nzt-build-backend-dotnet-persistence-direct` |
-| Result to HTTP | `result-extensions` | `nzt-build-backend-dotnet-results-extensions` |
-| | `result-filter` | `nzt-build-backend-dotnet-results-filter` |
+| Axis | The stack says | Read | Read with |
+|---|---|---|---|
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | — |
+| | `clean-architecture` | `references/architecture-clean.md` | — |
+| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | — |
+| Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | `references/api.md` |
+| | `controllers` | `references/endpoints-controllers.md` | `references/api.md` |
+| Domain model | `ddd` | `references/domain-ddd.md` | `references/domain-ddd-behaviour.md` — the same guidance, split at 200 lines |
+| | `anemic` | `references/domain-anemic.md` | — |
+| Persistence | `repositories` | `references/persistence-repositories.md` | — |
+| | `direct` | `references/persistence-direct.md` | — |
+| Result to HTTP | `result-extensions` | `references/results-extensions.md` | `references/results-pattern.md` |
+| | `result-filter` | `references/results-filter.md` | `references/results-pattern.md` |
 
-**A stack that names the skill instead of the concept resolves by the skill's documented
-meaning.** A stack that names neither is a gap in the stack document: say so and fill it
-there, do not pick one here.
+**A stack that names the old skill instead of the concept resolves by that reference's
+documented meaning.** A stack that names neither is a gap in the stack document: say so and
+fill it there, do not pick one here.
 
 ## Rows the task selects
 
-| The work touches | Load |
-|---|---|
-| The operation and its orchestration | `nzt-build-backend-dotnet-use-cases` |
-| The inputs of an operation and their validators | `nzt-build-backend-dotnet-validation` |
-| Anything returning `Result` from a use case | `nzt-build-backend-dotnet-results-pattern` |
-| API wiring: routing, model binding, pipeline | `nzt-build-backend-dotnet-api` |
-| An exception that can escape a use case, or the API's error handling | `nzt-build-backend-dotnet-exceptions` |
-| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `nzt-build-backend-dotnet-domain-value-objects` |
-| A protected resource, permissions, suspected unauthorised access | `nzt-build-backend-dotnet-security` |
-| Test projects, doubles, running the suite | `nzt-build-backend-dotnet-testing` |
+| The work touches | Read | Read with |
+|---|---|---|
+| The operation and its orchestration | `references/use-cases.md` | — |
+| The inputs of an operation and their validators | `references/validation.md` | — |
+| Anything returning `Result` from a use case | `references/results-pattern.md` | — |
+| API wiring: routing, model binding, pipeline | `references/api.md` | — |
+| An exception that can escape a use case, or the API's error handling | `references/exceptions.md` | `references/use-cases.md` |
+| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/domain-value-objects.md` | — |
+| A protected resource, permissions, suspected unauthorised access | `references/security.md` | — |
+| Test projects, doubles, running the suite | `references/testing.md` | `../nzt-build/references/tests.md` |
+
+Wherever a file names `nzt-build-backend-dotnet-<name>` and this folder has
+`references/<name>.md`, that is what it means
+(`nzt-build-backend-dotnet-domain-ddd` → `references/domain-ddd.md`): read that file — it is
+not a skill.
+
+Wherever a file here names `nzt-build-tests`, `nzt-build-dependencies` or
+`nzt-build-secrets`, it means `../nzt-build/references/<name>.md`
+(`nzt-build-tests` → `../nzt-build/references/tests.md`): read that file — it is not a
+skill. If `nzt-build` already had you read it in this session, do not read it again. Likewise
+`nzt-build-csharp-<name>` means `../nzt-build-csharp/references/<name>.md`.
 
 ## EF Core
 
-Only when the stack selected EF Core as the ORM. `nzt-build-backend-dotnet-ef-core` carries
-the rules that hold for all of it — tracking, the context's lifetime, what never happens in
-a loop — and is loaded with any of the rows below.
+Only when the stack selected EF Core as the ORM. **Read `references/ef-core.md` first, every
+time, whatever the row**: it carries the rules that hold for all of it — tracking, the
+context's lifetime, what never happens in a loop — and no row below repeats them. Then read
+the row's file **and every file in its *Read with* column**; a row read alone is half the
+guidance.
 
-| The operation | Load |
-|---|---|
-| Reading data: query shape, projection, execution | `nzt-build-backend-dotnet-ef-core-queries` |
-| Returning a page of results | `nzt-build-backend-dotnet-ef-core-pagination` |
-| Staging and saving changes, write conflicts | `nzt-build-backend-dotnet-ef-core-writes` |
-| Updating or deleting many rows by criteria | `nzt-build-backend-dotnet-ef-core-bulk` |
-| DbContext configuration, entity mapping, relationships | `nzt-build-backend-dotnet-ef-core-mappings` |
-| Mapping an aggregate or a value object | `nzt-build-backend-dotnet-ef-core-domain` |
-| A schema change that needs a migration | `nzt-build-backend-dotnet-ef-core-migrations` |
-| An index, or a uniqueness rule to enforce | `nzt-build-backend-dotnet-ef-core-indexes` |
+| The operation | Read | Read with — also required |
+|---|---|---|
+| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `references/ef-core.md` |
+| Returning a page of results | `references/ef-core-pagination.md` | `references/ef-core.md`, `references/ef-core-queries.md` |
+| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `references/ef-core.md` |
+| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `references/ef-core.md` |
+| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `references/ef-core.md` |
+| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `references/ef-core.md` |
+| A schema change that needs a migration | `references/ef-core-migrations.md` | `references/ef-core.md` |
+| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `references/ef-core.md` |
 
 ## Two escapes, and they are not the same
 
@@ -93,7 +107,7 @@ a loop — and is loaded with any of the rows below.
 
 ## Independent axes
 
-Getting these wrong loads skills that contradict each other:
+Getting these wrong reads references that contradict each other:
 
 - **Domain model and persistence are independent.** DDD does not imply repositories, and an
   anemic model does not imply direct access.
@@ -106,7 +120,7 @@ Getting these wrong loads skills that contradict each other:
 
 ## Closing checklist
 
-- [ ] Every row loaded was selected by the stack document, not by preference.
-- [ ] No two rows of the same axis were loaded.
+- [ ] Every row read was selected by the stack document, not by preference.
+- [ ] No two rows of the same axis were read.
 - [ ] Versions used came from the manifest, and any disagreement with the stack was reported.
 - [ ] The stack document was updated in this unit if the work changed what it declares.

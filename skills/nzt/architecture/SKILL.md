@@ -58,9 +58,9 @@ offer three ways:
 | **Together** | asks them too, **grouped into one round**, never one at a time |
 | **Dictated** | the user says how it goes, and the agent writes it |
 
-The mode governs **only the middle row of the table above**. A checkable fact is never
-asked in any mode; a tradeoff is always asked in every one. It is chosen per document, and
-what was chosen goes in the log.
+The mode governs **only the middle row of the table above**, so those details get no answer
+— not even a suggested one — until it is chosen. A checkable fact is never asked in any
+mode; a tradeoff is always asked in every one. It is chosen per document, and logged.
 
 **Dictated does not mean stenography.** What the user dictates is contrasted against the
 spec and the stack, and a contradiction is raised before it is written — otherwise it is
@@ -87,24 +87,34 @@ Every entry says **where it came from**, and one is never dressed as another:
 | `propuesta` | offered, not answered yet |
 | `[TO-DEFINE]` | explicitly out of scope, and it appears in every report until it is resolved |
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| The product's structure: components, boundaries, external systems | `nzt-architecture-design-product` |
-| One component's adopted technologies, versions and areas | `nzt-architecture-stack` |
-| One feature's technical design: flows, data, integrations | `nzt-architecture-design-feature` |
-| The entities of the business, their fields and their aggregates | `nzt-architecture-domain` |
-| More than one context, or meaning shared with a third party | `nzt-architecture-contexts` |
-| A consequential decision with alternatives and consequences | `nzt-architecture-adr` |
-| A decision that needs agreement from people outside this conversation — **on request** | `nzt-architecture-rfc` |
-| Technical work found and deliberately deferred | `nzt-architecture-tech-debt` |
-| Judging an existing structure against evidence, not designing one | `nzt-architecture-review` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
 
-**A diagram is never drawn from habit.** When a document of this phase earns one, load
-`nzt-architecture-diagrams`: it decides which of the seven is earned, offers it, and names
-the skill that draws it. A diagram the user does not want is not drawn, and the prose
-carries the weight alone.
+| The unit is | Read | Read with |
+|---|---|---|
+| The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/diagrams.md` |
+| One component's adopted technologies, versions and areas | `references/stack.md` | — |
+| One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/diagrams.md` |
+| The entities of the business, their fields and their aggregates | `references/domain.md` | — |
+| More than one context, or meaning shared with a third party | `references/contexts.md` | — |
+| A consequential decision with alternatives and consequences | `references/adr.md` | — |
+| A decision that needs agreement from people outside this conversation — **on request** | `references/rfc.md` | — |
+| Technical work found and deliberately deferred | `references/tech-debt.md` | — |
+| Judging an existing structure against evidence, not designing one | `references/review.md` | — |
+| Deciding whether a document earns a diagram, and offering it | `references/diagrams.md` | — |
+| Drawing `context` or `components` | `references/diagrams-components.md` | `references/diagrams.md` |
+| Drawing `bounded-contexts` or `aggregates` | `references/diagrams-domain.md` | `references/diagrams.md` |
+| Drawing `sequence`, `state` or `flow` | `references/diagrams-behavior.md` | `references/diagrams.md` |
+
+Wherever a file names `nzt-architecture-<name>`, it means `references/<name>.md` in this
+folder (`nzt-architecture-adr` → `references/adr.md`): read that file — it is not a skill.
+
+**A diagram is never drawn from habit, and it is offered while the document is planned.**
+So `references/diagrams.md` is read before that plan is shown — with the design rows, as
+their Read with says — and the row that draws one is read only once the user wants it. A
+diagram the user does not want is not drawn, and the prose carries the weight alone.
 
 ## When to skip this phase
 
@@ -159,8 +169,8 @@ decision record.
 - Respect what exists. In an existing system the current structure is a constraint and a
   source of information, not an accident to correct in passing.
 - A technical question that belongs to this phase is written in its log with a stable
-  `QT-NN` **before** it is asked or decided. One that belongs to a later phase is written
-  where that phase will read it, and is not decided early.
+  `QT-NN` (`QT-01`, `QT-02`…) **before** it is asked or decided, and every reply names it by
+  that id. One that belongs to a later phase goes where that phase reads it, undecided.
 - **An answered `QT-NN` is never deleted and never edited**: the log is append-only, and a
   superseded answer stays with a line saying what superseded it. A question that disappears
   once it is answered leaves the next reader deciding it again, with nothing saying it was

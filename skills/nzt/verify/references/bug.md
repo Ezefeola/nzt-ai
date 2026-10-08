@@ -1,14 +1,7 @@
----
-name: nzt-verify-bug
-description: Use when a defect is recorded or its state moves: one file per defect, the three states, and the retest that decides whether it closes.
----
-
 # Bug record
 
 Produces `Plan/specs/<feature>/testing/bugs/BUG-NNN-<slug>.md`, one file per defect. **This
 phase opens it and this phase closes it, even when build was the one that fixed it.**
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## What is a bug and what is not
 

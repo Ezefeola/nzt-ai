@@ -1,17 +1,18 @@
----
-name: nzt-build-backend-dotnet-domain-anemic
-description: Use when the stack selects an anemic domain model and that model changes - entities that are data, rules that live in the use case, and the duplication that choice accepts on purpose.
----
-
 # Anemic domain model
+
+## Contents
+- The entity
+- `Rules` and `Errors` still live on the entity
+- The rules live in the use case
+- A rule two use cases need is duplicated
+- What does not happen here
+- Closing checklist
 
 The domain axis says anemic, so **entities are data and the rules live in the use case**.
 **This is a decision, not an omission**: the project has one place where anything is decided,
 and it is the use case.
 
 Where the files live is the architecture skill's business; the mapping is the ORM's.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The entity
 

@@ -34,6 +34,9 @@ graders:
     criteria: |
       The reply is in Spanish and proposes a user manual for the operators of the orders
       product.
+      Judge the chapters it names, not the steps of its plan: steps such as building the
+      shell (front page, index, search) or a final coherence pass are work units, not
+      chapters. One chapter is a valid answer when only one task is verified.
       PASS if its chapters are things the operator wants to accomplish, named the way they
       would say them, and the manual is one self-contained HTML file that opens without a
       server or a network.

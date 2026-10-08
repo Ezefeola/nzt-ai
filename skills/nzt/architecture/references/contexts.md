@@ -1,14 +1,16 @@
----
-name: nzt-architecture-contexts
-description: Use when the business has more than one context, or shares meaning with a third party: what a term means in each, who depends on whom, and the domain events.
----
-
 # Context map
+
+## Contents
+- It talks about meaning, not machinery
+- The file
+- Writing it
+- Domain events
+- What this document does not carry
+- The diagram
+- Done when
 
 Produces `Docs/context-map.md`: how the business is cut up and who depends on whom. Its
 reader is deciding where to spend effort and which model to defend.
-
-If you did not arrive here from `nzt-architecture`, load it first.
 
 ## It talks about meaning, not machinery
 

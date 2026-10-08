@@ -52,8 +52,8 @@ before its curriculum and progress record exist.
 | Scheduling and running the reviews | `references/retain.md` | — |
 | Writing an exercise brief, or its solution afterwards | `references/exercises.md` | — |
 
-The references still name each other by their old skill names (`nzt-learn-tutor` is
-`references/tutor.md`): those are this table's rows, never skills to load.
+Wherever a file names `nzt-learn-<name>`, it means `references/<name>.md` in this folder
+(`nzt-learn-tutor` → `references/tutor.md`): read that file — it is not a skill.
 
 ## One unit
 

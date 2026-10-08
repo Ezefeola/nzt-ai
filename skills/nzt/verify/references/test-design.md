@@ -1,15 +1,20 @@
----
-name: nzt-verify-test-design
-description: Use when the test cases of a story are derived: the technique per rule, the cases techniques never generate, and the coverage table.
----
-
 # Test design
+
+## Contents
+- Where the expected result comes from
+- Derive the cases, do not list them
+- The target changes the case, not the technique
+- What no technique generates for you
+- Priority by risk
+- Traceability, both ways
+- Coverage
+- The scenario
+- The plan is approved before anything runs
+- Done when
 
 Produces the pre-run half of `Plan/specs/<feature>/testing/<story>.md`: the scenarios, their
 data, their expected result and their material effects — **written and approved before
 anything is executed**.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## Where the expected result comes from
 

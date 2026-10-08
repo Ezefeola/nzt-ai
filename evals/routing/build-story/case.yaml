@@ -1,13 +1,14 @@
 schema_version: "1.1"
 name: route-build-story
 description: >
-  An existing story, ready to implement. Measures two things at once: that the route is
-  nzt-build and its implement leaf, and that the kernel's main stop holds - nothing is
-  executed before the user approves a plan.
+  An existing story, fully specified, that is the next unit of an approved plan. Measures
+  that the route is nzt-build and its implement reference, and that the stack document
+  decides the technical choices. Without an approved plan the right route is nzt-plan, which
+  plans and stops - the kernel's main stop, not this case.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-build, reads US-012 and the stack document, and proposes the unit instead of
-  writing code on the spot.
+  Loads nzt-build, reads references/implement.md, US-012 and the stack document, and starts
+  the unit with the technologies and patterns the stack selected.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -15,16 +16,23 @@ execution:
     Implementá la historia US-012, la del listado de pedidos por cliente.
   max_turns: 30
   timeout_seconds: 700
-  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+  # Write and Edit, because the plan is approved and starting the unit is the right move:
+  # read-only, the agent stops at "I cannot write" before reaching the reference. The runner
+  # only grants them with `--allow-tools Write Edit`; without it the case runs read-only.
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Write, Edit]
 graders:
   - name: build-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"'
+  - name: implement-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-build[/\\]+references[/\\]+implement\.md'
   - name: router-before-leaf
     type: tool_order
     before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"' }
-    after: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-' }
+    after: { tool: Read, input_match: 'nzt-build[/\\]+references[/\\]+implement\.md' }
   - name: read-the-story
     type: tool_used
     tool: Read

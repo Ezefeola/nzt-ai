@@ -1,14 +1,18 @@
----
-name: nzt-build-csharp-linq
-description: Use when C# code reads, transforms or checks a collection in memory: which operator says what you mean, and what to never do to a chain. EF Core execution belongs to its own skills.
----
-
 # LINQ
+
+## Contents
+- This skill is base .NET only
+- Existence and counting
+- Enumerate once
+- Order of operations
+- Lookups instead of nested loops
+- `OfType<T>` filters by type and drops nulls
+- Pick the operator that says what you mean
+- Never return null for a sequence
+- Closing checklist
 
 Method syntax, always. Query syntax (`from x in xs select x`) is never used, not even for
 joins and groupings: one syntax across a codebase means one thing to read.
-
-Load `nzt-build-csharp` before applying this.
 
 ## This skill is base .NET only
 

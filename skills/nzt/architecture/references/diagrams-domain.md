@@ -1,15 +1,13 @@
----
-name: nzt-architecture-diagrams-domain
-description: Use when drawing the bounded-context map with its dependency patterns, or the aggregate map of what stays consistent at the same instant.
----
-
 # The context map and the aggregate map
+
+## Contents
+- `bounded-contexts` — who adapts to whom
+- `aggregates` — what is true at the same instant
+- Done when
 
 The two diagrams that draw the **business**, not the solution. Everything the shared rules
 forbid still holds, and these two add their own lists — because a context and an aggregate
 are not built things.
-
-Load `nzt-architecture` and `nzt-architecture-diagrams` before applying this.
 
 ## `bounded-contexts` — who adapts to whom
 

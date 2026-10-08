@@ -6,7 +6,8 @@ description: Use when the component's stack selects Blazor for the frontend, bef
 # Frontend on Blazor — selection by stack axis
 
 This router loads nothing by itself. It reads the component's stack document and turns each
-axis into **the one skill** that axis selected.
+axis into **the one reference** that axis selected. Paths are relative to this skill's folder.
+**Read the file before acting on the row** — the row is not the guidance, the file is.
 
 If you did not arrive here from `nzt-build`, load it first.
 
@@ -31,26 +32,26 @@ and before choosing a technology or a pattern.
 
 ## Required guidance
 
-Load `nzt-build-csharp` before applying any row here, and `nzt-build-csharp-dtos` when a typed
-client's DTOs are involved. **Reuse what is already loaded: this table is a selection, not an
-order to load every line.** A real task loads three or four.
+Load `nzt-build-csharp` before applying any row here, and read its `references/dtos.md`
+(`../nzt-build-csharp/references/dtos.md`) when a typed client's DTOs are involved. **Reuse what is already loaded: this table is a selection, not an
+order to read every line.** A real task reads three or four.
 
 **The UI documents decide what the screen looks like, not this tree**: `Docs/design-system.md`
 for visual work, states and wording, `Docs/ui-components.md` before adding a shared component.
 **Reuse the component library the stack adopted before writing a custom component.**
 
-## Exclusive axes — load only what the stack selected
+## Exclusive axes — read only what the stack selected
 
-| Axis | The stack says | Load |
-|---|---|---|
-| Architecture | `vertical-slice` | `nzt-build-frontend-blazor-architecture-vertical-slice` |
-| Render mode | `server` | `nzt-build-frontend-blazor-render-server` |
-| | `webassembly` | `nzt-build-frontend-blazor-render-webassembly` |
-| | `auto` | `nzt-build-frontend-blazor-render-auto` |
-| | `static` | `nzt-build-frontend-blazor-render-static` |
+| Axis | The stack says | Read | Read with |
+|---|---|---|---|
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | — |
+| Render mode | `server` | `references/render-server.md` | `references/components.md` |
+| | `webassembly` | `references/render-webassembly.md` | `references/components.md` |
+| | `auto` | `references/render-auto.md` | `references/components.md` |
+| | `static` | `references/render-static.md` | `references/components.md`, and `references/forms.md` when the page posts |
 
-**A render-mode skill is loaded only when the work touches rendering behaviour.** A copy change
-inside an established component does not need one.
+**A render-mode reference is read only when the work touches rendering behaviour.** A copy
+change inside an established component does not need one.
 
 **Architecture has one alternative here, and that is a fact about this set, not about Blazor.**
 A stack naming another concept for the frontend is a gap in the stack document: say so and
@@ -58,12 +59,16 @@ resolve it there, do not improvise a layout.
 
 ## Rows the task selects
 
-| The work touches | Load |
-|---|---|
-| A component: parameters, lifecycle, injection, the typed client, the three states | `nzt-build-frontend-blazor-components` |
-| A form, its validation or its submission | `nzt-build-frontend-blazor-forms` |
-| Prerendered state, initial state transfer, persistent services | `nzt-build-frontend-blazor-prerendering` |
-| Lists, grids, components repeated at scale, high-frequency events | `nzt-build-frontend-blazor-performance` |
+| The work touches | Read | Read with |
+|---|---|---|
+| A component or a screen: parameters, lifecycle, injection, the typed client, the three states | `references/components.md` | — |
+| A form, its validation or its submission | `references/forms.md` | `references/components.md` |
+| Prerendered state, initial state transfer, persistent services | `references/prerendering.md` | the render-mode reference the stack selected |
+| Lists, grids, components repeated at scale, high-frequency events — after a measurement | `references/performance.md` | `references/components.md` |
+
+Wherever a file names `nzt-build-frontend-blazor-<name>`, it means `references/<name>.md` in
+this folder (`nzt-build-frontend-blazor-render-auto` → `references/render-auto.md`): read that
+file — it is not a skill.
 
 ## Two escapes, and they are not the same
 
@@ -80,15 +85,15 @@ resolve it there, do not improvise a layout.
   WebAssembly does not, and code that assumes two initialisations is wrong in both directions.
 - **`AuthorizeView` hides, it does not protect.** It controls what the screen shows; whether the
   operation may run is decided by the backend
-  (`nzt-build-backend-dotnet-security`). A hidden button is not a permission.
+  (`../nzt-build-backend-dotnet/references/security.md`). A hidden button is not a permission.
 - **A screen never talks to the network itself.** Every call goes through its feature's typed
   client, which returns the same result shape the backend answers with. A component that holds
   an `HttpClient` is the boundary already broken.
 
 ## Closing checklist
 
-- [ ] Every row loaded was selected by the stack document, not by preference.
-- [ ] No two rows of the same axis were loaded, and the render-mode skill was loaded only
+- [ ] Every row read was selected by the stack document, not by preference.
+- [ ] No two rows of the same axis were read, and the render-mode reference was read only
       because the work touches rendering.
 - [ ] Versions used came from the manifest, and any disagreement with the stack was reported.
 - [ ] The design system and the component inventory were read before anything visual or shared.

@@ -45,7 +45,7 @@ offer, and no definition questions.
 
 - **Markdown, never inside a code block**, so the table renders.
 - One row per step, saying **what it produces and why**. The *why* is what lets the user
-  judge the approach instead of only the order.
+  judge the approach instead of only the order. Analysis produces the spec and its stories.
 - Under the table, three declarations: **where it stops**, **what it leaves out**, and what
   it covers beyond the minimum so the user can drop it. *"I am leaving out coupon
   administration: that is F-009 and you did not ask for it"* is what makes scope reviewable.

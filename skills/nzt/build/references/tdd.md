@@ -1,8 +1,3 @@
----
-name: nzt-build-tdd
-description: Use when the stack selected test-first for this component: the failing test before the code, and what is not written this way.
----
-
 # Test-first
 
 **This applies only where the stack document selected it.** An absent field does not enable
@@ -13,8 +8,6 @@ tests that ship with the code.
 **This leaf decides the order, never the value.** What is worth testing, what gets
 substituted and what makes a test survive a refactor is `nzt-build-tests`, and it holds
 whether the test comes first or last.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## The cycle
 

@@ -1,14 +1,13 @@
----
-name: nzt-architecture-diagrams-components
-description: Use when drawing the product's perimeter with its actors and third parties, or the map of its components with what travels on each arrow.
----
-
 # The context diagram and the component map
+
+## Contents
+- `context` — the perimeter
+- `components` — the map
+- What the map is not
+- Done when
 
 The two pictures of the solution's shape. `context` draws the product as one closed box with
 everyone who talks to it; `components` opens that box into who does what.
-
-Load `nzt-architecture` and `nzt-architecture-diagrams` before applying this.
 
 ## `context` — the perimeter
 

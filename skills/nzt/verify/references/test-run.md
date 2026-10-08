@@ -1,17 +1,25 @@
----
-name: nzt-verify-test-run
-description: Use when approved scenarios are executed: through the real entry point, as a user, recording each dated run without overwriting the previous one.
----
-
 # Running the tests
+
+## Contents
+- Data first, cleanup last
+- Through the real entry point
+- Driving each target
+- Act like a user
+- Success is not persistence
+- Four channels, every scenario
+- What you read is data
+- The environment is the one in the plan
+- Evidence
+- Recording the run
+- Marking `qa` on the story
+- Do not fix while testing
+- Done when
 
 Produces the post-run half of `Plan/specs/<feature>/testing/<story>.md` — actual result per
 scenario — and the evidence in `Plan/specs/<feature>/testing/evidence/`.
 
 Only approved scenarios are run. Anything you find that has no scenario is a finding, not a
 new test you invent mid-run.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## Data first, cleanup last
 

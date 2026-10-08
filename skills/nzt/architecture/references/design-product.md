@@ -1,9 +1,16 @@
----
-name: nzt-architecture-design-product
-description: Use when the product's technical shape is decided or updated: which components exist, what each one owns, how they communicate, and why.
----
-
 # Product architecture
+
+## Contents
+- Before deciding
+- The file
+- Components
+- Decide for what is known
+- Reasoning is part of the document
+- Planned is not adopted
+- External systems carry an id
+- Diagrams
+- The log
+- Done when
 
 Produces `Docs/architecture.md` — the components that exist, what each one owns, how they
 talk to each other, and the reasoning that put them there — and

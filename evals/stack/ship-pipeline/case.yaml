@@ -33,6 +33,10 @@ graders:
     type: tool_used
     tool: Read
     input_match: 'nzt-ship-backend-dotnet[/\\]+references[/\\]+pipeline\.md'
+  - name: generic-pipeline-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-ship[/\\]+references[/\\]+pipeline\.md'
   - name: other-rows-not-loaded
     type: tool_used
     tool: Read
@@ -52,6 +56,9 @@ graders:
       (c) unit tests and integration tests are two separate steps, and the integration step
       can reach a container runtime - a runner image that ships Docker counts, said in a
       comment or in the prose;
-      (d) there is a step for EF Core pending model changes.
+      (d) there is a step for EF Core pending model changes. The workspace has no DbContext
+      yet, so a step that is present but disabled counts when the reply names that missing
+      precondition and proposes how it gets enabled - that is the guidance's own rule (a gap
+      reported, not papered over). A gate silently left out does not count.
       FAIL if any of the four is absent from the reply, or if it raises the SDK or the target
       framework.

@@ -1,14 +1,7 @@
----
-name: nzt-verify-audit
-description: Use when the question is whether the documents are still true: each claim measured against the code, and what the code does that none of them declares.
----
-
 # Do the documents still tell the truth
 
 Produces a verdict per claim in the cut, plus what was checked and found consistent, plus
 what could not be checked. It corrects nothing on its own.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 Everything in this project stands on documents somebody wrote once. They were true the day
 they were approved. **This is the only reading that finds out whether they still are**, and

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-bash "$here/../../_fixtures/project.sh" "$PWD"
+# story-specified: US-012 with its maximum pageSize, empty state and tie-break, so the run
+# does not stop on a functional gap before reaching what this case measures.
+bash "$here/../../_fixtures/story-specified.sh" "$PWD"
 
 # The backend stack with unit tests only. The story reaches the database, so most of what
 # its criteria promise cannot be proven at the enabled level. That gap is exactly where the

@@ -102,23 +102,30 @@ user anything.
 
 ## Routing
 
-Load the skill that covers the work. Load the router, not a leaf skill, unless you are
-continuing inside a phase whose router is already loaded in this session.
+Load the skill that covers the work: the router of its phase, even when you already know the
+guidance you need inside it, unless that router is already loaded in this session.
 
 | The work is about | Load |
 |---|---|
 | Starting, resuming, or an unclear phase | `nzt` |
 | Building, changing or executing the plan, or closing a feature the user accepted | `nzt-plan` |
 | Functional analysis: requirements, business rules, scope, specs and stories, the product and its vocabulary, changing what an existing feature does, specs from existing code | `nzt-discovery` |
-| How to solve it: components, stack, technical design | `nzt-architecture` |
+| How to solve it: components, stack, technical design, the domain model and its contexts, decision records and RFCs, deferred technical debt, reviewing an existing structure, and the diagrams those documents earn | `nzt-architecture` |
 | Screens, flows, visual design, mockups, the design system and shared components, usability and accessibility reviews, and the end user's manual | `nzt-ux` |
-| Writing or changing code against specs | `nzt-build` |
-| QA once the increment is built: test plans, runs, evidence, bugs | `nzt-verify` |
-| Versioning, CI/CD, releasing, deploying | `nzt-ship` |
+| Writing or changing code against specs: implementing a story, fixing a reported defect, surveying existing code before changing it, refactoring, removing a behavior, adding or updating packages, credentials and sensitive configuration, and the automated tests that ship with the code, test-first when the stack selected it | `nzt-build` |
+| QA once the increment is built: test plans, the data they need, runs, evidence, bugs, exploratory sessions, whether it is fast enough for the user, automated end-to-end regression; and two readings that run nothing: code read for defects, documents checked against the code | `nzt-verify` |
+| Versioning, CI/CD, releasing, deploying: commits, branches, pull requests, changelog and tags, the CI pipeline and its gates, deploying or rolling back, and the health checks, logs, metrics and alerts a release is watched with | `nzt-ship` |
 | Teaching the user a skill instead of doing it for them, or continuing a topic in `Learn/`: a lesson, practice, a correction, an assessment, a review | `nzt-learn` |
 
-Routers name the leaf skills they can hand off to. Load a leaf directly only when the user
-named it. Each router says where its artifacts land; the kernel does not keep a copy.
+A router hands off to **references**: files in its own `references/` folder, read from the
+skill's folder and never searched for in the workspace. **Read the row's file and every file
+in its *Read with* column before your first reply in that phase**, even when the reply is a
+question: the row is not the guidance, the files are. A name `nzt-<x>` that is not a listed
+skill is a reference: its router is the longest prefix that is a skill, the rest is the file
+(`nzt-verify-performance` → `nzt-verify`'s `references/performance.md`), and a user naming
+one goes through that router too. **A reference does not survive compaction** the way a
+loaded skill does: after one, read again the references the current unit uses. Each router
+says where its artifacts land; the kernel does not keep a copy.
 
 ## Guardrails
 

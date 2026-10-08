@@ -1,9 +1,13 @@
----
-name: nzt-verify-test-data
-description: Use when a scenario needs data that does not exist: agreeing the mechanism with the user, and writing its setup and teardown scripts.
----
-
 # Test data — setup and teardown
+
+## Contents
+- The data is yours to create
+- Ask the mechanism once, not scenario by scenario
+- Two scripts per scenario, written together
+- The environment, and what is never touched
+- Around the run
+- Recording it
+- Done when
 
 Produces, per scenario, the two scripts that make it runnable and undoable:
 
@@ -14,8 +18,6 @@ Plan/specs/<feature>/testing/data/<story>/E-NN-teardown.sql
 
 Both are written **with the plan, before anything runs**, and both are part of what the user
 approves. The extension follows the mechanism: `.sql`, `.http`, `.sh`.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## The data is yours to create
 

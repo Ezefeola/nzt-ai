@@ -1,9 +1,16 @@
----
-name: nzt-build-backend-dotnet-testing
-description: Use when writing, running or setting up the automated tests that ship with .NET code - the project's own framework and layout, TimeProvider for time, and data access proven against a real engine.
----
-
 # Tests that ship with .NET code
+
+## Contents
+- Framework and runner: the project's, unchanged
+- Layout
+- Partitions become rows, not copies
+- Time is injected
+- Assertions
+- Test doubles
+- EF Core and persistence — with integration enabled
+- APIs — with the in-process level enabled
+- Mutation testing
+- Closing checklist
 
 What makes a test valuable does not change with the stack; this is **how a .NET project puts it
 into practice**. The stack document records the adopted choices, and **the test projects

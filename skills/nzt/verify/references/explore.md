@@ -1,14 +1,7 @@
----
-name: nzt-verify-explore
-description: Use when a time-boxed exploratory session is run: the charter written before exploring, and what to do with what you find outside it.
----
-
 # Exploratory testing
 
 Produces one session: a charter, what was found, and what each finding turned into. **One
 session is one unit.** It complements the scripted scenarios; it does not replace them.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## The charter, written first
 

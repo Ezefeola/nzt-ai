@@ -1,15 +1,15 @@
----
-name: nzt-build-backend-dotnet-exceptions
-description: Use when an exception can escape a use case, or the API's error handling is set up - one global handler, a clear message per kind of failure, and the whole exception in the log.
----
-
 # Exceptions — one global handler
+
+## Contents
+- Expected failures never get here
+- Recognised by type, never by code or text
+- The handler
+- Registration
+- Closing checklist
 
 **An exception that escapes a use case ends in one place**: a single `GlobalExceptionHandler`
 that answers with a clear message and leaves the whole exception in the log. Nothing else in
 the API catches to translate.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## Expected failures never get here
 

@@ -1,16 +1,19 @@
----
-name: nzt-build-backend-dotnet-results-pattern
-description: Use when the stack selects the Result pattern and a use case is written - the two types exactly as they are, the status code travelling inside the Result, and expected failures that are never exceptions.
----
-
 # The Result pattern
+
+## Contents
+- The implementation
+- Why it is shaped like that
+- Every return builds its own Result
+- The status code travels inside the Result
+- Reading one
+- How it reaches HTTP is not decided here
+- What never happens
+- Closing checklist
 
 A use case does not throw for something the business expects. **It returns
 `Result<TResponse>`**, and every caller — an endpoint, a job, a test — reads the same answer
 in the same shape. Exceptions stay for the exceptional: what nobody planned for and nobody
 can handle where it happened.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The implementation
 

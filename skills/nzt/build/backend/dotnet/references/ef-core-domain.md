@@ -1,16 +1,18 @@
----
-name: nzt-build-backend-dotnet-ef-core-domain
-description: Use when EF Core maps an aggregate or a value object - private setters kept private, collections behind their field, value objects as complex types, and loading only the part of the aggregate the operation touches.
----
-
 # Mapping the domain model — aggregates and value objects
+
+## Contents
+- Private setters and the private constructor stay private
+- Collections live behind a backing field
+- Relationships to another aggregate
+- Value objects are complex types, always
+- Column names are never literals
+- Loading: the minimum aggregate
+- Closing checklist
 
 Everything in `nzt-build-backend-dotnet-ef-core-mappings` still applies: one context, one
 configuration file per entity, no annotations, explicit delete behaviour. This is **what a model
 that protects itself needs on top of that** — the aggregate when the domain axis selected DDD,
 and the value object in any model that has one.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## Private setters and the private constructor stay private
 

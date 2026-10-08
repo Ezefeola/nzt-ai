@@ -1,9 +1,13 @@
----
-name: nzt-build-backend-dotnet-ef-core-queries
-description: Use when reading data with EF Core - project to the response DTO inside the query, ask for exactly what the response needs, and keep the IQueryable inside the method that built it.
----
-
 # EF Core queries — reading
+
+## Contents
+- Project to the DTO inside the query
+- When loading the entity is the right call instead
+- Optional filters chain onto the query
+- The operator for the intent, and what each one costs
+- Client evaluation is deliberate or it is a bug
+- Raw SQL
+- Closing checklist
 
 This is **reading**. Two rules frame everything below:
 
@@ -13,8 +17,6 @@ This is **reading**. Two rules frame everything below:
 > **The `IQueryable` never leaves the method that built it** — the use case with direct
 > persistence, the repository method where there is one. It is built, executed and
 > materialised in the same place; what comes back out is a DTO or an entity.
-
-Load `nzt-build-backend-dotnet` and `nzt-build-backend-dotnet-ef-core` before applying this.
 
 ## Project to the DTO inside the query
 

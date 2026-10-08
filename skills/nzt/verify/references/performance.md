@@ -1,9 +1,13 @@
----
-name: nzt-verify-performance
-description: Use when the question is whether it is fast enough for the person using it: the number measured against its requirement, and where the time actually goes.
----
-
 # Performance as the user feels it
+
+## Contents
+- It measures against a requirement, not a feeling
+- Measure what the user waits for
+- Where the time goes
+- What the user feels, past the number
+- The rules
+- Where a finding lands
+- Done when
 
 Produces a measured baseline, the located cause of what is slow, and improvements proposed
 with the numbers that justify them. **It changes no code.**
@@ -12,8 +16,6 @@ The numbers live with the scenario: the story's file in
 `Plan/specs/<feature>/testing/<story>.md` when they verify one of its requirements, or
 `Plan/specs/<feature>/testing/performance.md` when the measurement belongs to no single
 story. The captures go in the run's evidence folder, like any other run.
-
-If you did not arrive here from `nzt-verify`, load it first.
 
 ## It measures against a requirement, not a feeling
 

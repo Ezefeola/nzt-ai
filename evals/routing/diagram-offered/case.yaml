@@ -23,11 +23,17 @@ graders:
   - name: architecture-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture"'
+  - name: design-feature-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-architecture[/\\]+references[/\\]+design-feature\.md'
+  # The project's stack document, not references/stack.md: since D50 a bare 'stack' would
+  # also match the guidance file and pass without the project's stack being read.
   - name: read-the-stack
     type: tool_used
     tool: Read
-    input_match: 'stack'
+    input_match: 'Docs[/\\]+\w+-stack-'
   - name: offers-the-diagram
     type: llm
     criteria: |

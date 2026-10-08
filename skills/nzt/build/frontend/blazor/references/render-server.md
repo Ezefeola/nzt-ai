@@ -1,8 +1,3 @@
----
-name: nzt-build-frontend-blazor-render-server
-description: Use when the stack selects interactive server rendering and the work touches rendering - every interaction is a round trip, every user's state lives in server memory, and the connection can drop.
----
-
 # Interactive Server
 
 The component **runs on the server**. The browser holds the rendered HTML and a live connection;
@@ -10,8 +5,6 @@ an event travels to the server, which renders and sends back the difference.
 
 How a component is written does not change — that is
 `nzt-build-frontend-blazor-components`. This is only what the host changes.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## Every interaction is a round trip
 

@@ -20,7 +20,13 @@ graders:
   - name: ship-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ship'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ship"'
+  # "Subilo" reads as a push or as a deploy; either row is a correct route, so the grader
+  # asks that the reference of the row the agent chose was read, not which row.
+  - name: row-reference-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-ship[/\\]+references[/\\]+(?:vcs|release)\.md'
   - name: asks-which-environment
     type: llm
     criteria: |

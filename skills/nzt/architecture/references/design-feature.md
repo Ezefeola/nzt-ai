@@ -1,9 +1,9 @@
----
-name: nzt-architecture-design-feature
-description: Use when one feature needs its technical design before it is built: the flow across components, what is persisted, failures, and integration contracts.
----
-
 # Feature design
+
+## Contents
+- When a feature earns a design, and how it is offered · Before designing · The file · The log
+- Flows · Where each rule is enforced · Data and states · When a step fails
+- Integrations · Questions · Diagrams · Done when
 
 Produces `Plan/specs/<feature>/tech-design/design.md` — how this feature is solved across the
 components that already exist — and `tech-design/decisions.md`, the log of the questions that

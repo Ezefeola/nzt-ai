@@ -16,6 +16,13 @@ see repositories that are not its own.
 Load this before any area skill applies. If you did not arrive here from an area router,
 load that router too.
 
+| When the code touches | Read, in this skill's folder, before writing it |
+|---|---|
+| A DTO or its mapping extensions: what a use case returns, what a typed client sends | `references/dtos.md` |
+| A collection read, transformed or checked in memory (EF Core execution is the area's) | `references/linq.md` |
+
+A file naming `nzt-build-csharp-<name>` means `references/<name>.md` here — not a skill.
+
 ## Everything you write is in English
 
 Type names, members, parameters, locals, files, folders and comments, whatever language the
@@ -52,9 +59,9 @@ usually written in the same edit as the method that needed it. **Adding a member
 appending to the file.**
 
 The domain model fixes its own order on top of this, and inside an entity or a value object
-that one wins: `nzt-build-backend-dotnet-domain-ddd`.
+that one wins: `../nzt-build-backend-dotnet/references/domain-ddd.md`.
 DTOs also override this order: **properties first, then nested DTO declarations**,
-recursively, as defined in `nzt-build-csharp-dtos`.
+recursively, as defined in `references/dtos.md`.
 
 ## Never a primary constructor
 
@@ -161,7 +168,7 @@ something too.
 
 `record` for data types, **with explicit properties, never positional**, and `struct` where
 value semantics apply. Where the file lives and what it is allowed to carry is not decided
-here: that is `nzt-build-csharp-dtos`.
+here: that is `references/dtos.md`.
 
 ## Reflection is exceptional
 

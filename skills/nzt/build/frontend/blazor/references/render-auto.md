@@ -1,8 +1,3 @@
----
-name: nzt-build-frontend-blazor-render-auto
-description: Use when the stack selects auto rendering and the work touches rendering - two possible hosts, so the strictest rule of the two always applies and everything injected is registered on both.
----
-
 # Interactive Auto
 
 The component **runs on whichever host is ready**. On the first visit, while the WebAssembly
@@ -11,8 +6,6 @@ runtime is cached, **later visits run in the browser**.
 
 How a component is written does not change — that is
 `nzt-build-frontend-blazor-components`. This is only what having two possible hosts changes.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## What it does not do
 

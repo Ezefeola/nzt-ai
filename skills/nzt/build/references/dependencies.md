@@ -1,14 +1,7 @@
----
-name: nzt-build-dependencies
-description: Use when a package is added, updated or removed: the user confirms every new one, what was checked before adopting it, what an update could break, and the stack updated.
----
-
 # Dependencies
 
 Produces a dependency change and the stack document that records it, in the same unit. A
 package that is in the manifest and not in the stack is a decision nobody made.
-
-If you did not arrive here from `nzt-build`, load it first.
 
 ## Before adding one
 

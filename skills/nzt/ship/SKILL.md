@@ -41,16 +41,24 @@ already loaded; the tables below do not mean load every row.
   deployment's authorisation and is reported as it happens. **The database is the
   exception** and needs its own decision.
 
-## Choose the skill
+## Choose the reference
 
-| The unit is | Load |
-|---|---|
-| Commits, branches, pull requests, changelog, tags | `nzt-ship-vcs` |
-| Deploying to an environment, or rolling back | `nzt-ship-release` |
-| CI pipeline and its gates | `nzt-ship-pipeline` |
-| Health checks, logs, metrics and alerts for the release | `nzt-ship-observability` |
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
 
-If the component's stack selected one of these areas, load its area router:
+| The unit is | Read | Read with |
+|---|---|---|
+| Commits, branches, pull requests, changelog, tags | `references/vcs.md` | — |
+| Deploying to an environment, or rolling back | `references/release.md` | — |
+| CI pipeline and its gates | `references/pipeline.md` | — |
+| Health checks, logs, metrics, traces and alerts for the release | `references/observability.md` | — |
+
+Wherever a file names `nzt-ship-<name>`, it means `references/<name>.md` in this folder
+(`nzt-ship-release` → `references/release.md`): read that file — it is not a skill.
+`nzt-ship-backend-dotnet` is the exception: it is a skill, the area router below.
+
+If the component's stack selected one of these areas, load its area router as well — it
+adds the technology's reference on top of the row above:
 
 | The area is | Load |
 |---|---|

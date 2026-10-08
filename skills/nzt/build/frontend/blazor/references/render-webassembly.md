@@ -1,8 +1,3 @@
----
-name: nzt-build-frontend-blazor-render-webassembly
-description: Use when the stack selects WebAssembly rendering and the work touches rendering - the first visit pays for every dependency, one thread means blocking freezes the page, and everything shipped is public.
----
-
 # Interactive WebAssembly
 
 The component **runs in the browser**. No server holds its state and no interaction costs a
@@ -10,8 +5,6 @@ round trip: once loaded, the screen responds locally and only calls out for data
 
 How a component is written does not change — that is
 `nzt-build-frontend-blazor-components`. This is only what the host changes.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## The first visit pays for everything
 

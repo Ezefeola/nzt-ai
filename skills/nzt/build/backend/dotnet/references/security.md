@@ -1,16 +1,9 @@
----
-name: nzt-build-backend-dotnet-security
-description: Use when an operation touches a protected resource or its permissions, or when unauthorised access is suspected - the caller's authority comes from the server, and access is decided before anything is exposed.
----
-
 # Resource authorisation
 
 This applies whenever an operation reads or changes a protected resource, whenever a permission
 is defined or changed, and whenever unauthorised access is being investigated. **It is not an
 optional methodology like TDD**: an access requirement that exists is enforced while that
 behaviour is implemented, with no flag in the stack asking for it.
-
-Load `nzt-build-backend-dotnet` before applying this.
 
 ## The rule comes from the project, not from here
 

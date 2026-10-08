@@ -1,9 +1,13 @@
----
-name: nzt-build-frontend-blazor-architecture-vertical-slice
-description: Use when the frontend stack selects vertical-slice and code is added or moved - the feature is the unit, the render mode decides how many projects, and no feature reaches into another.
----
-
 # Frontend vertical slice
+
+## Contents
+- How many projects: the render mode decides
+- The tree
+- `Features/` — the slice
+- No feature reaches into another
+- The typed client belongs to its feature
+- Registration
+- Closing checklist
 
 **The unit of organisation is the feature, not the technical role.** Everything one screen needs
 sits in one folder, so changing it touches one place and removing it is a deleted folder.
@@ -11,8 +15,6 @@ sits in one folder, so changing it touches one place and removing it is a delete
 **This skill decides projects and folders, and names each folder by the role it holds — nothing
 else does.** What each file *is* comes from the components skill, and how it renders from the
 render mode's.
-
-Load `nzt-build-frontend-blazor` before applying this.
 
 ## How many projects: the render mode decides
 

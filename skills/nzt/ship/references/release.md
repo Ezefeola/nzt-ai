@@ -1,17 +1,24 @@
----
-name: nzt-ship-release
-description: Use when something is deployed or rolled back: the authorisation that names the environment, the readiness list, limited exposure, and verification there.
----
-
 # Release
+
+## Contents
+- The operating memory
+- Environments
+- Thresholds
+- Authorisation names the environment
+- Readiness, before proposing
+- The proposal
+- Exposure, least first
+- The database is where rollback breaks
+- Verify in the environment
+- Rolling back
+- The log
+- Done when
 
 Produces a deployment that is **verified in its environment**, its entry in
 `Docs/releases.md`, and `Docs/deployment.md` kept current.
 
 **A deployment ends when it is verified in its environment, not when the command returns.**
 Everything below follows from that sentence.
-
-If you did not arrive here from `nzt-ship`, load it first.
 
 ## The operating memory
 
