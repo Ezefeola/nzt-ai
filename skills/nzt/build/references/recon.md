@@ -10,7 +10,7 @@ follows the convention next to it and moves on.
 ## Finding where the behavior lives
 
 You are given the behavior in the user's words, and the code is in English. **The translation
-is not yours to invent**: `Docs/glossary.md` carries the code name of every term, and that is
+is not yours to invent**: `Docs/Domain/glossary.md` carries the code name of every term, and that is
 what you search for. If a term has no entry, search the plausible names, read what they
 actually do, and say which one you assumed. An ambiguous domain meaning is a question, not a
 guess.
@@ -57,7 +57,7 @@ Could not tell: whether the nightly job reuses the basket path — it is trigger
   accident the same weight as a decision — `nzt-discovery-reverse` is the door for that, and
   it ends with the user confirming.
 - **It never fixes anything on the way through.** What it finds outside the change is
-  reported; if the user defers it, it becomes an entry in `Docs/tech-debt.md`.
+  reported; if the user defers it, it becomes an entry in `Docs/Architecture/tech-debt.md`.
 - It does not judge the structure — that is `nzt-architecture-review` — and it does not hunt
   defects — that is `nzt-verify-review`.
 

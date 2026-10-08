@@ -12,9 +12,9 @@
 - The log
 - Done when
 
-Produces `Docs/architecture.md` — the components that exist, what each one owns, how they
+Produces `Docs/Architecture/architecture.md` — the components that exist, what each one owns, how they
 talk to each other, and the reasoning that put them there — and
-`Docs/architecture-decisions.md`, the log of the questions that produced it. It is the
+`Docs/Architecture/architecture-decisions.md`, the log of the questions that produced it. It is the
 document every feature design is fitted into.
 
 It does **not** write the stack documents — one per component and area,
@@ -31,13 +31,13 @@ mode, and log every answer with where it came from.
 of each component, how the components and the client applications talk to each other, which
 providers are used and what each one allows. Derive them from the product document, the
 specs and their technical notes, write them as open `QT-NN` in
-`Docs/architecture-decisions.md`, and only then say how many there are and ask the mode.
+`Docs/Architecture/architecture-decisions.md`, and only then say how many there are and ask the mode.
 **The stack's axes go in this same log** — `nzt-architecture-stack` keeps asking them the
 way it always did; what changed is only where the answer is recorded.
 
 ## Before deciding
 
-Read `Docs/product.md` — its modules, its constraints and its scope — and the feature specs
+Read `Docs/Product/product.md` — its modules, its constraints and its scope — and the feature specs
 that already exist. **Design against the spec, not against the request**: if no spec asks
 for it, it is not a requirement, and inventing one here is how a system grows a capability
 nobody bought.
@@ -88,7 +88,7 @@ Listed by id; they live and get answered in `architecture-decisions.md`: QT-02.
   ship together, in the same schedule, by the same people, they are one component with two
   parts.
 - **A module is not a component.** Modules are the product's capabilities, in
-  `Docs/product.md`; components are how the system is cut. One component usually serves
+  `Docs/Product/product.md`; components are how the system is cut. One component usually serves
   several modules, and that is fine.
 - Every component says **what it owns** — the data and the decisions that are its and
   nobody else's. Two components owning the same decision is the defect this table exists to
@@ -142,14 +142,14 @@ table in boxes is maintenance with no reader.
 
 ## The log
 
-`Docs/architecture-decisions.md` holds every `QT-NN` of this altitude, in its own series,
+`Docs/Architecture/architecture-decisions.md` holds every `QT-NN` of this altitude, in its own series,
 **append-only**: the question, its answer, the date, and the label saying where the answer
 came from. Its shape is the one `nzt-architecture-design-feature` writes out, with the
 product in the title instead of a feature. One that belongs to a later phase is written
 where that phase will read it and is not decided early — deciding a build question during
 architecture is deciding it with less information than whoever gets there will have.
 
-**`Docs/architecture.md` is the present and gets rewritten; the log is not touched.** A
+**`Docs/Architecture/architecture.md` is the present and gets rewritten; the log is not touched.** A
 superseded answer stays and gets a new entry naming what replaced it. When the answer
 earned an ADR, the line cites it instead of restating it.
 

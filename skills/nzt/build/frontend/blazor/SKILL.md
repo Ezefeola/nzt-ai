@@ -13,8 +13,9 @@ If you did not arrive here from `nzt-build`, load it first.
 
 ## Read the stack first
 
-`Docs/frontend-stack-<component>.md` decides every row below. Read it before loading anything,
-and before choosing a technology or a pattern.
+`<component folder>/Docs/Architecture/frontend-stack.md` decides every row below — the folder
+is the one `Docs/Architecture/architecture.md` names. Read it before loading anything, and
+before choosing a technology or a pattern.
 
 - **An installed folder is not an authorisation.** This whole tree is installed in every
   project, including the ones that are not Blazor. What makes it apply is the stack document,
@@ -36,8 +37,8 @@ Load `nzt-build-csharp` before applying any row here, and read its `references/d
 (`../nzt-build-csharp/references/dtos.md`) when a typed client's DTOs are involved. **Reuse what is already loaded: this table is a selection, not an
 order to read every line.** A real task reads three or four.
 
-**The UI documents decide what the screen looks like, not this tree**: `Docs/design-system.md`
-for visual work, states and wording, `Docs/ui-components.md` before adding a shared component.
+**The UI documents decide what the screen looks like, not this tree**: `Docs/UX/design-system.md`
+for visual work, states and wording, `Docs/UX/ui-components.md` before adding a shared component.
 **Reuse the component library the stack adopted before writing a custom component.**
 
 ## Exclusive axes — read only what the stack selected

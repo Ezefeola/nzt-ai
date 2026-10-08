@@ -13,8 +13,9 @@ If you did not arrive here from `nzt-build`, load it first.
 
 ## Read the stack first
 
-`Docs/backend-stack-<component>.md` decides every row below. Read it before loading
-anything, and before choosing a technology or a pattern.
+`<component folder>/Docs/Architecture/backend-stack.md` decides every row below — the folder
+is the one `Docs/Architecture/architecture.md` names. Read it before loading anything, and
+before choosing a technology or a pattern.
 
 - **An installed folder is not an authorisation.** This whole tree is installed in every
   project, including the ones that are not .NET. What makes it apply is the stack document,

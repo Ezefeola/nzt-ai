@@ -11,7 +11,7 @@ everyone who talks to it; `components` opens that box into who does what.
 
 ## `context` — the perimeter
 
-The highest-altitude diagram, and there is one per product, in `Docs/architecture.md`. It
+The highest-altitude diagram, and there is one per product, in `Docs/Architecture/architecture.md`. It
 answers in ten seconds, for someone who has never seen the system: **who uses this, and what
 does it talk to?**
 
@@ -51,7 +51,7 @@ flowchart LR
 
 ## `components` — the map
 
-Who does what and what crosses between them. It lives in `Docs/architecture.md` at product
+Who does what and what crosses between them. It lives in `Docs/Architecture/architecture.md` at product
 scope, and in a feature design at feature scope — where **only the participants of that
 feature** are drawn.
 
@@ -97,9 +97,9 @@ component: its projects, its layers, its folders.
 ## What the map is not
 
 - **It is not the component table.** What each one owns and which areas it has live in
-  `Docs/architecture.md`'s table; repeating them in the picture creates a second original.
+  `Docs/Architecture/architecture.md`'s table; repeating them in the picture creates a second original.
 - **It is not a deployment diagram.** Where each component runs is operation, and it goes in
-  prose or in `Docs/deployment.md`.
+  prose or in `Docs/Operations/deployment.md`.
 - **It does not draw order.** What happens first is the sequence's job. An arrow here means
   *talks to*, never *then*.
 

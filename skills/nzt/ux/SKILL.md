@@ -66,10 +66,10 @@ plan back.
 
 - One screen design, with its mockup beside it if there is one →
   `Plan/specs/<feature>/ux-ui/`
-- Visual direction and the design system → `Docs/design-system.md`; the shared component
-  inventory → `Docs/ui-components.md`. Both written and maintained per `references/system.md`
-- The end user's manual, one file per audience → `Docs/manual/<audience>.html`, its images
-  in `Docs/manual/assets/`. On request, written at the end of what is being delivered, and
+- Visual direction and the design system → `Docs/UX/design-system.md`; the shared component
+  inventory → `Docs/UX/ui-components.md`. Both written and maintained per `references/system.md`
+- The end user's manual, one file per audience → `Docs/Manual/<audience>.html`, its images
+  in `Docs/Manual/assets/`. On request, written at the end of what is being delivered, and
   kept current at every close after that
 
 ## Rules

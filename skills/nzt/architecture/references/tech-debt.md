@@ -1,6 +1,6 @@
 # Technical debt
 
-Produces `Docs/tech-debt.md`: the technical work that was found and deliberately not done.
+Produces `Docs/Architecture/tech-debt.md`: the technical work that was found and deliberately not done.
 It exists because the alternative is losing it — a report in a chat that ended is a decision
 nobody can act on three months later.
 

@@ -33,10 +33,10 @@ Seven, and it is closed. A picture outside this table is not drawn.
 
 | Diagram | Answers | Lives in | Earned when |
 |---|---|---|---|
-| `context` | who uses the product and what it talks to | `Docs/architecture.md` | there are third parties, or more than one kind of actor |
-| `components` | who does what, and what crosses between them | `Docs/architecture.md`, a feature design | whenever either document exists — it is the map |
-| `bounded-contexts` | how the business is cut, and who adapts to whom | `Docs/context-map.md` | whenever that file exists |
-| `aggregates` | what has to be true at the same instant | `Docs/domain-model.md` | the domain axis is `ddd` **and** there are three aggregates or more |
+| `context` | who uses the product and what it talks to | `Docs/Architecture/architecture.md` | there are third parties, or more than one kind of actor |
+| `components` | who does what, and what crosses between them | `Docs/Architecture/architecture.md`, a feature design | whenever either document exists — it is the map |
+| `bounded-contexts` | how the business is cut, and who adapts to whom | `Docs/Domain/context-map.md` | whenever that file exists |
+| `aggregates` | what has to be true at the same instant | `Docs/Domain/domain-model.md` | the domain axis is `ddd` **and** there are three aggregates or more |
 | `sequence` | in what order it happens, and who does each step | a feature design | one per flow that matters, with the failure that changes the outcome |
 | `state` | which business states exist and which transition is legal | a feature design | the feature has an entity with states |
 | `flow` | what is decided, in what order | a feature design | the branching lives **entirely inside one component** |
@@ -77,7 +77,7 @@ subdomain type is two diagrams stuck together.
 - **A sentence of prose above it, saying what to look at.** A diagram whose reader has to
   guess where the important part is has already failed.
 - **Labels come from the ubiquitous language**: the glossary's terms and the component names
-  `Docs/architecture.md` declares. Never a class, a method, a table or an endpoint.
+  `Docs/Architecture/architecture.md` declares. Never a class, a method, a table or an endpoint.
 - **The node limits are numbers, not judgement.** Each skill carries its own and they are
   hard: past the number it is two diagrams. A soft limit is evaluated by the same agent that
   wants everything in one picture.

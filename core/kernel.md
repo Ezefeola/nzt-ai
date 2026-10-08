@@ -125,7 +125,8 @@ skill is a reference: its router is the longest prefix that is a skill, the rest
 (`nzt-verify-performance` → `nzt-verify`'s `references/performance.md`), and a user naming
 one goes through that router too. **A reference does not survive compaction** the way a
 loaded skill does: after one, read again the references the current unit uses. Each router
-says where its artifacts land; the kernel does not keep a copy.
+says where its artifacts land; the kernel does not keep a copy. **A project document found
+somewhere else is read where it is and proposed for moving, never moved without approval.**
 
 ## Guardrails
 

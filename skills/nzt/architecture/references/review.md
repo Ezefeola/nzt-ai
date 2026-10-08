@@ -25,13 +25,13 @@ Write why the review was asked — changes are slow, defects cluster in one plac
 does not scale, a boundary nobody understands — and cut the scope to it.
 
 Then establish what this architecture has to optimise: the non-functional requirements of
-the features, the constraints in `Docs/product.md`, the stack documents and the accepted
+the features, the constraints in `Docs/Product/product.md`, the stack documents and the accepted
 ADRs. **A structure is good or bad against those.** A monolith is not a finding; a monolith
 that prevents a deployment the product requires is.
 
 ## Read what was declared, first
 
-Read `Docs/architecture.md`, `Docs/context-map.md` if it exists, the stacks in scope and the
+Read `Docs/Architecture/architecture.md`, `Docs/Domain/context-map.md` if it exists, the stacks in scope and the
 ADRs. Where the code contradicts them, **that is drift, not a finding of this reading**:
 report it as a verdict, or run `nzt-verify-audit` when the cut deserves one. The rest of the
 review starts from the architecture as it actually is.
@@ -83,7 +83,7 @@ shows under real traffic comes from what `nzt-ship-observability` instrumented.
 [2] Pedidos ↔ Stock are one deployment pretending to be two
     Evidence: 23 of the 31 commits touching Pedidos/Reservas.cs in 12 months also touch
               Stock/Disponibilidad.cs; Pedidos reads Stock's table directly
-    Hurts:    Stock's independent deployment, required by Docs/product.md
+    Hurts:    Stock's independent deployment, required by Docs/Product/product.md
     Case:     changing how Stock stores reservations forces Pedidos to ship with it
     Options:  a) Stock exposes availability by contract · medium cost, removes the
                  coupling (recommended)
@@ -104,7 +104,7 @@ Each finding says where it lands, and that is what makes the report actionable:
 | Becomes | Where it goes |
 |---|---|
 | an architecture decision | proposed now, recorded as an ADR once the user decides |
-| deferred work | `Docs/tech-debt.md`, with its evidence |
+| deferred work | `Docs/Architecture/tech-debt.md`, with its evidence |
 | a guard | a test that fails when the rule breaks again, written by `nzt-build` |
 | drift | a verdict of `nzt-verify-audit`, not a new decision |
 

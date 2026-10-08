@@ -4,7 +4,7 @@ Produces the instrumentation that answers two questions — **is it working?** a
 and why is it not?** — and nothing else. Not a catalogue of everything measurable.
 
 **Start from the signals the release compares to decide a rollback.** If a threshold in
-`Docs/deployment.md` mentions a signal, that signal is instrumented first; otherwise the
+`Docs/Operations/deployment.md` mentions a signal, that signal is instrumented first; otherwise the
 release has a rule it cannot evaluate.
 
 ## Health checks

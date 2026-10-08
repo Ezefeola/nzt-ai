@@ -10,7 +10,7 @@
 - Done when
 
 Produces a feature nobody has to interpret again: no marker left over, every document it
-touched current, and one entry in `Docs/history.md` saying what changed and why.
+touched current, and one entry in `Docs/Product/history.md` saying what changed and why.
 
 **One pass over the whole feature, never one per story.** The documents and the history are
 transversal to all of its stories, and closing story by story would write the same entry
@@ -27,7 +27,7 @@ The feature closes when **the user has accepted the work**, not when the code co
 - `Plan/specs/<feature>/testing/README.md` has no open bug, and no criterion sitting without
   a scenario that was agreed to have one.
 - **Deploying is not a condition.** If the agreed plan included ship, the release has to be
-  verified in its environment and logged in `Docs/releases.md`; if it did not, the feature
+  verified in its environment and logged in `Docs/Operations/releases.md`; if it did not, the feature
   closes undeployed.
 
 Anything missing is named and the close stops. A close that hides one unverified criterion
@@ -66,17 +66,17 @@ and decide which rows this feature fired.
 
 | If the feature changed | Check |
 |---|---|
-| a term's meaning, or introduced one | `Docs/glossary.md` |
-| an entity, a field, a relationship, an aggregate boundary | `Docs/domain-model.md` |
-| a context, a dependency between contexts, a domain event | `Docs/context-map.md` |
-| a component, a boundary, an external system | `Docs/architecture.md` |
+| a term's meaning, or introduced one | `Docs/Domain/glossary.md` |
+| an entity, a field, a relationship, an aggregate boundary | `Docs/Domain/domain-model.md` |
+| a context, a dependency between contexts, a domain event | `Docs/Domain/context-map.md` |
+| a component, a boundary, an external system | `Docs/Architecture/architecture.md` |
 | a technology, a version, a package, an area or an opt-in | the stack document of each area |
-| a decision that is expensive to reverse | `Docs/adr/` |
-| the product's objectives, users, modules or scope | `Docs/product.md` |
+| a decision that is expensive to reverse | `Docs/Architecture/adr/` |
+| the product's objectives, users, modules or scope | `Docs/Product/product.md` |
 | a screen, a shared component or a visual role | the UX documents — read their `update-when` |
-| what the end user does, and the manual **already exists** | `Docs/manual/` — the chapter of each task this feature changed (`nzt-ux-manual`). The manual is written at the end of a delivery; a close never creates one |
-| environments, pipeline, rollback | `Docs/deployment.md` |
-| technical work found and deliberately left | `Docs/tech-debt.md` |
+| what the end user does, and the manual **already exists** | `Docs/Manual/` — the chapter of each task this feature changed (`nzt-ux-manual`). The manual is written at the end of a delivery; a close never creates one |
+| environments, pipeline, rollback | `Docs/Operations/deployment.md` |
+| technical work found and deliberately left | `Docs/Architecture/tech-debt.md` |
 | its own flows, data or integrations | `Plan/specs/<feature>/tech-design/` |
 
 Each one is updated with **its own skill**, and a stack document describes what was actually
@@ -84,7 +84,7 @@ adopted, never what was planned.
 
 ## 3 · Write the history entry
 
-`Docs/history.md` is append-only, newest on top, one entry per closed change cycle — the
+`Docs/Product/history.md` is append-only, newest on top, one entry per closed change cycle — the
 birth of the feature, or each approved change that was merged and finished. **Never one per
 story and never one per criterion**: the history records decisions, and progress is read
 from the criteria.
@@ -104,7 +104,7 @@ Decision: the frontend does not recalculate; it shows what the backend returned 
 ## 2026-08-09 · Discount coupons — F-003
 Type:     add
 Change:   the total accepts one discount coupon.
-Reason:   retention campaign, objective O-2 of Docs/product.md.
+Reason:   retention campaign, objective O-2 of Docs/Product/product.md.
 Impact:   US-008 new · US-014 new · Coupon added to the domain model
 ```
 

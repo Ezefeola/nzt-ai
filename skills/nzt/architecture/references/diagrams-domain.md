@@ -11,7 +11,7 @@ are not built things.
 
 ## `bounded-contexts` — who adapts to whom
 
-It lives in `Docs/context-map.md`, and it is earned whenever that file exists: more than one
+It lives in `Docs/Domain/context-map.md`, and it is earned whenever that file exists: more than one
 context, or one of ours plus a third party's.
 
 **The limit is eight contexts.** Past eight the map stops reading and, far more likely, **the
@@ -46,7 +46,7 @@ diagram exists to show — **who has to change when the other one moves**.
 ### The label carries what travels and the pattern
 
 Both, separated by a middle dot: *"confirmed order · customer/supplier"*. What travels stays
-in ubiquitous language; the pattern is one of the names `Docs/context-map.md` uses. **A bare
+in ubiquitous language; the pattern is one of the names `Docs/Domain/context-map.md` uses. **A bare
 arrow is not allowed here**: the pattern is the content, and an arrow without one is a
 dependency nobody decided.
 
@@ -66,7 +66,7 @@ produces a diagram that is neither.
 
 ## `aggregates` — what is true at the same instant
 
-It lives in `Docs/domain-model.md`, and it is earned when the domain axis of the stack says
+It lives in `Docs/Domain/domain-model.md`, and it is earned when the domain axis of the stack says
 `ddd` **and there are three aggregates or more**. With one or two, the boundary fits in the
 sentence that opens each section and a picture of two boxes says less.
 
@@ -92,7 +92,7 @@ flowchart LR
   something were missing.
 - **A dashed arrow is a reference by id across a boundary**, labelled with the id and nothing
   else.
-- Names are the ones `Docs/domain-model.md` and the glossary use.
+- Names are the ones `Docs/Domain/domain-model.md` and the glossary use.
 
 ### What the two kinds of line mean
 

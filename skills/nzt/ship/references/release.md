@@ -15,14 +15,14 @@
 - Done when
 
 Produces a deployment that is **verified in its environment**, its entry in
-`Docs/releases.md`, and `Docs/deployment.md` kept current.
+`Docs/Operations/releases.md`, and `Docs/Operations/deployment.md` kept current.
 
 **A deployment ends when it is verified in its environment, not when the command returns.**
 Everything below follows from that sentence.
 
 ## The operating memory
 
-`Docs/deployment.md` is to this phase what the stack document is to build: read it before
+`Docs/Operations/deployment.md` is to this phase what the stack document is to build: read it before
 any work here, and maintain it when an environment, the pipeline, the artifact, the
 migration strategy, the way of exposing or reverting, or where things are observed changes.
 
@@ -128,7 +128,7 @@ The database is the exception and needs its own decision.
 
 ## The log
 
-`Docs/releases.md` is a log, not a spec: **new entries go on top, nothing is rewritten**,
+`Docs/Operations/releases.md` is a log, not a spec: **new entries go on top, nothing is rewritten**,
 and it carries no `update-when`. A rollback gets its own entry with its cause.
 
 ```markdown
@@ -147,4 +147,4 @@ how to get back?
 - Every readiness point is declared, and the missing ones were decided by the user.
 - The artifact deployed is the one that was built and verified.
 - Verification ran in the environment, for the whole window.
-- `Docs/releases.md` has its entry, and `Docs/deployment.md` matches what was actually done.
+- `Docs/Operations/releases.md` has its entry, and `Docs/Operations/deployment.md` matches what was actually done.

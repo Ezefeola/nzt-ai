@@ -119,7 +119,7 @@ as a raw exception message**.
 **Loading, empty and error — all three, from the first version.** A screen that only draws the
 happy path gets the other two added under pressure, by whoever is fixing something else.
 
-**What each one looks like comes from `Docs/design-system.md`.** This skill only says the
+**What each one looks like comes from `Docs/UX/design-system.md`.** This skill only says the
 component keeps the state it is in and renders the branch for it.
 
 ## What a component never does

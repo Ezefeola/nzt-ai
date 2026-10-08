@@ -8,7 +8,7 @@
 - When it closes
 - Done when
 
-Produces `Docs/rfc/RFC-NNN-<slug>.md`: a decision **proposed** so the people it affects can
+Produces `Docs/Architecture/rfc/RFC-NNN-<slug>.md`: a decision **proposed** so the people it affects can
 object before anyone commits to it.
 
 **On request.** It appears in the plan only when the user asks for one, because it buys a
@@ -101,7 +101,7 @@ accepted · 2026-09-24 · recorded in ADR-007
 - **Accepted** → write the ADR through `nzt-architecture-adr`, with the options and their
   costs already argued here, and name this RFC in it. Then the design documents it affects
   are brought current, in the same unit.
-- **Rejected or withdrawn** → the status and the reason, in one line. It stays in `Docs/rfc/`:
+- **Rejected or withdrawn** → the status and the reason, in one line. It stays in `Docs/Architecture/rfc/`:
   a rejected proposal is the cheapest way to stop the same idea from coming back every
   quarter with no memory of why it lost.
 

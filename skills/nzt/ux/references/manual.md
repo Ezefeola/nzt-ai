@@ -12,8 +12,8 @@
 - If it will not be maintained, do not create it
 - Done when
 
-Produces `Docs/manual/<audience>.html` — one interactive file per audience — with its
-images in `Docs/manual/assets/`. **It is written on request, at the end of what is being
+Produces `Docs/Manual/<audience>.html` — one interactive file per audience — with its
+images in `Docs/Manual/assets/`. **It is written on request, at the end of what is being
 delivered.** Once it exists it stops being optional: it is a document of the product, and
 every close keeps it current.
 
@@ -26,7 +26,7 @@ whoever builds. That single fact decides most of what follows:
   different work; one manual with a *"only if you are an admin"* note on every third step
   serves neither.
 - **It is written in the language the person uses the product in**, and in the domain's
-  words — the terms `Docs/glossary.md` fixed. A table, an endpoint, a class name or *"the
+  words — the terms `Docs/Domain/glossary.md` fixed. A table, an endpoint, a class name or *"the
   system validates that…"* never appears.
 - The product is for this person. The manual is where that is either true or a slogan.
 
@@ -81,7 +81,7 @@ hand-over, a training session, the release that opens the product to real users.
 
 ## It looks like the product, not like a template
 
-- **The real theme, from `Docs/design-system.md`.** A manual with its own palette reads as a
+- **The real theme, from `Docs/UX/design-system.md`.** A manual with its own palette reads as a
   third party's document about your product. **Never a second palette** — same rule and same
   reason as the mockup.
 - **Legible before pretty**: text readable at arm's length, a measure of 65–75 characters,

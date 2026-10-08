@@ -98,7 +98,7 @@ Perceived performance is real for the person, and it is recorded for exactly wha
 | The finding | Where it goes |
 |---|---|
 | A located cause the plan takes now | a unit of `nzt-build`, closing with the before and after |
-| A cause the user decides to defer | `Docs/tech-debt.md`, with the numbers as its evidence |
+| A cause the user decides to defer | `Docs/Architecture/tech-debt.md`, with the numbers as its evidence |
 | The product wants a number it never stated | a non-functional requirement, through `nzt-discovery` |
 | The structure is what costs | `nzt-architecture-review` |
 | It shows up only in production | `nzt-ship-observability` |

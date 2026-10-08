@@ -15,6 +15,9 @@
 # A leaf split in two (references/<x>.md + references/<x>-<part>.md) is compared against
 # the parts concatenated; the part's own "# " title is the only line it may add.
 # A reference with no leaf at <base> is new content (D51), reported and skipped.
+# The Docs/ paths of the project moved to one folder per subject (D57): the leaf at <base>
+# is rewritten with that path map before comparing, so a moved path is not a loss and any
+# other change still shows.
 # Usage: install/check-references.sh [base]   (default: main)
 set -euo pipefail
 
@@ -26,6 +29,19 @@ r2='^(Load .* before applying this[.]|Load `nzt-.* (before|and)|applying this[.]
 status=0
 moved=0
 fresh=0
+
+# D57: where each Docs/ path of the project lives now. Applied to the leaf at <base> only.
+docs_map='
+s#Docs/<area>-stack-<component>[.]md#<component folder>/Docs/Architecture/<area>-stack.md#g
+s#Docs/(product|analysis|history)[.]md#Docs/Product/\1.md#g
+s#Docs/(glossary|domain-model|context-map)[.]md#Docs/Domain/\1.md#g
+s#Docs/(architecture|architecture-decisions|tech-debt)[.]md#Docs/Architecture/\1.md#g
+s#Docs/(adr|rfc)/#Docs/Architecture/\1/#g
+s#Docs/(design-system|ui-components)[.]md#Docs/UX/\1.md#g
+s#Docs/(deployment|releases)[.]md#Docs/Operations/\1.md#g
+s#Docs/manual/#Docs/Manual/#g
+s#backend-stack-Pedidos[.]Api[.]md#src/Pedidos.Api/Docs/Architecture/backend-stack.md#g
+'
 
 # Prints the leaf at <base> that references/<leaf>.md came from, or nothing.
 old_leaf() {
@@ -82,7 +98,7 @@ while IFS= read -r ref; do
   parts="$(parts_of "$routerdir" "$leaf")"
 
   bad="$(diff --old-line-format='-%L' --new-line-format='+%L' --unchanged-line-format='' \
-      <(git show "$base:$old" | tr -d '\r' | awk 'NR==1 && /^---$/ {f=1; next} f && /^---$/ {f=0; next} !f') \
+      <(git show "$base:$old" | tr -d '\r' | awk 'NR==1 && /^---$/ {f=1; next} f && /^---$/ {f=0; next} !f' | sed -E "$docs_map") \
       <(tr -d '\r' < "$ref"; for part in $parts; do tr -d '\r' < "$part" | awk 'NR==1 && /^# / {next} 1'; done) \
     | awk -v r2="$r2" '
         /^[-+][[:space:]]*$/ { next }

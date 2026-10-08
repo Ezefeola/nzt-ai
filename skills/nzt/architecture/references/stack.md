@@ -13,7 +13,7 @@
 - Keeping it current
 - Done when
 
-Produces `Docs/<area>-stack-<component>.md`: what this component is built with, which
+Produces `<component folder>/Docs/Architecture/<area>-stack.md`: what this component is built with, which
 option it took on each axis, what it opted into, and which packages it uses. One document
 per **component and area** — a component with a backend and a frontend has two.
 
@@ -95,7 +95,7 @@ Versions read on 2026-09-16 from `global.json` and `Directory.Packages.props`.
 
 | It is | It goes to |
 |---|---|
-| Source URLs, support dates, what was checked in a registry | the decision log, `Docs/architecture-decisions.md`, beside the `QT-NN` it backs |
+| Source URLs, support dates, what was checked in a registry | the decision log, `Docs/Architecture/architecture-decisions.md`, beside the `QT-NN` it backs |
 | Why something was chosen, the history of a change | the decision log |
 | The folder and project structure | the leaf skill of the architecture chosen — it already defines it |
 | How a feature uses a package | the feature's design |
@@ -114,7 +114,7 @@ actually needs. Skill names in this set come from the folder tree, so they move.
 - An axis is a place where the technology offers **exclusive alternatives** — one domain
   model, one endpoint style, one error-handling shape. Write the one that was taken.
 - An axis with no decision is an **open decision**, not a blank row: it is recorded as
-  `QT-NN` in `Docs/architecture-decisions.md`, saying what it blocks, and the row cites it.
+  `QT-NN` in `Docs/Architecture/architecture-decisions.md`, saying what it blocks, and the row cites it.
 - Two options coexisting in the code is one row with the option that wins, plus a `Planned`
   line saying the other is being retired.
 - **The `Tests` axis is the framework and nothing else.** Whether tests are written, and how

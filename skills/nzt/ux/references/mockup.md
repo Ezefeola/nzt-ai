@@ -23,7 +23,7 @@ to copy into the project.
   the reference someone builds from.
 - In a new product with nothing adopted yet, mark them `/* provisional */` and keep the
   marking until the design system adopts them.
-- A value that corresponds to no role is a proposal to `Docs/design-system.md`, not a local
+- A value that corresponds to no role is a proposal to `Docs/UX/design-system.md`, not a local
   exception.
 
 ## Every state, reachable on its own

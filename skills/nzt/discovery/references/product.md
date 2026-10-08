@@ -11,13 +11,13 @@
 - Keep it current
 - Done when
 
-Produces `Docs/product.md`: what the product is, for whom, and what it will not be. It is
+Produces `Docs/Product/product.md`: what the product is, for whom, and what it will not be. It is
 the document every feature is checked against — a feature that serves none of its
 objectives is a feature nobody should be building.
 
 ## It is the minutes, not the source
 
-- **It is written from `Docs/analysis.md`**, the product interview. Every line traces back
+- **It is written from `Docs/Product/analysis.md`**, the product interview. Every line traces back
   to something the user said. What you filled in yourself is marked as proposed until they
   confirm it.
 - **Never written by reading the repository.** Code says what exists, not what the product

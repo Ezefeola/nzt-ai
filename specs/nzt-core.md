@@ -172,8 +172,8 @@ skills/nzt/                      nzt
 ├─ research/                     nzt-research               → evidencia externa (D31)
 ├─ discovery/                    nzt-discovery          (análisis funcional)
 │  ├─ analysis/                  nzt-discovery-analysis     → análisis append-only (T2)
-│  ├─ product/                   nzt-discovery-product      → Docs/
-│  ├─ glossary/                  nzt-discovery-glossary     → Docs/
+│  ├─ product/                   nzt-discovery-product      → Docs/Product/ (D57)
+│  ├─ glossary/                  nzt-discovery-glossary     → Docs/Domain/ (D57)
 │  ├─ write-spec/                nzt-discovery-write-spec   → Plan/specs/ (feature)
 │  ├─ write-stories/             nzt-discovery-write-stories → Plan/specs/ (historias, T1)
 │  ├─ change/                    nzt-discovery-change       → cambio a feature viva (D28)
@@ -196,7 +196,7 @@ skills/nzt/                      nzt
 │  ├─ screen/                    nzt-ux-screen       (incluye navegación, T11)
 │  ├─ mockup/                    nzt-ux-mockup       → HTML, a pedido (T12)
 │  ├─ manual/                    nzt-ux-manual       → manual del usuario final (D37)
-│  ├─ system/                    nzt-ux-system       → Docs/ de UX + visual (T13)
+│  ├─ system/                    nzt-ux-system       → Docs/UX/ + visual (T13)
 │  └─ review/                    nzt-ux-review
 ├─ build/                        nzt-build                 (convención de comentarios, T4)
 │  ├─ recon/                     nzt-build-recon           → relevamiento de impacto (D30)
@@ -234,8 +234,8 @@ una charla:
 | Skill | Produce | Dónde |
 |---|---|---|
 | `nzt-discovery-clarify` | preguntas y ambigüedades resueltas | (entrada de las demás) |
-| `nzt-discovery-product` | objetivos, usuarios, módulos, alcance y no‑alcance | `Docs/` |
-| `nzt-discovery-glossary` | vocabulario del dominio y su significado | `Docs/` |
+| `nzt-discovery-product` | objetivos, usuarios, módulos, alcance y no‑alcance — obligatorio (D56) | `Docs/Product/` |
+| `nzt-discovery-glossary` | vocabulario del dominio, su significado y su nombre en código — obligatorio y al día (D56) | `Docs/Domain/` |
 | `nzt-discovery-write-spec` | spec de feature: reglas de negocio y criterios de aceptación | `Plan/specs/<feature>/` |
 | `nzt-discovery-reverse` | specs derivadas de código existente | `Plan/specs/<feature>/` |
 
@@ -451,6 +451,12 @@ Reglas del acuerdo:
   existente sin stack lo obtiene desde evidencia antes de que se toque su código. Es la
   única forma de que el agente sepa con qué se construye este proyecto en vez de improvisar
   convenciones.
+- **Obligatorios también: la definición de producto y el glosario** (D56). Un producto
+  nuevo los produce en Análisis, antes de la primera spec; uno existente que no los tiene
+  los obtiene cuando una feature entra a Análisis. **El glosario se mantiene al día en la
+  misma unidad que introduce o cambia un término** —spec, historia, cambio o cierre—, y un
+  término que build necesita y no está es una entrada de glosario que escribe discovery, no
+  un nombre que se pregunta o se inventa a mitad del código.
 - **No preguntar lo verificable.** Una versión, una capacidad del framework, el estado de
   mantenimiento de un paquete: eso se comprueba, no se consulta. Al usuario se le
   consultan tradeoffs y cambios materiales, no hechos.
@@ -501,27 +507,38 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
 
 ## 8. Artefactos en el proyecto destino
 
-Dos raíces, separadas por vida útil: lo que es del producto vive en `Docs/`, lo que es de
-una feature vive con su spec en `Plan/`.
+Tres lugares, separados por vida útil y por dueño: lo que es del producto vive en `Docs/`
+de la raíz, ordenado por carpeta; lo que es de un componente vive en `Docs/` dentro del
+componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 
 ```
 <proyecto>/
-├─ Docs/                       # lo que sobrevive a cualquier feature y es del arquitecto:
-│  ├─ product.md · glossary.md # de discovery, con nombre fijo (D7)
-│  ├─ analysis.md              # entrevista de producto, append-only (D5)
-│  ├─ architecture.md          # componentes, límites, sistemas externos con su INT-NN (D10)
-│  ├─ architecture-decisions.md # log append-only de los QT-NN de producto (D41)
-│  ├─ domain-model.md          # entidades, campos, agregados (D26)
-│  ├─ context-map.md           # contextos, dependencias y eventos — si hay más de uno (D26)
-│  ├─ adr/ADR-NNN-<slug>.md    # una decisión por archivo
-│  ├─ rfc/RFC-NNN-<slug>.md    # propuesta en discusión, a pedido (D35)
-│  ├─ tech-debt.md             # trabajo técnico diferido, con su impacto (D29)
-│  ├─ history.md               # log append-only de ciclos cerrados (D25)
-│  ├─ design-system.md · ui-components.md   # de nzt-ux-system (D11)
-│  ├─ manual/<audiencia>.html  # el manual del usuario final, a pedido (D37)
-│  │  └─ assets/               # sus imágenes, sacadas de la evidencia de verify
-│  ├─ deployment.md            # entornos con su autorizador, pipeline, rollback (T16)
-│  └─ releases.md              # log append-only de despliegues y rollbacks (T16)
+├─ Docs/                       # lo que sobrevive a cualquier feature (D57)
+│  ├─ Product/
+│  │  ├─ product.md            # de discovery, obligatorio, nombre fijo (D7, D56)
+│  │  ├─ analysis.md           # entrevista de producto, append-only (D5)
+│  │  └─ history.md            # log append-only de ciclos cerrados (D25)
+│  ├─ Domain/
+│  │  ├─ glossary.md           # de discovery, obligatorio y al día (D7, D56)
+│  │  ├─ domain-model.md       # entidades, campos, agregados, su diagrama (D26)
+│  │  └─ context-map.md        # contextos, dependencias y eventos — si hay más de uno (D26)
+│  ├─ Architecture/
+│  │  ├─ architecture.md       # componentes con su carpeta, límites, sistemas externos con su INT-NN (D10, D57)
+│  │  ├─ architecture-decisions.md # log append-only de los QT-NN de producto (D41)
+│  │  ├─ adr/ADR-NNN-<slug>.md # una decisión por archivo
+│  │  ├─ rfc/RFC-NNN-<slug>.md # propuesta en discusión, a pedido (D35)
+│  │  └─ tech-debt.md          # trabajo técnico diferido, con su impacto (D29)
+│  ├─ UX/
+│  │  └─ design-system.md · ui-components.md   # de nzt-ux-system (D11)
+│  ├─ Operations/
+│  │  ├─ deployment.md         # entornos con su autorizador, pipeline, rollback (T16)
+│  │  └─ releases.md           # log append-only de despliegues y rollbacks (T16)
+│  └─ Manual/
+│     ├─ <audiencia>.html      # el manual del usuario final, a pedido (D37)
+│     └─ assets/               # sus imágenes, sacadas de la evidencia de verify
+├─ <carpeta del componente>/   # la que architecture.md declara, p. ej. src/Pedidos.Api/
+│  └─ Docs/Architecture/
+│     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
    ├─ state.json               # plan + estado, actualizado por unidad
    └─ specs/
@@ -552,7 +569,8 @@ una feature vive con su spec en `Plan/`.
 - Un criterio pasa a completo cuando todas sus áreas están verificadas **y** el usuario
   aprueba. Las áreas del proyecto son las que declaran sus documentos de stack (T3).
 - `analysis.md` es append‑only: las respuestas superadas se marcan, no se editan (13.2).
-  Hay uno por altitud: el de producto en `Docs/` y el de cada feature junto a su spec (D5).
+  Hay uno por altitud: el de producto en `Docs/Product/` y el de cada feature junto a su
+  spec (D5).
 - **Los datos de cada escenario son dos archivos, no una improvisación**: `data/<historia>/`
   lleva un script que los prepara y otro que borra exactamente lo que ese preparó, escritos
   con el plan y aprobados con él (D36). El mecanismo —API, SQL que corre el agente, SQL que
@@ -570,19 +588,30 @@ una feature vive con su spec en `Plan/`.
 - El inventario exacto de `Docs/` (nombres de archivo y cuándo se crea cada uno) lo define
   el router `nzt-architecture` en la fase 4, no el kernel. **Excepción: los documentos de
   UX** — design system e inventario de componentes compartidos — los define y mantiene
-  `nzt-ux-system` (T13).
-- **Los dos logs append-only del proyecto son `Docs/history.md` y `Docs/releases.md`**, y
+  `nzt-ux-system` (T13). **Las carpetas las fija D57 y valen para todas las fases**: cada
+  documento va en la carpeta de su tema, sin importar qué fase lo escribe.
+- **El stack vive dentro de su componente**: `<carpeta>/Docs/Architecture/<área>-stack.md`,
+  donde `<carpeta>` es la que `Docs/Architecture/architecture.md` declara para ese
+  componente. Se escribe al diseñar el componente, aunque la carpeta todavía no exista: la
+  ruta la fija arquitectura en ese mismo momento, y el resto del set encuentra el stack a
+  partir de ella (D57).
+- **Un documento del producto fuera de este orden se propone reordenar, nunca se mueve
+  solo** (D57): el agente lo nombra, dice a dónde iría y espera la aprobación del usuario.
+  Mientras tanto lo lee donde está.
+- **Los dos logs append-only del proyecto son `Docs/Product/history.md` y
+  `Docs/Operations/releases.md`**, y
   no se pisan: el primero es qué cambió el producto y por qué, una entrada por ciclo
   cerrado (D25); el segundo, qué se desplegó y cuándo (T16). Ninguno de los dos lleva
   checkboxes, y ninguno reemplaza al presente, que siempre vive en la spec.
 - **`tech-debt.md` es el único documento con estado abierto/resuelto**, y aun así sin
   checkboxes: una entrada se mueve de sección (D29).
 - **El manual del usuario final es el único artefacto que lee alguien de afuera del equipo**,
-  vive en `Docs/manual/`, es **a pedido** y **se arma al final de lo que se entrega, no
+  vive en `Docs/Manual/`, es **a pedido** y **se arma al final de lo que se entrega, no
   mientras se construye**; desde que existe, cada cierre de feature lo pone al día como a
   cualquier otro documento (D37).
 - **Los `QT-NN` tienen archivo propio y append-only: el log de decisiones técnicas** —
-  `Docs/architecture-decisions.md` a nivel producto, `tech-design/decisions.md` por feature—.
+  `Docs/Architecture/architecture-decisions.md` a nivel producto, `tech-design/decisions.md`
+  por feature—.
   El diseño es el presente y se reescribe; el log es la conversación que lo produjo y no se
   pisa: una respuesta superada se marca, nunca se edita. Los `QT-NN` del stack van al log de
   producto (D41, que supera esa parte de D27).
@@ -1530,6 +1559,42 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   anuncia sin numerarlas, y cortarlas en unidades al cerrar la spec es seguir el plan, no
   apartarse de él. Una línea en *How the plan is shown* de `nzt-plan`. Caso
   `routing/plan-stories`. Decidido por el usuario el 2026-10-07.
+- **D56.** **La definición de producto y el glosario son obligatorios, y el glosario se
+  mantiene al día término por término.** Lo que la forzó: en uso real (un producto nuevo de
+  una sola feature), el plan no incluyó el glosario porque nada lo exigía —el único
+  obligatorio era el stack, y el glosario solo figuraba como ejemplo de unidad—, y build se
+  frenó a mitad del código a preguntar cómo se llamaba "tarea", porque `nzt-build-csharp`
+  le prohíbe inventar la traducción y la manda al glosario. **Había un consumidor sin
+  productor**, el mismo patrón que D26 cerró para el modelo de dominio. Reglas: **(1)** en
+  §6.1 los tres obligatorios son el stack, el producto y el glosario; **(2)** un producto
+  nuevo escribe producto y glosario en Análisis antes de la primera spec, y uno existente
+  sin ellos los obtiene cuando una feature entra a Análisis; **(3)** el glosario se
+  actualiza en la misma unidad que introduce o cambia un término —spec, historia, cambio,
+  cierre—, no en una unidad aparte al final; **(4)** un término que build necesita y no está
+  en el glosario es una entrada que escribe discovery, no una pregunta de código ni un
+  nombre inventado. La fila de Análisis de D55 suma el glosario. Decidido por el usuario el
+  2026-10-08.
+- **D57.** **`Docs/` se ordena por carpeta de tema, y el stack vive dentro de su
+  componente.** Lo que la forzó: en uso real, los stacks quedaban en el `Docs/` de donde se
+  abrió la sesión, sueltos junto al resto, y en un repositorio con varios componentes no
+  viajaban con su proyecto. El orden: `Docs/Product/` (`product.md`, `analysis.md`,
+  `history.md`), `Docs/Domain/` (`glossary.md`, `domain-model.md`, `context-map.md`),
+  `Docs/Architecture/` (`architecture.md`, `architecture-decisions.md`, `adr/`, `rfc/`,
+  `tech-debt.md`), `Docs/UX/` (`design-system.md`, `ui-components.md`), `Docs/Operations/`
+  (`deployment.md`, `releases.md`) y `Docs/Manual/`. `history.md` va con el producto
+  porque registra qué cambió el producto, no qué se desplegó (eso es `releases.md`). **El
+  stack**: `<carpeta del componente>/Docs/Architecture/<área>-stack.md`, sin el nombre del
+  componente en el archivo porque la carpeta ya lo dice. La carpeta la declara
+  `Docs/Architecture/architecture.md` en la fila del componente, se fija al diseñarlo y es
+  como el resto del set encuentra su stack. **Un documento fuera de este orden se propone
+  reordenar y nunca se mueve sin aprobación**, y ninguna skill ni referencia describe un
+  orden anterior: el set nombra solo el actual. Los nombres de archivo de D7, D10, D11, D25,
+  D26, D29, D41 y T16 no cambian; cambian sus carpetas. Cómo quedó: el orden lo declara el
+  router de arquitectura (dueño del inventario de `Docs/`), la regla de proponer y no mover
+  es una línea del kernel porque vale en todas las fases, y `install/check-references.sh`
+  aplica el mapa de rutas a la hoja de `main` antes de comparar, así una ruta movida no
+  cuenta como pérdida y una mal movida sí (visto fallar con `glossary.md` en `Product/`).
+  Decidido por el usuario el 2026-10-08.
 
 ## 13. Revisión contra Temper v3
 

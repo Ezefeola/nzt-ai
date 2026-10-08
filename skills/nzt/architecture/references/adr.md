@@ -1,6 +1,6 @@
 # Decision record
 
-Produces `Docs/adr/ADR-NNN-<slug>.md`, one file per decision. It exists so that a decision
+Produces `Docs/Architecture/adr/ADR-NNN-<slug>.md`, one file per decision. It exists so that a decision
 nobody can reconstruct does not get relitigated every few months by someone who cannot tell
 a choice from an accident.
 
@@ -19,7 +19,7 @@ RFC comes first** (`nzt-architecture-rfc`) and this record is what its acceptanc
 with the options already argued there, and naming it.
 
 What does not earn a record: anything reversible in an afternoon, and anything the stack
-document already records. A row in `Docs/<area>-stack-<component>.md` saying `Endpoints: minimal APIs` needs
+document already records. A row in `<component folder>/Docs/Architecture/<area>-stack.md` saying `Endpoints: minimal APIs` needs
 no ADR unless choosing it cost something worth remembering.
 
 ## The file
@@ -77,7 +77,7 @@ Nothing.
 
 ## Where it is referenced
 
-`Docs/architecture.md` names the ADR next to the choice it explains, and the feature design
+`Docs/Architecture/architecture.md` names the ADR next to the choice it explains, and the feature design
 does the same when the decision shaped it. A record nobody links to is a record nobody
 finds.
 

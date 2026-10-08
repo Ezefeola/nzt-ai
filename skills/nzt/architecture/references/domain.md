@@ -11,7 +11,7 @@
 - The diagram
 - Done when
 
-Produces `Docs/domain-model.md`: the things the business is made of, what each one holds and
+Produces `Docs/Domain/domain-model.md`: the things the business is made of, what each one holds and
 how they relate. It exists so every story starts from the same model instead of adding
 attributes one at a time, each one inventing the shape it needs.
 
@@ -45,7 +45,7 @@ invent it differently.
 **Nothing else changes.** Fields, relationships, language and everything this document
 refuses are identical in both: **an aggregate is a statement about the business**, not about
 code. With more than one context, the file is organised by context first, with the names
-`Docs/context-map.md` declares — the same term under two of them with different fields is not
+`Docs/Domain/context-map.md` declares — the same term under two of them with different fields is not
 a duplicate, it is what having two contexts means.
 
 > **How an aggregate is written in code does not belong here.** Private setters,
@@ -148,9 +148,9 @@ matters *which one* it is, it is an entity.
 | Types, lengths, nullability, indexes, keys | nowhere — it is code |
 | Migrations, tables, columns as such | nowhere — code |
 | A business rule, or the lifecycle as a rule | the feature's `spec.md` |
-| What each term means | `Docs/glossary.md` — here go the relationships |
-| Which context an entity belongs to, and how contexts relate | `Docs/context-map.md` |
-| Which component owns the data | `Docs/architecture.md` |
+| What each term means | `Docs/Domain/glossary.md` — here go the relationships |
+| Which context an entity belongs to, and how contexts relate | `Docs/Domain/context-map.md` |
+| Which component owns the data | `Docs/Architecture/architecture.md` |
 | Setters, constructors, mapping — any line of code | `nzt-build` |
 
 The third row is the frequent one. *"A confirmed order cannot be modified"* is a business

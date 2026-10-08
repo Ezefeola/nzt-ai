@@ -21,7 +21,7 @@ not fix what verification found.
 
 ## Required guidance
 
-Before any work in this phase, read `Docs/deployment.md` — it is this phase's operative
+Before any work in this phase, read `Docs/Operations/deployment.md` — it is this phase's operative
 memory — and the repository's own rules: contribution guide, commit convention, branch
 naming, hooks, required checks. **Repository rules win over this skill.** Reuse what is
 already loaded; the tables below do not mean load every row.
@@ -33,7 +33,7 @@ already loaded; the tables below do not mean load every row.
   named production in it**: *"run the whole plan"* does not include it.
 - **Local and disposable environments need no authorisation beyond the plan.** Otherwise
   every `docker compose up` becomes a stop.
-- `Docs/deployment.md` names **who authorises each environment**, in a column. An
+- `Docs/Operations/deployment.md` names **who authorises each environment**, in a column. An
   environment with no named authoriser is a question.
 - Deploying unverified work is not proposed as routine. If the user wants it anyway — a
   staging preview, say — **say exactly what is not verified**.
@@ -76,8 +76,8 @@ rollback. Never a chain of them.
 
 - Environments with their authoriser, pipeline, artifacts, migration strategy, exposure,
   rollback with its agreed thresholds, where it is observed, and secrets **by key name** →
-  `Docs/deployment.md`, mandatory from the first deploy to a shared environment.
-- One append-only entry per deploy and per rollback, newest on top → `Docs/releases.md`
+  `Docs/Operations/deployment.md`, mandatory from the first deploy to a shared environment.
+- One append-only entry per deploy and per rollback, newest on top → `Docs/Operations/releases.md`
 - Pipeline definitions → wherever the provider requires them in this repository
 
 ## Rules
@@ -120,7 +120,7 @@ rollback. Never a chain of them.
 The action is verified where it landed: the deploy observed for its whole window against
 its thresholds, the pipeline run — a gate proven by making it fail on purpose, on a
 throwaway branch — the instrumentation seen arriving. What only got written is reported as
-**not verified**, and `Docs/releases.md` has its entry.
+**not verified**, and `Docs/Operations/releases.md` has its entry.
 
 ## Closing checklist
 
@@ -128,6 +128,6 @@ throwaway branch — the instrumentation seen arriving. What only got written is
 - [ ] Readiness declared point by point, with every gap reported as a risk.
 - [ ] Rollback plan written before going out, with its thresholds.
 - [ ] Verified in the environment, for the whole observation window.
-- [ ] `Docs/deployment.md` current; `Docs/releases.md` has this entry.
+- [ ] `Docs/Operations/deployment.md` current; `Docs/Operations/releases.md` has this entry.
 - [ ] No secret in a diff, a log, a screenshot or a document — only key names.
 - [ ] What was deployed, where, and what changed for users, said plainly.

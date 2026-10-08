@@ -24,8 +24,9 @@ is built.
 ## Required guidance
 
 Before writing code, read the stack document of every area you touch, the story with its
-criteria, and the feature's business rules. Reuse what is already loaded — the tables below
-do not mean load every row. **A small edit in an established place follows the convention
+criteria, the feature's business rules and the glossary. Reuse what is already loaded — the
+tables below do not mean load every row. **A domain term with no glossary entry stops the
+code that names it**: the entry is written in `nzt-discovery` first, never coined here. **A small edit in an established place follows the convention
 next to it, with no guidance reloaded.**
 
 ## Choose the reference
@@ -121,7 +122,7 @@ They apply to every unit of this phase, so they live here and not in a leaf.
   the change reference of `nzt-discovery`, when the user approved the change; they survive
   until the close of `nzt-plan` sweeps them, and whoever implements does not clean them up.
 - **Technical work you find and do not do is reported, and it becomes an entry in
-  `Docs/tech-debt.md` when the user decides to defer it** — never a comment in the code and
+  `Docs/Architecture/tech-debt.md` when the user decides to defer it** — never a comment in the code and
   never a silent omission.
 - A refactor changes structure and nothing else. If behavior changed, it was not a
   refactor: it needs its own spec and its own verification. A refactor still needs the

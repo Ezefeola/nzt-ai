@@ -9,7 +9,7 @@
 - The diagram
 - Done when
 
-Produces `Docs/context-map.md`: how the business is cut up and who depends on whom. Its
+Produces `Docs/Domain/context-map.md`: how the business is cut up and who depends on whom. Its
 reader is deciding where to spend effort and which model to defend.
 
 ## It talks about meaning, not machinery
@@ -19,7 +19,7 @@ reader is deciding where to spend effort and which model to defend.
 
 **It is written only when there is more than one context, or one of ours plus a third
 party's.** With a single context it says less than the first sentence of
-`Docs/architecture.md`, and then it does not exist. Offer it when a second context appears
+`Docs/Architecture/architecture.md`, and then it does not exist. Offer it when a second context appears
 in the conversation, and say what is lost without it: the same word keeps meaning two things
 and nobody knows which side has to change when the other moves.
 
@@ -65,7 +65,7 @@ The industry already solved it. We do not model it: the gateway does.
 ## Terms that change meaning
 
 - **Reservation** — in Sales it is what the customer set aside; in Stock it is the unit
-  taken out of the available count. Both readings are in `Docs/glossary.md`.
+  taken out of the available count. Both readings are in `Docs/Domain/glossary.md`.
 ```
 
 ## Writing it
@@ -77,8 +77,8 @@ The industry already solved it. We do not model it: the gateway does.
   differentiates), `supporting` (ours, necessary, built simple) and `generic` (the industry
   solved it; buy it). It is the most actionable line in the file — it says where to build
   carefully and what not to model at all.
-- **The join lines are two and they are the point.** Modules order `Docs/product.md`,
-  components order `Docs/architecture.md`, and the context orders neither: naming the three
+- **The join lines are two and they are the point.** Modules order `Docs/Product/product.md`,
+  components order `Docs/Architecture/architecture.md`, and the context orders neither: naming the three
   together is what lets them be read at once **without forcing them to match**. A context
   with no component is normal — it may be a third party's, or not built yet.
 - **Every pair that touches has a row, and the last column is what the row is for.** *"What
@@ -101,7 +101,7 @@ The industry already solved it. We do not model it: the gateway does.
 - **An event is a past-tense fact in ubiquitous language**: *Order confirmed*. Not
   `OrderConfirmedEvent`, not a topic, not a queue.
 - Each one says **who needs to find out**, and cites the `INT-NN` of
-  `Docs/architecture.md` when an integration carries it.
+  `Docs/Architecture/architecture.md` when an integration carries it.
 - **Nothing here says when it is dispatched, who handles it or where it accumulates.** That
   is the feature design and the stack. An event listed by name invites explaining how it
   travels; it does not travel here.
@@ -110,19 +110,19 @@ The industry already solved it. We do not model it: the gateway does.
 
 | Not here | Where it goes |
 |---|---|
-| What we send, what comes back, timeouts, retries | `Docs/architecture.md` external systems, and the feature design |
+| What we send, what comes back, timeouts, retries | `Docs/Architecture/architecture.md` external systems, and the feature design |
 | Whether it is an event or a call, and over which pipe | the feature design |
-| What each component is built with | `Docs/<area>-stack-<component>.md` |
-| The fields and relationships of the model | `Docs/domain-model.md` |
-| What each term means | `Docs/glossary.md` — here go the boundaries |
-| Why the product has this technical shape | `Docs/architecture.md` |
+| What each component is built with | `<component folder>/Docs/Architecture/<area>-stack.md` |
+| The fields and relationships of the model | `Docs/Domain/domain-model.md` |
+| What each term means | `Docs/Domain/glossary.md` — here go the boundaries |
+| Why the product has this technical shape | `Docs/Architecture/architecture.md` |
 
 ## The diagram
 
 `bounded-contexts` is earned whenever this file exists, and it is the first thing anyone
 reads. It is offered like any diagram — `nzt-architecture-diagrams` decides, and
 `nzt-architecture-diagrams-domain` draws it. It is **not** the `context` diagram of
-`Docs/architecture.md`: that one draws the perimeter with its actors, this one the
+`Docs/Architecture/architecture.md`: that one draws the perimeter with its actors, this one the
 boundaries of meaning inside it.
 
 ## Done when

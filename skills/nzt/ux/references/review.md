@@ -39,7 +39,7 @@ and freedom · consistency and standards · error prevention · recognition over
 flexibility · minimalist design · help users recover from errors · help and documentation.
 
 **Consistency is measured against this project too**, not only against general convention:
-`Docs/design-system.md`, `Docs/ui-components.md`, and the neighbouring screens. A screen
+`Docs/UX/design-system.md`, `Docs/UX/ui-components.md`, and the neighbouring screens. A screen
 that is internally consistent and unlike every other screen in the product is inconsistent.
 
 ## Then accessibility
@@ -78,7 +78,7 @@ against AA and ask whether it is adopted.
 | Breaks an existing criterion | a bug, opened by `nzt-verify` |
 | Needs behavior no criterion states | a proposal to the user; spec change if accepted |
 | Construction only, no behavior change | fixed inside the authorised work |
-| A missing convention | a proposal to `Docs/design-system.md` |
+| A missing convention | a proposal to `Docs/UX/design-system.md` |
 
 **The review proposes; the spec decides.** A finding you fixed by inventing behavior is not
 a fix, it is an unreviewed spec change.

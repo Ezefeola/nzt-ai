@@ -85,7 +85,7 @@ What two features share moves up: a component to the root `Components/`, state t
 **The duplicate is the cheap problem.** The shared component between two features is the
 expensive one: the second caller needs one more parameter, the first gets an optional one, and
 the component stops being removable. A shared component is a decision, and
-`Docs/ui-components.md` is where it is recorded.
+`Docs/UX/ui-components.md` is where it is recorded.
 
 ## The typed client belongs to its feature
 

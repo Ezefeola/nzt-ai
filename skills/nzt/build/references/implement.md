@@ -125,7 +125,7 @@ are the one who fixed it. Report the fix and let that phase move its state.
 - No criterion, no code — except authorised setup, and repairs to your own change.
 - A defect you introduced is repaired and verified in the same unit, without asking.
 - Something you find outside the scope is **reported, not implemented**. If the user decides
-  to leave it, it becomes an entry in `Docs/tech-debt.md`; undecided, it stays in the report
+  to leave it, it becomes an entry in `Docs/Architecture/tech-debt.md`; undecided, it stays in the report
   and nowhere else.
 
 ## Closing

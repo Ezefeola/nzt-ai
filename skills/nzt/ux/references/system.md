@@ -9,8 +9,8 @@
 
 Produces two documents in `Docs/`, one per unit:
 
-- **`Docs/design-system.md`** — the visual direction and the roles every screen reuses.
-- **`Docs/ui-components.md`** — the shared component inventory.
+- **`Docs/UX/design-system.md`** — the visual direction and the roles every screen reuses.
+- **`Docs/UX/ui-components.md`** — the shared component inventory.
 
 They are separate because they rot at different speeds: the direction and its roles are
 stable, the component list changes with every second screen.
@@ -70,7 +70,7 @@ as a decision.
 
 ## Shared components
 
-`Docs/ui-components.md` is coarse-grained and short. A component earns an entry only when:
+`Docs/UX/ui-components.md` is coarse-grained and short. A component earns an entry only when:
 
 - two screens use it, **or**
 - it carries a decision that would otherwise be re-argued on every screen.

@@ -24,8 +24,8 @@ each rule is enforced would get decided while the code is written"* — that the
 
 ## Before designing
 
-Read the feature's `spec.md` and its stories, `Docs/architecture.md`, the stack document of
-every component you touch, and `Docs/domain-model.md` if it exists — the entities this
+Read the feature's `spec.md` and its stories, `Docs/Architecture/architecture.md`, the stack document of
+every component you touch, and `Docs/Domain/domain-model.md` if it exists — the entities this
 feature works with already have a shape, and a design that invents a second one is where
 two models start. You are fitting this feature into a system that already made decisions;
 re-deciding them here is how two architectures start.
@@ -153,7 +153,7 @@ succeeded?
 
 ## Integrations
 
-- **Cite the `INT-NN`** of `Docs/architecture.md` instead of describing the system again.
+- **Cite the `INT-NN`** of `Docs/Architecture/architecture.md` instead of describing the system again.
   The product-level row says what we need from it and what happens when it is not there;
   this table says what **this flow** sends and expects.
 - Each one gets what we send, what we expect back, and **what happens when it is unavailable
@@ -195,6 +195,6 @@ Rehearse it: could someone implement this feature without asking you a structura
 - Every integration cites its `INT-NN` and says what happens when it is down.
 - The questions were derived and logged **before** anything was proposed, the user chose
   the mode, and every entry says where its answer came from.
-- Nothing contradicts `Docs/architecture.md` or a stack document; contradictions were
+- Nothing contradicts `Docs/Architecture/architecture.md` or a stack document; contradictions were
   raised, not absorbed.
 - Open technical questions are `QT-NN`, not assumptions.

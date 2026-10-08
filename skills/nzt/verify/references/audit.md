@@ -27,13 +27,13 @@ Both sweeps are bound to the agreed cut. An audit of everything at once produces
 nobody reads.
 
 **Structure is in scope here**, unlike anywhere else: if a stack document declares
-`Architecture: vertical-slice` or `Docs/architecture.md` declares a boundary, that is a claim,
+`Architecture: vertical-slice` or `Docs/Architecture/architecture.md` declares a boundary, that is a claim,
 and a claim is measurable. **What no document claims is not a finding.**
 
 ## The three verdicts
 
 ```text
-Document: backend-stack-Pedidos.Api.md — Persistence: repositories with unit of work
+Document: src/Pedidos.Api/Docs/Architecture/backend-stack.md — Persistence: repositories with unit of work
 The code: 4 of 11 features inject the DbContext into the endpoint
 Verdict:  the document no longer matches
 

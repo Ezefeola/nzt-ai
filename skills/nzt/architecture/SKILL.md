@@ -14,12 +14,11 @@ structure, and it records why.
 in technical terms (entities, aggregates, value objects), the cut into contexts,
 persistence, consistency, integrations and contracts, cross-cutting concerns, decision
 records, deferred technical work, the diagrams of all of it, and the inventory of `Docs/` —
-which documents exist and when each one is created.
+which documents exist, in which folder, and when each one is created.
 
 **Does not own:** business rules (`nzt-discovery`), screen design (`nzt-ux`), writing the
-code (`nzt-build`). Two sets of `Docs/` files are not yours either: the UX documents —
-design system and shared component inventory — belong to `nzt-ux`, and
-`product.md`, `glossary.md` and `analysis.md` belong to discovery.
+code (`nzt-build`). Nor are two sets of `Docs/` files: the UX documents (design system,
+shared components) are `nzt-ux`'s; `product.md`, `glossary.md` and `analysis.md`, discovery's.
 
 ## Required guidance
 
@@ -69,7 +68,7 @@ found in build, by someone with less information than you have now.
 ## The decisions log
 
 Every `QT-NN` lives in an **append-only log**, beside the document it serves:
-`Docs/architecture-decisions.md` for the product — the stack's axes included — and
+`Docs/Architecture/architecture-decisions.md` for the product — the stack's axes included — and
 `Plan/specs/<feature>/tech-design/decisions.md` for a feature. One series each.
 
 **The design is the present and gets rewritten; the log is the conversation that produced
@@ -124,27 +123,28 @@ skipped it and why; do not design a system that already exists.
 
 ## One unit
 
-One document. The product design, one feature's design, one stack document, or one
-decision record.
+One document: the product design, one feature's design, one stack, or one decision record.
 
 ## Where it lands
 
-- Components, boundaries, external systems and the reasoning behind them →
-  `Docs/architecture.md`
-- The entities of the business, with their aggregates when the stack says so →
-  `Docs/domain-model.md`
-- The contexts, their dependencies and the domain events → `Docs/context-map.md`, only when
-  there is more than one context or a third party
-- Decision records → `Docs/adr/` · proposals still being agreed → `Docs/rfc/`, on request ·
-  deferred technical work → `Docs/tech-debt.md`
-- One stack document per component and area → `Docs/<area>-stack-<component>.md`
-- The technical questions and their answers → `Docs/architecture-decisions.md` for the
-  product, `Plan/specs/<feature>/tech-design/decisions.md` for a feature. Append-only
+`Docs/` has one folder per subject, whichever phase writes it: `Product/` (product, interview,
+history), `Domain/`, `Architecture/`, `UX/`, `Operations/` (deployment, releases), `Manual/`.
+
+- Components, boundaries, external systems and why → `Docs/Architecture/architecture.md`;
+  **each component's row names its folder** (`src/Pedidos.Api/`), fixed when it is designed,
+  before the folder exists: it is how every phase finds that component's stack
+- Entities, with aggregates when the stack says so → `Docs/Domain/domain-model.md`; contexts,
+  dependencies, domain events → `Docs/Domain/context-map.md`, only past one context or with a third party
+- Decision records → `Docs/Architecture/adr/` · proposals still being agreed →
+  `Docs/Architecture/rfc/`, on request · deferred work → `Docs/Architecture/tech-debt.md`
+- One stack per component and area, **inside the component** →
+  `<component folder>/Docs/Architecture/<area>-stack.md` (`backend-stack.md`, `frontend-stack.md`)
+- The technical questions and their answers → `Docs/Architecture/architecture-decisions.md`
+  for the product, `Plan/specs/<feature>/tech-design/decisions.md` for a feature. Append-only
 - A feature's technical design → `Plan/specs/<feature>/tech-design/design.md`, **offered, not
   declared**, with any contract or diagram it needs beside it in the same folder
-- A review's findings go in its report, and land where each one belongs: an ADR, an entry
-  of deferred work, or a proposal back to the product design. It writes no document of its
-  own.
+- A review writes no document of its own: its findings land where each belongs — an ADR,
+  deferred work, or a proposal back to the product design.
 
 ## Rules
 

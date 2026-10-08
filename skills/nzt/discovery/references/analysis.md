@@ -11,7 +11,7 @@
 - Done when
 
 Produces the interview record: `Plan/specs/<feature>/analysis.md` for a feature,
-`Docs/analysis.md` for the product. Everything the rest of discovery writes is read from
+`Docs/Product/analysis.md` for the product. Everything the rest of discovery writes is read from
 this file, and it is the only place where a question survives a cleared context.
 
 ## The file
@@ -104,7 +104,7 @@ Both have to close before the phase does.
 
 | Altitude | Where | How it is established |
 |---|---|---|
-| Product | `Docs/analysis.md` | Conversation only. **Never written by reading the repository** |
+| Product | `Docs/Product/analysis.md` | Conversation only. **Never written by reading the repository** |
 | Feature | `Plan/specs/<feature>/analysis.md` | Conversation, and code when the behavior already exists |
 
 - Features emerge from the conversation, and the product document is the minutes of what

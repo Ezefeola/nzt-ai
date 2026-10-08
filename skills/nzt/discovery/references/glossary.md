@@ -1,6 +1,6 @@
 # Glossary
 
-Produces `Docs/glossary.md`: the terms this product's domain uses, what each one means
+Produces `Docs/Domain/glossary.md`: the terms this product's domain uses, what each one means
 **here**, and the one name it gets in code. It exists so the spec, the screens, the code
 and the user are talking about the same thing.
 
@@ -76,9 +76,9 @@ belongs to, and say which one the specs use by default.
 The term and its meaning are discovery's. The entity, its identity, its aggregate and where
 it is persisted are architecture's. If the entry is starting to describe fields and
 relationships, stop: what you have is a domain model, and it belongs in
-`Docs/domain-model.md`, which `nzt-architecture-domain` writes. A term that means two
+`Docs/Domain/domain-model.md`, which `nzt-architecture-domain` writes. A term that means two
 different things in two contexts keeps both readings here, and the boundary that separates
-them is `Docs/context-map.md`'s.
+them is `Docs/Domain/context-map.md`'s.
 
 ## Done when
 

@@ -40,7 +40,8 @@ objective and with review dates, and has no entry in `Plan/state.json`.
 For an existing project not on NZT, the request decides:
 
 - **Small change** → do the work; write only the spec for what you touch.
-- **New feature** → analysis for that feature only. Do not back-fill the whole product.
+- **New feature** → analysis for that feature, plus the product definition and the glossary
+  if they are missing — the glossary with this feature's terms. Do not back-fill other features.
 - **Reported bug** → reproduce, fix, verify. No specs, no plan, no ceremony.
 - **"Put this project in order"** → adoption: reverse engineering.
 
