@@ -493,7 +493,7 @@ Reportes: `evals/results/2026-10-07-u35-routing.*`, `2026-10-07-u35-stack.*`, `2
 | routing | build-story | 0.58 | **0.93** | juez 2 a 1 en una corrida |
 | routing | design-mode | 0.58 | **1.00** | — |
 | routing | close-feature | 0.50 | **0.83** | `sweeps-and-records` 2 de 3: objeta cerrar porque el fixture no tiene el código de US-012 (la misma calibración vista desde la unidad 9) |
-| routing | test-data | 0.33 | **0.92** | `creates-the-data` 1 de 3 (3-0). La respuesta crea los datos con SQL más su limpieza y pregunta quién los corre; lo probable es que el juez lea como "achicar el plan" la línea que deja afuera la parte de pantalla. Criterio a revisar |
+| routing | test-data | 0.33 | **0.92** | `creates-the-data` 1 de 3 (3-0). La respuesta crea los datos con SQL más su limpieza y pregunta quién los corre; lo probable es que el juez lea como "achicar el plan" la línea que deja afuera la parte de pantalla |
 | routing | learn-resume · plan-stories · ux-mockup · ux-review · ux-system | (casos nuevos) | **1.00** cada uno | — |
 | stack | ef-listado | 0.83 | **1.00** | — |
 | stack | not-dotnet | 0.83 | **1.00** | — (medido dos veces: en el tag stack y en el tag restraint) |
@@ -517,8 +517,7 @@ Reportes: `evals/results/2026-10-07-u35-routing.*`, `2026-10-07-u35-stack.*`, `2
 
 1. **Ningún caso queda por debajo de su línea base por causa del set.** Los tres que bajan o empatan (`endpoint-axis`, `foreign-repo`, `qa-unasked`) se explican por la traza: `endpoint-axis` da lo mismo que `main`, y los otros dos frenan por fixtures incompletos.
 2. **Los graders de ruteo pasan en todos los casos**: ningún `*-fired` ni `*-read` falló en las tandas válidas. Las fallas que quedan son todas del juez o de un regex, sobre la respuesta.
-3. **El patrón que más se repite es el fixture `project.sh` con huecos**: `package-unasked`, `test-levels-unasked` y `qa-unasked`, más `foreign-repo.sh` con la misma forma. Es la palanca que ya funcionó en las unidades 28, 29, 31, 32 y 37: una base especificada (`story-specified.sh` / `stack-ready.sh`) y `Write`/`Edit` en el caso. **Propuesto, no aplicado.**
-4. **Candidatos a corregir en los casos (propuestos, no aplicados):** el regex de `blazor-render` sobre el último mensaje (pasarlo a lo que se escribió en `.razor`, o sacarlo y dejar el criterio del juez, que ya lo cubre); el criterio (d) de `ship-pipeline` alineado con `pipeline.md` (el gate ausente pero reportado y propuesto pasa); y el criterio de `test-data` (dejar afuera la parte de pantalla en una prueba de API no es achicar el plan).
-5. Comparación con dos jueces distintos: la línea base fue haiku y esta tanda es sonnet, que en este set reprueba menos respuestas correctas (unidades 7, 27 y 28). Los graders deterministas (`tool_used`, `tool_order`, `regex`) no dependen del juez y son los que sostienen la mejora de ruteo.
+3. **El patrón que más se repite es el fixture `project.sh` con huecos**: `package-unasked`, `test-levels-unasked` y `qa-unasked`, más `foreign-repo.sh` con la misma forma.
+4. Comparación con dos jueces distintos: la línea base fue haiku y esta tanda es sonnet, que en este set reprueba menos respuestas correctas (unidades 7, 27 y 28). Los graders deterministas (`tool_used`, `tool_order`, `regex`) no dependen del juez y son los que sostienen la mejora de ruteo.
 
 **Costo:** US$46.21 en total (routing 16.70, stack 17.61 + 0.48 de la tanda invalidada, repeticiones 1.11 + 2.91, restraint 7.40).
