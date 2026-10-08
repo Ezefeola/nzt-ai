@@ -1,6 +1,6 @@
 # NZT — Instalador
 
-> Estado: **construido** (v0.3.0) · `installer/src/Nzt.Cli` · Runbook en
+> Estado: **construido** (v1.0.0) · `installer/src/Nzt.Cli` · Runbook en
 > `installer/README.md` · Depende de: `specs/nzt-core.md` (secciones 3, 9.1 y 9.2)
 
 ## 1. Propósito

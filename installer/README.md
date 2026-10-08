@@ -1,6 +1,6 @@
 # Instalador de NZT — .NET 10
 
-Versión 0.3.0. Instala NZT **globalmente**, sin plugins: el kernel como bloque en el archivo
+Versión 1.0.0. Instala NZT **globalmente**, sin plugins: el kernel como bloque en el archivo
 de instrucciones que el proveedor ya lee en toda sesión, y las 111 skills aplanadas en su
 carpeta de skills de usuario. El contenido de `core/` y `skills/` se **embebe al compilar**,
 así que el ejecutable es el set: un solo artefacto y nada que resolver en tiempo de

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-08T05:00:00-03:00",
+  "updated": "2026-10-08T10:02:18Z",
   "goal": "Reorganizar NZT en la rama marco-trabajo-mejoras: hojas a referencias de su router (D4 se reemplaza), capa de prácticas agnóstica de tecnología, y spec al día, sin perder comportamiento ni contenido de código.",
   "phase": "architecture",
   "approved": true,
@@ -45,7 +45,8 @@
     { "id": 22, "do": "Piso genérico D51: practices-backend.md y practices-frontend.md en nzt-build con fila en su tabla", "status": "todo", "detail": "Alcance ampliado por el usuario (sacar lo general de .NET/Blazor): ver Plan/mejoras/06-capa-generica.md; recortar en unidades al retomar." },
     { "id": 23, "do": "stack-axes.md en nzt-architecture con fila en su tabla", "status": "todo", "detail": "Alcance ampliado: stack genérico que conserva preguntas de .NET, opciones en bullets o herramienta de preguntas del CLI. Ver 06-capa-generica.md." },
     { "id": 24, "do": "Cierre: suite completa contra la línea base (juez sonnet), dist/, README y §14 de la spec", "status": "dropped", "detail": "Partida por el usuario 2026-10-07 en 35 (24a) y 36 (24b)." },
-    { "id": 36, "do": "24b: README y §14 de la spec, al final de todo", "status": "todo", "detail": null }
+    { "id": 36, "do": "24b: README y §14 de la spec, al final de todo", "status": "todo", "detail": null },
+    { "id": 41, "do": "Publicar v1.0.0: versión, comprobaciones y tag", "status": "doing", "detail": "Usuario autorizó v1.0.0 el 2026-10-08; main actualizado a 887f9b3. Build correcto, 53 checks y lint sin problemas. Pendiente push y verificar release; se conservan pendientes anteriores." }
   ],
   "waiting_on": "Próximo: 22 (capa genérica) cuando el usuario lo pida; reinstalar NZT para que lleguen 33-40. Evals y fixtures fuera (usuario, 2026-10-08).",
   "notes": [
