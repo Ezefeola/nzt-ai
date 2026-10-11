@@ -55,10 +55,10 @@ A web application with one API and one browser client, one relational database, 
 outbound integration with the billing system. Nothing runs asynchronously today.
 
 ## Components
-| Component | Owns | Talks to | Areas |
-|---|---|---|---|
-| `Pedidos.Api` | orders, coupons, redemptions | Postgres, Billing (HTTP) | backend |
-| `Pedidos.Web` | checkout and support screens | `Pedidos.Api` (HTTP) | frontend |
+| Component | Folder | Owns | Talks to | Areas |
+|---|---|---|---|---|
+| `Pedidos.Api` | `Pedidos.Api/` | orders, coupons, redemptions | Postgres, Billing (HTTP) | backend |
+| `Pedidos.Web` | `Pedidos.Web/` | checkout and support screens | `Pedidos.Api` (HTTP) | frontend |
 
 ## Boundaries
 - Coupon validity is decided in the API and never in the client. The client shows what the
@@ -96,6 +96,14 @@ Listed by id; they live and get answered in `architecture-decisions.md`: QT-02.
 - Every component lists its **areas**, because that list is what acceptance criteria use to
   mark coverage, and what tells `nzt-architecture-stack` how many stack documents this
   component needs.
+- Every component names its **folder**: **its root, the one that holds everything it has —
+  its solution or manifest, `src/`, `tests/` — never the folder of one build project.** Its
+  `Docs/Architecture/<area>-stack.md` lives there, and every phase finds the stack from this
+  column. **With one component in the repository, the folder is the repository root** (`./`),
+  and the stack sits in the same `Docs/` as this file. With more than one, each has a root of
+  its own.
+- **This file exists from the first stack document**, even if it is one row: without the
+  folder column, nobody knows where the stack is.
 
 ## Decide for what is known
 
@@ -158,7 +166,7 @@ earned an ADR, the line cites it instead of restating it.
 Rehearse it: could someone design a feature against this document without asking you where
 something belongs?
 
-- Every component says what it owns and lists its areas.
+- Every component says what it owns, lists its areas and names its root folder.
 - No two components own the same decision.
 - Every external system has its `INT-NN` and says what happens when it is unavailable.
 - The questions were derived and logged before anything was proposed, the user chose the

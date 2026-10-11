@@ -1,0 +1,3 @@
+# Unit 44: architecture-clean.md (.NET) cut against backend-architecture-clean.md
+the layer, and the layer is a project => generic: "the layer, and the boundary between layers is the strongest one the stack offers" (decision B of 07); .NET: "the layer is a project", enforced by the compiler
+this skill decides projects and folders, and names each folder by the role it holds — nothing else does => generic: "This reference decides layers and folders, and names each folder by the role it holds — nothing else does"

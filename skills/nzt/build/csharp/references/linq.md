@@ -11,6 +11,10 @@
 - Never return null for a sequence
 - Closing checklist
 
+**Read `../nzt-build/references/code-collections.md` first.** It holds existence and counting,
+enumerating once, the order of operations, lookups instead of nested loops, the operator for
+the intent and never returning null for a sequence. This file holds only what is LINQ.
+
 Method syntax, always. Query syntax (`from x in xs select x`) is never used, not even for
 joins and groupings: one syntax across a codebase means one thing to read.
 
@@ -42,8 +46,6 @@ parameterless `Any()` from a count without enumerating.
 **On a lazy `IEnumerable<T>` it is the other way round**: `Any()` stops at the first element,
 while `Count() > 0` can walk the whole sequence when the count is not directly available.
 
-With a predicate, pass it to the operator instead of filtering first:
-
 | Instead of | Write |
 |---|---|
 | `items.Where(p).Count()` | `items.Count(p)` |
@@ -51,9 +53,6 @@ With a predicate, pass it to the operator instead of filtering first:
 | `items.Where(p).FirstOrDefault()` | `items.FirstOrDefault(p)` |
 
 ## Enumerate once
-
-**A chain is a recipe, not a result.** Enumerating it twice runs it twice — twice the work,
-and with a changing source, twice a different answer.
 
 ```csharp
 // no — filters twice
@@ -67,14 +66,9 @@ int count = pending.Count;
 Order first = pending[0];
 ```
 
-Materialise **once**, when the result is needed more than once. Mid-chain, `ToList()` does
-the opposite: it pulls the whole set into memory so the next operator can filter it. **Filter
-first, materialise last.**
+Mid-chain, `ToList()` pulls the whole set into memory.
 
 ## Order of operations
-
-Filter before sorting when that preserves the result, and place the projection according to
-what the later operators need.
 
 ```csharp
 // no
@@ -92,13 +86,9 @@ List<OrderLineDto> lines = order.Lines
     .ToList();
 ```
 
-**Never move a filter across `Take`, `Skip` or a grouping**: there it changes which elements
-are selected, and the result is wrong rather than slower. Treat the shape above as useful,
-not universal.
+**Never move a filter across `Take`, `Skip` or a grouping.**
 
 ## Lookups instead of nested loops
-
-A repeated linear search over m candidates for n items costs O(n × m):
 
 ```csharp
 // no — one scan of skus per line
@@ -145,13 +135,11 @@ List<Order> found = ids.Select(FindOrder).OfType<Order>().ToList();
 | Pair two sequences | `Zip` |
 | Sort by the element itself | `Order` / `OrderDescending` |
 
-`Single` and `First` throw on an empty sequence: use them only where empty is genuinely
-impossible, and prefer handling the `null`.
+`Single` and `First` throw on an empty sequence: prefer handling the `null`.
 
 ## Never return null for a sequence
 
-An empty collection is `[]` or `Enumerable.Empty<T>()`. **A null sequence turns every caller
-into a null check that someone will forget.**
+An empty collection is `[]` or `Enumerable.Empty<T>()`.
 
 ## Closing checklist
 
@@ -159,8 +147,5 @@ into a null check that someone will forget.**
 - [ ] No operator here needs a package — if it does, it is not this skill.
 - [ ] `Count`/`Length` for a materialised collection, `Any()` for a lazy one, predicates
       passed to the operator.
-- [ ] No chain enumerated twice, nothing materialised mid-chain.
-- [ ] No filter moved across paging or grouping.
 - [ ] No search inside a loop where a `HashSet`, `Dictionary` or `Lookup` does it in one pass.
 - [ ] `MaxBy`/`MinBy` instead of ordering to take one, `OfType<T>()` instead of `!`.
-- [ ] No method returns `null` in place of an empty sequence.

@@ -1,0 +1,4 @@
+# Unit 59: prerendering.md (Blazor) cut against frontend-rendering.md
+no side effect in initialisation; browser storage and js only after the first interactive render => generic checklist: "No side effect in initialisation; browser storage and script only after the first interactive render"
+nothing persisted is a secret or data this user may not inspect => generic: "No secret, and nothing they may not inspect, ever goes into persisted state" + checklist "nothing persisted that this user may not read"
+dependencies resolve on every host that runs the component, prerender host included, and a persistent service is scoped on the server and singleton in .client => generic checklist: "Dependencies resolve on every host that runs the component, prerender host included"; Blazor checklist: "A persistent service is scoped on the server and singleton in .Client"

@@ -1,18 +1,15 @@
 # EF Core mappings — the context and its entities
 
-The mapping is where persistence decisions are written down, **in one place per entity**, so
-that nothing about how the model is stored has to be inferred from the domain types.
+**Read `../nzt-build/references/data-mapping.md` first.** It holds the handle that exposes only
+its entities, one configuration per entity, the concerns that are never left to convention, and
+the foreign key as a property. This file holds only what is EF Core.
 
 ## The `DbContext`
 
 **One `DbContext` per component, named after the component** and ending in `DbContext` — the
-component `Billing` gets `BillingDbContext`, never a name derived from what it happens to
-store. **It is the persistence handle**: whatever the architecture says about where the handle
-lives and how it reaches a use case applies to this type.
-
-It exposes **a `DbSet<T>` per entity and nothing else**: no queries, no business logic, no
-helper methods. **A `DbContext` that grows methods becomes the place where use cases hide their
-decisions**, and none of them are reviewable as behaviour any more.
+component `Billing` gets `BillingDbContext`. It exposes **a `DbSet<T>` per entity and nothing
+else**. **A `DbContext` that grows methods becomes the place where use cases hide their
+decisions.**
 
 `OnModelCreating` has **one job**:
 
@@ -23,45 +20,22 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 }
 ```
 
-Nothing is configured inline there, so **two unrelated changes never edit the same method**.
+The lifetime is the default **scoped**.
 
-**It is registered once, in the composition root**, with the provider and the connection string
-read from configuration — never a literal in code. The lifetime is the default **scoped**.
-
-## Entity configuration lives in its own file
+## Entity configuration
 
 **One `IEntityTypeConfiguration<T>` per entity**, in its own file, named `<Entity>Configuration`.
 
-**Data annotations are not used** — not even the easy ones. A model configured in two places is
-a model where nobody knows which one wins, and attributes put persistence concerns inside the
-domain type.
+**Data annotations are not used** — not even the easy ones.
 
-| Concern | Why it is not left to convention |
-|---|---|
-| Key | explicit, even where the convention would find it |
-| Required and max length | the database rejects what the type alone allows; **the length is the entity's, cited — never a literal or a local `const`** |
-| `decimal` precision | the default precision silently truncates money |
-| Relationships and delete behaviour | below |
-| Value conversions (enums, dates, ids) | how a value is stored is a decision, not a default |
-| Table and column names | **the property name is the column name**: no literal ever, `nameof` if one must be stated |
-| Indexes | declared here; which ones, in `nzt-build-backend-dotnet-ef-core-indexes` |
-
-## Relationships: the foreign key is a property
-
-**Every relationship declares both the FK property and the navigation** — `CustomerId` and
-`Customer` — **except a cross-aggregate relationship in a DDD model, which keeps the FK and
-drops the outward navigation** (`nzt-build-backend-dotnet-ef-core-domain`). Three things follow,
-and they are the reason:
-
-- **A relationship can be assigned without loading the other entity.** Setting an `int` does not
-  need a round trip.
-- **Optionality is expressed in the type**: `int` means required, `int?` means optional. The
-  navigation's nullability never has to be interpreted.
-- **Filtering and grouping read naturally** without walking into the navigation.
-
-Collection navigations are initialised where they are declared, so no consumer null-checks a
-list that always exists. **Delete behaviour is always explicit**: the default cascade is
-convenient right up to the day a delete takes rows nobody expected with it.
+- `decimal` precision is explicit.
+- **The length is the entity's, cited — never a literal or a local `const`.**
+- A column name, if one must be stated, comes from `nameof`. Indexes: which ones, in
+  `nzt-build-backend-dotnet-ef-core-indexes`.
+- **Every relationship declares both the FK property and the navigation** — `CustomerId` and
+  `Customer` — except across aggregates (`nzt-build-backend-dotnet-ef-core-domain`).
+- **Optionality is expressed in the type**: `int` means required, `int?` means optional. Setting
+  an `int` does not need a round trip.
 
 ## Closing checklist
 
@@ -70,8 +44,5 @@ convenient right up to the day a delete takes rows nobody expected with it.
 - [ ] Registered scoped in the composition root, with provider and connection string from
       configuration.
 - [ ] One `IEntityTypeConfiguration<T>` per entity, in its own file, with no data annotations.
-- [ ] Keys, required, lengths, precision and conversions are explicit, and lengths cite the
-      entity's own constant.
-- [ ] No table or column name written as a literal.
 - [ ] Every relationship declares its FK property, its optionality in the type and its delete
       behaviour; collection navigations are initialised.

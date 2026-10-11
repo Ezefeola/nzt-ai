@@ -90,7 +90,20 @@ if [ -d "$root/skills" ]; then
           echo "WARNING: $rel/references/$rname : over 100 lines and no '## Contents'." >&2
           status=1
         fi
-        if ! grep -qF "references/$rname" "$file"; then
+        # a row in the router, or in an index reference the router has a row for (D58)
+        reached=0
+        if grep -qF "references/$rname" "$file"; then
+          reached=1
+        else
+          for index in "$(dirname "$file")"/references/*.md; do
+            if [ "$index" != "$ref" ] && grep -qF "references/$(basename "$index")" "$file" \
+               && grep -qF "references/$rname" "$index"; then
+              reached=1
+              break
+            fi
+          done
+        fi
+        if [ "$reached" -eq 0 ]; then
           echo "WARNING: $rel/references/$rname : no row in the router's table." >&2
           status=1
         fi

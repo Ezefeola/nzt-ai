@@ -1,0 +1,4 @@
+# Unit 44: architecture-vertical-slice.md (.NET) cut against backend-architecture-vertical-slice.md
+the feature folder is the aggregate in plural, holding the endpoint class and the aggregate's single <entity>mappingextensions, with no copy in any operation folder => generic checklist ("aggregate's single mapping file") + .NET checklist ("mapping file is its <Entity>MappingExtensions")
+one registration file per root folder, one private method per feature, and program.cs calling only the public ones => generic checklist ("entry point calling only the public ones") + .NET checklist (Program.cs calls only the public method of each registration file)
+this skill decides folders, projects and where every file goes — nothing else does => generic: "This reference decides folders, units and where every file goes — nothing else does" (project -> build unit: the generic does not name the .NET mechanism, decision B of 07)

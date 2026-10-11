@@ -1,5 +1,8 @@
 # Minimal API endpoints
 
+**Read `../nzt-build/references/backend-api.md` first** — what any endpoint does and never
+does. This file holds how a minimal API is written.
+
 **What the model is for:** an endpoint is a **function reachable over HTTP**. No class holding
 state, no base type, no attribute ceremony — the route, the verb and the handler are one
 declaration.
@@ -60,21 +63,8 @@ rest — the one that takes no attribute — and it is passed to the use case.
 
 ## What never goes inside a handler
 
-Binding, one call, the return. That is the whole body:
-
-- No validation — that is the use case's.
-- No mapping — `<Entity>MappingExtensions` does it.
-- No status code chosen here — it comes from the `Result`.
-- No business logic and no `try/catch` for business errors.
-- **No data access**: a handler never touches persistence.
-
-**If the body has more than the call and the return, something that belongs somewhere else
-ended up here.**
-
-## Where the files live is not decided here
-
-Folders, projects and layout belong to the architecture skill the stack selected. This skill
-says **what a minimal API is for and how it is written**, never where it is put.
+Binding, one call, the return — the generic list holds. **No data access**: a handler never
+touches persistence, and the mapping is `<Entity>MappingExtensions`'s.
 
 ## Closing checklist
 

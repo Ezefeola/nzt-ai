@@ -1,22 +1,20 @@
 # Result to HTTP — the filter
 
+**Read `../nzt-build/references/backend-api.md` first** — what holds for every way a Result
+reaches HTTP. This file holds the filter.
+
 **The endpoint returns the `Result` and that is what the client receives** — success or
 failure, same shape, serialised as it is. **The `Result` is the response contract**, so it is
 never converted into `ProblemDetails` and never unwrapped by an extension.
 
-Host-level failures keep the project's centralised handling, and an exception that escapes
-a use case goes to the global handler (`nzt-build-backend-dotnet-exceptions`), which answers
-in this same shape; **do not force them into a use-case `Result`**.
+The global handler (`nzt-build-backend-dotnet-exceptions`) answers in this same shape; **do
+not force host-level failures into a use-case `Result`**.
 
 ## What the filter does, and all it does
 
 **It matches the response's status code to `result.HttpStatusCode`.** Nothing else: it does
 not unwrap the payload, does not reshape the body, does not build a `ProblemDetails` and does
 not log.
-
-Without it every response goes out as `200` with a `Result` inside saying otherwise — **a
-client that checks the status code sees success on a failure, and nothing in the codebase
-looks wrong.** That mismatch is the only reason this filter exists.
 
 ## How it reads the status code
 
@@ -37,15 +35,10 @@ need more than this, **the base type is what is missing** — not a way around i
 ## It is registered once
 
 An `IEndpointFilter` under minimal APIs, a result filter under controllers, **registered
-globally at startup**.
+globally at startup**. **Never per endpoint.**
 
-**Never per endpoint.** A filter that has to be remembered is a filter that will be missing on
-the endpoint somebody adds next month, and that endpoint will answer `200` on failures.
-
-## What this means for the endpoint
-
-It returns the `Result` and stops there: no translation, no status code, no envelope.
-Everything else `nzt-build-backend-dotnet-api` says about endpoints still holds.
+The endpoint returns the `Result` and stops there. Everything else
+`nzt-build-backend-dotnet-api` says about endpoints still holds.
 
 ## Closing checklist
 

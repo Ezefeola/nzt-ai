@@ -1,0 +1,5 @@
+# Unit 56: ef-core-bulk.md (.NET) cut against data-bulk.md
+mixed with tracked changes or another statement, there is an explicit transaction, and nothing touched in bulk was already loaded in this use case => generic checklist: "mixed with staged changes ... already loaded in this operation"
+2. they leave the change tracker stale => generic: "2. They leave what is in memory stale"; .NET: "They leave the change tracker stale"
+do not bulk-update or bulk-delete what this use case has already loaded => generic: "... what this operation has already loaded"
+the bulk call is the write of that use case => generic: "the statement is the write of that operation"

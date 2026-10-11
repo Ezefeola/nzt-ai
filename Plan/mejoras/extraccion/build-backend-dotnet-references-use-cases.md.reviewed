@@ -1,0 +1,3 @@
+# Unit 50: use-cases.md (.NET) cut against backend-use-cases.md
+interface and class are two files => generic: "Interface and implementation are two files, where the language has interfaces"
+in executeasync, after validation and before anything is written => generic: "in the use case, after validation and before anything is written"; .NET: the entry is ExecuteAsync

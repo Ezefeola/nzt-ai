@@ -181,6 +181,7 @@ skills/nzt/                      nzt
 ├─ architecture/                 nzt-architecture
 │  ├─ design-product/            nzt-architecture-design-product
 │  ├─ stack/                     nzt-architecture-stack     → documento de stack (D9)
+│  ├─ stack-axes/                nzt-architecture-stack-axes → ejes, opciones y cómo se preguntan (D59)
 │  ├─ design-feature/            nzt-architecture-design-feature
 │  ├─ domain/                    nzt-architecture-domain    → domain-model.md (D26)
 │  ├─ contexts/                  nzt-architecture-contexts  → context-map.md (D26)
@@ -286,10 +287,13 @@ Reglas de esta capa:
   presupuesto** y no solo de cohesión: cada skill acá se paga en cada proyecto, incluso en
   los que nunca la van a usar. **Desde D50 un área cuesta una sola entrada** —su router—, y
   sus hojas son referencias que no se pagan hasta leerse.
-- **Debajo de esta capa hay un piso genérico (D51)**: `nzt-build` lleva las prácticas de
-  backend y frontend que valen en cualquier stack, y `nzt-architecture` los ejes del
-  documento de stack con opciones genéricas. Un componente sin router de área para su
-  tecnología lee ese piso en vez de quedarse sin guía.
+- **Debajo de esta capa hay una capa genérica (D58)**: `nzt-build` lleva el principio de cada
+  práctica de backend, datos, código y frontend, extraído de las referencias de área, y
+  `nzt-architecture` los ejes del documento de stack en `stack-axes.md`, con las opciones
+  copiadas de las tablas de build y los ejes propios de cada router de área sumados (D59). Un
+  componente sin router de área para su tecnología lee la capa genérica a través de
+  `practices-backend.md` o `practices-frontend.md`. Uno con router de área la lee como
+  *Read with* obligatoria, antes de la referencia que dice cómo se hace en su tecnología.
 - El contenido base sale del set de skills que ya tiene el usuario; se porta y se adapta
   a las convenciones de autoría de la sección 10, no se copia tal cual.
 
@@ -536,7 +540,9 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │  └─ Manual/
 │     ├─ <audiencia>.html      # el manual del usuario final, a pedido (D37)
 │     └─ assets/               # sus imágenes, sacadas de la evidencia de verify
-├─ <carpeta del componente>/   # la que architecture.md declara, p. ej. src/Pedidos.Api/
+├─ <carpeta del componente>/   # su raíz, la que architecture.md declara, p. ej. Pedidos.Api/ (D60);
+│  │                           # con un solo componente es la raíz del repo y este Docs/ es el de arriba
+│  ├─ src/ · tests/            # sus proyectos de build y sus tests, adentro de la raíz
 │  └─ Docs/Architecture/
 │     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
@@ -592,7 +598,9 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
   documento va en la carpeta de su tema, sin importar qué fase lo escribe.
 - **El stack vive dentro de su componente**: `<carpeta>/Docs/Architecture/<área>-stack.md`,
   donde `<carpeta>` es la que `Docs/Architecture/architecture.md` declara para ese
-  componente. Se escribe al diseñar el componente, aunque la carpeta todavía no exista: la
+  componente: **su raíz, la que contiene todo lo suyo (solution o manifiesto, `src/`,
+  `tests/`), nunca la carpeta de un proyecto de build; con un solo componente, la raíz del
+  repo** (D60). `architecture.md` es obligatorio desde el primer stack. Se escribe al diseñar el componente, aunque la carpeta todavía no exista: la
   ruta la fija arquitectura en ese mismo momento, y el resto del set encuentra el stack a
   partir de ella (D57).
 - **Un documento del producto fuera de este orden se propone reordenar, nunca se mueve
@@ -721,7 +729,10 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 13. **El archivo se llama como la hoja sin el prefijo de su router**
    (`nzt-build-backend-dotnet-ef-core-queries` → `build/backend/dotnet/references/ef-core-queries.md`),
    y **toda referencia tiene una fila en la tabla de su router**. Una referencia sin fila no
-   la carga nadie.
+   la carga nadie. Desde D58 la fila puede estar en una **referencia índice** que tiene fila
+   en el router (`practices-backend.md`, `practices-frontend.md`): un nivel, no más. El build
+   lo comprueba así (`build.sh` y `build.ps1`, vistos fallar con una referencia huérfana en
+   la unidad 44).
 14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
    secciones. Protege contra la lectura parcial (`head -100`) que documenta la guía de
    Anthropic. **Si con el índice pasa de 200, se parte** (la regla 3, no subir el techo):
@@ -729,9 +740,17 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    fila del router lee las dos. El script de migración compara la hoja vieja contra las
    partes juntas. Primer caso: `domain-ddd` (200 en `main`, 203 con índice), decidido por el
    usuario en la unidad 19.
-15. **Una práctica escrita en un área y en el piso genérico (D51) se cambia en los dos.**
-   Cada línea genérica nombra la referencia de área que la implementa, para que la revisión
-   no dependa de acordarse.
+15. **Una práctica vive en un solo nivel (D58).** Si vale fuera de la tecnología, está en
+   la referencia genérica; si no, está en la de área. Nunca en las dos. **El vínculo va en una
+   sola dirección**: la de área abre diciendo qué genérica presupone, y **la genérica no nombra
+   ninguna tecnología ni referencia de área**, como el dominio no conoce la infraestructura.
+   Si la nombrara, cada tecnología nueva obligaría a editar todas las genéricas, y el agente
+   que la lee sin router de área recibiría un vínculo a algo que su stack no seleccionó. Qué
+   referencias implementan un principio se encuentra por grep del nombre de la genérica.
+   Decidido por el usuario el 2026-10-11, tras la unidad 54. Así, cambiar un principio no deja
+   una copia vieja en otro lado. Recortar una
+   referencia de área para extraer algo exige el chequeo de no-pérdida de D58 antes de dar la
+   unidad por terminada.
 16. **El disparador de una hoja vive en la cadena instruida, nunca en una descripción**
    (D53). Al mover una hoja, lo que su `description` decía que la disparaba tiene que estar
    cubierto en los tres eslabones: la fila del kernel que lleva a su router, el *hand off*
@@ -1508,7 +1527,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   un script falla si cambió cualquier otra línea. Opción descartada: mover solo la capa de
   stack (68 skills, ~11.500 chars), que seguía arriba del piso de Codex y no escalaba al
   sumar stacks. Decidido por el usuario; detalle en `Plan/mejoras/04-propuesta.md`.
-- **D51.** **Hay un piso genérico de prácticas, liviano, debajo de la capa de stack.**
+- **D51.** *(Reemplazada por D58, 2026-10-10, salvo `stack-axes.md`, que D58 mantiene.)* **Hay un piso genérico de prácticas, liviano, debajo de la capa de stack.**
   `nzt-build/references/practices-backend.md` y `practices-frontend.md` llevan una línea por
   práctica con su porqué, sin código ni librerías: operación con una sola entrada, validar
   la forma en el borde, fallas esperadas como valor y excepciones a un manejador global,
@@ -1583,7 +1602,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `tech-debt.md`), `Docs/UX/` (`design-system.md`, `ui-components.md`), `Docs/Operations/`
   (`deployment.md`, `releases.md`) y `Docs/Manual/`. `history.md` va con el producto
   porque registra qué cambió el producto, no qué se desplegó (eso es `releases.md`). **El
-  stack**: `<carpeta del componente>/Docs/Architecture/<área>-stack.md`, sin el nombre del
+  stack** *(qué es la carpeta del componente lo define D60)*: `<carpeta del componente>/Docs/Architecture/<área>-stack.md`, sin el nombre del
   componente en el archivo porque la carpeta ya lo dice. La carpeta la declara
   `Docs/Architecture/architecture.md` en la fila del componente, se fija al diseñarlo y es
   como el resto del set encuentra su stack. **Un documento fuera de este orden se propone
@@ -1595,6 +1614,101 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   aplica el mapa de rutas a la hoja de `main` antes de comparar, así una ruta movida no
   cuenta como pérdida y una mal movida sí (visto fallar con `glossary.md` en `Product/`).
   Decidido por el usuario el 2026-10-08.
+- **D58.** **La capa genérica es el principio, la de área es cómo se hace en esa tecnología,
+  y lo genérico se extrae de las referencias de área.** Reemplaza a D51. Lo que la forzó: fuera
+  de .NET y Blazor el agente recibía método pero ninguna práctica, mientras que las
+  referencias de .NET ya estaban escritas casi en genérico (arquitecturas por roles,
+  persistencia por "el handle del ORM"). Copiar el principio a un piso liviano dejaba la misma
+  regla en dos lugares. Extraerla deja una sola versión. Inventario y destinos en
+  `Plan/mejoras/07-extraccion.md`.
+  - **Dónde vive:** 30 referencias en `nzt-build/references/`, con prefijo por grupo:
+    `backend-` (arquitecturas, use cases, validación, resultados, errores, dominio,
+    persistencia, API, seguridad), `data-` (acceso, consultas, paginación, escrituras,
+    operaciones por criterio, mapeo, migraciones, índices), `code-` (reglas de código, DTOs,
+    colecciones) y `frontend-` (arquitectura, componentes, formularios, rendering,
+    performance). Lo genérico de los tests de .NET va a `tests.md`, que ya existe.
+  - **Cómo se elige sin router de área:** dos índices, `references/practices-backend.md`
+    (backend y datos) y `references/practices-frontend.md`, con los ejes del router de área y
+    las filas por tarea. Los dos nombran las `code-*`. `nzt-build` los nombra en dos filas.
+  - **Con router de área:** la fila del router .NET o Blazor pone la genérica en *Read with*,
+    **obligatoria**. La referencia de área se queda con lo que no existe fuera de esa
+    tecnología: los proyectos de la solution en clean y hexagonal, el `.csproj` único en
+    vertical slice, el código C# exacto (Result, handler global), EF Core, ASP.NET Core y los
+    render modes. **El código .NET que sale es el mismo de antes**. Lo que cambia es que otro
+    lenguaje recibe la capa genérica.
+  - **El límite entre capas en la genérica** es "el más fuerte que ofrezca el stack, escrito
+    en su documento de stack", sin nombrar el mecanismo de cada lenguaje. Nombrarlo exige
+    verificarlo en su fuente, y eso es de los ejes del stack (`stack-axes.md`, la parte de D51
+    que esta decisión mantiene).
+  - **Sin evals:** la no-pérdida se prueba sobre el texto. Por cada extracción, un script
+    compara la referencia de área de `main` contra la recortada más su genérica (`install/check-extraction.sh`): toda regla
+    que salió de la de área tiene que aparecer en la genérica, o queda listada para revisarla
+    a mano. Un `check-references.sh` no sirve para esto: prueba movimientos mecánicos, no
+    recortes.
+  - Opciones descartadas: el piso liviano de D51 (deja la regla en dos lugares, R3), y
+    borrar las referencias de arquitectura de .NET (se perderían los proyectos de la
+    solution, que solo existen en .NET). Lo que se acepta: el agente .NET lee dos archivos
+    donde antes leía uno, y la *Read with* salteada ya pasó con EF Core (unidad 20). Por eso
+    es obligatoria desde la primera extracción. Volver atrás es reponer el texto de la
+    genérica en cada referencia de área. Decidido por el usuario el 2026-10-09 y el
+    2026-10-10, en las unidades 42 a 47.
+- **D59.** **Los ejes del stack tienen una referencia propia, `stack-axes.md`, que no
+  inventa opciones y pregunta con la herramienta del host si existe.** Es la parte de D51 que
+  D58 mantuvo, con el alcance que pidió el usuario en `Plan/mejoras/06-capa-generica.md`.
+  - **Una sola fuente de opciones:** los valores de cada eje son los de las tablas que
+    seleccionan referencias en build (`practices-backend.md`, `practices-frontend.md` y la
+    tabla de ejes excluyentes de cada router de área), escritos **exactamente** como ahí. Lo
+    que la forzó: los routers comparan el texto del stack, y un sinónimo no selecciona nada.
+    El ejemplo de `stack.md` tenía ese defecto (`minimal APIs` contra `minimal-apis`, y sin
+    el eje `Result to HTTP`), y se corrigió en la misma unidad.
+  - **Los ejes del router de área se suman a los genéricos**, y se preguntan recién cuando se
+    eligió la tecnología. Así .NET conserva sus preguntas (endpoints y Result a HTTP; con EF
+    Core, la persistencia directa o con repositorios sigue siendo un eje, genérico) y otra
+    tecnología recibe solo los ejes genéricos. Un
+    concepto que ninguna tabla ofrece es un hueco con su `QT-NN`, nunca un valor nuevo.
+  - **Se lee siempre que se escribe un stack**, como *Read with* de la fila de `stack.md` en
+    `nzt-architecture`. Esto cambia el "solo sin router de área" de D51: con router de área,
+    la referencia manda a leer también la tabla de ese router.
+  - **Formato de la pregunta, agnóstico del host:** la herramienta de preguntas de opción
+    múltiple del host si la sesión la ofrece; si no, viñetas con la opción recomendada
+    primero y su costo al lado. Una ronda, ordenada por dependencia. Verificado en la unidad
+    61: Claude Code documenta `AskUserQuestion`, y Codex tiene `request_user_input` solo en
+    Plan Mode (issue openai/codex#30150, abierto), así que nombrar cualquiera de las dos
+    rompería en el otro host. Se reabre si Codex la habilita fuera de Plan Mode.
+  - Riesgo aceptado: los costos de cada opción en `stack-axes.md` son una línea que resume
+    la genérica de esa opción y pueden derivar de ella (R3); se revisan cuando se cambia una
+    genérica de arquitectura, dominio o persistencia. Sin evals: el cambio en cómo pregunta
+    architecture no se midió, por decisión del usuario. Pedido y aprobado por el usuario el
+    2026-10-11 (unidades 61 y 62); el formato agnóstico y la fuente única de opciones son
+    decisiones del agente dentro del alcance, por la verificación de la 61.
+- **D60.** **La carpeta del componente es su raíz, nunca la de un proyecto de build.** Lo
+  que la forzó: en un proyecto real (Todo, 2026-10-11) el stack quedó en
+  `src/Todo.Api/Docs/Architecture/backend-stack.md`, y el agente hizo exactamente lo que el
+  set decía: "carpeta del componente" no estaba definida, y el único ejemplo (D57, el árbol
+  de §8, el router de arquitectura y `audit.md`) era `src/Pedidos.Api/`, la carpeta del
+  `.csproj`. Ese ejemplo contradecía al propio set: los tests de .NET van en
+  `tests/<Component>.UnitTests`, fuera del `.csproj`, y en clean o hexagonal un componente
+  son cuatro proyectos, sin ninguno que lo represente.
+  - **Definición:** la carpeta del componente es **su raíz, la que contiene todo lo suyo** —
+    solution o manifiesto, `src/`, `tests/`— y ahí vive su `Docs/Architecture/`. **Con un
+    solo componente en el repo, es la raíz del repo**, y el stack queda en
+    `Docs/Architecture/<área>-stack.md`, junto al resto de `Docs/`.
+  - **Con más de un componente, cada uno tiene su propia raíz** (`Pedidos.Api/`,
+    `Pedidos.Web/`, cada una con su `src/`, `tests/` y `Docs/`), y una solution en la raíz
+    del repo, si la hay, solo las referencia. Opción descartada: componentes que comparten
+    `src/` y `tests/` con los stacks en el `Docs/` de la raíz, con el componente en el
+    nombre del archivo (rompe la regla de D57 sobre el nombre y el stack deja de viajar con
+    su proyecto). Se reabre si un proyecto real necesita componentes sin raíz propia.
+  - **`architecture.md` es obligatorio desde el primer stack**, aunque sea una fila por
+    componente con su carpeta: todo el set encuentra el stack a partir de esa fila, y en
+    Todo no se escribió, así que la carpeta la fijó el ejemplo.
+  - **La unidad de build y el componente son dos cosas.** El vertical slice decía "a
+    component is one `.csproj`"; ahora dice un proyecto de build por componente, y su árbol
+    nombra el proyecto aparte de la raíz.
+  - Los `src/Pedidos.Api` de `nzt-ship-backend-dotnet` (contenedores, migraciones) no
+    cambian: son rutas de proyecto para comandos `dotnet`, no carpetas de componente.
+  - Pedido por el usuario el 2026-10-11 ("hacé estos cambios", sobre el análisis que
+    recomendaba la opción a); aplicado en las unidades 64 a 66.
 
 ## 13. Revisión contra Temper v3
 
@@ -2967,13 +3081,39 @@ curiosidad.
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
-> **En curso (2026-10-03), rama `marco-trabajo-mejoras`:** D50–D52 decididas y escritas en
-> esta spec. **Migrados:** `ship-backend-dotnet` (piloto, 4 hojas), `nzt-plan` (`close.md`),
-> `nzt-learn` (7 hojas), `nzt-discovery` (7 hojas) y `nzt-ux` (5 hojas) tienen sus hojas en
-> `references/` (87 skills); `install/check-references.sh` prueba que cada referencia es su hoja menos los
-> cambios mecánicos, y el build mide referencias (200 líneas, `## Contents` pasadas las 100,
-> fila en la tabla). El resto de los routers sigue como lo describe esta sección. Línea base
-> de evals en `Plan/mejoras/05-linea-base.md`; plan y dónde quedó en `Plan/state.json`.
+> **Estado actual (2026-10-11), rama `capa-generica`.** Lo que sigue a este bloque es la
+> historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
+> como skills) ya no valen. El plan en curso y dónde quedó viven en `Plan/state.json`.
+>
+> - **El set son 14 skills y 131 referencias** (D50): las hojas pasaron a `references/` de su
+>   router; el listado ocupa ~2.540 caracteres, bajo el piso de 8.000 de Codex.
+>   `install/check-references.sh` probó cada movimiento; el build mide referencias (200
+>   líneas, `## Contents` pasadas las 100, fila en la tabla o en un índice).
+> - **El kernel dice cómo se lee una referencia** (D52, D54): *Read with* antes de la primera
+>   respuesta, nombres viejos por prefijo más largo, y releer tras una compactación.
+> - **Docs/ por carpeta de tema y stack dentro de su componente** (D56, D57); glosario y
+>   `product.md` obligatorios.
+> - **v1.0.0 publicada el 2026-10-08** con todo lo anterior. Lo que sigue (D58, D59) está solo
+>   en esta rama.
+> - **Capa genérica terminada (D58, unidades 42-59):** 30 referencias en
+>   `nzt-build/references/` (`backend-*`, `data-*`, `code-*`, `frontend-*`) con el principio
+>   de cada práctica sin nombrar tecnologías, y los índices `practices-backend.md` y
+>   `practices-frontend.md` para un stack sin router de área. Las referencias .NET y Blazor
+>   quedaron con el cómo en su tecnología y leen la genérica primero (*Read with*, obligatoria).
+>   `install/check-extraction.sh` probó cada recorte contra `main`: 0 reglas perdidas, las
+>   reescritas revisadas a mano en `Plan/mejoras/extraccion/*.reviewed`.
+> - **Ejes del stack (D59):** `nzt-architecture/references/stack-axes.md`, con las opciones
+>   copiadas de las tablas de build, los ejes del router de área sumados, y la pregunta con la
+>   herramienta del host o en viñetas.
+> - **Carpeta del componente (D60):** es su raíz (solution o manifiesto, `src/`, `tests/`),
+>   nunca la de un proyecto de build; con un solo componente, la raíz del repo.
+>   `architecture.md` es obligatorio desde el primer stack, con la columna de carpeta.
+> - **Evals:** la última suite completa es la 24a (2026-10-07, juez sonnet: routing 0.97,
+>   stack 0.89, restraint 0.90; `Plan/mejoras/05-linea-base.md`). Lo posterior (D56-D59) se
+>   probó sobre el texto, sin evals, por decisión del usuario; los fixtures siguen con las
+>   rutas viejas de `Docs/`.
+> - **Pendiente:** que el usuario pruebe la rama instalada, el PR a `main` (lo arma el
+>   usuario) y la versión nueva después de esa prueba.
 
 **Dónde estamos, en una línea:** **el roadmap está construido entero — 111 skills, la suite
 de evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La

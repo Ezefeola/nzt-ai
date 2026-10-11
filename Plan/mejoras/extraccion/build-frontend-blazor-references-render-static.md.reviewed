@@ -1,0 +1,3 @@
+# Unit 59: render-static.md (Blazor) cut against frontend-rendering.md
+everything the user changes travels as a navigation or a form post => generic checklist: "Everything the user changes on a static page travels as a navigation or a form post, and ..."
+outgrowing the mode was reported as a stack decision, not worked around in the screen => generic checklist: "... and outgrowing the mode was reported as a stack decision"; body: "the stack file is what changes"

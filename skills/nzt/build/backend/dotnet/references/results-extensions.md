@@ -1,5 +1,8 @@
 # Result to HTTP — the extension
 
+**Read `../nzt-build/references/backend-api.md` first** — what holds for every way a Result
+reaches HTTP. This file holds the extension.
+
 **The `Result` never leaves the process.** What goes out is the payload on success and a
 `ProblemDetails` on failure.
 
@@ -46,27 +49,11 @@ body, same output** — only the framework type changes.
 
 - **`Status` is the `Result`'s**, on both branches, never one chosen here.
 - **`Title` is the fixed sentence.** It is not a place to describe the failure.
-- **`Extensions["errors"]` carries the errors as they came.** It is the only thing that says
-  what went wrong.
-- **No `Detail`.** The `Result` has no free-text description to put there, and a summary
-  written here would be a second version of the same failure, drifting from the errors it is
-  supposed to summarise.
-- **Success carries no envelope.** The payload travels as it is: no `{ data }`, no wrapper
-  invented on top.
+- **`Extensions["errors"]` carries the errors as they came.**
+- **No `Detail`.** The `Result` has no free-text description to put there.
 
-## One place, and only one
-
-**This extension owns the translation of failed use-case Results.** Not the endpoint, not a
-middleware, not a second copy for the one case that felt different.
-
-Host-level failures — authentication, routing — keep the project's centralised handling, an
-unexpected exception goes to the global handler (`nzt-build-backend-dotnet-exceptions`), and
-**this rule does not forbid their own `ProblemDetails`**. What it
-forbids is a use-case `Result` being translated in two places, because the two stop agreeing
-and nobody notices until a client depends on the difference.
-
-**Existing public status codes and bodies are preserved** unless changing them is explicitly
-authorised: they are the contract.
+**This extension owns the translation of failed use-case Results.** Host-level failures and
+the global handler (`nzt-build-backend-dotnet-exceptions`) keep their own `ProblemDetails`.
 
 ## Closing checklist
 

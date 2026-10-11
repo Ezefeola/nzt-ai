@@ -1,5 +1,8 @@
 # Controller endpoints
 
+**Read `../nzt-build/references/backend-api.md` first** — what any endpoint does and never
+does. This file holds how a controller is written.
+
 **What the model is for:** a controller is a **class that groups the operations of one
 feature**, with routing declared as attributes and the MVC pipeline — binding, filters,
 conventions — around it.
@@ -54,22 +57,11 @@ written.**
 
 ## What never goes inside an action
 
-Binding, one call, the return:
+Binding, one call, the return — the generic list holds, and on a controller it also means:
 
-- No validation — that is the use case's.
-- No mapping — `<Entity>MappingExtensions` does it.
-- No status code chosen here: **no `Ok()`, `NotFound()`, `BadRequest()` or `StatusCode(...)`
-  by hand**. It comes from the `Result`.
-- No business logic and no `try/catch` for business errors.
-- **No data access**, and nothing read from `HttpContext` beyond what the framework bound.
-
-**If the body has more than the call and the return, something that belongs somewhere else
-ended up here.**
-
-## Where the files live is not decided here
-
-Folders, projects and layout belong to the architecture skill the stack selected. This skill
-says **what a controller is for and how it is written**, never where it is put.
+- **no `Ok()`, `NotFound()`, `BadRequest()` or `StatusCode(...)` by hand**;
+- **No data access**, and nothing read from `HttpContext` beyond what the framework bound;
+- the mapping is `<Entity>MappingExtensions`'s.
 
 ## Closing checklist
 

@@ -1,5 +1,9 @@
 # Interactive Auto
 
+**Read `../nzt-build/references/frontend-rendering.md` first** — *A component that may run in
+either place*, with the server and browser sections it combines. It holds being correct in both
+places and the strictest of the two always applying. This file holds only what is Blazor.
+
 The component **runs on whichever host is ready**. On the first visit, while the WebAssembly
 runtime downloads, it runs **on the server** so the screen is usable immediately; once the
 runtime is cached, **later visits run in the browser**.
@@ -13,17 +17,11 @@ How a component is written does not change — that is
 component starts; a screen that began on the server finishes there. The switch shows up on the
 **next** visit, not in the middle of this one.
 
-So there is no moment to handle, no event to subscribe to and nothing to migrate. What there is
-is a component that **must be correct in both places**.
+So there is no moment to handle, no event to subscribe to and nothing to migrate.
 
 ## The strictest of the two always applies
 
-- **No server-only service and no database, ever** — in the browser they do not exist. Every
-  call goes through the typed client.
-- **No secret, no key, no privileged rule**: it may end up downloaded to the browser.
 - **Nothing synchronous that waits.** On WebAssembly it freezes the page.
-- **No assumption about latency in either direction.** On the server every interaction is a
-  round trip; in the browser the calls to the API are.
 
 On .NET 10, `RendererInfo.Name` and `RendererInfo.IsInteractive` say where the code is executing
 now; **`AssignedRenderMode` is the assigned mode, not the current host** — confusing the two is

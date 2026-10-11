@@ -13,12 +13,12 @@
 - Keeping it current
 - Done when
 
-Produces `<component folder>/Docs/Architecture/<area>-stack.md`: what this component is built with, which
-option it took on each axis, what it opted into, and which packages it uses. One document
-per **component and area** — a component with a backend and a frontend has two.
+Produces `<component folder>/Docs/Architecture/<area>-stack.md`, one per **component and
+area**: how it is built, each axis, its opt-ins and its packages. **The folder is the
+component's root** — its solution or manifest, `src/`, `tests/`; the repository root when it
+is the only one — **never a build project's folder**, and `architecture.md` names it.
 
-**No component gets built without one.** A new component gets it when it is designed; an
-existing one gets it from evidence before its code is touched.
+**No component gets built without one, nor without its row in `architecture.md`**: a new one when designed, an existing one from evidence before its code is touched.
 
 ## What this document is for
 
@@ -54,8 +54,9 @@ component: Pedidos.Api · area: backend
 | Domain model | ddd | entities and aggregates protect the order rules |
 | ORM | EF Core 10 | every access to PostgreSQL |
 | Persistence | direct | use cases reach the DbContext; no repositories |
-| Endpoints | minimal APIs | every HTTP endpoint |
+| Endpoints | minimal-apis | every HTTP endpoint |
 | Error handling | result pattern | expected failures; exceptions stay exceptional |
+| Result to HTTP | result-extensions | every endpoint that returns a use case's result |
 | Tests | xUnit 3 | — |
 
 ## Opt-ins
@@ -110,6 +111,9 @@ survives a rename, it can be read without opening anything, and it is what the n
 actually needs. Skill names in this set come from the folder tree, so they move.
 
 ## One choice per axis
+
+**Which axes there are, their options, and how each one is asked: `stack-axes.md`.** The value
+is written exactly as the build tables spell it.
 
 - An axis is a place where the technology offers **exclusive alternatives** — one domain
   model, one endpoint style, one error-handling shape. Write the one that was taken.

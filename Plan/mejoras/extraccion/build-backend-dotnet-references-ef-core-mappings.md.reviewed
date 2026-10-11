@@ -1,0 +1,3 @@
+# Unit 56: ef-core-mappings.md (.NET) cut against data-mapping.md
+two unrelated changes never edit the same method => generic: "two unrelated changes never edit the same place"; .NET: OnModelCreating has one job
+except a cross-aggregate relationship in a ddd model, which keeps the fk and drops the outward navigation => generic: "... which keeps the foreign key and drops the outward navigation"

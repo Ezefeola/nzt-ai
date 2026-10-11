@@ -94,7 +94,7 @@ row is not the guidance, the file is.
 | The unit is | Read | Read with |
 |---|---|---|
 | The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/diagrams.md` |
-| One component's adopted technologies, versions and areas | `references/stack.md` | — |
+| One component's adopted technologies, versions and areas | `references/stack.md` | `references/stack-axes.md` — its axes, options and how they are asked |
 | One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/diagrams.md` |
 | The entities of the business, their fields and their aggregates | `references/domain.md` | — |
 | More than one context, or meaning shared with a third party | `references/contexts.md` | — |
@@ -130,14 +130,14 @@ One document: the product design, one feature's design, one stack, or one decisi
 `Docs/` has one folder per subject, whichever phase writes it: `Product/` (product, interview,
 history), `Domain/`, `Architecture/`, `UX/`, `Operations/` (deployment, releases), `Manual/`.
 
-- Components, boundaries, external systems and why → `Docs/Architecture/architecture.md`;
-  **each component's row names its folder** (`src/Pedidos.Api/`), fixed when it is designed,
-  before the folder exists: it is how every phase finds that component's stack
+- Components, boundaries, external systems and why → `Docs/Architecture/architecture.md`, from
+  the first stack; **each row names the component's root** (`Pedidos.Api/`; `./` if it is the
+  only one), never a build project's folder: it is how every phase finds that stack
 - Entities, with aggregates when the stack says so → `Docs/Domain/domain-model.md`; contexts,
   dependencies, domain events → `Docs/Domain/context-map.md`, only past one context or with a third party
 - Decision records → `Docs/Architecture/adr/` · proposals still being agreed →
   `Docs/Architecture/rfc/`, on request · deferred work → `Docs/Architecture/tech-debt.md`
-- One stack per component and area, **inside the component** →
+- One stack per component and area, **in the component's root** →
   `<component folder>/Docs/Architecture/<area>-stack.md` (`backend-stack.md`, `frontend-stack.md`)
 - The technical questions and their answers → `Docs/Architecture/architecture-decisions.md`
   for the product, `Plan/specs/<feature>/tech-design/decisions.md` for a feature. Append-only

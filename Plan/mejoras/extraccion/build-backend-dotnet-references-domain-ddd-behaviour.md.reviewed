@@ -1,0 +1,3 @@
+# Unit 51: domain-ddd-behaviour.md (.NET) cut against backend-domain-ddd.md (and domain-ddd.md)
+only the ddd pieces the stack says yes to; the id is a primitive unless typed ids are; the entity is sealed, with private setters and read-only collections => generic checklist (DDD pieces, primitive id, state writable only from inside) + .NET checklist (int or Guid, sealed, private setters, read-only collections)
+nothing is made public for it => generic: "nothing is made public for the creation entry"

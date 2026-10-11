@@ -65,7 +65,7 @@ line. Three categories:
 - Offering one, say what dropping it loses: not *"do you want the ADR?"* but *"without it,
   this decision gets re-argued in three months with no record of what was weighed"*.
 - **Mandatory:** the stack per component and area, designed with it or read from evidence
-  before its code is touched; the product definition and the glossary, from Analysis on, the
+  before its code is touched, with `architecture.md` naming its root; the product definition and the glossary, from Analysis on, the
   glossary updated by every unit that adds or changes a term. **Offered: feature design.**
 - A document that already exists and that the change affects is kept current as part of the
   work, never offered as optional.

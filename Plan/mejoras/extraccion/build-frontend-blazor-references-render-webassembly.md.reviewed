@@ -1,0 +1,2 @@
+# Unit 59: render-webassembly.md (Blazor) cut against frontend-rendering.md
+no dependency added to the client project without weighing the download, measured on a published build with a cold cache => generic checklist: "No dependency added to the browser-side code without weighing the download, measured on a published build with a cold cache"
