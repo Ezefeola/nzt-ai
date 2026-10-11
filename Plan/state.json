@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-11T22:00:00Z",
+  "updated": "2026-10-11T23:00:00Z",
   "goal": "Reorganizar NZT en la rama marco-trabajo-mejoras: hojas a referencias de su router (D4 se reemplaza), capa de prácticas agnóstica de tecnología, y spec al día, sin perder comportamiento ni contenido de código.",
   "phase": "architecture",
   "approved": true,
@@ -69,11 +69,11 @@
     { "id": 64, "do": "Spec: D60 define la carpeta del componente (su raíz, no la del .csproj; un solo componente = raíz del repo; opción a), corrige D57 y el árbol de §8", "status": "done", "detail": "D60 escrita (opción a: cada componente su raíz; uno solo = raíz del repo; architecture.md obligatorio desde el primer stack); árbol §8, regla de §8 y nota en D57." },
     { "id": 65, "do": "Architecture y plan: ejemplo y definición en el router, columna de carpeta en design-product, architecture.md obligatorio con el stack, adr.md minimal-apis", "status": "done", "detail": "design-product: columna Folder + definición + archivo desde el primer stack; router architecture (sigue en 200), stack.md (sigue en 200), nzt-plan Mandatory, adr.md minimal-apis." },
     { "id": 66, "do": "Build y verify: vertical slice (.NET, Blazor y las dos genéricas) separa proyecto de build y raíz del componente; ejemplo de audit.md", "status": "done", "detail": "Genéricas backend/frontend: la unidad de build no es la raíz; .NET: builds into one .csproj, árbol src/<Component>/; Blazor sin cambio (lo cubre la genérica, regla 15); audit.md Pedidos.Api/; check-extraction .NET 0 missing; builds ok; §14 suma D60. Commiteado y pusheado por el usuario (8fe792d)." },
-    { "id": 67, "do": "Publicar v1.1.0 desde main (PR #2 mergeado en f450352): versión, puertas, tag y verificación del workflow", "status": "doing", "detail": "Versión 1.1.0 en csproj, build.sh/ps1, installer/README (y 14 skills en vez de 111), spec del instalador; build, 53 checks y verify ok en local. Falta: tag, workflow y release." },
+    { "id": 67, "do": "Publicar v1.1.0 desde main (PR #2 mergeado en f450352): versión, puertas, tag y verificación del workflow", "status": "done", "detail": "v1.1.0 publicado el 2026-10-11 sobre e7775a5; main y tag pusheados. Workflow 38181836030 success (gates, 6 binarios, release, notify-landing); release con 11 assets y releases/latest -> v1.1.0: https://github.com/Ezefeola/nzt-ai/releases/tag/v1.1.0" },
     { "id": 41, "do": "Publicar v1.0.0: versión, comprobaciones y tag", "status": "done", "detail": "v1.0.0 publicado el 2026-10-08 sobre bc18258; main y tag pusheados. Build, 53 checks y lint correctos. Workflow 37760800986 success, incluidos seis binarios y notify-landing; release con 11 assets: https://github.com/Ezefeola/nzt-ai/releases/tag/v1.0.0. Pendientes anteriores conservados." }
   ],
   "autonomy": {},
-  "waiting_on": "El usuario prueba la rama capa-generica instalada; después arma el PR a main y avisa para publicar la versión nueva.",
+  "waiting_on": null,
   "notes": [
     "Decidido por el usuario 2026-10-03: hojas a references/ de su router, todas (quedan 14 skills); el agente usa solo skills, nunca comandos /; no se pierde comportamiento ni contenido; cada hoja se mueve con 4 cambios mecánicos verificados por install/check-references.sh.",
     "Por unidad de migración (D53, decidido por el usuario: el ruteo nunca depende de descripciones): por cada hoja, su descripción vieja queda cubierta por la fila del kernel, el hand off de nzt y la fila del router; si un eval falla en ruteo se lee la traza (--keep-temp) antes de arreglar; ampliando texto de fila, nunca la descripción; git mv + 4 cambios, tabla del router con columnas Read / Read with, check-references ok, build.sh sin WARNING, graders Skill->Read; un 'load' convertido en mención lo marca el script y se revisa a mano. Juez: el de la línea base del caso (haiku) para comparar; sonnet en casos nuevos.",
