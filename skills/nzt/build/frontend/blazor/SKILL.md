@@ -45,7 +45,7 @@ for visual work, states and wording, `Docs/UX/ui-components.md` before adding a 
 
 | Axis | The stack says | Read | Read with |
 |---|---|---|---|
-| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | — |
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | `../nzt-build/references/frontend-architecture-vertical-slice.md` — first, required |
 | Render mode | `server` | `references/render-server.md` | `references/components.md` |
 | | `webassembly` | `references/render-webassembly.md` | `references/components.md` |
 | | `auto` | `references/render-auto.md` | `references/components.md` |

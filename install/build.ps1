@@ -101,7 +101,18 @@ if (Test-Path $skillsRoot) {
                     Write-Warning "$rel/references/$($ref.Name) : over 100 lines and no '## Contents'."
                     $failed = $true
                 }
-                if (-not $text.Contains("references/$($ref.Name)")) {
+                # a row in the router, or in an index reference the router has a row for (D58)
+                $reached = $text.Contains("references/$($ref.Name)")
+                if (-not $reached) {
+                    foreach ($index in Get-ChildItem $refDir -File -Filter '*.md') {
+                        if ($index.Name -ne $ref.Name -and $text.Contains("references/$($index.Name)") -and
+                            (Get-Content $index.FullName -Raw).Contains("references/$($ref.Name)")) {
+                            $reached = $true
+                            break
+                        }
+                    }
+                }
+                if (-not $reached) {
                     Write-Warning "$rel/references/$($ref.Name) : no row in the router's table."
                     $failed = $true
                 }

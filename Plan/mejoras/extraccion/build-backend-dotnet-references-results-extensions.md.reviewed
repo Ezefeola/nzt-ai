@@ -1,0 +1,3 @@
+# Unit 53: results-extensions.md (.NET) cut against backend-api.md
+success carries no envelope => generic: "On success the payload travels as it is: no { data }, no envelope invented on top"; .NET checklist: "Success returns the payload with no envelope"
+this rule does not forbid their own problemdetails => generic: "Host-level failures keep their own handling"; .NET: "Host-level failures and the global handler keep their own ProblemDetails"

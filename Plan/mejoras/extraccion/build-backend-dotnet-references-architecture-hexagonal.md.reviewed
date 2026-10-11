@@ -1,0 +1,5 @@
+# Unit 44: architecture-hexagonal.md (.NET) cut against backend-architecture-hexagonal.md
+every way in or out is a project of its own => generic: "every way in or out is a unit of its own"; .NET: "every unit of the generic table is a project"
+this skill decides projects and folders, and names each folder by the role it holds — nothing else does => generic: "This reference decides units and folders, and names each folder by the role it holds — nothing else does"
+the feature level holds the aggregate's single <entity>mappingextensions => generic: "The feature level holds the aggregate's single mapping file"; .NET: "The aggregate's single mapping file is its <Entity>MappingExtensions"
+every project registers itself, and compositionroot calls them => generic: "Every unit registers itself, and CompositionRoot calls them"

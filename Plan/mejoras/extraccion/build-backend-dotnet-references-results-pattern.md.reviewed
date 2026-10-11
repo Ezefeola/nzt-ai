@@ -1,0 +1,2 @@
+# Unit 50: results-pattern.md (.NET) cut against backend-results.md
+it returns result<tresponse> => generic: "It returns a Result"; .NET checklist: "Every use case returns Result<TResponse>"

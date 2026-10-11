@@ -60,8 +60,17 @@ the only thing that knows that technology's leaves:
 | Frontend on Blazor | `nzt-build-frontend-blazor` |
 
 **An installed folder is not an authorisation.** A technology the stack did not select is
-never loaded. If no area applies to this component, read the neighbouring code and follow the
-conventions already there. Never impose another project's conventions on this one.
+never loaded. Never impose another project's conventions on this one.
+
+If no area router applies to this component, its practices are the generic ones, chosen by the
+same stack axes:
+
+| The component is | Read |
+|---|---|
+| A backend with no area router | `references/practices-backend.md` |
+| A frontend with no area router | `references/practices-frontend.md` |
+
+Code this project does not document is still written the way the code next to it is written.
 
 ## One unit
 

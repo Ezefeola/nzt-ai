@@ -39,17 +39,17 @@ the same axis.
 
 | Axis | The stack says | Read | Read with |
 |---|---|---|---|
-| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | — |
-| | `clean-architecture` | `references/architecture-clean.md` | — |
-| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | — |
-| Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | `references/api.md` |
-| | `controllers` | `references/endpoints-controllers.md` | `references/api.md` |
-| Domain model | `ddd` | `references/domain-ddd.md` | `references/domain-ddd-behaviour.md` — the same guidance, split at 200 lines |
-| | `anemic` | `references/domain-anemic.md` | — |
-| Persistence | `repositories` | `references/persistence-repositories.md` | — |
-| | `direct` | `references/persistence-direct.md` | — |
-| Result to HTTP | `result-extensions` | `references/results-extensions.md` | `references/results-pattern.md` |
-| | `result-filter` | `references/results-filter.md` | `references/results-pattern.md` |
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | `../nzt-build/references/backend-architecture-vertical-slice.md` — first, required |
+| | `clean-architecture` | `references/architecture-clean.md` | `../nzt-build/references/backend-architecture-clean.md` — first, required |
+| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | `../nzt-build/references/backend-architecture-hexagonal.md` — first, required |
+| Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | `../nzt-build/references/backend-api.md` — first, required; `references/api.md` |
+| | `controllers` | `references/endpoints-controllers.md` | `../nzt-build/references/backend-api.md` — first, required; `references/api.md` |
+| Domain model | `ddd` | `references/domain-ddd.md` | `../nzt-build/references/backend-domain-ddd.md` — first, required; `references/domain-ddd-behaviour.md` |
+| | `anemic` | `references/domain-anemic.md` | `../nzt-build/references/backend-domain-anemic.md` — first, required |
+| Persistence | `repositories` | `references/persistence-repositories.md` | `../nzt-build/references/backend-persistence-repositories.md` — first, required |
+| | `direct` | `references/persistence-direct.md` | `../nzt-build/references/backend-persistence-direct.md` — first, required |
+| Result to HTTP | `result-extensions` | `references/results-extensions.md` | `../nzt-build/references/backend-api.md` — first, required; `references/results-pattern.md`, `../nzt-build/references/backend-results.md` |
+| | `result-filter` | `references/results-filter.md` | `../nzt-build/references/backend-api.md` — first, required; `references/results-pattern.md`, `../nzt-build/references/backend-results.md` |
 
 **A stack that names the old skill instead of the concept resolves by that reference's
 documented meaning.** A stack that names neither is a gap in the stack document: say so and
@@ -59,14 +59,14 @@ fill it there, do not pick one here.
 
 | The work touches | Read | Read with |
 |---|---|---|
-| The operation and its orchestration | `references/use-cases.md` | — |
-| The inputs of an operation and their validators | `references/validation.md` | — |
-| Anything returning `Result` from a use case | `references/results-pattern.md` | — |
-| API wiring: routing, model binding, pipeline | `references/api.md` | — |
-| An exception that can escape a use case, or the API's error handling | `references/exceptions.md` | `references/use-cases.md` |
-| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/domain-value-objects.md` | — |
-| A protected resource, permissions, suspected unauthorised access | `references/security.md` | — |
-| Test projects, doubles, running the suite | `references/testing.md` | `../nzt-build/references/tests.md` |
+| The operation and its orchestration | `references/use-cases.md` | `../nzt-build/references/backend-use-cases.md` — first, required |
+| The inputs of an operation and their validators | `references/validation.md` | `../nzt-build/references/backend-validation.md` — first, required |
+| Anything returning `Result` from a use case | `references/results-pattern.md` | `../nzt-build/references/backend-results.md` — first, required |
+| API wiring: routing, model binding, pipeline | `references/api.md` | `../nzt-build/references/backend-api.md` — first, required |
+| An exception that can escape a use case, or the API's error handling | `references/exceptions.md` | `../nzt-build/references/backend-errors.md` — first, required; `references/use-cases.md` |
+| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/domain-value-objects.md` | `../nzt-build/references/backend-domain-value-objects.md` — first, required |
+| A protected resource, permissions, suspected unauthorised access | `references/security.md` | `../nzt-build/references/backend-security.md` — first, required |
+| Test projects, doubles, running the suite | `references/testing.md` | `../nzt-build/references/tests.md` — first, required |
 
 Wherever a file names `nzt-build-backend-dotnet-<name>` and this folder has
 `references/<name>.md`, that is what it means

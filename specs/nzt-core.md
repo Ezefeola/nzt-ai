@@ -286,10 +286,12 @@ Reglas de esta capa:
   presupuesto** y no solo de cohesión: cada skill acá se paga en cada proyecto, incluso en
   los que nunca la van a usar. **Desde D50 un área cuesta una sola entrada** —su router—, y
   sus hojas son referencias que no se pagan hasta leerse.
-- **Debajo de esta capa hay un piso genérico (D51)**: `nzt-build` lleva las prácticas de
-  backend y frontend que valen en cualquier stack, y `nzt-architecture` los ejes del
-  documento de stack con opciones genéricas. Un componente sin router de área para su
-  tecnología lee ese piso en vez de quedarse sin guía.
+- **Debajo de esta capa hay una capa genérica (D58)**: `nzt-build` lleva el principio de cada
+  práctica de backend, datos, código y frontend, extraído de las referencias de área, y
+  `nzt-architecture` los ejes del documento de stack con opciones genéricas (D51). Un
+  componente sin router de área para su tecnología lee la capa genérica a través de
+  `practices-backend.md` o `practices-frontend.md`. Uno con router de área la lee como
+  *Read with* obligatoria, antes de la referencia que dice cómo se hace en su tecnología.
 - El contenido base sale del set de skills que ya tiene el usuario; se porta y se adapta
   a las convenciones de autoría de la sección 10, no se copia tal cual.
 
@@ -721,7 +723,10 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 13. **El archivo se llama como la hoja sin el prefijo de su router**
    (`nzt-build-backend-dotnet-ef-core-queries` → `build/backend/dotnet/references/ef-core-queries.md`),
    y **toda referencia tiene una fila en la tabla de su router**. Una referencia sin fila no
-   la carga nadie.
+   la carga nadie. Desde D58 la fila puede estar en una **referencia índice** que tiene fila
+   en el router (`practices-backend.md`, `practices-frontend.md`): un nivel, no más. El build
+   lo comprueba así (`build.sh` y `build.ps1`, vistos fallar con una referencia huérfana en
+   la unidad 44).
 14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
    secciones. Protege contra la lectura parcial (`head -100`) que documenta la guía de
    Anthropic. **Si con el índice pasa de 200, se parte** (la regla 3, no subir el techo):
@@ -729,9 +734,17 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    fila del router lee las dos. El script de migración compara la hoja vieja contra las
    partes juntas. Primer caso: `domain-ddd` (200 en `main`, 203 con índice), decidido por el
    usuario en la unidad 19.
-15. **Una práctica escrita en un área y en el piso genérico (D51) se cambia en los dos.**
-   Cada línea genérica nombra la referencia de área que la implementa, para que la revisión
-   no dependa de acordarse.
+15. **Una práctica vive en un solo nivel (D58).** Si vale fuera de la tecnología, está en
+   la referencia genérica; si no, está en la de área. Nunca en las dos. **El vínculo va en una
+   sola dirección**: la de área abre diciendo qué genérica presupone, y **la genérica no nombra
+   ninguna tecnología ni referencia de área**, como el dominio no conoce la infraestructura.
+   Si la nombrara, cada tecnología nueva obligaría a editar todas las genéricas, y el agente
+   que la lee sin router de área recibiría un vínculo a algo que su stack no seleccionó. Qué
+   referencias implementan un principio se encuentra por grep del nombre de la genérica.
+   Decidido por el usuario el 2026-10-11, tras la unidad 54. Así, cambiar un principio no deja
+   una copia vieja en otro lado. Recortar una
+   referencia de área para extraer algo exige el chequeo de no-pérdida de D58 antes de dar la
+   unidad por terminada.
 16. **El disparador de una hoja vive en la cadena instruida, nunca en una descripción**
    (D53). Al mover una hoja, lo que su `description` decía que la disparaba tiene que estar
    cubierto en los tres eslabones: la fila del kernel que lleva a su router, el *hand off*
@@ -1508,7 +1521,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   un script falla si cambió cualquier otra línea. Opción descartada: mover solo la capa de
   stack (68 skills, ~11.500 chars), que seguía arriba del piso de Codex y no escalaba al
   sumar stacks. Decidido por el usuario; detalle en `Plan/mejoras/04-propuesta.md`.
-- **D51.** **Hay un piso genérico de prácticas, liviano, debajo de la capa de stack.**
+- **D51.** *(Reemplazada por D58, 2026-10-10, salvo `stack-axes.md`, que D58 mantiene.)* **Hay un piso genérico de prácticas, liviano, debajo de la capa de stack.**
   `nzt-build/references/practices-backend.md` y `practices-frontend.md` llevan una línea por
   práctica con su porqué, sin código ni librerías: operación con una sola entrada, validar
   la forma en el borde, fallas esperadas como valor y excepciones a un manejador global,
@@ -1595,6 +1608,44 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   aplica el mapa de rutas a la hoja de `main` antes de comparar, así una ruta movida no
   cuenta como pérdida y una mal movida sí (visto fallar con `glossary.md` en `Product/`).
   Decidido por el usuario el 2026-10-08.
+- **D58.** **La capa genérica es el principio, la de área es cómo se hace en esa tecnología,
+  y lo genérico se extrae de las referencias de área.** Reemplaza a D51. Lo que la forzó: fuera
+  de .NET y Blazor el agente recibía método pero ninguna práctica, mientras que las
+  referencias de .NET ya estaban escritas casi en genérico (arquitecturas por roles,
+  persistencia por "el handle del ORM"). Copiar el principio a un piso liviano dejaba la misma
+  regla en dos lugares. Extraerla deja una sola versión. Inventario y destinos en
+  `Plan/mejoras/07-extraccion.md`.
+  - **Dónde vive:** 30 referencias en `nzt-build/references/`, con prefijo por grupo:
+    `backend-` (arquitecturas, use cases, validación, resultados, errores, dominio,
+    persistencia, API, seguridad), `data-` (acceso, consultas, paginación, escrituras,
+    operaciones por criterio, mapeo, migraciones, índices), `code-` (reglas de código, DTOs,
+    colecciones) y `frontend-` (arquitectura, componentes, formularios, rendering,
+    performance). Lo genérico de los tests de .NET va a `tests.md`, que ya existe.
+  - **Cómo se elige sin router de área:** dos índices, `references/practices-backend.md`
+    (backend y datos) y `references/practices-frontend.md`, con los ejes del router de área y
+    las filas por tarea. Los dos nombran las `code-*`. `nzt-build` los nombra en dos filas.
+  - **Con router de área:** la fila del router .NET o Blazor pone la genérica en *Read with*,
+    **obligatoria**. La referencia de área se queda con lo que no existe fuera de esa
+    tecnología: los proyectos de la solution en clean y hexagonal, el `.csproj` único en
+    vertical slice, el código C# exacto (Result, handler global), EF Core, ASP.NET Core y los
+    render modes. **El código .NET que sale es el mismo de antes**. Lo que cambia es que otro
+    lenguaje recibe la capa genérica.
+  - **El límite entre capas en la genérica** es "el más fuerte que ofrezca el stack, escrito
+    en su documento de stack", sin nombrar el mecanismo de cada lenguaje. Nombrarlo exige
+    verificarlo en su fuente, y eso es de los ejes del stack (`stack-axes.md`, la parte de D51
+    que esta decisión mantiene).
+  - **Sin evals:** la no-pérdida se prueba sobre el texto. Por cada extracción, un script
+    compara la referencia de área de `main` contra la recortada más su genérica (`install/check-extraction.sh`): toda regla
+    que salió de la de área tiene que aparecer en la genérica, o queda listada para revisarla
+    a mano. Un `check-references.sh` no sirve para esto: prueba movimientos mecánicos, no
+    recortes.
+  - Opciones descartadas: el piso liviano de D51 (deja la regla en dos lugares, R3), y
+    borrar las referencias de arquitectura de .NET (se perderían los proyectos de la
+    solution, que solo existen en .NET). Lo que se acepta: el agente .NET lee dos archivos
+    donde antes leía uno, y la *Read with* salteada ya pasó con EF Core (unidad 20). Por eso
+    es obligatoria desde la primera extracción. Volver atrás es reponer el texto de la
+    genérica en cada referencia de área. Decidido por el usuario el 2026-10-09 y el
+    2026-10-10, en las unidades 42 a 47.
 
 ## 13. Revisión contra Temper v3
 

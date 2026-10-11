@@ -1,7 +1,7 @@
 # Tests that ship with .NET code
 
 ## Contents
-- Framework and runner: the project's, unchanged
+- Framework and runner
 - Layout
 - Partitions become rows, not copies
 - Time is injected
@@ -12,22 +12,18 @@
 - Mutation testing
 - Closing checklist
 
-What makes a test valuable does not change with the stack; this is **how a .NET project puts it
-into practice**. The stack document records the adopted choices, and **the test projects
-already in the repository are the evidence in force** for how this project writes a test —
-framework, layout, conventions. **Which levels get written is not evidence, it is the
-`Test levels` opt-in**, and a project sitting there is not a decision to add to it. Every
-section below applies only at the levels that opt-in enabled.
+**Read `../nzt-build/references/tests.md` first.** It holds what makes a test valuable, the
+levels as the stack's opt-in, what is substituted, the shape, determinism and integration;
+this is **how a .NET project puts it into practice**. The stack document records the adopted
+choices, and **the test projects already in the repository are the evidence in force** for
+how this project writes a test. **Which levels get written is not evidence, it is the
+`Test levels` opt-in**, and every section below applies only at the levels it enabled.
 
-Load `nzt-build-backend-dotnet` and `nzt-build-tests` before applying this: the criteria that
-decide what is worth testing, what is substituted and what survives a refactor live there,
-and this leaf only says how .NET does it.
+## Framework and runner
 
-## Framework and runner: the project's, unchanged
-
-Use the framework already there — xUnit, MSTest or NUnit — at the version in the manifest.
-**Never add a second framework, and never migrate the suite to match an example.** In a new
-component, propose one in the plan and record it in the stack; xUnit v3 is a common default.
+Use the framework already there — xUnit, MSTest or NUnit — at the version in the manifest. In
+a new component, propose one in the plan and record it in the stack; xUnit v3 is a common
+default.
 
 Some projects run on Microsoft.Testing.Platform instead of VSTest. **Check the test project
 before choosing command-line options** (`UseMicrosoftTestingPlatformRunner`,
@@ -42,15 +38,10 @@ dotnet test --filter "FullyQualifiedName~Coupon"
 
 ## Layout
 
-- `tests/<Component>.UnitTests` and `tests/<Component>.IntegrationTests`, **separate**. The
-  unit project references no database provider, no container and no web host — the day it does,
-  the fast suite stops being fast and nobody runs it.
+- `tests/<Component>.UnitTests` and `tests/<Component>.IntegrationTests`, separate.
 - **A project exists because a level is enabled.** With integration off there is no
   `IntegrationTests` project, and nothing of it moves into the unit one: no provider, no
   container, no host. Creating the project "so it is there" adopts the level by the back door.
-- Test folders mirror the feature or slice under test, not the class list.
-- A test data builder lives next to the tests that use it, and is shared only when several
-  features build the same entity.
 
 ## Partitions become rows, not copies
 
@@ -75,28 +66,22 @@ MSTest uses `[DataRow]` and NUnit `[TestCase]`; follow the framework in use.
 Code that reads the clock receives `TimeProvider`, registered as `TimeProvider.System` in
 production. Tests use `FakeTimeProvider` from `Microsoft.Extensions.TimeProvider.Testing` and
 move time with `SetUtcNow` or `Advance`. **No custom clock interface** where the target
-framework has `TimeProvider`, and **no mixing real and fake time in one test** — that is the
-test that passes all year and fails on one date. When the use case already receives the moment
-as a parameter, pass it.
+framework has `TimeProvider`. When the use case already receives the moment as a parameter,
+pass it.
 
 ## Assertions
 
-Use the framework's assertions, or the library the stack adopted. Adding one is a dependency
-decision (`nzt-build-dependencies`): **FluentAssertions 8 and later require a paid licence for
-commercial use**, so it is never added by default. Open-licence alternatives exist —
-AwesomeAssertions (Apache 2.0 fork), Shouldly. **Check the licence of the version before
-proposing it.**
+Adding a library is a dependency decision (`nzt-build-dependencies`): **FluentAssertions 8 and
+later require a paid licence for commercial use**, so it is never added by default.
+Open-licence alternatives exist — AwesomeAssertions (Apache 2.0 fork), Shouldly.
 
 For the Result pattern: assert `IsSuccess` first, then the payload, or the status and errors the
-rule defines. **Compare message text only when the text is the contract.**
+rule defines.
 
 ## Test doubles
 
-A hand-written fake is often clearer for a small port. Use a mocking library only when the
-project already has one or the stack adopts it. **Substitute the interfaces this component owns
-in front of out-of-process systems** — payment, mail, bus, third-party APIs — and **never mock
-`DbContext`, `DbSet` or this project's repositories**: what comes back then is the test's own
-opinion about the ORM.
+**Never mock `DbContext`, `DbSet` or this project's repositories**: what comes back then is the
+test's own opinion about the ORM.
 
 ## EF Core and persistence — with integration enabled
 
@@ -108,19 +93,13 @@ opinion about the ORM.
   about constraints, translation or transactions.
 - SQLite in-memory is closer, still different, and cannot run provider-specific functions.
 - **With integration off, neither of those becomes the fallback.** Data access stays
-  uncovered and the report says so: the in-memory provider as a substitute for a level nobody
-  enabled is a green suite that proves nothing, and it costs the time it took to write.
-- Each test owns its data, or the fixture resets the database between tests.
-- **An integration database is disposable and explicitly for tests.** A test never points at a
-  shared or production connection.
+  uncovered and the report says so.
 
 ## APIs — with the in-process level enabled
 
-Endpoints are tested in the integration project with `WebApplicationFactory<TProgram>`:
-**replace only unowned external services and keep the real pipeline** — serialisation,
-validation, authorisation. Assert the status code, the project's error shape on failure
-(`ProblemDetails` with result extensions, the serialised `Result` with a result filter) and the
-persisted effect when the endpoint writes.
+Endpoints are tested in the integration project with `WebApplicationFactory<TProgram>`. The
+project's error shape on failure is `ProblemDetails` with result extensions, the serialised
+`Result` with a result filter.
 
 With that level off, the endpoint keeps its own tests only where the handler holds behavior
 worth pinning — and the pipeline itself, binding and error shape included, is uncovered.
@@ -129,7 +108,7 @@ worth pinning — and the pipeline itself, binding and error shape included, is 
 
 Stryker.NET mutates the code and reports what no test detected. **Propose it for critical
 modules** — pricing, payments, permissions — and record its adoption and thresholds in the
-stack. It is slow, and it does not run on every change.
+stack.
 
 ## Closing checklist
 

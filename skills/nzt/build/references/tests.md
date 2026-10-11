@@ -90,6 +90,8 @@ suite of false alarms stops being read, which costs more than having no suite.
 - **Call a double by what it does**: a stub supplies data, a mock is asserted on, a fake is a
   working lightweight implementation. A misnamed double misleads the next reader about what
   the test verifies.
+- **A mocking library only when the project already has one or the stack adopts it**; a
+  hand-written fake is often clearer for a small port.
 
 ## The shape
 
@@ -106,6 +108,11 @@ suite of false alarms stops being read, which costs more than having no suite.
   Partitions and boundaries become parameterized cases, not a loop over an array.
 - **Named values.** A limit that explains itself beats a bare number nobody can place.
 - Failure output shows expected and actual **in the domain's terms**.
+- **The suite's framework, unchanged**: never a second one, and never the suite migrated to
+  match an example. Test folders mirror the feature under test, not the class list, and a data
+  builder lives beside the tests that use it, shared only when several features build it.
+- **An assertion library is a dependency decision: check the licence of the version before
+  proposing it.** Compare message text only when the text is the contract.
 
 ## Determinism
 
@@ -126,12 +133,16 @@ container, and exercising the HTTP pipeline in process are three decisions, not 
 off is not built and not approximated.
 
 Where they are on: behavior that depends on the database, serialization, the HTTP pipeline or
-configuration is proven against the real piece. They live in **their own project**, so the
-fast suite stays fast and free of infrastructure — the day the unit suite needs a container,
-nobody runs it.
+configuration is proven against the real piece. They live in **their own project**, and **the
+unit project references no database provider, no container and no web host** — the day the
+unit suite needs a container, nobody runs it.
 
 Each test owns its data, or runs inside a reset strategy. **A shared mutable fixture is how a
-suite starts depending on order**, and that failure looks like flakiness for weeks.
+suite starts depending on order**, and that failure looks like flakiness for weeks. **An
+integration database is disposable and explicitly for tests**: never a shared or production
+connection. An in-process API test replaces only unowned external services and **keeps the
+real pipeline** — serialisation, validation, authorisation — and asserts the status, the
+project's error shape and the persisted effect.
 
 **An enabled level that cannot run here is not a skipped level.** No container runtime on this
 machine means the tests are written and the report says they could not be executed — that is

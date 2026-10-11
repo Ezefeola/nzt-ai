@@ -1,0 +1,5 @@
+# Unit 54: testing.md (.NET) cut against tests.md
+never add a second framework, and never migrate the suite to match an example => tests.md "The shape": "The suite's framework, unchanged: never a second one, and never the suite migrated to match an example"
+no mixing real and fake time in one test => tests.md "Determinism": "Time comes from the injected clock, never from the real one, and the two are never mixed in one test"
+substitute the interfaces this component owns in front of out-of-process systems => tests.md "What gets substituted": out-of-process and not ours — substituted; never substitute what the project owns
+replace only unowned external services and keep the real pipeline => tests.md "Integration tests": "replaces only unowned external services and keeps the real pipeline"

@@ -1,0 +1,2 @@
+# Unit 44: architecture-vertical-slice.md (Blazor) cut against frontend-architecture-vertical-slice.md
+this skill decides projects and folders, and names each folder by the role it holds — nothing else does => generic: "This reference decides units and folders, and names each folder by the role it holds — nothing else does"

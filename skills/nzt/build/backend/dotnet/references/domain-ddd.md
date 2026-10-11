@@ -1,45 +1,21 @@
-# DDD entities and aggregates
+# DDD entities and aggregates on .NET
 
-## Contents
-- Entity, aggregate, root
-- `Rules` and `Errors` live on the entity
-- Between aggregates, only the id
-- The entity's layout, in this order
+**Read `../nzt-build/references/backend-domain-ddd.md` first.** It holds the entity, the
+aggregate and its root, `Rules` and `Errors`, the id between aggregates, the layout, creation,
+change and the minimum aggregate. This file and `domain-ddd-behaviour.md` hold only what is
+.NET.
 
-The domain axis says DDD, so **the entity protects its own invariants**: what must always be
-true about a thing is enforced by the thing itself, not by whoever happens to be using it.
+How this is mapped belongs to `nzt-build-backend-dotnet-ef-core-domain`.
 
-- **This axis does not decide persistence.** Repository or direct handle is the persistence
-  axis, and both work with everything below.
-- How this is mapped belongs to `nzt-build-backend-dotnet-ef-core-domain`, and where the files
-  live to the architecture skill.
+## The entity on .NET
 
-**The stack's DDD line decides how far this goes** — *aggregates · value objects · domain
-events · typed ids*. A piece that is not `yes` is not built, and a missing line builds none:
-no value object (the field stays primitive, checked by the entity), no domain event (a
-reaction elsewhere is the use case's job), no id wrapper.
+The id is `int` or `Guid`. Entities are `sealed`, properties have **private setters**,
+collections are exposed read-only.
 
-## Entity, aggregate, root
+Between aggregates, without the navigation outwards, an `Include` cannot walk from one
+aggregate into another.
 
-An **entity** has identity: two with the same values are still different things. **The id is a
-primitive** — `int` or `Guid` — unless the stack says *typed ids yes*: wrapping it charges a
-conversion at every boundary, every single time.
-
-An **aggregate** is one or more entities that change together and must stay consistent
-together. One of them is the **root**, and it is the only one the outside world names: an
-order and its lines are one aggregate, and nothing loads a line on its own.
-
-**The aggregate is the consistency boundary.** Everything inside it is true at the same time,
-and it is what a use case loads, changes and saves as a unit.
-
-Entities are `sealed`, properties have **private setters**, collections are exposed
-read-only. **Anything that can change from outside without passing through a method is an
-invariant nobody is protecting.**
-
-## `Rules` and `Errors` live on the entity
-
-Every value a business rule fixes and every message a broken rule produces is declared **on
-the entity the rule is about**:
+## `Rules` and `Errors`
 
 ```csharp
 public sealed class Order
@@ -59,30 +35,6 @@ public sealed class Order
     }
 ```
 
-**Whatever layer evaluates the rule cites it from here and declares no constant of its own**:
-the validator checking an input before any entity exists, the mapping declaring a column
-length, the use case rejecting a duplicate. One rule, one definition.
-
-**The entity not holding the value does not move the rule.** An entity that stores a hash
-never sees the password, and the minimum length is still what the business says about it.
-
-What stays out is **the failure that names no business concept** — a dependency that did not
-answer, a permission the caller lacks. That belongs to the operation that hit it.
-
-`Errors` carries text the user reads, so it stays in the story's language.
-
-## Between aggregates, only the id
-
-An aggregate **references another by its id and does not navigate to it**: `Order` carries
-`CustomerId` and has no `Customer` property. Inside the aggregate, navigations are normal.
-
-The foreign key is still mandatory; **what disappears is the navigation outwards.** Without
-that, an `Include` can walk from any entity to any other and **the aggregate has no visible
-edge left** — every query becomes a decision about how much of the model to drag along.
-
-When a use case needs data from another aggregate, it queries for it. That is a second read,
-and it is the honest cost of having boundaries.
-
 ## The entity's layout, in this order
 
 ```csharp
@@ -101,7 +53,4 @@ public sealed class StaffAccount
 }
 ```
 
-**A property added later joins the properties.** Writing it next to the method that happens
-to use it — `PasswordHash` sitting under `DefinePassword` because that method came second —
-scatters the entity's state through its behaviour. **Adding a member is not appending to the
-file.**
+Creating and changing on .NET continue in `domain-ddd-behaviour.md`.
