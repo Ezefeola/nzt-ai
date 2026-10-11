@@ -54,8 +54,9 @@ component: Pedidos.Api · area: backend
 | Domain model | ddd | entities and aggregates protect the order rules |
 | ORM | EF Core 10 | every access to PostgreSQL |
 | Persistence | direct | use cases reach the DbContext; no repositories |
-| Endpoints | minimal APIs | every HTTP endpoint |
+| Endpoints | minimal-apis | every HTTP endpoint |
 | Error handling | result pattern | expected failures; exceptions stay exceptional |
+| Result to HTTP | result-extensions | every endpoint that returns a use case's result |
 | Tests | xUnit 3 | — |
 
 ## Opt-ins
@@ -110,6 +111,9 @@ survives a rename, it can be read without opening anything, and it is what the n
 actually needs. Skill names in this set come from the folder tree, so they move.
 
 ## One choice per axis
+
+**Which axes there are, their options, and how each one is asked: `stack-axes.md`.** The value
+is written exactly as the build tables spell it.
 
 - An axis is a place where the technology offers **exclusive alternatives** — one domain
   model, one endpoint style, one error-handling shape. Write the one that was taken.

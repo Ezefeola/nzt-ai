@@ -94,7 +94,7 @@ row is not the guidance, the file is.
 | The unit is | Read | Read with |
 |---|---|---|
 | The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/diagrams.md` |
-| One component's adopted technologies, versions and areas | `references/stack.md` | — |
+| One component's adopted technologies, versions and areas | `references/stack.md` | `references/stack-axes.md` — its axes, options and how they are asked |
 | One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/diagrams.md` |
 | The entities of the business, their fields and their aggregates | `references/domain.md` | — |
 | More than one context, or meaning shared with a third party | `references/contexts.md` | — |

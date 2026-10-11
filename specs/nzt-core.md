@@ -181,6 +181,7 @@ skills/nzt/                      nzt
 ├─ architecture/                 nzt-architecture
 │  ├─ design-product/            nzt-architecture-design-product
 │  ├─ stack/                     nzt-architecture-stack     → documento de stack (D9)
+│  ├─ stack-axes/                nzt-architecture-stack-axes → ejes, opciones y cómo se preguntan (D59)
 │  ├─ design-feature/            nzt-architecture-design-feature
 │  ├─ domain/                    nzt-architecture-domain    → domain-model.md (D26)
 │  ├─ contexts/                  nzt-architecture-contexts  → context-map.md (D26)
@@ -288,7 +289,8 @@ Reglas de esta capa:
   sus hojas son referencias que no se pagan hasta leerse.
 - **Debajo de esta capa hay una capa genérica (D58)**: `nzt-build` lleva el principio de cada
   práctica de backend, datos, código y frontend, extraído de las referencias de área, y
-  `nzt-architecture` los ejes del documento de stack con opciones genéricas (D51). Un
+  `nzt-architecture` los ejes del documento de stack en `stack-axes.md`, con las opciones
+  copiadas de las tablas de build y los ejes propios de cada router de área sumados (D59). Un
   componente sin router de área para su tecnología lee la capa genérica a través de
   `practices-backend.md` o `practices-frontend.md`. Uno con router de área la lee como
   *Read with* obligatoria, antes de la referencia que dice cómo se hace en su tecnología.
@@ -1646,6 +1648,35 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     es obligatoria desde la primera extracción. Volver atrás es reponer el texto de la
     genérica en cada referencia de área. Decidido por el usuario el 2026-10-09 y el
     2026-10-10, en las unidades 42 a 47.
+- **D59.** **Los ejes del stack tienen una referencia propia, `stack-axes.md`, que no
+  inventa opciones y pregunta con la herramienta del host si existe.** Es la parte de D51 que
+  D58 mantuvo, con el alcance que pidió el usuario en `Plan/mejoras/06-capa-generica.md`.
+  - **Una sola fuente de opciones:** los valores de cada eje son los de las tablas que
+    seleccionan referencias en build (`practices-backend.md`, `practices-frontend.md` y la
+    tabla de ejes excluyentes de cada router de área), escritos **exactamente** como ahí. Lo
+    que la forzó: los routers comparan el texto del stack, y un sinónimo no selecciona nada.
+    El ejemplo de `stack.md` tenía ese defecto (`minimal APIs` contra `minimal-apis`, y sin
+    el eje `Result to HTTP`), y se corrigió en la misma unidad.
+  - **Los ejes del router de área se suman a los genéricos**, y se preguntan recién cuando se
+    eligió la tecnología. Así .NET conserva sus preguntas (endpoints y Result a HTTP; con EF
+    Core, la persistencia directa o con repositorios sigue siendo un eje, genérico) y otra
+    tecnología recibe solo los ejes genéricos. Un
+    concepto que ninguna tabla ofrece es un hueco con su `QT-NN`, nunca un valor nuevo.
+  - **Se lee siempre que se escribe un stack**, como *Read with* de la fila de `stack.md` en
+    `nzt-architecture`. Esto cambia el "solo sin router de área" de D51: con router de área,
+    la referencia manda a leer también la tabla de ese router.
+  - **Formato de la pregunta, agnóstico del host:** la herramienta de preguntas de opción
+    múltiple del host si la sesión la ofrece; si no, viñetas con la opción recomendada
+    primero y su costo al lado. Una ronda, ordenada por dependencia. Verificado en la unidad
+    61: Claude Code documenta `AskUserQuestion`, y Codex tiene `request_user_input` solo en
+    Plan Mode (issue openai/codex#30150, abierto), así que nombrar cualquiera de las dos
+    rompería en el otro host. Se reabre si Codex la habilita fuera de Plan Mode.
+  - Riesgo aceptado: los costos de cada opción en `stack-axes.md` son una línea que resume
+    la genérica de esa opción y pueden derivar de ella (R3); se revisan cuando se cambia una
+    genérica de arquitectura, dominio o persistencia. Sin evals: el cambio en cómo pregunta
+    architecture no se midió, por decisión del usuario. Pedido y aprobado por el usuario el
+    2026-10-11 (unidades 61 y 62); el formato agnóstico y la fuente única de opciones son
+    decisiones del agente dentro del alcance, por la verificación de la 61.
 
 ## 13. Revisión contra Temper v3
 
