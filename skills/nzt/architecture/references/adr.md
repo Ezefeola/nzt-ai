@@ -19,7 +19,7 @@ RFC comes first** (`nzt-architecture-rfc`) and this record is what its acceptanc
 with the options already argued there, and naming it.
 
 What does not earn a record: anything reversible in an afternoon, and anything the stack
-document already records. A row in `<component folder>/Docs/Architecture/<area>-stack.md` saying `Endpoints: minimal APIs` needs
+document already records. A row in `<component folder>/Docs/Architecture/<area>-stack.md` saying `Endpoints: minimal-apis` needs
 no ADR unless choosing it cost something worth remembering.
 
 ## The file

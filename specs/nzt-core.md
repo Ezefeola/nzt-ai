@@ -540,7 +540,9 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │  └─ Manual/
 │     ├─ <audiencia>.html      # el manual del usuario final, a pedido (D37)
 │     └─ assets/               # sus imágenes, sacadas de la evidencia de verify
-├─ <carpeta del componente>/   # la que architecture.md declara, p. ej. src/Pedidos.Api/
+├─ <carpeta del componente>/   # su raíz, la que architecture.md declara, p. ej. Pedidos.Api/ (D60);
+│  │                           # con un solo componente es la raíz del repo y este Docs/ es el de arriba
+│  ├─ src/ · tests/            # sus proyectos de build y sus tests, adentro de la raíz
 │  └─ Docs/Architecture/
 │     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
@@ -596,7 +598,9 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
   documento va en la carpeta de su tema, sin importar qué fase lo escribe.
 - **El stack vive dentro de su componente**: `<carpeta>/Docs/Architecture/<área>-stack.md`,
   donde `<carpeta>` es la que `Docs/Architecture/architecture.md` declara para ese
-  componente. Se escribe al diseñar el componente, aunque la carpeta todavía no exista: la
+  componente: **su raíz, la que contiene todo lo suyo (solution o manifiesto, `src/`,
+  `tests/`), nunca la carpeta de un proyecto de build; con un solo componente, la raíz del
+  repo** (D60). `architecture.md` es obligatorio desde el primer stack. Se escribe al diseñar el componente, aunque la carpeta todavía no exista: la
   ruta la fija arquitectura en ese mismo momento, y el resto del set encuentra el stack a
   partir de ella (D57).
 - **Un documento del producto fuera de este orden se propone reordenar, nunca se mueve
@@ -1598,7 +1602,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   `tech-debt.md`), `Docs/UX/` (`design-system.md`, `ui-components.md`), `Docs/Operations/`
   (`deployment.md`, `releases.md`) y `Docs/Manual/`. `history.md` va con el producto
   porque registra qué cambió el producto, no qué se desplegó (eso es `releases.md`). **El
-  stack**: `<carpeta del componente>/Docs/Architecture/<área>-stack.md`, sin el nombre del
+  stack** *(qué es la carpeta del componente lo define D60)*: `<carpeta del componente>/Docs/Architecture/<área>-stack.md`, sin el nombre del
   componente en el archivo porque la carpeta ya lo dice. La carpeta la declara
   `Docs/Architecture/architecture.md` en la fila del componente, se fija al diseñarlo y es
   como el resto del set encuentra su stack. **Un documento fuera de este orden se propone
@@ -1677,6 +1681,34 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     architecture no se midió, por decisión del usuario. Pedido y aprobado por el usuario el
     2026-10-11 (unidades 61 y 62); el formato agnóstico y la fuente única de opciones son
     decisiones del agente dentro del alcance, por la verificación de la 61.
+- **D60.** **La carpeta del componente es su raíz, nunca la de un proyecto de build.** Lo
+  que la forzó: en un proyecto real (Todo, 2026-10-11) el stack quedó en
+  `src/Todo.Api/Docs/Architecture/backend-stack.md`, y el agente hizo exactamente lo que el
+  set decía: "carpeta del componente" no estaba definida, y el único ejemplo (D57, el árbol
+  de §8, el router de arquitectura y `audit.md`) era `src/Pedidos.Api/`, la carpeta del
+  `.csproj`. Ese ejemplo contradecía al propio set: los tests de .NET van en
+  `tests/<Component>.UnitTests`, fuera del `.csproj`, y en clean o hexagonal un componente
+  son cuatro proyectos, sin ninguno que lo represente.
+  - **Definición:** la carpeta del componente es **su raíz, la que contiene todo lo suyo** —
+    solution o manifiesto, `src/`, `tests/`— y ahí vive su `Docs/Architecture/`. **Con un
+    solo componente en el repo, es la raíz del repo**, y el stack queda en
+    `Docs/Architecture/<área>-stack.md`, junto al resto de `Docs/`.
+  - **Con más de un componente, cada uno tiene su propia raíz** (`Pedidos.Api/`,
+    `Pedidos.Web/`, cada una con su `src/`, `tests/` y `Docs/`), y una solution en la raíz
+    del repo, si la hay, solo las referencia. Opción descartada: componentes que comparten
+    `src/` y `tests/` con los stacks en el `Docs/` de la raíz, con el componente en el
+    nombre del archivo (rompe la regla de D57 sobre el nombre y el stack deja de viajar con
+    su proyecto). Se reabre si un proyecto real necesita componentes sin raíz propia.
+  - **`architecture.md` es obligatorio desde el primer stack**, aunque sea una fila por
+    componente con su carpeta: todo el set encuentra el stack a partir de esa fila, y en
+    Todo no se escribió, así que la carpeta la fijó el ejemplo.
+  - **La unidad de build y el componente son dos cosas.** El vertical slice decía "a
+    component is one `.csproj`"; ahora dice un proyecto de build por componente, y su árbol
+    nombra el proyecto aparte de la raíz.
+  - Los `src/Pedidos.Api` de `nzt-ship-backend-dotnet` (contenedores, migraciones) no
+    cambian: son rutas de proyecto para comandos `dotnet`, no carpetas de componente.
+  - Pedido por el usuario el 2026-10-11 ("hacé estos cambios", sobre el análisis que
+    recomendaba la opción a); aplicado en las unidades 64 a 66.
 
 ## 13. Revisión contra Temper v3
 
@@ -3073,6 +3105,9 @@ curiosidad.
 > - **Ejes del stack (D59):** `nzt-architecture/references/stack-axes.md`, con las opciones
 >   copiadas de las tablas de build, los ejes del router de área sumados, y la pregunta con la
 >   herramienta del host o en viñetas.
+> - **Carpeta del componente (D60):** es su raíz (solution o manifiesto, `src/`, `tests/`),
+>   nunca la de un proyecto de build; con un solo componente, la raíz del repo.
+>   `architecture.md` es obligatorio desde el primer stack, con la columna de carpeta.
 > - **Evals:** la última suite completa es la 24a (2026-10-07, juez sonnet: routing 0.97,
 >   stack 0.89, restraint 0.90; `Plan/mejoras/05-linea-base.md`). Lo posterior (D56-D59) se
 >   probó sobre el texto, sin evals, por decisión del usuario; los fixtures siguen con las

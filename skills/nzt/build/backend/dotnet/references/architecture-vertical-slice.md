@@ -6,7 +6,9 @@ only what is .NET.
 
 ## One project per component
 
-A component is **one `.csproj`**. No `.Domain`, no `.Application`, no `.Infrastructure`.
+A component builds into **one `.csproj`**. No `.Domain`, no `.Application`, no `.Infrastructure`.
+**The `.csproj` folder is not the component's root**: the root holds `src/<Component>/`,
+`tests/` and `Docs/`, and its stack lives there, never beside the `.csproj`.
 **The compiler enforces *"the domain may not see the database"*** the moment the layers are
 projects, and nothing enforces the boundary between operations — which is why they are not.
 
@@ -15,7 +17,7 @@ projects, and nothing enforces the boundary between operations — which is why 
 The generic tree, with these roles filled the .NET way:
 
 ```
-<Component>/                   at its root, the .csproj and Program.cs
+src/<Component>/               at its root, the .csproj and Program.cs
   Contracts/
     Results/                   the result type and its HTTP translation, plus
                                the response filter if there is one

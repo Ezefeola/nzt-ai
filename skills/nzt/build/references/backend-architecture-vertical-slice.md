@@ -18,8 +18,10 @@ each file *is* and what it is called comes from its own reference.
 
 ## No unit per layer
 
-A component is **one unit of the build** — no domain, application or infrastructure module of
-its own.
+A component **builds into one unit** — no domain, application or infrastructure module of its
+own. **The unit is not the component's root**: the root holds the unit (under `src/` when the
+project uses one), its tests and its `Docs/`, and that root is the folder `architecture.md`
+names.
 
 Splitting into layer units puts the boundary back on the horizontal layer, **which is what this
 architecture exists to avoid**: the tooling enforces *"the domain may not see the database"*
@@ -28,10 +30,11 @@ actually breaks.
 
 ## The tree
 
-Each line is a **role**: what belongs there, never what it is called.
+Each line is a **role**: what belongs there, never what it is called. The tree is the build
+unit's folder, inside the component's root.
 
 ```
-<Component>/                   at its root, the project manifest and the entry point
+<Component>/                   the build unit: the project manifest and the entry point
   Contracts/                   what crosses the boundary out of the application
     Results/                   the result type and its translation to the transport
   Domain/

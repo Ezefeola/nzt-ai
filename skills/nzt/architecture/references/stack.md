@@ -13,12 +13,12 @@
 - Keeping it current
 - Done when
 
-Produces `<component folder>/Docs/Architecture/<area>-stack.md`: what this component is built with, which
-option it took on each axis, what it opted into, and which packages it uses. One document
-per **component and area** — a component with a backend and a frontend has two.
+Produces `<component folder>/Docs/Architecture/<area>-stack.md`, one per **component and
+area**: how it is built, each axis, its opt-ins and its packages. **The folder is the
+component's root** — its solution or manifest, `src/`, `tests/`; the repository root when it
+is the only one — **never a build project's folder**, and `architecture.md` names it.
 
-**No component gets built without one.** A new component gets it when it is designed; an
-existing one gets it from evidence before its code is touched.
+**No component gets built without one, nor without its row in `architecture.md`**: a new one when designed, an existing one from evidence before its code is touched.
 
 ## What this document is for
 

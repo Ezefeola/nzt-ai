@@ -33,7 +33,7 @@ and a claim is measurable. **What no document claims is not a finding.**
 ## The three verdicts
 
 ```text
-Document: src/Pedidos.Api/Docs/Architecture/backend-stack.md — Persistence: repositories with unit of work
+Document: Pedidos.Api/Docs/Architecture/backend-stack.md — Persistence: repositories with unit of work
 The code: 4 of 11 features inject the DbContext into the endpoint
 Verdict:  the document no longer matches
 

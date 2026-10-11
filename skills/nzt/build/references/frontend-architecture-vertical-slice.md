@@ -30,7 +30,9 @@ and serves it. Nothing goes the other way.
 ## The tree
 
 Each line is a **role**: what belongs there, never what it is called. The annotation says what
-sits directly in that folder.
+sits directly in that folder. **The tree is the build unit's folder, not the component's
+root**: the root holds the units (under `src/` when the project uses one), their tests and the
+component's `Docs/`, and that root is the folder `architecture.md` names.
 
 ```
 <Component>/                   at its root, the entry point of the application
