@@ -3049,13 +3049,36 @@ curiosidad.
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
-> **En curso (2026-10-03), rama `marco-trabajo-mejoras`:** D50–D52 decididas y escritas en
-> esta spec. **Migrados:** `ship-backend-dotnet` (piloto, 4 hojas), `nzt-plan` (`close.md`),
-> `nzt-learn` (7 hojas), `nzt-discovery` (7 hojas) y `nzt-ux` (5 hojas) tienen sus hojas en
-> `references/` (87 skills); `install/check-references.sh` prueba que cada referencia es su hoja menos los
-> cambios mecánicos, y el build mide referencias (200 líneas, `## Contents` pasadas las 100,
-> fila en la tabla). El resto de los routers sigue como lo describe esta sección. Línea base
-> de evals en `Plan/mejoras/05-linea-base.md`; plan y dónde quedó en `Plan/state.json`.
+> **Estado actual (2026-10-11), rama `capa-generica`.** Lo que sigue a este bloque es la
+> historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
+> como skills) ya no valen. El plan en curso y dónde quedó viven en `Plan/state.json`.
+>
+> - **El set son 14 skills y 131 referencias** (D50): las hojas pasaron a `references/` de su
+>   router; el listado ocupa ~2.540 caracteres, bajo el piso de 8.000 de Codex.
+>   `install/check-references.sh` probó cada movimiento; el build mide referencias (200
+>   líneas, `## Contents` pasadas las 100, fila en la tabla o en un índice).
+> - **El kernel dice cómo se lee una referencia** (D52, D54): *Read with* antes de la primera
+>   respuesta, nombres viejos por prefijo más largo, y releer tras una compactación.
+> - **Docs/ por carpeta de tema y stack dentro de su componente** (D56, D57); glosario y
+>   `product.md` obligatorios.
+> - **v1.0.0 publicada el 2026-10-08** con todo lo anterior. Lo que sigue (D58, D59) está solo
+>   en esta rama.
+> - **Capa genérica terminada (D58, unidades 42-59):** 30 referencias en
+>   `nzt-build/references/` (`backend-*`, `data-*`, `code-*`, `frontend-*`) con el principio
+>   de cada práctica sin nombrar tecnologías, y los índices `practices-backend.md` y
+>   `practices-frontend.md` para un stack sin router de área. Las referencias .NET y Blazor
+>   quedaron con el cómo en su tecnología y leen la genérica primero (*Read with*, obligatoria).
+>   `install/check-extraction.sh` probó cada recorte contra `main`: 0 reglas perdidas, las
+>   reescritas revisadas a mano en `Plan/mejoras/extraccion/*.reviewed`.
+> - **Ejes del stack (D59):** `nzt-architecture/references/stack-axes.md`, con las opciones
+>   copiadas de las tablas de build, los ejes del router de área sumados, y la pregunta con la
+>   herramienta del host o en viñetas.
+> - **Evals:** la última suite completa es la 24a (2026-10-07, juez sonnet: routing 0.97,
+>   stack 0.89, restraint 0.90; `Plan/mejoras/05-linea-base.md`). Lo posterior (D56-D59) se
+>   probó sobre el texto, sin evals, por decisión del usuario; los fixtures siguen con las
+>   rutas viejas de `Docs/`.
+> - **Pendiente:** que el usuario pruebe la rama instalada, el PR a `main` (lo arma el
+>   usuario) y la versión nueva después de esa prueba.
 
 **Dónde estamos, en una línea:** **el roadmap está construido entero — 111 skills, la suite
 de evals y el instalador —, el repo está en GitHub, y el primer eval corrió y pasó.** La

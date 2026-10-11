@@ -38,13 +38,16 @@ estado y **la tabla de ruteo**. Eso último es la decisión de diseño más impo
 qué skill cargar está *instruido en una tabla*, no librado a que el modelo adivine por la
 descripción.
 
-**2. Los routers.** Uno por fase. No hacen el trabajo: leen el pedido y dicen qué hoja
-cargar.
+**2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
+(`nzt`) y el de investigación (`nzt-research`). No hacen el trabajo:
+leen el pedido y el documento de stack, y dicen qué referencia leer.
 
-**3. Las hojas.** Una skill, un trabajo, ≤ 200 líneas. Sólo se carga la que la tarea pide.
+**3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
+`references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
+listado de skills**, que el proveedor carga en toda sesión: el set entero son 14 entradas.
 
 ```
-pedido → kernel (tabla de ruteo) → router de fase → la hoja que corresponde
+pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
 ```
 
 El bucle que impone el kernel es siempre el mismo: **entender → proponer → ejecutar por
@@ -75,6 +78,16 @@ contenedores, migraciones. **Se instalan siempre y se aplican sólo si el docume
 del componente las eligió.** En un proyecto que no es .NET no se cargan, y en un repositorio
 con convenciones propias las de NZT se corren a un costado y la diferencia se reporta en vez
 de aplicarse.
+
+Debajo hay una **capa genérica**: el principio de cada práctica —arquitecturas, modelo de
+dominio, persistencia, acceso a datos, API, seguridad, reglas de código, componentes,
+formularios, rendering, performance— escrito sin nombrar ninguna tecnología. Un stack sin
+skills propias (Node, Go, React…) la recibe entera; .NET y Blazor la leen primero y después
+leen cómo se hace en su tecnología, así que **cada regla vive en un solo lugar**.
+
+Los **ejes del stack** —arquitectura, modelo de dominio, persistencia y los propios de cada
+tecnología— se preguntan una vez, con sus opciones y lo que cuesta cada una, con la
+herramienta de preguntas del proveedor cuando la sesión la ofrece.
 
 ## Instalación
 
@@ -153,9 +166,10 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**111 skills.** El estado exacto de la construcción, las decisiones tomadas y lo que queda
-abierto están en la sección 14 de [`specs/nzt-core.md`](specs/nzt-core.md), que es el punto
-de retomada: si volvés al proyecto después de un tiempo, se empieza por ahí.
+**14 skills y 131 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
+quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
+[`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
+volvés al proyecto después de un tiempo, se empieza por esos dos.
 
 ## Licencia
 
