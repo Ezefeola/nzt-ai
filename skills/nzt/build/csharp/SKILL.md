@@ -5,63 +5,35 @@ description: Use when writing or changing C# in any component, backend or fronte
 
 # Writing C#
 
-These are **project rules written as prohibitions on purpose**: a prohibition is verifiable
-and a preference is not. They hold in every component; Blazor adds only what differs, in its
-own guidance.
+**Read `../nzt-build/references/code-code.md` first, required.** It holds the rules of code in
+any language: English with the glossary's names, one type per file, no folder named after a
+type, the member order, absence handled, async, control flow, no magic literals and reflection.
+This skill holds only what is C#.
 
-**In a foreign component — one this project's `Docs/` does not document — you write the way
-that code is written and these rules step aside.** This set is installed globally and will
-see repositories that are not its own.
+These are **project rules written as prohibitions on purpose**. They hold in every component;
+Blazor adds only what differs, in its own guidance. **In a foreign component these rules step
+aside**, as `code-code.md` says.
 
 Load this before any area skill applies. If you did not arrive here from an area router,
 load that router too.
 
-| When the code touches | Read, in this skill's folder, before writing it |
-|---|---|
-| A DTO or its mapping extensions: what a use case returns, what a typed client sends | `references/dtos.md` |
-| A collection read, transformed or checked in memory (EF Core execution is the area's) | `references/linq.md` |
+| When the code touches | Read, in this skill's folder, before writing it | Read with |
+|---|---|---|
+| A DTO or its mapping extensions: what a use case returns, what a typed client sends | `references/dtos.md` | `../nzt-build/references/code-dtos.md` — first, required |
+| A collection read, transformed or checked in memory (EF Core execution is the area's) | `references/linq.md` | `../nzt-build/references/code-collections.md` — first, required |
 
 A file naming `nzt-build-csharp-<name>` means `references/<name>.md` here — not a skill.
-
-## Everything you write is in English
-
-Type names, members, parameters, locals, files, folders and comments, whatever language the
-spec is in. The specs, the glossary and the artifacts in `Plan/` stay in the project's
-language: **you are the boundary where the term lands in English code.**
-
-- **The translation is not yours to invent.** `Docs/Domain/glossary.md` carries the code
-  name of every domain term; if it is there, that is the name. If it is missing and the code
-  has none, it is a glossary entry `nzt-discovery` writes before the code uses it — never a
-  name coined here. Two translations of one term are the same term with two names.
-- What is not a domain term — a local, a helper, a private method — you name yourself.
-- **The one exception is text the user reads**: labels, messages and validation copy come
-  from the story, in the story's language, and are never translated.
 
 ## Files, types and namespaces
 
 - **File-scoped namespaces**, nothing nested.
 - **`sealed` by default.** Unsealing later is free; re-sealing a class that something
   already inherits from is not.
-- **One top-level type per file**, and the file is named after it.
 - **A folder name never matches a type name.** The folder becomes part of the namespace and
   the compiler resolves the name to the namespace, which makes the type impossible to
-  import. For an `Order` type the folder is `Orders`.
+  import.
 
-## Members in one order, and each group together
-
-Inside a type: **nested types · constants and static fields · instance fields ·
-constructors · properties · methods**, public before private. Each group is contiguous.
-
-**A member added later joins its group.** Declaring it beside the method that uses it, or at
-the end of the file because that is where the file ended, scatters a type's state through
-its behaviour — and it is the most common way this order breaks, because the member is
-usually written in the same edit as the method that needed it. **Adding a member is not
-appending to the file.**
-
-The domain model fixes its own order on top of this, and inside an entity or a value object
-that one wins: `../nzt-build-backend-dotnet/references/domain-ddd.md`.
-DTOs also override this order: **properties first, then nested DTO declarations**,
-recursively, as defined in `references/dtos.md`.
+The domain model's own order: `../nzt-build-backend-dotnet/references/domain-ddd.md`.
 
 ## Never a primary constructor
 
@@ -134,15 +106,12 @@ if (customer is null)
 ## Async
 
 - **Never `async void`.** The language allows it for event handlers; there are none here.
-- **Take a `CancellationToken` wherever the caller can give one, and pass it down** — to the
-  next method, the ORM, the HTTP call. A token that stops halfway is the same as no token.
+- **Take a `CancellationToken` wherever the caller can give one, and pass it down.**
 - **Never `.Result`, `.Wait()` or `.GetAwaiter().GetResult()`.** Always `await`.
-- If what you call is async, your method is async, all the way up.
 
 ## Control flow
 
-**No nested if/else.** Guard clauses and early return, and a `switch` expression or pattern
-matching where a chain would appear.
+A `switch` expression or pattern matching where a chain would appear.
 
 ```csharp
 // no
@@ -156,13 +125,10 @@ if (order is null) return OrderNotFound(id);
 if (!order.IsOpen) return OrderClosed(order.Id);
 ```
 
-Nesting is where the case nobody wrote hides.
-
 ## No magic strings, and no magic numbers
 
 A literal that means something gets a name — a `const`, an enum, or a member of a static
-class of names. Keys, claims, headers, policies, states and routes, and numbers that mean
-something too.
+class of names.
 
 ## Types for data
 
@@ -173,27 +139,15 @@ here: that is `references/dtos.md`.
 ## Reflection is exceptional
 
 **Reaching for `GetType()`, `GetProperty` or `GetValue` to read something off an object is
-the symptom of a missing abstraction.** Give the type the surface the code is asking for.
-
-The cases where reflection is genuinely right are rare, and **you do not decide alone: if
-you are not sure yours is one, ask before writing it.** Reflection a package does for you is
-not yours.
+the symptom of a missing abstraction.**
 
 ## Closing checklist
 
-- [ ] Every identifier, file, folder and comment in English, with domain terms taking the
-      name `Docs/Domain/glossary.md` gives them.
-- [ ] User-facing text in the story's language, as the story wrote it.
 - [ ] File-scoped namespace, one top-level type, file named after it, `sealed` unless
       something inherits.
-- [ ] No folder named after a type.
-- [ ] Members in order with each group contiguous, and nothing appended at the end of the
-      file; DTOs put properties before nested DTOs, and domain types use their own order.
 - [ ] No primary constructors; dependencies are `readonly` fields set in a constructor.
 - [ ] No `var`.
 - [ ] No `global using`, `using static`, alias usings or qualified names in the body, and
       `ImplicitUsings` left as it came.
 - [ ] No `!`, and zero nullable warnings.
 - [ ] No `async void`, no `.Result`/`.Wait()`; tokens taken and propagated.
-- [ ] No nested if/else, no meaningful literal left unnamed.
-- [ ] No hand-written reflection, and a doubtful case was asked rather than decided alone.

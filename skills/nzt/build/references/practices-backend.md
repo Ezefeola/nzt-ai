@@ -28,8 +28,12 @@ not pick one here.
 
 ## Rows the task selects
 
+**Read `references/code-code.md` before writing any code**: the rules of code in any language.
+
 | The work touches | Read | Read with |
 |---|---|---|
+| A DTO or its mapping: what an operation returns or receives | `references/code-dtos.md` | — |
+| A collection read, transformed or checked in memory | `references/code-collections.md` | — |
 | The operation and its orchestration | `references/backend-use-cases.md` | — |
 | The inputs of an operation and their validators | `references/backend-validation.md` | — |
 | Anything returning a Result from a use case | `references/backend-results.md` | — |
@@ -37,6 +41,21 @@ not pick one here.
 | An endpoint, its binding, or how a Result reaches HTTP | `references/backend-api.md` | `references/backend-results.md` |
 | A protected resource, permissions, suspected unauthorised access | `references/backend-security.md` | — |
 | A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/backend-domain-value-objects.md` | `references/backend-domain-ddd.md` |
+
+## Data access — when the component reads or writes a database
+
+**Read `references/data-access.md` first, every time, whatever the row**: it carries what holds
+for every operation, and no row below repeats it.
+
+| The operation | Read | Read with |
+|---|---|---|
+| Reading data: query shape, projection, execution | `references/data-queries.md` | — |
+| Returning a page of results | `references/data-pagination.md` | `references/data-queries.md` |
+| Staging and saving changes, write conflicts | `references/data-writes.md` | — |
+| Updating or deleting many rows by criteria | `references/data-bulk.md` | `references/data-writes.md` |
+| The handle's configuration, entity mapping, relationships, mapping an aggregate or a value object | `references/data-mapping.md` | — |
+| A schema change that needs a migration | `references/data-migrations.md` | — |
+| An index, or a uniqueness rule to enforce | `references/data-indexes.md` | — |
 
 ## Applying a generic reference to a technology
 

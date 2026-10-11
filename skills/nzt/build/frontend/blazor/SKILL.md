@@ -33,23 +33,24 @@ before choosing a technology or a pattern.
 
 ## Required guidance
 
-Load `nzt-build-csharp` before applying any row here, and read its `references/dtos.md`
+Load `nzt-build-csharp` before applying any row here, and read
+`../nzt-build/references/code-dtos.md` and then its `references/dtos.md`
 (`../nzt-build-csharp/references/dtos.md`) when a typed client's DTOs are involved. **Reuse what is already loaded: this table is a selection, not an
 order to read every line.** A real task reads three or four.
 
 **The UI documents decide what the screen looks like, not this tree**: `Docs/UX/design-system.md`
 for visual work, states and wording, `Docs/UX/ui-components.md` before adding a shared component.
-**Reuse the component library the stack adopted before writing a custom component.**
+The adopted component library comes first, as `frontend-components.md` says.
 
 ## Exclusive axes — read only what the stack selected
 
 | Axis | The stack says | Read | Read with |
 |---|---|---|---|
 | Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | `../nzt-build/references/frontend-architecture-vertical-slice.md` — first, required |
-| Render mode | `server` | `references/render-server.md` | `references/components.md` |
-| | `webassembly` | `references/render-webassembly.md` | `references/components.md` |
-| | `auto` | `references/render-auto.md` | `references/components.md` |
-| | `static` | `references/render-static.md` | `references/components.md`, and `references/forms.md` when the page posts |
+| Render mode | `server` | `references/render-server.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md` |
+| | `webassembly` | `references/render-webassembly.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md` |
+| | `auto` | `references/render-auto.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md` |
+| | `static` | `references/render-static.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md`, and `../nzt-build/references/frontend-forms.md` with `references/forms.md` when the page posts |
 
 **A render-mode reference is read only when the work touches rendering behaviour.** A copy
 change inside an established component does not need one.
@@ -62,10 +63,10 @@ resolve it there, do not improvise a layout.
 
 | The work touches | Read | Read with |
 |---|---|---|
-| A component or a screen: parameters, lifecycle, injection, the typed client, the three states | `references/components.md` | — |
-| A form, its validation or its submission | `references/forms.md` | `references/components.md` |
-| Prerendered state, initial state transfer, persistent services | `references/prerendering.md` | the render-mode reference the stack selected |
-| Lists, grids, components repeated at scale, high-frequency events — after a measurement | `references/performance.md` | `references/components.md` |
+| A component or a screen: parameters, lifecycle, injection, the typed client, the three states | `references/components.md` | `../nzt-build/references/frontend-components.md` — first, required |
+| A form, its validation or its submission | `references/forms.md` | `../nzt-build/references/frontend-forms.md` — first, required; `references/components.md`, `../nzt-build/references/frontend-components.md` |
+| Prerendered state, initial state transfer, persistent services | `references/prerendering.md` | `../nzt-build/references/frontend-rendering.md` — first, required; the render-mode reference the stack selected |
+| Lists, grids, components repeated at scale, high-frequency events — after a measurement | `references/performance.md` | `../nzt-build/references/frontend-performance.md` — first, required; `references/components.md` |
 
 Wherever a file names `nzt-build-frontend-blazor-<name>`, it means `references/<name>.md` in
 this folder (`nzt-build-frontend-blazor-render-auto` → `references/render-auto.md`): read that
@@ -81,15 +82,13 @@ file — it is not a skill.
 
 ## Three confusions that cost the most
 
-- **The render mode and prerendering are two things.** The mode says where the component runs;
-  prerendering says a server pass may also have run. Interactive modes can have it, standalone
-  WebAssembly does not, and code that assumes two initialisations is wrong in both directions.
+- **The render mode and prerendering are two things** (`frontend-rendering.md`). Interactive
+  modes can have a server pass; standalone WebAssembly does not.
 - **`AuthorizeView` hides, it does not protect.** It controls what the screen shows; whether the
   operation may run is decided by the backend
   (`../nzt-build-backend-dotnet/references/security.md`). A hidden button is not a permission.
-- **A screen never talks to the network itself.** Every call goes through its feature's typed
-  client, which returns the same result shape the backend answers with. A component that holds
-  an `HttpClient` is the boundary already broken.
+- **A component that holds an `HttpClient` is the boundary already broken**: every call goes
+  through its feature's typed client (`frontend-components.md`).
 
 ## Closing checklist
 

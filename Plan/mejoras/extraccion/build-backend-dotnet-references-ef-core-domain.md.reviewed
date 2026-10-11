@@ -1,0 +1,4 @@
+# Unit 56: ef-core-domain.md (.NET) cut against data-mapping.md
+relationships to other aggregates are configured without a navigation, keeping the fk, its index and its delete behaviour => generic checklist: "... keeping the foreign key, its index and its delete behaviour"
+what a model that protects itself needs on top of that => generic: section "Mapping a domain model that protects itself", "on top of everything above"
+a field renamed later fails here, in the file that configured it => generic: "a field renamed later fails in the file that configured it"

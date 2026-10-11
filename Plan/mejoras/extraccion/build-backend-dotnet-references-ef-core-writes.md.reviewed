@@ -1,0 +1,3 @@
+# Unit 55: ef-core-writes.md (.NET) cut against data-writes.md
+nothing was loaded without a use; many rows by criteria went to a bulk statement => generic checklist: "many rows by criteria went to a statement by criteria"
+only when a use case cannot avoid two writes that must land together => generic: "only when an operation cannot avoid two writes that must land together"

@@ -1,0 +1,2 @@
+# Unit 57: dtos.md (C#) cut against code-dtos.md
+one file per entity, holding the mapping to every use case's dtos => generic: "One file per entity, holding the mapping to every operation's DTOs"

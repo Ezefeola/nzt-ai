@@ -1,0 +1,2 @@
+# Unit 55: ef-core-pagination.md (.NET) cut against data-pagination.md
+pagenumber is 1-based, and both values are validated in the operation's validator — the method corrects nothing => generic checklist: "... in the operation's validator — the function corrects nothing"; .NET: "PaginateAsync trusts its arguments"

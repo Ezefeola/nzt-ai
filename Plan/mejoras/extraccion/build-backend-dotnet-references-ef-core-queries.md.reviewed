@@ -1,0 +1,3 @@
+# Unit 55: ef-core-queries.md (.NET) cut against data-queries.md
+any entity load is justified by the query being unable to express the read; single versus split query accounts for duplication, round trips and read consistency => generic checklist: "one query or one per collection accounts for duplication, round trips and read consistency"; .NET: AsSplitQuery() in "Loading the entity"
+a performance claim is settled with the generated sql, the actual plan and representative data => generic: "settled with the generated query, the actual plan and representative data"

@@ -81,22 +81,23 @@ skill. If `nzt-build` already had you read it in this session, do not read it ag
 
 ## EF Core
 
-Only when the stack selected EF Core as the ORM. **Read `references/ef-core.md` first, every
-time, whatever the row**: it carries the rules that hold for all of it — tracking, the
-context's lifetime, what never happens in a loop — and no row below repeats them. Then read
-the row's file **and every file in its *Read with* column**; a row read alone is half the
-guidance.
+Only when the stack selected EF Core as the ORM. **Read
+`../nzt-build/references/data-access.md` and then `references/ef-core.md` first, every time,
+whatever the row**: they carry the rules that hold for all of it — tracking, the context's
+lifetime, what never happens in a loop — and no row below repeats them. Then read the row's
+file **and every file in its *Read with* column**, the generic one first; a row read alone is
+half the guidance.
 
 | The operation | Read | Read with — also required |
 |---|---|---|
-| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `references/ef-core.md` |
-| Returning a page of results | `references/ef-core-pagination.md` | `references/ef-core.md`, `references/ef-core-queries.md` |
-| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `references/ef-core.md` |
-| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `references/ef-core.md` |
-| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `references/ef-core.md` |
-| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `references/ef-core.md` |
-| A schema change that needs a migration | `references/ef-core-migrations.md` | `references/ef-core.md` |
-| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `references/ef-core.md` |
+| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `../nzt-build/references/data-queries.md` — first; `references/ef-core.md` |
+| Returning a page of results | `references/ef-core-pagination.md` | `../nzt-build/references/data-pagination.md` — first; `references/ef-core.md`, `references/ef-core-queries.md`, `../nzt-build/references/data-queries.md` |
+| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `../nzt-build/references/data-writes.md` — first; `references/ef-core.md` |
+| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `../nzt-build/references/data-bulk.md` — first; `references/ef-core.md` |
+| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `../nzt-build/references/data-mapping.md` — first; `references/ef-core.md` |
+| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `../nzt-build/references/data-mapping.md` — first; `references/ef-core.md` |
+| A schema change that needs a migration | `references/ef-core-migrations.md` | `../nzt-build/references/data-migrations.md` — first; `references/ef-core.md` |
+| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `../nzt-build/references/data-indexes.md` — first; `references/ef-core.md` |
 
 ## Two escapes, and they are not the same
 

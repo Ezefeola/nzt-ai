@@ -1,8 +1,12 @@
 # Static server rendering
 
+**Read `../nzt-build/references/frontend-rendering.md` first** — *Rendered on the server, with no
+interactivity*. It holds every change travelling as a request, data loaded before the render,
+what this mode is good at and what to do when a screen outgrows it. This file holds only what is
+Blazor.
+
 The server renders HTML per request, **without a live interactive .NET circuit or runtime for
-that page**. The browser still runs scripts and enhanced navigation still works: static does not
-mean the page is dead.
+that page**. Enhanced navigation still works.
 
 How a component is written does not change — that is
 `nzt-build-frontend-blazor-components`. This is only what having no interactivity changes.
@@ -16,12 +20,8 @@ How a component is written does not change — that is
 - **Streaming can deliver several HTML updates for one request**, and it still establishes no
   interactive circuit.
 
-**Anything the user does that changes something travels as a request**: a link that navigates,
-or a form that posts.
-
 ## The data is loaded before the render
 
-What the page shows is loaded in the initial lifecycle, and **nothing there has a side effect**.
 For a slow read-only load, `[StreamRendering]` can show early content — it does not change what
 this mode is.
 
@@ -37,28 +37,17 @@ They are not optional here, because this is the mode where the post *is* the int
 
 ## When a screen has outgrown this mode
 
-When the requirement genuinely needs live .NET event handling, **propose an interactive
-boundary and record the adopted mode and its scope**. That is a decision about the project, not
-about the screen: it is reported, and **the stack file is what changes.**
-
-A native control like `<details>`, or a small justified piece of JS, does not by itself require
+When the requirement genuinely needs live .NET event handling, propose the interactive boundary
+the generic reference describes. A native control like `<details>` does not by itself require
 making the whole application interactive.
-
-## What it is good at
-
-A page that shows what it was given and asks for nothing back: a report, a printable document, a
-detail screen, a landing page. It avoids an interactive runtime for that page — **the actual
-latency still depends on the data and the rendering**, not on the mode alone.
 
 ## Closing checklist
 
 - [ ] Nothing relies on a live .NET handler or on `OnAfterRender`, and a POST handler is not
       described as interactivity.
 - [ ] The data is loaded in the initial lifecycle, with no side effect there.
-- [ ] Everything the user changes travels as a navigation or a form post.
 - [ ] The form mechanics of the forms skill are all in place, antiforgery included.
 - [ ] Shape is validated here and business rules are answered by the backend — **and no claim of
       client-side validation in static SSR.**
 - [ ] A valid post, an invalid post, more than one form on the page, enhanced navigation and a
       full reload were exercised where they apply.
-- [ ] Outgrowing the mode was reported as a stack decision, not worked around in the screen.
