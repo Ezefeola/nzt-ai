@@ -1,0 +1,316 @@
+<!doctype html>
+<!--
+  Mockup del panel de nzt-files 0.1.0: el árbol del proyecto arriba y el archivo elegido abajo.
+  Fuente: specs/mods/nzt-files/spec.md (reglas RN-files-* y sección Diseño), unidad 142, 2026-10-14.
+  Pedido del usuario 2026-10-14: "ver el proyecto desde el CLI, como si fuese un visual studio
+  digamos para verlo desde ahí y navegar el mismo y abrir los files"; Q-01 los dos a la vez,
+  Q-02 solo .git oculto, Q-04 marcas de git como VS Code.
+  Base visual: el mockup aceptado de nzt-changes 0.4.0 (specs/mods/nzt-changes/mockup.html): misma
+  paleta, misma tarjeta, alto fijo, scroll propio y filas que son botones.
+  Lo que el motor permite (tipos de Claude Code 2.1.296): ui.scroll con la fila bajo el puntero
+  para mover solo el árbol o solo el archivo; una fila es un Button; el contenido se dibuja con
+  el elemento Code (colores según el lenguaje) si acepta texto sin diff: se confirma al construir.
+  Imita el panel de Claude Code en una terminal oscura; no es código del mod. Los datos son los
+  de este repo el 2026-10-14.
+  Colores: aproximaciones /* provisional: la terminal y el tema de la persona ponen los reales */.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nzt-files 0.1.0 · mockup</title>
+<style>
+  :root {
+    /* provisional: la misma aproximación de terminal oscura que specs/mods/nzt-changes/mockup.html */
+    --page: #111; --bg: #1a1a1a; --text: #e6e6e6; --dim: #8f8f8f; --border: #3a3a3a;
+    --accent: #d97757; /* color 'claude' del tema: el acento de los mods de NZT */
+    --cyan: #29b8db; --green: #6cc070; --red: #f07178; --yellow: #e5c07b;
+    --kw: #ff8ac6; --str: #c3e88d; --fn: #82aaff; --num: #f9b26b; --key: #89ddff; --com: #8f8f8f; --head: #e6e6e6;
+    --sel-bg: #263a42;                               /* el archivo abierto */
+    --row: 20px;                                     /* una fila de la terminal */
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text);
+         font: 14px/var(--row) ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; padding: 16px; }
+  .states { max-width: 820px; margin: 0 auto 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .states span { color: var(--dim); width: 100%; font-size: 12px; line-height: 1.4; }
+  .states a { color: var(--text); border: 1px solid var(--border); padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; line-height: 1.4; }
+  .states a:focus-visible, button:focus-visible, .view:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+  .states a[aria-current] { background: var(--accent); color: #111; border-color: var(--accent); }
+  .dock { width: 62ch; max-width: 100%; margin: 0 auto; background: var(--bg); padding: 8px; border-left: 2px solid var(--border); }
+  /* Alto fijo: --rows filas siempre (RN-files-alto). */
+  .card { border: 1px solid var(--accent); border-radius: 10px; padding: 0 1ch;
+          height: calc(var(--rows) * var(--row) + 2px); display: flex; flex-direction: column; overflow: hidden; }
+  .card > * { flex: none; }
+  .badge { background: var(--accent); color: #111; font-weight: 700; margin-right: 1ch; }
+  .row { display: flex; justify-content: space-between; gap: 0 1ch; min-width: 0; white-space: nowrap; height: var(--row); }
+  .row > span { overflow: hidden; text-overflow: ellipsis; }
+  .title { color: var(--accent); font-weight: 700; }
+  .bold { font-weight: 700; } .dim { color: var(--dim); }
+  .M { color: var(--yellow); } .U, .A { color: var(--green); } .D { color: var(--red); }
+  /* El árbol: alto fijo de --tree-rows filas, scroll propio; ↑/↓ n más sobre la primera y la última. */
+  .tree { position: relative; height: calc(var(--tree-rows) * var(--row)); overflow-y: auto; scrollbar-width: none; }
+  .tree::-webkit-scrollbar { display: none; }
+  .edge { position: sticky; z-index: 1; height: var(--row); background: var(--bg); color: var(--dim); text-align: right; display: none; }
+  .edge.up { top: 0; } .edge.down { bottom: 0; }
+  .node { all: unset; box-sizing: border-box; display: flex; gap: 1ch; width: 100%; height: var(--row); white-space: nowrap; min-width: 0; cursor: pointer; }
+  .node .ind { flex: none; white-space: pre; }
+  .node .tw { flex: none; width: 1ch; color: var(--dim); }
+  .node .name { overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+  .node.dir .name { color: var(--text); font-weight: 700; }
+  .node.leaf .name { color: #c8c8c8; }
+  .node .mk { flex: none; min-width: 1ch; text-align: right; }
+  /* Solo el nombre es el botón: Claude Code lo invierte bajo el puntero (lo aprendido en nzt-changes). */
+  .node:hover .name { background: #ddd; color: #111 !important; flex: 0 1 auto; }
+  .node:hover .name + .fill { flex: 1; }
+  .node .fill { flex: 0; }
+  .node.on { background: var(--sel-bg); }
+  .node.on .name { color: var(--cyan); font-weight: 700; }
+  .node.del .name { text-decoration: line-through; color: var(--red); }
+  .node.on.del .name { color: #ff9aa0; } /* el rojo sobre la fila elegida daba 4,15: no llegaba a AA */
+  .node.err { cursor: default; } .node.err .name { color: var(--red); }
+  .rule { border-top: 1px solid var(--border); margin: calc(var(--row) / 2 - 1px) 0 calc(var(--row) / 2); height: 0; }
+  .file { color: var(--cyan); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; height: var(--row); }
+  .meta { color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: var(--row); }
+  .kind { color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 0 .5ch; }
+  /* El visor: ocupa lo que queda y se desplaza solo. */
+  .view { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+  .view::-webkit-scrollbar { display: none; }
+  .ln { display: grid; grid-template-columns: 5ch 1fr; }
+  .ln > span:first-child { color: var(--dim); text-align: right; padding-right: 1ch; }
+  .ln .t { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .k { color: var(--kw); } .s { color: var(--str); } .f { color: var(--fn); } .num { color: var(--num); }
+  .p { color: var(--key); } .c { color: var(--com); font-style: italic; } .h { color: var(--head); font-weight: 700; }
+  .msgs { flex: 1 1 0; min-height: 0; padding: 0 0 0 2ch; }
+  .pos { color: var(--dim); display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden; height: var(--row); }
+  .buttons { display: flex; gap: 0 2ch; white-space: nowrap; height: var(--row); }
+  .btn { all: unset; font-weight: 700; cursor: pointer; }
+  .btn.focus { background: #ddd; color: #111; }
+  .btn.plain { font-weight: 400; color: var(--text); }
+  .note { max-width: 62ch; margin: 12px auto 0; color: var(--dim); font-size: 12px; line-height: 1.5; }
+  .note b { color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav class="states" aria-label="Estados del mockup (fuera del panel)">
+  <span>Dónde está el panel:</span>
+  <a href="#" data-place="dock">Al costado · todo el alto (40 filas)</a>
+  <a href="#" data-place="inline">Sobre el prompt · 24 filas (sin lugar al costado)</a>
+  <span>Estado del panel (las carpetas y los archivos del árbol también se clickean):</span>
+  <a href="#" data-state="start">Al abrir</a>
+  <a href="#" data-state="md">Markdown abierto</a>
+  <a href="#" data-state="code">Código largo con scroll</a>
+  <a href="#" data-state="json">JSON modificado</a>
+  <a href="#" data-state="many">node_modules abierto</a>
+  <a href="#" data-state="bin">Binario</a>
+  <a href="#" data-state="big">Archivo grande</a>
+  <a href="#" data-state="del">Archivo borrado</a>
+  <a href="#" data-state="gone">El abierto dejó de existir</a>
+  <a href="#" data-state="err">Carpeta sin permiso</a>
+  <a href="#" data-state="loading">Leyendo</a>
+  <a href="#" data-state="norepo">Sin repositorio</a>
+</nav>
+
+<main class="dock" id="dock"></main>
+
+<div class="note">
+  <p><b>Cómo se lee:</b> arriba el árbol, abajo el archivo, los dos a la vez (Q-01). El panel mide siempre lo mismo: abrir carpetas o elegir otro archivo no lo estira ni mueve el botón.</p>
+  <p><b>Árbol.</b> <b>▸</b> carpeta cerrada, <b>▾</b> abierta; un clic la abre o la cierra. Primero carpetas, después archivos. Solo se oculta <code>.git</code> (Q-02). Si no entra, la rueda sobre el árbol lo mueve y en los bordes dice <i>↑ n más</i> y <i>↓ n más</i>.</p>
+  <p><b>Marcas de git</b> (Q-04), a la derecha: <span class="M">M</span> modificado, <span class="U">U</span> nuevo sin seguir, <span class="A">A</span> nuevo agregado, <span class="D">D</span> borrado (tachado, no se abre). Una carpeta con cambios adentro lleva <span class="M">●</span> del color de su cambio más fuerte: rojo, amarillo, verde.</p>
+  <p><b>Archivo.</b> Ruta, tipo, tamaño y líneas; el contenido con número de línea y colores según el lenguaje. Se mueve con la rueda, con <b>k</b> / <b>j</b> (también con clic) y con RePág / AvPág; debajo dice qué líneas ves.</p>
+  <p>Teclas con el panel enfocado: Tab y flechas recorren las filas del árbol, Enter abre, Escape cierra.</p>
+</div>
+
+<script>
+  // Solo dibuja los estados del mockup a partir de datos fijos; no hay lógica del mod.
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const ts = s => esc(s)
+    .replace(/('[^']*')/g, '<span class="s">$1</span>')
+    .replace(/\b(import|export|const|let|return|if|for|of|from|type|await|async|new|else|continue)\b/g, '<span class="k">$1</span>')
+    .replace(/(\/\/.*)$/, '<span class="c">$1</span>');
+  const md = s => esc(s)
+    .replace(/^(#+ .*)$/, '<span class="h">$1</span>')
+    .replace(/(`[^`]*`)/g, '<span class="s">$1</span>')
+    .replace(/(\*\*[^*]+\*\*)/g, '<span class="p">$1</span>');
+
+  // Contenidos de ejemplo.
+  const MD = [
+    '# Mod · nzt-files — explorador del proyecto', '',
+    '> Estado: **especificado** (unidad 141, 2026-10-14); falta el mockup (unidad 142) · Depende de:',
+    '> `specs/nzt-mods.md` (reglas de todo mod).', '',
+    '## Qué resuelve', '',
+    'Para mirar cómo está armado el proyecto o leer un archivo mientras se trabaja con Claude,',
+    'hoy hay que salir de Claude Code al editor o pedirle a Claude que lo lea, lo que gasta',
+    'contexto en algo que solo quería ver la persona.', '',
+    '## Alcance', '', '**Adentro**',
+    '- Un panel lateral, abierto con `/nzt-files`, con el árbol del proyecto arriba y el archivo',
+    '  elegido abajo, los dos a la vez.',
+    '- Abrir y cerrar carpetas con un clic, y elegir un archivo con un clic.',
+    '- Ver el contenido de un archivo con números de línea y scroll propio.', '',
+    '**Afuera**',
+    '- **Editar, crear, renombrar, mover o borrar** archivos o carpetas.',
+    '- **Abrir el archivo en un editor externo.** El usuario: "no por ahora" (Q-03).', '',
+    '## Reglas', '',
+    '### RN-files-ubicacion · origin: propuesta del agente',
+    'El panel se abre al costado de la conversación con `/nzt-files`.',
+  ].map(md);
+  const CODE = [
+    "import type { Line, Hunk } from './types'", '',
+    '// Lines of a text, the last newline not opening another.',
+    'export const splitLines = (text: string) => {', "  const lines = text.split('\\n')",
+    "  if (lines[lines.length - 1] === '') lines.pop()", '  return lines', '}', '',
+    'export const diffLines = (before: string[], after: string[]): Line[] => {',
+    '  const table = lcs(before, after)', '  const out: Line[] = []', '  let i = 0, j = 0',
+    '  for (const step of walk(table)) {', "    if (step === 'same') out.push({ op: ' ', text: before[i++] }), j++",
+    "    else if (step === 'del') out.push({ op: '-', text: before[i++] })",
+    "    else out.push({ op: '+', text: after[j++] })", '  }', '  return out', '}', '',
+    'export const hunksOf = (lines: Line[], context = 1): Hunk[] => {', '  const hunks: Hunk[] = []',
+    '  let open: Hunk | undefined', '  for (const [at, line] of lines.entries()) {',
+    "    const near = lines.slice(Math.max(0, at - context), at + context + 1).some(l => l.op !== ' ')",
+    '    if (!near) { open = undefined; continue }', '    if (!open) hunks.push(open = { start: at + 1, lines: [] })',
+    '    open.lines.push(line)', '  }', '  return hunks', '}', '',
+    'export const startLineOf = (file: string, oldText: string) => {', '  const at = file.indexOf(oldText)',
+    '  if (at < 0) return 1', "  return file.slice(0, at).split('\\n').length", '}',
+  ].map(ts);
+  const JSON_ = [
+    '{', '  <span class="p">"version"</span>: <span class="num">1</span>,',
+    '  <span class="p">"updated"</span>: <span class="s">"2026-10-14T18:30:00Z"</span>,',
+    '  <span class="p">"goal"</span>: <span class="s">"Mod nuevo (nombre tentativo nzt-files): explorar el proyecto…"</span>,',
+    '  <span class="p">"phases"</span>: [', '    { <span class="p">"name"</span>: <span class="s">"discovery"</span>, <span class="p">"status"</span>: <span class="s">"done"</span>, <span class="p">"units"</span>: [',
+    '      { <span class="p">"id"</span>: <span class="num">141</span>, <span class="p">"status"</span>: <span class="s">"done"</span> }', '    ] },',
+    '    { <span class="p">"name"</span>: <span class="s">"ux"</span>, <span class="p">"status"</span>: <span class="s">"doing"</span>, <span class="p">"units"</span>: [',
+    '      { <span class="p">"id"</span>: <span class="num">142</span>, <span class="p">"status"</span>: <span class="s">"doing"</span> }', '    ] }', '  ],',
+    '  <span class="p">"approved"</span>: <span class="k">true</span>,', '  <span class="p">"autonomy"</span>: {},',
+    '  <span class="p">"waiting_on"</span>: <span class="k">null</span>', '}',
+  ];
+  const LOCK = Array.from({ length: 60 }, (_, i) => ['{', '  <span class="p">"name"</span>: <span class="s">"web"</span>,', '  <span class="p">"lockfileVersion"</span>: <span class="num">3</span>,', '  <span class="p">"packages"</span>: {'][i] ||
+    ['    <span class="p">"node_modules/react"</span>: {', '      <span class="p">"version"</span>: <span class="s">"18.3.1"</span>,', '      <span class="p">"integrity"</span>: <span class="s">"sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ=="</span>,', '    },'][i % 4]);
+
+  // El árbol de este repo el 2026-10-14. d: carpeta, o: abierta, m: marca de git.
+  const D = (name, kids, o, dot) => ({ name, d: true, kids, o, dot });
+  const F = (name, m, extra) => ({ name, m, ...extra });
+  const tree = (open = {}) => [
+    D('.claude-plugin', [F('marketplace.json', 'M')], open.plugin, 'M'),
+    D('.github', [D('workflows', [F('ci.yml')])]),
+    D('core', [F('kernel.md')]),
+    D('dist', [F('nzt-ai.zip')]),
+    D('evals', [F('README.md')]),
+    D('installer', [F('install.ps1'), F('install.sh')]),
+    D('mods', [
+      D('nzt-changes', [D('hooks', ['git.test.ts', 'git.ts', 'hooks.json', 'i18n.ts', 'kinds.test.ts', 'kinds.ts', 'register.test.tsx', 'register.tsx', 'turn.test.ts', 'turn.ts'].map(n => F(n, 'U')), open.hooks, 'U'),
+        D('types', [F('index.d.ts', 'U')], false, 'U'), F('README.md', 'U'), F('tsconfig.json', 'U')], open.changes, 'U'),
+      D('nzt-context', []), D('nzt-state', [])], open.mods, 'U'),
+    D('node_modules', open.many ? ['@types', 'ansi-styles', 'chalk', 'debug', 'esbuild', 'fast-glob', 'ms', 'picomatch', 'react', 'scheduler', 'semver', 'typescript', 'undici-types', 'yaml'].map(n => D(n, [])) : [], open.many),
+    D('Plan', [F('state.json', 'M'), F('state.real.json', 'U')], open.plan, 'M'),
+    D('presentation', [F('logo.png'), F('old-logo.png', 'D', { del: true })], open.pres, 'D'),
+    D('secrets', open.err ? [{ name: 'no se pudo leer: permiso denegado', err: true }] : [], open.err),
+    D('skills', []),
+    D('specs', [D('mods', [F('nzt-changes.html', 'U'), F('nzt-changes.md', 'U'), F('nzt-context.md'), F('nzt-files.html', 'U'), F('nzt-files.md', 'U'), F('nzt-state.md')], open.smods, 'U'),
+      F('nzt-core.md'), F('nzt-installer.md'), F('nzt-mods.md', 'M')], open.specs, 'M'),
+    F('.gitattributes'), F('.gitignore'), F('LICENSE'), F('package-lock.json'), F('README.md', 'M'),
+  ];
+  const strip = nodes => nodes.map(n => ({ ...n, m: undefined, dot: undefined, kids: n.kids && strip(n.kids) }));
+
+  const rows = (nodes, sel, depth = 0, path = '') => nodes.flatMap(n => {
+    const p = path + n.name;
+    if (n.err) return [`<div class="node err"><span class="ind">${' '.repeat(depth * 2)}</span><span class="tw">⚠</span><span class="name">${esc(n.name)}</span></div>`];
+    const mark = n.d ? (n.dot ? `<span class="mk ${n.dot}">●</span>` : '<span class="mk"></span>') : `<span class="mk ${n.m || ''}">${n.m || ''}</span>`;
+    const cls = `node ${n.d ? 'dir' : 'leaf'} ${p === sel ? 'on' : ''} ${n.del ? 'del' : ''}`;
+    const row = `<button class="${cls}" data-path="${esc(p)}"${p === sel ? ' aria-current="true"' : ''}><span class="ind">${' '.repeat(depth * 2)}</span><span class="tw">${n.d ? (n.o ? '▾' : '▸') : ' '}</span><span class="name">${esc(n.name)}${n.d ? '/' : ''}</span><span class="fill"></span>${mark}</button>`;
+    return [row, ...(n.d && n.o ? rows(n.kids, sel, depth + 1, p + '/') : [])];
+  });
+
+  const kind = k => `<span class="kind">${k}</span>`;
+  const head = right => `<div class="row"><span><span class="badge">&nbsp;NZT&nbsp;</span><span class="title">Archivos</span></span><span class="dim">${right}</span></div>`;
+  const treeBox = (nodes, sel) => `<div class="tree" aria-label="Árbol del proyecto"><div class="edge up"></div>${rows(nodes, sel).join('')}<div class="edge down"></div></div><div class="rule"></div>`;
+  const buttons = `<div class="buttons"><button class="btn">[ Cerrar ]</button></div>`;
+  const msgs = (...ms) => `<div class="msgs">${ms.map(([t, cls = 'dim']) => `<div class="${cls}">${t}</div>`).join('')}</div>`;
+  const viewer = (lines, label) => `<div class="view" tabindex="0" aria-label="Contenido de ${esc(label)}">${lines.map((h, i) => `<div class="ln"><span>${i + 1}</span><span class="t">${h}</span></div>`).join('')}</div><div class="pos" data-pos></div>`;
+  const fileHead = (path, meta) => `<div class="file">${esc(path)}</div><div class="meta">${meta}</div>`;
+  const SUM = '<span class="M">●</span> 22 cambiados';
+
+  const STATES = {
+    start: () => head(`nzt-ai · ${SUM}`) + treeBox(tree()) + fileHead('', '') + msgs(['Elegí un archivo del árbol.']) + '<div class="pos"></div>' + buttons,
+    md: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ specs: true, smods: true }), 'specs/mods/nzt-files.md')
+      + fileHead('specs/mods/nzt-files.md', `<span class="U">U nuevo</span> · ${kind('Markdown')} · 14 KB · 162 líneas`) + viewer(MD, 'nzt-files.md') + buttons,
+    code: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ mods: true, changes: true, hooks: true }), 'mods/nzt-changes/hooks/turn.ts')
+      + fileHead('mods/nzt-changes/hooks/turn.ts', `<span class="U">U nuevo</span> · ${kind('TypeScript')} · 12 KB · 344 líneas`) + viewer(CODE, 'turn.ts') + buttons,
+    json: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ plan: true }), 'Plan/state.json')
+      + fileHead('Plan/state.json', `<span class="M">M modificado</span> · ${kind('JSON')} · 3 KB · 31 líneas`) + viewer(JSON_, 'state.json') + buttons,
+    many: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ many: true, mods: true, changes: true }), '')
+      + fileHead('', '') + msgs(['Elegí un archivo del árbol.']) + '<div class="pos"></div>' + buttons,
+    bin: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ pres: true }), 'presentation/logo.png')
+      + fileHead('presentation/logo.png', `${kind('imagen PNG')} · 48 KB`) + msgs(['Archivo binario: no se muestra su contenido.']) + '<div class="pos"></div>' + buttons,
+    big: () => head(`nzt-ai · ${SUM}`) + treeBox(tree(), 'package-lock.json')
+      + fileHead('package-lock.json', `${kind('JSON')} · 2,4 MB · 61.204 líneas · se ven 5.000`) + viewer(LOCK, 'package-lock.json').replace('<div class="pos" data-pos></div>', '<div class="pos" data-pos data-big></div>') + buttons,
+    del: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ pres: true }), 'presentation/old-logo.png')
+      + fileHead('presentation/old-logo.png', `<span class="D">D borrado</span> · ${kind('imagen PNG')}`) + msgs(['Se borró desde el último commit.'], ['Su diff está en /nzt-changes.']) + '<div class="pos"></div>' + buttons,
+    gone: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ plan: true }).map(n => n.name === 'Plan' ? { ...n, kids: [n.kids[0]] } : n))
+      + fileHead('Plan/state.real.json', '') + msgs(['Este archivo ya no existe.', 'D'], ['Lo borraron mientras estaba abierto.']) + '<div class="pos"></div>' + buttons,
+    err: () => head(`nzt-ai · ${SUM}`) + treeBox(tree({ err: true }), '') + fileHead('', '') + msgs(['Elegí un archivo del árbol.']) + '<div class="pos"></div>' + buttons,
+    loading: () => head('nzt-ai') + msgs(['Leyendo el proyecto…']) + buttons,
+    norepo: () => head('nzt-ai · <span class="dim">sin git</span>') + treeBox(strip(tree({ specs: true, smods: true })), 'specs/mods/nzt-files.md')
+      + fileHead('specs/mods/nzt-files.md', `${kind('Markdown')} · 14 KB · 162 líneas`) + viewer(MD, 'nzt-files.md') + buttons,
+  };
+
+  // Lo que el mod escribe a mano en las filas fijas: qué líneas se ven y cuánto árbol queda afuera.
+  const track = card => {
+    const win = card.querySelector('.view'), pos = card.querySelector('[data-pos]');
+    if (win && pos) {
+      const update = () => {
+        const all = win.querySelectorAll('.ln'), r = win.getBoundingClientRect();
+        const seen = [...all].filter(l => { const b = l.getBoundingClientRect(); return b.bottom > r.top + 1 && b.top < r.bottom - 1; });
+        const first = [...all].indexOf(seen[0]), fits = win.scrollHeight <= win.clientHeight + 1;
+        const total = pos.hasAttribute('data-big') ? '5.000 · sigue' : all.length;
+        pos.innerHTML = fits ? `<span>${all.length} líneas</span><span></span>`
+          : `<span>líneas ${first + 1}–${first + seen.length} de ${total}</span><span><button class="btn plain" data-move="-1">k ▲</button> <button class="btn plain" data-move="1">j ▼</button></span>`;
+      };
+      win.addEventListener('scroll', update); update();
+    }
+    const t = card.querySelector('.tree');
+    if (t) {
+      const up = t.querySelector('.edge.up'), down = t.querySelector('.edge.down');
+      const nodes = [...t.querySelectorAll('.node')];
+      const update = () => {
+        const r = t.getBoundingClientRect();
+        const above = nodes.filter(e => e.getBoundingClientRect().top < r.top - 1).length;
+        const below = nodes.filter(e => e.getBoundingClientRect().bottom > r.bottom + 1).length;
+        up.style.display = above ? 'block' : 'none'; down.style.display = below ? 'block' : 'none';
+        up.textContent = `↑ ${above} más`; down.textContent = `↓ ${below} más`;
+      };
+      const on = t.querySelector('.node.on');
+      if (on) t.scrollTop = on.offsetTop - 2 * 20; // .tree es el offsetParent: dos filas de aire arriba
+      t.addEventListener('scroll', update); update();
+    }
+  };
+
+  // Clic en el árbol: qué estado del mockup muestra cada fila (no hay más que estos).
+  const GO = { 'specs/mods/nzt-files.md': 'md', 'mods/nzt-changes/hooks/turn.ts': 'code', 'Plan/state.json': 'json',
+    'node_modules': 'many', 'presentation/logo.png': 'bin', 'package-lock.json': 'big', 'presentation/old-logo.png': 'del',
+    'secrets': 'err', 'specs': 'md', 'mods': 'code', 'Plan': 'json', 'presentation': 'bin' };
+
+  const parse = () => {
+    const h = new URLSearchParams(location.hash.slice(1));
+    return { state: STATES[h.get('state')] ? h.get('state') : 'md', place: h.get('place') === 'inline' ? 'inline' : 'dock' };
+  };
+  const go = patch => { const s = { ...parse(), ...patch }; location.hash = `state=${s.state}&place=${s.place}`; };
+  const show = () => {
+    const { state, place } = parse();
+    const dock = document.getElementById('dock');
+    dock.innerHTML = `<section class="card" data-state="${state}" style="--rows:${place === 'dock' ? 40 : 24};--tree-rows:${place === 'dock' ? 15 : 7}">${STATES[state]()}</section>`;
+    track(dock.querySelector('.card'));
+    document.querySelectorAll('.states a').forEach(a => a.toggleAttribute('aria-current', a.dataset.state ? a.dataset.state === state : a.dataset.place === place));
+  };
+  document.addEventListener('click', ev => {
+    const a = ev.target.closest('.states a');
+    if (a) { ev.preventDefault(); go(a.dataset.state ? { state: a.dataset.state } : { place: a.dataset.place }); return; }
+    const move = ev.target.closest('[data-move]');
+    if (move) { const win = document.querySelector('.view'); win.scrollTop += +move.dataset.move * 20; return; }
+    const n = ev.target.closest('.node[data-path]');
+    if (n && GO[n.dataset.path]) go({ state: GO[n.dataset.path] });
+  });
+  addEventListener('hashchange', show); show();
+</script>
+</body>
+</html>

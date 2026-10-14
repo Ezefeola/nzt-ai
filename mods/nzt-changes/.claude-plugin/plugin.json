@@ -1,0 +1,16 @@
+{
+  "name": "nzt-changes",
+  "version": "0.4.0",
+  "description": "Step through the last turn's edits or the project's changes against HEAD, one diff at a time",
+  "author": { "name": "Ezefeola" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The language the pane speaks: es (español) or en (English)",
+      "default": "es",
+      "options": ["es", "en"]
+    }
+  }
+}

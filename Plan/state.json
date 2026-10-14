@@ -1,17 +1,38 @@
 {
   "version": 1,
-  "updated": "2026-10-14T20:00:00Z",
-  "goal": "Rama nzt-mods desde main con lo hecho (fases en el estado, mods nzt-state y nzt-context), commiteada y pusheada; se sigue afinando ahí.",
+  "updated": "2026-10-14T22:00:00Z",
+  "goal": "Mod nuevo (nombre tentativo nzt-files): explorar el proyecto desde Claude Code como la barra de VS Code, navegar carpetas y ver archivos; solo lectura, sin editar. Rama nzt-mods.",
   "phases": [
-    { "name": "ship", "status": "done", "units": [
-      { "id": 117, "do": "Rama nzt-mods, dos commits (estado con fases D61/D62; capa de mods D63 + nzt-state + nzt-context 0.2.0) y push a origin", "status": "done", "detail": "Plan/state.real.json queda sin commitear. El merge a main lo hace el usuario a mano." }
+    { "name": "discovery", "status": "done", "units": [
+      { "id": 141, "do": "Spec specs/mods/nzt-files.md: preguntas de definición (ubicación, qué se ve, qué se oculta, abrir en editor) y reglas", "status": "done", "detail": "Q-01 árbol+archivo a la vez, Q-02 solo .git oculto, Q-03 sin editor (pendiente: editor según proyecto, ej. Visual Studio para .NET), Q-04 marcas git sí; reglas 'propuesta del agente' se confirman con el mockup" }
+    ] },
+    { "name": "ux", "status": "done", "units": [
+      { "id": 142, "do": "Mockup HTML del panel (árbol + visor) en specs/mods/nzt-files.html y sección Diseño de la spec", "status": "done", "detail": "12 estados x dock 40 / inline 24 (hash state=..&place=..); árbol 15/7 filas, visor 19/11; 320/800 sin scroll H, alto igual en todos, AA; Q-05 confirma propuestas; falta que el usuario lo mire" }
+    ] },
+    { "name": "build", "status": "done", "units": [
+      { "id": 143, "do": "Construir el árbol navegable y el visor con scroll, con tests; copia a dev-mods", "status": "done", "detail": "mods/nzt-files 0.1.0: tree.ts puro, register.tsx con todo $; 26/26 tests, tsc (scratchpad tsc-files), validate OK; copia en dev-mods 18601fef/nzt-files igual al repo; SPEC-CONFLICT >4 MiB en RN-files-grande esperando al usuario; no cargado en vivo todavía" },
+      { "id": 144, "do": "README del mod, catálogo de specs/nzt-mods.md, README del repo y marketplace (abrir en editor quedó afuera por Q-03)", "status": "done", "detail": "Hechos los 4; validate del marketplace OK; Q-06 (A) resolvió el SPEC-CONFLICT: RN-files-muy-grande nueva. Hallado: README de nzt-changes dice que git ignora .claude-plugin/types y el .gitignore no lo hace (reportado, no tocado)" }
+    ] },
+    { "name": "verify", "status": "done", "units": [
+      { "id": 145, "do": "Validate, tsc, tests y carga en vivo; el usuario acepta o pide cambios", "status": "done", "detail": "Cargado en vivo, /nzt-files abrió al costado; 'Genial se ve bien!'; ACEPTADA por el usuario 2026-10-14 (respuesta 'Sí, lo acepto')" }
+    ] },
+    { "name": "close", "status": "done", "units": [
+      { "id": 146, "do": "Cerrar la feature con references/close.md de nzt-plan: marcas, documentos, historia", "status": "done", "detail": "Sin marcas; estado 'aceptado', RN-files-idioma corregida (opción del mod), notas técnicas, Tests e Historia en la spec; catálogo 'aceptado y cerrado'. Sin medir: NFR de 20.000 archivos" }
+    ] },
+    { "name": "docs", "status": "done", "units": [
+      { "id": 147, "do": "Una carpeta por mod en specs/mods/<mod>/ con spec.md y mockup.html; actualizar toda referencia a las rutas viejas", "status": "done", "detail": "4 carpetas (git mv para state y context); referencias al día en nzt-mods.md (sec. 2, 3, 4, 5), nzt-core.md, specs, comentarios de mockups y README; datos de ejemplo de los mockups sin tocar" },
+      { "id": 148, "do": "Revisar mods/nzt-state/README.md: estructura común de los 4 README y contenido al día con su spec", "status": "done", "detail": "Estructura: título+versión/spec, qué es+diagrama, Es opcional, Cómo se usa, Dónde aparece, Idioma, Instalación, Desarrollo. nzt-state: sumados Cómo se usa (clics, personaje, porcentaje) y Dónde aparece (espera sin lugar, 2 s)" },
+      { "id": 149, "do": "Revisar mods/nzt-context/README.md con la estructura común", "status": "done", "detail": "Reordenado (Cómo se usa con Animaciones y Qué le dice al agente; Dónde aparece); sumado lo de la spec que faltaba: cede la banda a una encuesta, un fallo no frena" },
+      { "id": 150, "do": "Revisar mods/nzt-changes/README.md con la estructura común (su frase sobre .claude-plugin/types es correcta: el motor deja un .gitignore '*' ahí)", "status": "done", "detail": "Línea de versión y spec; final de Desarrollo alineado; teclas coinciden con RN-cambios-teclas" },
+      { "id": 151, "do": "Revisar mods/nzt-files/README.md con la estructura común", "status": "done", "detail": "Línea de versión, diagrama con specs/mods/<mod>/, RePág/AvPág, frase de tipos correcta; enlaces de los 4 README verificados; validate del marketplace OK" }
     ] }
   ],
   "approved": true,
-  "waiting_on": null,
+  "autonomy": { "units": [146, 147, 148, 149, 150, 151], "keep_stops": [] },
+  "waiting_on": "Corrida terminada. Pendiente para después: abrir en el editor según el proyecto (Sin determinar de specs/mods/nzt-files/spec.md). Próxima corrida, ids desde 152",
   "notes": [
-    "Usuario 2026-10-14: trabajar sobre la rama nzt-mods ('NZT MODS' tiene espacio, no es nombre de rama válido); él mergea a main a mano al terminar.",
-    "Corrida anterior 113-116 (nzt-context 0.2.0, diseño 'Zonas a la vista' + 4 animaciones) cerrada; usuario la vio en vivo y aprobó 2026-10-14.",
-    "Plan/state.real.json viejo, sin commitear; borrar solo con ok del usuario. Escritorio sin ver en vivo; fallback ui.fault sin test."
+    "API 2.1.296 (types/claude-code.d.ts del plugin-authoring): $.fs.list/read/stat para el árbol y el visor; $.process.run podría abrir en editor (sin probar). Todo lo que usa $ va en register.tsx.",
+    "Probar en vivo: esta sesión (18601fef) carga mods de ~/.claude/dev-mods/18601fef-.../ (copia de nzt-files ahí); el motor pasa rutas con \\ a fs.*; ui.find con texto string busca subcadena.",
+    "Rama nzt-mods sin commitear (el usuario mergea a main). Plan/state.real.json viejo: borrar solo con su ok."
   ]
 }

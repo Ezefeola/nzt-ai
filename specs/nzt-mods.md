@@ -111,6 +111,8 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 |---|---|---|---|---|
 | `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.3.0, en `mods/nzt-state/` |
 | `nzt-context` | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
+| `nzt-changes` | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios), en `mods/nzt-changes/` |
+| `nzt-files` | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0, en `mods/nzt-files/` |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
 cambia las dos.
