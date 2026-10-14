@@ -143,6 +143,21 @@ dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 manejar, y nada que dependa de un mecanismo que Codex no tiene. El detalle está en
 [`installer/README.md`](installer/README.md).
 
+## Mods
+
+NZT trae **mods**: extensiones de la interfaz de Claude Code que hacen visible lo que el
+método produce. **Son opcionales**: instalar NZT no instala ninguno y el método funciona
+completo sin ellos. Existen solo para Claude Code, porque Codex no tiene mods.
+
+| Mod | Qué hace | Instalación |
+|---|---|---|
+| [`nzt-state`](mods/nzt-state/README.md) | Panel lateral con el plan y el estado de la corrida, leído de `Plan/state.json` y actualizado en vivo | `/plugin install nzt-state --marketplace Ezefeola/nzt-ai` |
+| [`nzt-context`](mods/nzt-context/README.md) | Barra del contexto consumido encima del prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | `/plugin install nzt-context --marketplace Ezefeola/nzt-ai` |
+
+La línea se escribe en una sesión de Claude Code en la terminal. Más adelante, el instalador
+va a preguntar si se instalan también los mods. Cómo se arma un mod y qué tiene que traer
+está en [`specs/nzt-mods.md`](specs/nzt-mods.md).
+
 ## Qué no hace
 
 Es tan importante como lo otro:
@@ -160,7 +175,8 @@ Es tan importante como lo otro:
 ```
 core/        kernel.md + un adapter por proveedor
 skills/      el árbol de skills (anidado acá, plano al instalarse)
-specs/       nzt-core.md — la spec fundacional, y la del instalador
+specs/       nzt-core.md — la spec fundacional, la del instalador, la de los mods y mods/ con una por mod
+mods/        los mods de Claude Code, uno por carpeta (opcionales)
 installer/   el CLI que instala, con sus comprobaciones
 evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea

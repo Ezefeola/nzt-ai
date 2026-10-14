@@ -16,7 +16,8 @@ conocer, no existe en Codex, y namespacea las skills (`nzt:nzt-build`) rompiendo
 que nombran las tablas de ruteo. Lo que se instala son **skills sueltas en la carpeta de
 usuario** y un bloque en el archivo de instrucciones. El único plugin del repo es
 `dist/plugin/`, que existe para que `claude plugin eval` tenga un target (D23) y **no se
-instala nunca**.
+instala nunca**. Los mods de `mods/` sí son plugins, pero son una capa aparte y opcional
+que el instalador todavía no toca (D63, `specs/nzt-mods.md` sección 6).
 
 ## 2. Destinos de instalación
 

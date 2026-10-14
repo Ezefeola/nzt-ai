@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "updated": "2026-10-14T12:00:00Z",
+  "goal": "Estado de prueba del panel: varias fases con unidades pendientes, hechas y descartadas.",
+  "phases": [
+    { "name": "analysis", "status": "done", "units": [
+      { "id": 1, "do": "Relevar el pedido y escribir el alcance", "status": "done", "detail": "Alcance aprobado." },
+      { "id": 2, "do": "Spec de login", "status": "done", "detail": "Spec al día." },
+      { "id": 3, "do": "Spec de recuperar la contraseña", "status": "dropped", "detail": "El usuario la sacó del alcance." }
+    ] },
+    { "name": "architecture", "status": "done", "units": [
+      { "id": 4, "do": "Elegir el stack y registrar la decisión", "status": "done", "detail": "ADR-001 escrito." },
+      { "id": 5, "do": "Modelo de dominio", "status": "done", "detail": "Diagrama incluido." }
+    ] },
+    { "name": "ux", "status": "dropped", "units": [
+      { "id": 6, "do": "Maqueta de la pantalla de login", "status": "dropped", "detail": "Se usa el diseño existente." }
+    ] },
+    { "name": "build", "status": "doing", "units": [
+      { "id": 7, "do": "Endpoint de login", "status": "done", "detail": "Tests verdes." },
+      { "id": 8, "do": "Pantalla de login", "status": "doing", "detail": "Formulario armado; falta el manejo de errores." },
+      { "id": 9, "do": "Cerrar sesión", "status": "todo", "detail": "" },
+      { "id": 10, "do": "Recordarme en este equipo", "status": "dropped", "detail": "Pasa a la próxima versión." }
+    ] },
+    { "name": "verify", "status": "todo", "units": [
+      { "id": 11, "do": "Plan de pruebas del login", "status": "todo", "detail": "" },
+      { "id": 12, "do": "Correr las pruebas y registrar la evidencia", "status": "todo", "detail": "" }
+    ] },
+    { "name": "ship", "status": "todo", "units": [
+      { "id": 13, "do": "Release 1.0 y changelog", "status": "todo", "detail": "" }
+    ] }
+  ],
+  "approved": true,
+  "autonomy": { "units": [8, 9], "keep_stops": [9] },
+  "waiting_on": null,
+  "notes": [
+    "Estado de prueba: no es un plan real.",
+    "Cubre fases hechas, en curso, pendientes y descartadas, y unidades en cada estado."
+  ]
+}

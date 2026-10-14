@@ -1,0 +1,17 @@
+{
+  "name": "nzt",
+  "owner": { "name": "Ezefeola" },
+  "description": "NZT's optional mods for Claude Code (see specs/nzt-mods.md)",
+  "plugins": [
+    {
+      "name": "nzt-state",
+      "source": "./mods/nzt-state",
+      "description": "Live pane with the NZT plan and state from Plan/state.json"
+    },
+    {
+      "name": "nzt-context",
+      "source": "./mods/nzt-context",
+      "description": "Context-used bar above the prompt with the NZT kernel's 20/30/40 marks"
+    }
+  ]
+}
