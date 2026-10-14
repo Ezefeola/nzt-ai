@@ -75,22 +75,29 @@ user anything.
   "version": 1,
   "updated": "2026-09-16T14:22:00Z",
   "goal": "one line: what this run is for",
-  "phase": "build",
+  "phases": [{ "name": "build", "status": "doing", "units": [
+    { "id": 4, "do": "one line", "status": "doing", "detail": "where you stopped" }] }],
   "approved": true,
-  "units": [{ "id": 1, "do": "one line", "status": "doing", "detail": "where you stopped" }],
-  "autonomy": { "units": [2, 3], "keep_stops": [3] },
+  "autonomy": { "units": [4, 5], "keep_stops": [5] },
   "waiting_on": "what you are blocked on, or null",
   "notes": ["at most 3 short items"]
 }
 ```
 
 - `status` is `todo`, `doing`, `done` or `dropped`. At most one unit is `doing`.
+- `phases` are the phases `nzt` chose, in run order, with the same statuses: the one `doing`
+  is the current phase, a skipped one is not listed. **Each unit lives in its phase's
+  `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
+  phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
+  next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
+  A state with `phase`, or with `units` at the top, is converted on its next write.
 - `approved` is the lock on the main stop: without `true`, nothing executes.
 - `autonomy` records the batch the user selected: which units run without stopping, and
   which stops are kept anyway. **Absent or empty means accompanied.** Write it when the
   user selects it, not when they approve the plan.
-- Write the file when a unit ends, not while you are inside one. Rewrite `units` when the
-  user changes the plan.
+- Write the file when a unit ends, not while you are inside one. Rewrite `phases` when the
+  user changes the plan. **A new run rewrites the file** with its own goal, phases and
+  units, ids counting on from the last run; inside a run, nothing `done` or `dropped` goes.
 - **Write it for a session that has none of this conversation.** The test is literal: if
   picking the work up again would need something that exists only in the chat — a decision
   taken out loud, where a unit actually stopped, what it is waiting on — it goes in the
