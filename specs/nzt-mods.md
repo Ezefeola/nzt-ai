@@ -45,7 +45,7 @@ Un mod existe solo para Claude Code. Si el instalador ofrece mods, al elegir Cod
 ofrece y lo dice; no los instala a medias.
 
 ### RN-mod-documentado · origin: usuario 2026-10-13
-Un mod no entra al repo sin su spec en `specs/mods/<mod>.md`, su `README.md` y su fila en
+Un mod no entra al repo sin su spec en `specs/mods/<mod>/spec.md`, su `README.md` y su fila en
 el catálogo (sección 5 y `README.md` del repo).
 
 ### RN-mod-lee-formatos-viejos · origin: D63 (propuesta del agente, aceptada por el usuario 2026-10-14)
@@ -72,7 +72,9 @@ nzt-ai/
 │     └─ README.md                 # para quien lo usa: qué es, cómo se instala
 ├─ specs/
 │  ├─ nzt-mods.md                  # este documento
-│  └─ mods/<mod>.md                # la spec de la feature de cada mod
+│  └─ mods/<mod>/                  # una carpeta por mod, con el mismo nombre que en mods/
+│     ├─ spec.md                   # la spec de la feature del mod
+│     └─ mockup.html               # su mockup, si lo tiene
 └─ .claude-plugin/marketplace.json # el repo como marketplace: una entrada por mod (sección 6)
 ```
 
@@ -84,14 +86,17 @@ nzt-ai/
   Se versiona el contrato propio del mod (`types/index.d.ts`).
 - **`mods/` no entra al build de las skills.** `install/build.*` arma `dist/` desde
   `skills/` y `core/`; un mod no es una skill y no se aplana.
-- **La spec del mod está en `specs/mods/`, no adentro del mod.** Las specs del repo viven
-  juntas; dentro del mod va el `README.md`, que es documentación de uso.
+- **La spec del mod está en `specs/mods/<mod>/`, no adentro del mod.** Las specs del repo
+  viven juntas; dentro del mod va el `README.md`, que es documentación de uso. Cada mod tiene
+  su carpeta, con `spec.md` y, si se diseñó con mockup, `mockup.html` al lado (usuario,
+  2026-10-14).
 
 ## 4. Qué lleva cada mod
 
 | Pieza | Qué es | Quién la lee |
 |---|---|---|
-| `specs/mods/<mod>.md` | Qué hace el mod, sus reglas, qué lee, sus estados, fuera de alcance | Quien lo cambia |
+| `specs/mods/<mod>/spec.md` | Qué hace el mod, sus reglas, qué lee, sus estados, fuera de alcance | Quien lo cambia |
+| `specs/mods/<mod>/mockup.html` | Cómo se ve, estado por estado; solo si el mod se diseñó con mockup | Quien lo cambia y quien lo revisa |
 | `mods/<mod>/README.md` | Qué muestra, cómo se instala y cómo se desinstala | Quien lo usa |
 | Fila en el catálogo | Nombre, una línea, estado | Quien instala NZT |
 | `version` en `plugin.json` | La versión del mod | El instalador, `claude plugin update` |
@@ -104,8 +109,8 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 
 | Mod | Qué hace | Lee | Spec | Estado |
 |---|---|---|---|---|
-| `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state.md` | construido, 0.3.0, en `mods/nzt-state/` |
-| `nzt-context` | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context.md` | construido, 0.2.0, en `mods/nzt-context/` |
+| `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.3.0, en `mods/nzt-state/` |
+| `nzt-context` | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
 cambia las dos.

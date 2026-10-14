@@ -655,7 +655,7 @@ nzt-ai/
 │  ├─ nzt-core.md               # este documento
 │  ├─ nzt-installer.md          # el instalador
 │  ├─ nzt-mods.md               # qué es un mod y qué trae cada uno (D63)
-│  └─ mods/<mod>.md             # la spec de cada mod
+│  └─ mods/<mod>/               # la spec de cada mod (spec.md) y su mockup (mockup.html)
 ├─ mods/<mod>/                  # los mods de Claude Code, opcionales (D63)
 ├─ .claude-plugin/
 │  └─ marketplace.json          # el repo como marketplace de los mods
@@ -1798,7 +1798,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     por el usuario el 2026-10-14): el estado tiene un solo dueño.
   - **El repo es el marketplace de los mods** (`.claude-plugin/marketplace.json` en la
     raíz), y cada mod lleva su propia versión (aceptadas por el usuario el 2026-10-14).
-  - **Cada mod lleva su spec en `specs/mods/<mod>.md`, su `README.md` y su fila en el
+  - **Cada mod lleva su spec en `specs/mods/<mod>/spec.md`, su `README.md` y su fila en el
     catálogo** (`specs/nzt-mods.md` sección 5 y `README.md` del repo), pedido por el usuario.
   - **El nombre de la carpeta es el del plugin:** el panel queda `nzt-state` (usuario).
   - Opción descartada: meter el mod en `dist/plugin/`. Ese plugin existe solo para los evals

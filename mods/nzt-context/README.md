@@ -1,5 +1,7 @@
 # nzt-context
 
+> Versión **0.2.0** · spec en [`specs/mods/nzt-context/spec.md`](../../specs/mods/nzt-context/spec.md)
+
 Una barra de Claude Code, encima del prompt, que muestra cuánto contexto lleva consumido la
 sesión, con las marcas del 20, 30 y 40% que usa el kernel de NZT para recomendar limpiar.
 
@@ -12,7 +14,10 @@ contexto ━━━━━━━━━━━━━━━━━━━━┃━━�
 Codex no tiene mods. No lee ningún archivo del proyecto, así que sirve también en proyectos
 que no usan NZT.
 
-## Qué muestra
+## Cómo se usa
+
+No tiene comando: una vez instalada, la barra está siempre encima del prompt. Se pliega
+con `ctrl+x ctrl+a`, como cualquier banda sobre el prompt.
 
 - Una barra de 0 a 100% de la ventana de contexto del modelo, la misma cifra que muestran la
   status line y `/context`, con el porcentaje y los tokens usados sobre el total.
@@ -25,7 +30,7 @@ que no usan NZT.
 - Antes de la primera respuesta del modelo, y después de un `/clear`, dice **sin lectura
   todavía** en vez de dibujar un 0%.
 
-## Animaciones
+### Animaciones
 
 Corren en tu terminal o en la app de escritorio, sin consumir tokens:
 
@@ -39,12 +44,7 @@ Corren en tu terminal o en la app de escritorio, sin consumir tokens:
 Se apagan todas con la opción **animations** en `off`; la barra queda quieta y muestra lo
 mismo. Si la parte animada falla en una superficie, la barra se dibuja quieta sola.
 
-Se actualiza en cada paso del agente, no solo al terminar el turno. Entre una respuesta y
-otra la cifra no cambia: Claude Code la mide por respuesta. En una terminal angosta saca
-primero el rótulo y después los tokens; el porcentaje y las marcas quedan siempre. La banda
-se pliega con `ctrl+x ctrl+a`, como cualquier banda sobre el prompt.
-
-## Qué le dice al agente
+### Qué le dice al agente
 
 Con cada prompt, el mod le agrega al agente una línea que el usuario no ve, en inglés:
 
@@ -57,6 +57,17 @@ unidad: con el mod instalado, el agente reporta una cifra real en vez de decir q
 señal. Si en mitad de un turno largo —una tanda autónoma— el consumo cruza una marca, se lo
 avisa una vez, junto al siguiente resultado de herramienta. Cuesta menos de 40 tokens por
 prompt.
+
+## Dónde aparece
+
+En la banda encima del prompt, en la terminal y en la app de escritorio. Se actualiza en
+cada paso del agente, no solo al terminar el turno; entre una respuesta y otra la cifra no
+cambia, porque Claude Code la mide por respuesta.
+
+En una terminal angosta saca primero el rótulo y después los tokens; el porcentaje y las
+marcas quedan siempre. Mientras Claude Code muestra una encuesta en esa banda, la barra no
+se dibuja y le deja el lugar. Si la cifra no llega o la lectura falla, dice que no hay
+lectura: un fallo del mod nunca frena un prompt ni un turno.
 
 ## Idioma y animaciones
 
@@ -92,9 +103,13 @@ claude plugin test mods/nzt-context       # los tests de hooks/*.test.tsx
 claude --plugin-dir mods/nzt-context      # una sesión con el mod cargado desde la carpeta
 ```
 
-El chequeo de tipos (`tsc -p mods/nzt-context/tsconfig.json`) necesita los tipos del motor
-en `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la
-carpeta, y git no los sigue.
+Que los tests pasen no prueba que el módulo cargue en una sesión: probalo siempre cargado
+de verdad. Todo lo que use `$` va en `hooks/register.tsx`, porque la sesión no acepta `$`
+pasado a una función importada de otro archivo.
 
-La spec del comportamiento está en [`specs/mods/nzt-context.md`](../../specs/mods/nzt-context.md),
+El chequeo de tipos (`tsc -p mods/nzt-context/tsconfig.json`) necesita los tipos del motor
+en `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta,
+con su propio `.gitignore`, así que git no los sigue.
+
+La spec, con sus reglas, está en [`specs/mods/nzt-context/spec.md`](../../specs/mods/nzt-context/spec.md),
 y las reglas de todos los mods, en [`specs/nzt-mods.md`](../../specs/nzt-mods.md).
