@@ -517,6 +517,11 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
   del plan, en `dropped`. Con la última unidad del plan terminada, todas quedan `done` o
   `dropped`.
 - `approved` es el candado del freno principal: sin `true`, no se ejecuta nada.
+- `notes` son, como mucho, tres frases cortas con lo que una sesión nueva necesita para
+  retomar y que no es de ninguna unidad: un dato ya verificado, una restricción del entorno,
+  una advertencia (commits sin push, un archivo que no se borra sin el ok del usuario). No
+  son un log. El panel `nzt-state` las muestra como **Notas para retomar** (usuario,
+  2026-10-15).
 - `autonomy` registra la tanda autorizada (T22): qué unidades se corren sin frenar y qué
   frenos se conservan igual. **Ausente o vacío significa acompañado**, que es el default.
   Se escribe cuando el usuario la selecciona, no cuando aprueba el plan.
@@ -1762,6 +1767,12 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     estado y fase actual, y sacar `phase`. Aplicado en las unidades 68 a 72.
   - **Ampliada por D62:** las unidades pasan a vivir dentro de su fase. La forma de
     `phases` y sus estados siguen como acá.
+  - **Corregido el 2026-10-15 (unidad 163):** `core/kernel.md` no decía en forma explícita
+    "como máximo una en `doing`" y se deducía de *"the one `doing`"*. La deducción falló:
+    el estado de este repo quedó con `ux`, `build` y `verify` en `doing`, y el panel iluminó
+    las tres con el personaje de UX (`specs/mods/nzt-state/testing/2026-10-15-dibujo.md`
+    E-01). Ahora el kernel lo dice con las mismas palabras que esta spec. Pedido por el
+    usuario.
 - **D62.** **Cada unidad vive dentro de su fase, y una corrida nueva reescribe el estado.**
   Lo que la forzó: con D61 el panel `nzt-state` sabía qué fases tenía la corrida pero no a
   cuál pertenecía cada unidad, y `Plan/state.json` de este repo juntaba unas 65 unidades de

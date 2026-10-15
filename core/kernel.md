@@ -85,8 +85,8 @@ user anything.
 ```
 
 - `status` is `todo`, `doing`, `done` or `dropped`. At most one unit is `doing`.
-- `phases` are the phases `nzt` chose, in run order, with the same statuses: the one `doing`
-  is the current phase, a skipped one is not listed. **Each unit lives in its phase's
+- `phases` are the phases `nzt` chose, in run order, with the same statuses and **at most
+  one `doing`**: that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
   `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
   phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
   next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
