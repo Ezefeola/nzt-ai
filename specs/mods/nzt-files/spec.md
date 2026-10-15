@@ -243,8 +243,8 @@ AvPág (RN-files-teclas).
 
 ## Tests
 
-`claude plugin test mods/nzt-files`: 26 tests (18 de la lógica pura del árbol, las marcas y la
-ventana del archivo; 8 del panel dibujado: árbol al abrir, abrir y cerrar carpetas, archivo con
+`claude plugin test mods/nzt-files`: 27 tests (18 de la lógica pura del árbol, las marcas y la
+ventana del archivo; 9 del panel dibujado: árbol al abrir, aire bajo la pestaña, abrir y cerrar carpetas, archivo con
 detalle, binario, borrado, sin repositorio, carpeta sin permiso, scroll y cierre con el comando).
 Pasar estos tests no prueba que el módulo cargue en una sesión; eso se probó en vivo el
 2026-10-14.
@@ -252,6 +252,13 @@ Pasar estos tests no prueba que el módulo cargue en una sesión; eso se probó 
 ## Historia
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba, como en `nzt-changes`.
+
+### 2026-10-15 · Aire bajo la pestaña — 0.1.1
+Type:     modify
+Change:   una fila en blanco entre la pestaña y la tarjeta; la tarjeta mide una fila menos y sigue llenando el cuerpo.
+Reason:   el usuario, al ver los paneles en vivo: "no debe estar tan pegado" a la selección de pestañas.
+Impact:   RN-mod-pestaña de `specs/nzt-mods.md` (regla común); RN-files-alto cuenta esa fila.
+Decision: en los cuatro mods con panel, no solo en `nzt-state` (usuario: "dale que no esten pegados a los tabs").
 
 ### 2026-10-14 · Explorador del proyecto — 0.1.0
 Type:     add

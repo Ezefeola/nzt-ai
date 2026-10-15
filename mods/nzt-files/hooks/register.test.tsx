@@ -101,6 +101,13 @@ test('the pane opens on the project: folders first, .git hidden, marks and dots 
   expect(await ui.find({ type: 'Text', text: / 2 cambiados$/ })).toBeDefined()
 })
 
+test('the card keeps a blank row under the pane tabs and still fills the body', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
+})
+
 test('a folder opens with a click and its file shows beneath, numbered, with its detail', async ($, on) => {
   fakeDisk(on, DISK)
   await openPane($)

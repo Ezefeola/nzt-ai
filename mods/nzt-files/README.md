@@ -1,6 +1,6 @@
 # nzt-files
 
-> Versión **0.1.0** · spec en [`specs/mods/nzt-files/spec.md`](../../specs/mods/nzt-files/spec.md)
+> Versión **0.1.1** · spec en [`specs/mods/nzt-files/spec.md`](../../specs/mods/nzt-files/spec.md)
 
 Un panel lateral de Claude Code para **recorrer el proyecto como el explorador de VS Code**:
 arriba el árbol de carpetas y archivos, abajo el archivo elegido, los dos a la vez. Sirve

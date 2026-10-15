@@ -294,7 +294,8 @@ export const register: Register = (on, options) => {
     const files = git.kind === 'ok' ? git.files : {}
     // Inside the card's border and padding.
     const width = Math.max(30, e.props.bodyColumns - 4)
-    const height = e.props.scroll.bodyRows
+    // One row less than the body: the blank row above the card keeps it off the pane's tabs.
+    const height = e.props.scroll.bodyRows - 1
     const treeRows = Math.min(TREE_ROWS[e.props.placement], Math.max(3, height - CARD_ROWS - MIN_VIEW_ROWS))
     const viewRows = Math.max(MIN_VIEW_ROWS, height - CARD_ROWS - treeRows)
 
@@ -328,7 +329,7 @@ export const register: Register = (on, options) => {
     if (known[''] === undefined) {
       void refresh($)
       return (
-        <Box flexDirection="column" height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
+        <Box flexDirection="column" marginTop={1} height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
           {heading}
           <Box flexDirection="column" flexGrow={1}>
             {message(t.reading)}
@@ -465,7 +466,7 @@ export const register: Register = (on, options) => {
     }
 
     return (
-      <Box flexDirection="column" height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
+      <Box flexDirection="column" marginTop={1} height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
         {heading}
         <Box flexDirection="column" height={treeRows} overflow="hidden">
           {tree}
