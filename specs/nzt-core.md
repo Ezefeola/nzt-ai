@@ -49,7 +49,8 @@ una habilidad a la persona en lugar de reemplazarla (sección 4.6).
 - Proveedores fuera de Claude Code y Codex CLI (Cursor, Gemini CLI, Copilot: v2).
 - Stacks fuera de .NET 10 y Blazor. La capa de stack de v1 cubre solo esos dos (4.5); el
   núcleo metodológico es agnóstico y no puede depender de ellos.
-- Automatizaciones por hooks o MCP.
+- Automatizaciones por hooks o MCP **en el núcleo**. Los mods de Claude Code son una capa
+  aparte y opcional que el método no necesita (D63, `specs/nzt-mods.md`).
 
 ## 3. Restricciones de plataforma (investigadas)
 
@@ -478,13 +479,15 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
   "version": 1,
   "updated": "2026-09-16T14:22:00Z",
   "goal": "Autenticación con refresh token",
-  "phase": "build",
-  "approved": true,
-  "units": [
-    { "id": 1, "do": "Spec de login", "status": "done" },
-    { "id": 2, "do": "Implementar login", "status": "doing", "detail": "falta refresh token" },
-    { "id": 3, "do": "Pruebas de Plan/specs/auth/testing/login.md", "status": "todo" }
+  "phases": [
+    { "name": "analysis", "status": "done", "units": [
+      { "id": 1, "do": "Spec de login", "status": "done" } ] },
+    { "name": "build", "status": "doing", "units": [
+      { "id": 2, "do": "Implementar login", "status": "doing", "detail": "falta refresh token" } ] },
+    { "name": "verify", "status": "todo", "units": [
+      { "id": 3, "do": "Pruebas de Plan/specs/auth/testing/login.md", "status": "todo" } ] }
   ],
+  "approved": true,
   "autonomy": { "units": [2, 3], "keep_stops": [3] },
   "waiting_on": "aprobación para seguir con la spec de registro",
   "notes": ["El proyecto no tiene CI todavía"]
@@ -493,7 +496,32 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
 
 - Se escribe al **terminar cada unidad**, no durante.
 - `status`: `todo`, `doing`, `done`, `dropped`. Como máximo una unidad en `doing`.
+- `phases` son las fases que `nzt` eligió para esta corrida, **en el orden en que corren**,
+  cada una con `name` (`analysis`, `architecture`, `ux`, `build`, `verify`, `ship`) y
+  `status`, con los mismos cuatro valores que las unidades. Como máximo una en `doing`: es
+  la fase actual, y no hay otro campo que la repita (D61). Una fase salteada no entra al
+  array; su porqué va en el plan. Al escribir el plan, la primera fase queda en `doing`, y
+  si el usuario cambia el plan, `phases` se reescribe.
+- **Cada unidad vive dentro de su fase**, en `units` de esa fase, en el orden en que se
+  ejecuta; no hay una lista de unidades aparte (D62). Una fase sin unidades todavía lleva
+  `units` vacío. Los ids son únicos en todo el archivo, y la unidad que se ejecuta es la
+  primera `todo` de la fase en `doing`.
+- **Una corrida nueva reescribe el estado**: con todas las unidades en `done` o `dropped`,
+  el pedido siguiente arranca su `goal`, sus `phases` y sus unidades, y lo de la corrida
+  anterior sale del archivo. Lo que queda de ella está en git y, si cerró una feature, en
+  `Docs/Product/history.md`. Los ids siguen la numeración, nunca vuelven a 1. Dentro de
+  una corrida, una unidad `done` o `dropped` no se borra.
+- **Cuando termina la última unidad de una fase, en la misma escritura del estado**, esa
+  fase pasa a `done` y la siguiente a `doing`. Una fase que todavía no tiene unidades
+  (el plan solo dibuja la forma de lo que viene) queda en `todo`; una que el usuario saca
+  del plan, en `dropped`. Con la última unidad del plan terminada, todas quedan `done` o
+  `dropped`.
 - `approved` es el candado del freno principal: sin `true`, no se ejecuta nada.
+- `notes` son, como mucho, tres frases cortas con lo que una sesión nueva necesita para
+  retomar y que no es de ninguna unidad: un dato ya verificado, una restricción del entorno,
+  una advertencia (commits sin push, un archivo que no se borra sin el ok del usuario). No
+  son un log. El panel `nzt-state` las muestra como **Notas para retomar** (usuario,
+  2026-10-15).
 - `autonomy` registra la tanda autorizada (T22): qué unidades se corren sin frenar y qué
   frenos se conservan igual. **Ausente o vacío significa acompañado**, que es el default.
   Se escribe cuando el usuario la selecciona, no cuando aprueba el plan.
@@ -628,7 +656,14 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 
 ```
 nzt-ai/
-├─ specs/nzt-core.md            # este documento
+├─ specs/
+│  ├─ nzt-core.md               # este documento
+│  ├─ nzt-installer.md          # el instalador
+│  ├─ nzt-mods.md               # qué es un mod y qué trae cada uno (D63)
+│  └─ mods/<mod>/               # la spec de cada mod (spec.md) y su mockup (mockup.html)
+├─ mods/<mod>/                  # los mods de Claude Code, opcionales (D63)
+├─ .claude-plugin/
+│  └─ marketplace.json          # el repo como marketplace de los mods
 ├─ core/
 │  ├─ kernel.md                 # fuente única del contenido de Capa 0
 │  ├─ adapter-claude.md         # agregados específicos de Claude Code
@@ -1709,6 +1744,78 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     cambian: son rutas de proyecto para comandos `dotnet`, no carpetas de componente.
   - Pedido por el usuario el 2026-10-11 ("hacé estos cambios", sobre el análisis que
     recomendaba la opción a); aplicado en las unidades 64 a 66.
+- **D61.** **El estado registra las fases de la corrida y su avance; `phase` desaparece.**
+  Lo que la forzó: `nzt` elige las fases (§4 de su router) pero nada las guardaba, y
+  `phase` se escribía una sola vez, al armar el plan, sin regla que la moviera. En este
+  repo la corrida de la capa genérica terminó con `"phase": "architecture"` después de
+  pasar por build, verify y ship, y el panel `nzt-state` no tenía cómo dibujar qué fases
+  aplican ni cuáles terminaron.
+  - **Forma:** `phases` es un array ordenado de `{ "name", "status" }`, con los estados de
+    las unidades y como máximo una en `doing`. El orden es el del array; la actual, la que
+    está en `doing`. Las reglas viven en §7.
+  - **`phase` se saca**, porque repetía lo que dice el `doing` y dos lugares que dicen lo
+    mismo se desincronizan (el mismo argumento de §7 para un solo archivo). Un estado
+    viejo con `phase` y sin `phases` se reconcilia al retomar: la próxima escritura arma
+    `phases` a partir del plan y de las unidades, y deja de escribir `phase`.
+  - **La fase avanza al terminar su última unidad**, en la misma escritura que cierra la
+    unidad, porque el estado se escribe al terminar unidades y no durante.
+  - Opciones descartadas: una lista de nombres más `phase` como la actual (las terminadas
+    se deducían del orden y `phase` seguía pudiendo quedar vieja), y una fase por unidad
+    (B: las fases sin unidades todavía no aparecían, y el plan solo detalla la fase en
+    curso).
+  - Pedido y aprobado por el usuario el 2026-10-13: la opción A, como array ordenado con
+    estado y fase actual, y sacar `phase`. Aplicado en las unidades 68 a 72.
+  - **Ampliada por D62:** las unidades pasan a vivir dentro de su fase. La forma de
+    `phases` y sus estados siguen como acá.
+  - **Corregido el 2026-10-15 (unidad 163):** `core/kernel.md` no decía en forma explícita
+    "como máximo una en `doing`" y se deducía de *"the one `doing`"*. La deducción falló:
+    el estado de este repo quedó con `ux`, `build` y `verify` en `doing`, y el panel iluminó
+    las tres con el personaje de UX (`specs/mods/nzt-state/testing/2026-10-15-dibujo.md`
+    E-01). Ahora el kernel lo dice con las mismas palabras que esta spec. Pedido por el
+    usuario.
+- **D62.** **Cada unidad vive dentro de su fase, y una corrida nueva reescribe el estado.**
+  Lo que la forzó: con D61 el panel `nzt-state` sabía qué fases tenía la corrida pero no a
+  cuál pertenecía cada unidad, y `Plan/state.json` de este repo juntaba unas 65 unidades de
+  varias corridas. El kernel dice que el estado nunca es un log, pero ninguna regla decía
+  qué pasaba con las unidades al empezar una corrida nueva (`nzt` solo dice que es nueva),
+  así que se acumulaban.
+  - **Forma:** cada elemento de `phases` lleva su `units`, en orden de ejecución; la lista
+    `units` de arriba desaparece. No se repite el nombre de la fase en cada unidad y
+    ninguna unidad puede nombrar una fase que no esté. Los ids son únicos en el archivo.
+  - **Corrida nueva:** con todo `done` o `dropped`, el estado se reescribe con la corrida
+    nueva sola. Lo anterior vive en git y, si cerró una feature, en
+    `Docs/Product/history.md` (D25), que es el log del proyecto. **Los ids siguen la
+    numeración**, porque la spec y los documentos citan unidades por número y un id reusado
+    las confundiría. Dentro de una corrida, nada `done` o `dropped` se borra (regla de
+    `nzt-plan`).
+  - Un estado con `units` arriba (D61 o anterior) se convierte en su próxima escritura,
+    como un `phase` viejo: cada unidad va a la fase a la que pertenece.
+  - Opción descartada: un campo `phase` en cada unidad (más carga en el archivo y una
+    fase que puede no estar en `phases`).
+  - Pedido por el usuario el 2026-10-13 ("que cada unidad vaya dentro de su fase", y la
+    limpieza al empezar corrida sobre la propuesta del agente, con los ids siguiendo).
+    Aplicado en las unidades 73 a 77; en este repo se limpió el estado dejando 68-72,
+    todavía sin commit, y 1-67 quedan en `e29d0c6`.
+- **D63.** **NZT trae mods: una capa aparte, opcional y solo de Claude Code.** Lo que la
+  forzó: el panel `nzt-state` se construyó fuera del repo (unidades 71 y 76) y el usuario
+  pidió que viva en el repo, documentado, y que más adelante el instalador ofrezca instalar
+  los mods globales. Eso choca con dos cosas escritas: la sección 2 dejaba *"automatizaciones
+  por hooks o MCP"* fuera de v1, y `specs/nzt-installer.md` dice *"sin plugins"*.
+  - **Cómo se resuelve:** el núcleo sigue sin plugins y sin hooks. Un mod es una capa aparte
+    —`mods/`, con su propia spec en `specs/nzt-mods.md`— que **el método no necesita**: nada
+    del kernel ni de las skills le pide algo que solo un mod da. La sección 2 lo dice ahora.
+  - **Solo Claude Code:** un mod es un plugin de *function hooks*, y Codex no tiene plugins.
+  - **Un mod lee los artefactos de NZT y no los escribe** (propuesta del agente, aceptada
+    por el usuario el 2026-10-14): el estado tiene un solo dueño.
+  - **El repo es el marketplace de los mods** (`.claude-plugin/marketplace.json` en la
+    raíz), y cada mod lleva su propia versión (aceptadas por el usuario el 2026-10-14).
+  - **Cada mod lleva su spec en `specs/mods/<mod>/spec.md`, su `README.md` y su fila en el
+    catálogo** (`specs/nzt-mods.md` sección 5 y `README.md` del repo), pedido por el usuario.
+  - **El nombre de la carpeta es el del plugin:** el panel queda `nzt-state` (usuario).
+  - Opción descartada: meter el mod en `dist/plugin/`. Ese plugin existe solo para los evals
+    (D23) y no se instala nunca.
+  - Pedido por el usuario el 2026-10-13. Spec en la unidad 78; traer el mod y el catálogo,
+    unidades 80 y 81; el instalador queda para otra corrida.
 
 ## 13. Revisión contra Temper v3
 
@@ -3107,7 +3214,13 @@ curiosidad.
 >   herramienta del host o en viñetas.
 > - **Carpeta del componente (D60):** es su raíz (solution o manifiesto, `src/`, `tests/`),
 >   nunca la de un proyecto de build; con un solo componente, la raíz del repo.
+> - **Fases en el estado (D61, 2026-10-13):** `Plan/state.json` lleva `phases`, ordenado y
+>   con estado por fase; `phase` desaparece. **D62:** cada fase lleva sus `units` y una
+>   corrida nueva reescribe el estado con lo suyo, con los ids siguiendo.
 >   `architecture.md` es obligatorio desde el primer stack, con la columna de carpeta.
+> - **Mods (D63, 2026-10-13):** capa aparte, opcional y solo de Claude Code, en `mods/`,
+>   especificada en `specs/nzt-mods.md`; cada mod con su spec en `specs/mods/`. El primero
+>   es el panel `nzt-state`. El instalador de mods queda para otra corrida.
 > - **Evals:** la última suite completa es la 24a (2026-10-07, juez sonnet: routing 0.97,
 >   stack 0.89, restraint 0.90; `Plan/mejoras/05-linea-base.md`). Lo posterior (D56-D59) se
 >   probó sobre el texto, sin evals, por decisión del usuario; los fixtures siguen con las

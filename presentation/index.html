@@ -150,12 +150,13 @@
         </div>
         <pre class="code-card" data-reveal><code>{
   <span class="code-key">"goal"</span>: <span class="code-string">"Crear Radar"</span>,
-  <span class="code-key">"phase"</span>: <span class="code-string">"build"</span>,
-  <span class="code-key">"approved"</span>: <span class="code-bool">true</span>,
-  <span class="code-key">"units"</span>: [
-    { <span class="code-key">"id"</span>: 3, <span class="code-key">"status"</span>: <span class="code-string">"done"</span> },
-    { <span class="code-key">"id"</span>: 4, <span class="code-key">"status"</span>: <span class="code-string">"todo"</span> }
+  <span class="code-key">"phases"</span>: [
+    { <span class="code-key">"name"</span>: <span class="code-string">"analysis"</span>, <span class="code-key">"status"</span>: <span class="code-string">"done"</span>, <span class="code-key">"units"</span>: [
+      { <span class="code-key">"id"</span>: 3, <span class="code-key">"status"</span>: <span class="code-string">"done"</span> } ] },
+    { <span class="code-key">"name"</span>: <span class="code-string">"build"</span>, <span class="code-key">"status"</span>: <span class="code-string">"doing"</span>, <span class="code-key">"units"</span>: [
+      { <span class="code-key">"id"</span>: 4, <span class="code-key">"status"</span>: <span class="code-string">"todo"</span> } ] }
   ],
+  <span class="code-key">"approved"</span>: <span class="code-bool">true</span>,
   <span class="code-key">"waiting_on"</span>: <span class="code-null">null</span>
 }</code></pre>
       </div>

@@ -5,7 +5,7 @@ description: Use when a plan has to be built, approved, changed, executed or res
 
 # Planning and execution
 
-The plan is the list of units in `Plan/state.json`. There is no separate plan file. The
+The plan is each phase's units in `Plan/state.json`. There is no separate plan file. The
 schema is in your instructions; do not restate it here.
 
 ## Cutting the work into units
@@ -31,7 +31,7 @@ is produced: the plan says what it delivers, not which files will end up existin
    obvious.
 2. Turn each phase into its units, in dependency order. **Verify's units go after the
    increment's last build unit, never between two**, unless the user asks for it.
-3. Write `goal`, `phase`, `units` and `approved: false` to `Plan/state.json`.
+3. Write `goal`, `phases` (the first `doing`, each with its units) and `approved: false`.
 4. Show the plan in the reply and ask for approval. Stop.
 
 Keep the plan to what you can see. Fifteen units written before the first spec exists is
@@ -79,7 +79,7 @@ Set `approved: true` only when the user approves it in this conversation. Silenc
 approval. A question about the plan is not approval.
 
 The user can change anything: reorder units, drop them, add them, change the goal. Rewrite
-`units` and keep asking until they approve. Units already `done` keep their `id` and their
+`phases` and keep asking until they approve. Units already `done` keep their `id` and their
 status; new units get new ids.
 
 **Accompanied is the default.** Offer autonomy once, with the plan, and not again:
@@ -95,10 +95,10 @@ status; new units get new ids.
 
 One unit per turn:
 
-1. Take the first `todo` unit. Set it to `doing`.
+1. Take the first `todo` unit of the phase in `doing`. Set it to `doing`.
 2. Load the skill that unit needs, per the routing table in your instructions.
 3. Do the unit, and mark progress where that phase marks it.
-4. Set it to `done`, update `updated`, write the file.
+4. Set it to `done`, update `updated`, advance `phases` if it closed its phase, write.
 5. Report, then stop.
 
 **A direct request or an approved plan authorises its ordinary steps.** Do not ask again

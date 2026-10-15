@@ -13,7 +13,8 @@ work and does not write specs, code or tests. It ends by handing off.
 If `Plan/state.json` exists, read it first, before asking the user anything.
 
 - A unit with `status: "doing"` → that is where you are. Report it and continue there.
-- All units `done` → the previous run finished. Treat the new request as a new run.
+- All units `done` → the previous run finished. Treat the new request as a new run: its
+  plan rewrites the state with that run alone, ids counting on from the last one.
 - `approved` is `false` → a plan was proposed and never approved. Show it again instead of
   writing a new one.
 - `waiting_on` is set → say what it was waiting on before proposing anything new.
@@ -62,6 +63,9 @@ changes what gets built:
 
 Be able to say in one line why you skipped each phase you skipped. A one-line change needs
 build and verify, nothing else. Skipping is normal; skipping silently is not.
+
+The phases you name become the run's `phases` in `Plan/state.json`, in this order; a
+skipped phase is not listed.
 
 ## 5. Hand off
 

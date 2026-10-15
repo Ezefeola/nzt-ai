@@ -1,0 +1,16 @@
+{
+  "name": "nzt-files",
+  "version": "0.1.1",
+  "description": "Browse the project like an editor's explorer: folders that open and close, git marks, and the chosen file beneath",
+  "author": { "name": "Ezefeola" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The language the pane speaks: es (español) or en (English)",
+      "default": "es",
+      "options": ["es", "en"]
+    }
+  }
+}
