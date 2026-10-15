@@ -48,6 +48,6 @@
   "notes": [
     "API 2.1.299 verificada: $.command.list() lista los comandos, $.command.run({command}) abre otro mod cuando la sesión está libre; Box tiene borderStyle/borderColor/backgroundColor/padding, Text color/negrita/cursiva.",
     "nzt-state, nzt-changes y nzt-files registran /<nombre>; nzt-context no tiene comando (banda sobre el prompt). 2026-10-15: nzt-changes 0.4.1 y nzt-files 0.1.1 instalados scope user desde el marketplace local nzt (idioma sin configurar = español).",
-    "2026-10-15: todo commiteado y pusheado en nzt-mods (pedido del usuario); PR nzt-mods -> main lo crea y confirma el usuario en GitHub (no hay gh en esta PC); con main al día los 5 mods se instalan desde el marketplace Ezefeola/nzt-ai. state.real.json viejo: borrar solo con ok del usuario. 159-164 pedidas 2026-10-15 ('todo junto, modo autónomo'); ux y build pasadas a done (error: 3 fases doing)."
+    "2026-10-15: PR #3 nzt-mods -> main mergeado por el usuario; v1.2.0 publicada y verificada (workflow release success, 6 binarios + SHA256SUMS + 4 install-*); los 5 mods se instalan desde el marketplace Ezefeola/nzt-ai (main). Trabajo nuevo: rama desde main. state.real.json viejo: borrar solo con ok del usuario. 159-164 pedidas 2026-10-15 ('todo junto, modo autónomo'); ux y build pasadas a done (error: 3 fases doing)."
   ]
 }
