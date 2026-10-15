@@ -22,6 +22,11 @@
       "name": "nzt-files",
       "source": "./mods/nzt-files",
       "description": "Browse the project like an editor's explorer: folders that open and close, git marks, and the chosen file beneath"
+    },
+    {
+      "name": "nzt-hub",
+      "source": "./mods/nzt-hub",
+      "description": "One pane with every NZT mod: what each is for, its version, a button that opens it, and the install command for the missing ones"
     }
   ]
 }

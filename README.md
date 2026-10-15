@@ -155,6 +155,7 @@ completo sin ellos. Existen solo para Claude Code, porque Codex no tiene mods.
 | [`nzt-context`](mods/nzt-context/README.md) | Barra del contexto consumido encima del prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | `/plugin install nzt-context --marketplace Ezefeola/nzt-ai` |
 | [`nzt-changes`](mods/nzt-changes/README.md) | Panel lateral al estilo Replay Theater: recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
 | [`nzt-files`](mods/nzt-files/README.md) | Panel lateral que recorre el proyecto como el explorador de VS Code: carpetas que se abren y cierran, marcas de git y el archivo elegido debajo, solo para leer | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
+| [`nzt-hub`](mods/nzt-hub/README.md) | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | `/plugin install nzt-hub --marketplace Ezefeola/nzt-ai` |
 
 La línea se escribe en una sesión de Claude Code en la terminal. Más adelante, el instalador
 va a preguntar si se instalan también los mods. Cómo se arma un mod y qué tiene que traer

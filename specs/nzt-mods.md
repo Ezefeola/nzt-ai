@@ -54,6 +54,16 @@ el mod sigue leyendo el formato anterior. Un proyecto que todavía no se reescri
 romper el panel. Si un mod no puede leer un archivo, lo dice en su propia superficie y no
 interrumpe la sesión.
 
+### RN-mod-pestaña · origin: usuario 2026-10-15
+Un mod con panel lleva en la pestaña **su nombre en una palabra, en el idioma del mod**, el
+mismo con el que aparece su tarjeta en `nzt-hub`: Estado, Cambios, Archivos, Mods (State,
+Changes, Files, Mods). Nunca solo "NZT": con varios paneles abiertos no se sabría cuál es
+cuál. Adentro, la cabecera repite la marca y el nombre (` NZT ` + nombre) y **deja una línea
+en blanco entre la pestaña y la cabecera**, para que no quede pegada a la selección de
+pestañas. Pedido del usuario al ver `nzt-state` en vivo (*"esta deberia decir state o algo
+asi, asi cuando tengo mas de una ventana abierta … puedo identificar bien cada una"* y *"no
+debe estar tan pegado"*); los nombres los propuso el agente y el usuario los aprobó.
+
 ## 3. Estructura en el repo
 
 ```
@@ -109,10 +119,11 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 
 | Mod | Qué hace | Lee | Spec | Estado |
 |---|---|---|---|---|
-| `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.3.0, en `mods/nzt-state/` |
+| `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.4.0, en `mods/nzt-state/` |
 | `nzt-context` | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
-| `nzt-changes` | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios), en `mods/nzt-changes/` |
-| `nzt-files` | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0, en `mods/nzt-files/` |
+| `nzt-changes` | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 en verificación (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable), en `mods/nzt-changes/` |
+| `nzt-files` | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña, en `mods/nzt-files/` |
+| `nzt-hub` | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | los comandos y las opciones de la sesión y la lista de plugins instalados de Claude Code (ningún artefacto de NZT) | `specs/mods/nzt-hub/` (spec y mockup) | construido, 0.1.0, en `mods/nzt-hub/`; falta la prueba en vivo y la aceptación |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
 cambia las dos.
