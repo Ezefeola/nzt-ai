@@ -210,6 +210,7 @@ const mountPane = async (
   on: Parameters<TestBody>[1],
   state: object,
   surface: 'terminal' | 'desktop' = 'terminal',
+  bodyColumns = 76,
 ) => {
   const raw = JSON.stringify(state)
   on('fs.stat', async () => ({ value: { kind: 'file', size: raw.length, mtimeMs: 4, isLink: false } }))
@@ -231,7 +232,7 @@ const mountPane = async (
     props: {
       title: 'NZT',
       isFocused: false,
-      bodyColumns: 76,
+      bodyColumns,
       placement: 'dock',
       scroll: { offset: 0, bodyRows: 56 },
       view: {},
@@ -282,6 +283,34 @@ test('every unit in progress is shown, with a warning when there is more than on
   expect(await ui.find({ type: 'Text', text: /First in progress/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Second in progress/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /2 unidades en curso/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('every phase in progress is lit, with a warning when there is more than one', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'Phases left open',
+    phases: [
+      { name: 'ux', status: 'doing', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
+      { name: 'verify', status: 'doing', units: [{ id: 2, do: 'Check it', status: 'doing' }] },
+    ],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /^ ● UX $/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^ ● Verificación $/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /2 fases en curso: el kernel permite una sola/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a single phase in progress draws no phase warning', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'One phase',
+    phases: [
+      { name: 'ux', status: 'done', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
+      { name: 'verify', status: 'doing', units: [{ id: 2, do: 'Check it', status: 'doing' }] },
+    ],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /fases en curso/ })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -406,6 +435,97 @@ test('the terminal pane draws the character of the phase in progress', async ($,
   expect(await ui.find({ type: 'Raster', key: 'mini-timeline-2' })).toBeDefined()
   expect(await ui.find({ type: 'Raster', key: 'mini-timeline-3' })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: /^Build$/ })).toBeDefined()
+  await ui.unmount()
+})
+
+type Drawn = { type?: string; key?: string; props?: Record<string, unknown>; children?: unknown[] }
+
+/** The innermost row that holds both the character and the Plan label, if one does. */
+const rowWithCharacterAndPlan = (node: unknown): Drawn | undefined => {
+  if (node === null || typeof node !== 'object') return undefined
+  const el = node as Drawn
+  for (const child of el.children ?? []) {
+    const inner = rowWithCharacterAndPlan(child)
+    if (inner !== undefined) return inner
+  }
+  const text = JSON.stringify(el)
+  const holdsBoth = /"Plan"/.test(text) && /"character"|"type":"Svg"/.test(text)
+  return el.type === 'Box' && el.props?.flexDirection === 'row' && holdsBoth ? el : undefined
+}
+
+test('the tab says what the pane is, and the heading keeps a blank row under it', async ($, on) => {
+  const titles: string[] = []
+  const raw = STATE
+  on('fs.stat', async () => ({ value: { kind: 'file', size: raw.length, mtimeMs: 4, isLink: false } }))
+  on('fs.read', async () => ({ value: raw }))
+  on('ui.open', async (_, e) => {
+    titles.push(e.title ?? '')
+    return { value: { isPlaced: true } }
+  })
+  on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
+  await $.command.run({
+    command: 'nzt-state',
+    args: '',
+    origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 },
+  })
+  expect(titles).toEqual(['Estado'])
+
+  const ui = await $.ui.mount({
+    plugin: 'nzt-state',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: 'nzt-state',
+    viewport: { columns: 80, rows: 60 },
+    props: { title: 'Estado', isFocused: false, bodyColumns: 76, placement: 'dock', scroll: { offset: 0, bodyRows: 56 }, view: {} },
+  })
+  const heading = await ui.find({ key: 'heading' })
+  expect(heading?.props?.marginTop).toBe(1)
+  expect(heading?.text).toBe(' NZT  Estado')
+  await ui.unmount()
+})
+
+test('the notes section says they are there to resume the run', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE))
+  expect(await ui.find({ type: 'Text', text: /NOTAS PARA RETOMAR · 1/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('the goal carries its label and sits above the phases', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE))
+  const texts = (await ui.findAll({ type: 'Text' })).map(found => found.text)
+  const goal = texts.findIndex(text => /^Objetivo /.test(text))
+  const phases = texts.findIndex(text => /✓ Análisis/.test(text))
+  expect(goal).toBeGreaterThan(-1)
+  expect(phases).toBeGreaterThan(goal)
+  // Drawn like the units count: bold, in the terminal's own color.
+  const goalText: string = JSON.parse(STATE).goal
+  const text = (await ui.findAll({ type: 'Text' })).find(found => found.text === goalText)
+  expect(text?.props).toMatchObject({ bold: true })
+  expect(text?.props?.color).toBeUndefined()
+  await ui.unmount()
+})
+
+test('a wide pane puts Plan and Mode to the left of the character', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'terminal', 43)
+  const row = rowWithCharacterAndPlan(await ui.drawn())
+  // The column starts right under the title, and the goal shares it with Plan and Mode.
+  expect(row?.props?.alignItems).toBeUndefined()
+  expect(JSON.stringify(row)).toContain('Objetivo')
+  await ui.unmount()
+})
+
+test('a narrow pane stacks the character above Plan and Mode', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'terminal', 42)
+  expect(rowWithCharacterAndPlan(await ui.drawn())).toBeUndefined()
+  expect(await ui.find({ type: 'Raster', key: 'character' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Plan$/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('the desktop pane puts Plan and Mode beside the character too', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 60)
+  expect(rowWithCharacterAndPlan(await ui.drawn())).toBeDefined()
   await ui.unmount()
 })
 

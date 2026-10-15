@@ -1,7 +1,8 @@
 # Mod · nzt-state — panel del plan y el estado
 
-> Estado: **construido**, versión 0.3.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
-> unidades 84 a 88; fases plegables y personajes en 91 a 95) · Depende de: `specs/nzt-mods.md`,
+> Estado: **construido**, versión 0.4.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
+> unidades 84 a 88; fases plegables y personajes en 91 a 95; aviso de varias fases en curso
+> en la 164; Plan y Modo al lado del personaje en la 166) · Depende de: `specs/nzt-mods.md`,
 > `specs/nzt-core.md` sección 7 (formato de `Plan/state.json`), D61 y D62.
 > Escrita el 2026-10-13 leyendo el código; los hallazgos R-01 a R-08 los resolvió el usuario
 > el 2026-10-14 (sección **Hallazgos resueltos**).
@@ -16,18 +17,19 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 ## Alcance
 
 **Adentro**
-- Un panel lateral en Claude Code, llamado **NZT**, que muestra el `Plan/state.json` del
+- Un panel lateral en Claude Code, llamado **Estado** (State en inglés; RN-mod-pestaña de
+  `specs/nzt-mods.md`), que muestra el `Plan/state.json` del
   proyecto en el que está abierta la sesión.
 - Si el plan está aprobado, el modo (acompañado o autónomo, y en autónomo la tanda con su
   avance y las paradas que se mantienen), la línea de fases, el objetivo, el porcentaje de
   avance, hace cuánto se actualizó y lo que se está esperando.
 - La unidad en curso con su detalle. Las pendientes agrupadas por fase, y las hechas, las
-  descartadas y las notas en secciones que se pliegan.
+  descartadas y las notas (**Notas para retomar**, lo que una sesión nueva necesita para seguir) en secciones que se pliegan.
 - El comando `/nzt-state`, que abre el panel.
 - La lectura de los tres formatos del estado: el actual (D62), el de D61 y el anterior con
   `phase`.
 - Los avisos de un estado que rompe el formato del kernel: un estado inválido, más de una
-  unidad en curso, una tanda que nombra unidades que no existen.
+  unidad en curso, más de una fase en curso, una tanda que nombra unidades que no existen.
 - Español e inglés.
 - Las fases plegables dentro de cada sección, y la identidad de cada fase: su color, su
   personaje animado y su sombrero en miniatura.
@@ -89,6 +91,23 @@ hecha, ni en el porcentaje, y el panel avisa cuántas hay.
 Si hay más de una unidad `doing`, el panel las muestra todas en **En curso** y avisa que el
 kernel permite una sola.
 
+### RN-panel-objetivo · origin: usuario 2026-10-15
+El objetivo de la corrida va debajo de Plan y Modo, en su misma columna (al lado del
+personaje cuando entran lado a lado) y arriba de la línea de fases. Lleva delante la
+etiqueta **Objetivo** ("Goal" en inglés), atenuada, y el texto, tal como lo trae el estado,
+va en negrita y en el color propio de la terminal, igual que el número de unidades hechas
+(usuario: *"que sea blanco como el numero 16 de 18 unidades hechas, despues el texto debe
+llegar hasta antes del crab"*). Antes iba debajo de las fases y sin etiqueta, y no se entendía qué era (usuario:
+*"el Goal primero deberia decir que es ese texto osea Objetivo: y el texto y deberia estar
+arriba de las fases"*).
+
+### RN-panel-varias-fases-en-curso · origin: usuario 2026-10-15 (unidad 164)
+Si hay más de una fase `doing`, la línea de fases las muestra todas en curso, tal como
+vienen, y debajo avisa cuántas son y que el kernel permite una sola. El personaje de
+arriba es el de la primera, como ya pasa hoy: el panel no adivina cuál es la verdadera. Se
+encontró con el estado de este repo (`testing/2026-10-15-dibujo.md` E-01): tres fases
+iluminadas, el personaje de UX y ningún aviso.
+
 ### RN-panel-porcentaje · origin: reverse (R-04)
 El avance es *hechas ÷ (todas − descartadas)*. Con 3 hechas, 1 descartada y 2 pendientes,
 muestra 50%.
@@ -144,11 +163,30 @@ del usuario, 2026-10-14: se le avisó que Clawd es el personaje de Anthropic y q
 público, y lo mantiene). Una fase que NZT no conoce usa el personaje sin sombrero y un
 color neutro.
 
-### RN-panel-personaje-en-curso · origin: usuario 2026-10-14
-Arriba del panel se ve, grande, animado y centrado, el personaje de la fase en curso, con el
-nombre de la fase en su color centrado debajo. Si ninguna está en curso, el de la primera pendiente; con el plan
+### RN-panel-personaje-en-curso · origin: usuario 2026-10-14; ubicación, usuario 2026-10-15
+Arriba del panel se ve, grande y animado, el personaje de la fase en curso, con el nombre
+de la fase en su color centrado debajo. Si ninguna está en curso, el de la primera pendiente; con el plan
 completo, el de la última fase de la corrida. Un estado anterior con un solo `phase` muestra
 el de esa fase; uno sin fases, ninguno.
+
+**Dónde va** (cambio pedido por el usuario el 2026-10-15: *"podriamos poner los labels de
+Plan y Modo arriba a la par del crab … que esten arriba a la izquierda y el crab que este a
+la derecha … y aprovechamos mejor el espacio"*):
+- **Si el panel tiene 40 columnas útiles o más**, el personaje va arriba a la derecha, con
+  su nombre debajo. A su izquierda, en una columna que empieza justo debajo del título NZT,
+  van **Plan**, **Modo** y el **Objetivo** (RN-panel-objetivo). Si un texto no entra en una
+  línea, se parte en renglones en esa misma columna, sin pasar por debajo del personaje.
+- **Si tiene menos**, va como antes: centrado arriba, y Plan y Modo debajo.
+- Lo demás del panel (línea de fases, objetivo, avance, secciones) sigue debajo, a todo el
+  ancho, en los dos casos.
+- El corte en 40 columnas lo propuso el agente con el plan, y el usuario lo aprobó ("hace
+  todas en autonomo"). El agente también propuso alinear la columna arriba; al verlo en vivo,
+  el usuario lo cambió: *"quedo como arriba a la izquierda literalmente y desalineado con el
+  crab, yo los quiero alineados"*, y quedó centrada. Al sumar el objetivo a esa columna, el
+  usuario la volvió a poner arriba: *"La parte de Plan aprobado y el modo dejalo justo
+  debajo del titulo NZT, tal cual esta alineado a la izquierda, debajo la seccion de
+  objetivo"*.
+- Un estado sin personaje (sin fases) muestra Plan y Modo a todo el ancho, como antes.
 
 ### RN-panel-mini-sombrero · origin: usuario 2026-10-14
 En la línea de fases y en el encabezado de cada grupo, cada fase lleva su sombrero en
@@ -183,9 +221,9 @@ dibujo lo cambia en las dos.
 | Bug | Hallazgo | Comportamiento esperado | Unidad | Estado |
 |---|---|---|---|---|
 | B-01 | R-01 | RN-panel-abre-con-estado | 84 | verificado por su test (89); falta verlo en vivo |
-| B-02 | R-02 | RN-panel-status-invalido | 85 | verificado por su test (89); falta verlo en vivo |
-| B-03 | R-03 | RN-panel-varias-en-curso | 86 | verificado por su test (89); falta verlo en vivo |
-| B-04 | R-07 | RN-panel-tanda-ids | 87 | verificado por su test (89); falta verlo en vivo |
+| B-02 | R-02 | RN-panel-status-invalido | 85 | verificado por su test (89) y por el árbol dibujado sobre el demo (162, [testing/2026-10-15-dibujo.md](testing/2026-10-15-dibujo.md) E-04); falta verlo en vivo |
+| B-03 | R-03 | RN-panel-varias-en-curso | 86 | verificado por su test (89) y por el árbol dibujado (162, E-05); falta verlo en vivo |
+| B-04 | R-07 | RN-panel-tanda-ids | 87 | verificado por su test (89) y por el árbol dibujado (162, E-06); falta verlo en vivo |
 
 ## Hallazgos resueltos
 
@@ -215,7 +253,9 @@ Leídos del código el 2026-10-13 y resueltos por el usuario el 2026-10-14.
 fases en los tres formatos, la lectura del estado, el JSON roto, el panel con la unidad en
 curso, las pendientes por fase, las secciones que se pliegan (en terminal y en escritorio)
 y la tanda autónoma con sus paradas; la apertura con y sin estado (B-01), el status
-inválido (B-02), varias unidades en curso (B-03), la tanda con ids que no existen (B-04) y
-el panel en inglés; los grupos por fase que se pliegan, los cuadros y sombreros de cada
-personaje, las celdas, el personaje y los mini sombreros en la terminal, y el SVG en el
-escritorio. 21 tests.
+inválido (B-02), varias unidades en curso (B-03), varias fases en curso y una sola sin
+aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
+se pliegan, los cuadros y sombreros de cada personaje, las celdas, el personaje y los mini
+sombreros en la terminal, y el SVG en el escritorio; Plan y Modo al lado del personaje
+desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el objetivo con su
+etiqueta, arriba de las fases. 28 tests.

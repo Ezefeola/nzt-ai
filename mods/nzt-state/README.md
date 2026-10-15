@@ -1,18 +1,21 @@
 # nzt-state
 
-> Versión **0.3.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.4.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
 
 ```
- NZT
-Plan  ● aprobado
-Modo  ⚡ autónomo · 80–82 sin frenar · 1 de 3 hechas
+
+ NZT  Estado
+Plan  ● aprobado                         ▄▄████████▄▄
+Modo  ⚡ autónomo · 80–82 sin            ██ ▀▀  ▀▀ ██
+      frenar · 1 de 3 hechas             ████████████
+                                          ▀█▀ ▀▀ ▀█▀
+Objetivo Mods de NZT: spec, el              Build
+mod en mods/ y el catálogo.
 
 ✓ Análisis → ● Build → ○ Verificación
-
-Mods de NZT: spec, el mod en mods/ y el catálogo.
 
 3 de 5 unidades hechas                         60%
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -36,21 +39,23 @@ igual. Funciona solo en Claude Code, porque Codex no tiene mods.
 
 Abre el panel si lo cerraste; en un proyecto con `Plan/state.json` ya se abre solo al
 empezar la sesión. **Un clic** en el título de una sección (Pendientes, Hechas,
-Descartadas, Notas) o en el de una fase dentro de ella la pliega o la despliega.
+Descartadas, Notas para retomar) o en el de una fase dentro de ella la pliega o la despliega.
 
 De arriba hacia abajo muestra:
 
-- El personaje de la fase en curso, animado, con el nombre de la fase debajo.
-- Si el plan está aprobado y en qué modo corre: acompañado, o autónomo con la tanda, cuántas
-  unidades lleva hechas y en cuáles frena igual.
-- La línea de fases de la corrida con su estado, el objetivo, el porcentaje de avance
+- Arriba a la derecha, el personaje de la fase en curso, animado, con el nombre de la fase
+  debajo. A su izquierda: si el plan está aprobado, en qué modo corre (acompañado, o
+  autónomo con la tanda, cuántas unidades lleva hechas y en cuáles frena igual) y el
+  objetivo de la corrida, con la etiqueta **Objetivo**. Con menos de 40 columnas útiles no
+  entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
+- La línea de fases de la corrida con su estado, el porcentaje de avance
   (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.
 - La unidad en curso con su detalle y lo que se está esperando.
-- Las pendientes, las hechas y las descartadas, agrupadas por fase, y las notas. Al abrir el
+- Las pendientes, las hechas y las descartadas, agrupadas por fase, y las **notas para retomar**: lo que una sesión nueva necesita saber después de `/clear`. Al abrir el
   panel solo está desplegada la fase en curso.
 
 Avisa cuando el estado rompe el formato del kernel: una unidad con un status que no existe,
-más de una unidad en curso, o una tanda que nombra unidades que no están. No lo corrige.
+más de una unidad en curso, más de una fase en curso, o una tanda que nombra unidades que no están. No lo corrige.
 
 ### Fases y personajes
 

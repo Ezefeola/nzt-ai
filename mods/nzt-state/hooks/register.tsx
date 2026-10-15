@@ -18,7 +18,6 @@ import {
 } from './sprites'
 
 const PANE = 'nzt-state'
-const TITLE = 'NZT'
 const FILE = 'Plan/state.json'
 const POLL_MS = 2000
 const FRAME_MS = 220
@@ -29,6 +28,9 @@ const MINI_SCALE = 4
 const LABEL = 6
 // Columns a phase group's units sit in from the section's edge.
 const GROUP_INDENT = 4
+// Usable columns from which Plan and Mode sit to the left of the character instead of below it.
+const SIDE_BY_SIDE_MIN = 40
+const SIDE_BY_SIDE_GAP = 2
 
 const snapshot = atom({ plugin: 'nzt-state', key: 'snapshot' } as const, {
   kind: 'missing',
@@ -150,14 +152,14 @@ export const register: Register = (on, options) => {
         .catch(() => undefined)
     })
     // Installed for every project, so a project that does not use NZT starts without it.
-    if ((await read($, snapshot)).kind !== 'missing') void $.ui.open({ id: PANE, title: TITLE })
+    if ((await read($, snapshot)).kind !== 'missing') void $.ui.open({ id: PANE, title: t.title })
 
     return next(e)
   })
 
   on('command.run', { command: 'nzt-state' }, async $ => {
     await refresh($, true)
-    const opened = await $.ui.open({ id: PANE, title: TITLE })
+    const opened = await $.ui.open({ id: PANE, title: t.title })
 
     return {
       text: opened.isPlaced
@@ -313,6 +315,7 @@ export const register: Register = (on, options) => {
     const Svg = e.surface !== 'terminal' ? $.ui.resolve(e).Svg : undefined
 
     const steps = timelineOf(state.phases, state.legacyPhase, isComplete, lang)
+    const phasesInProgress = steps.filter(step => step.status === 'doing').length
     // A phase's hat in miniature, before its name: in the timeline and in each group heading.
     const mini = (phase: string, key: string) => {
       const rows = miniOf(idOf(phase))
@@ -351,12 +354,9 @@ export const register: Register = (on, options) => {
       )
     })
 
-    return (
-      <Box flexDirection="column" paddingX={1}>
-        <Text backgroundColor="claude" color="inverseText" bold> NZT </Text>
-
-        {characterPhase !== undefined && (
-          <Box marginTop={1} flexDirection="column" alignItems="center" width={inner}>
+    const character = (columns: number) =>
+      characterPhase !== undefined && (
+          <Box flexDirection="column" alignItems="center" width={columns}>
             {Raster !== undefined && (
               <Raster
                 key={CHARACTER}
@@ -374,9 +374,12 @@ export const register: Register = (on, options) => {
             )}
             <Text bold color={colorOf(characterPhase)}>{labelOf(characterPhase, lang)}</Text>
           </Box>
-        )}
+        )
 
-        <Box marginTop={1} flexDirection="row">
+    // Plan, mode and goal: the column beside the character, or under it when they are stacked.
+    const summary = (columns: number) => (
+      <Box flexDirection="column" width={columns}>
+        <Box flexDirection="row">
           <Box width={LABEL}>
             <Text dimColor>{t.plan}</Text>
           </Box>
@@ -390,9 +393,9 @@ export const register: Register = (on, options) => {
           <Box width={LABEL}>
             <Text dimColor>{t.mode}</Text>
           </Box>
-          <Box width={inner - LABEL}>
+          <Box width={columns - LABEL}>
             {state.autonomy.units.length === 0 ? (
-              <Text>
+              <Text wrap="wrap">
                 {t.accompanied}<Text dimColor>{t.stopsEachUnit}</Text>
               </Text>
             ) : (
@@ -413,16 +416,49 @@ export const register: Register = (on, options) => {
             )}
           </Box>
         </Box>
+        <Box marginTop={1} width={columns}>
+          <Text wrap="wrap">
+            <Text dimColor>{t.goal} </Text>
+            <Text bold>{state.goal}</Text>
+          </Text>
+        </Box>
+      </Box>
+    )
+
+    // Narrower than this, the column beside the character is too thin to read: stack them.
+    const isSideBySide = characterPhase !== undefined && inner >= SIDE_BY_SIDE_MIN
+
+    return (
+      <Box flexDirection="column" paddingX={1}>
+        {/* A blank row keeps the heading off the pane's tabs. */}
+        <Box key="heading" marginTop={1}>
+          <Text>
+            <Text backgroundColor="claude" color="inverseText" bold> NZT </Text>{' '}
+            <Text bold color="claude">{t.title}</Text>
+          </Text>
+        </Box>
+
+        {isSideBySide ? (
+          <Box marginTop={1} flexDirection="row">
+            {summary(inner - WIDTH - SIDE_BY_SIDE_GAP)}
+            <Box width={SIDE_BY_SIDE_GAP} />
+            {character(WIDTH)}
+          </Box>
+        ) : (
+          <Box flexDirection="column">
+            {characterPhase !== undefined && <Box marginTop={1}>{character(inner)}</Box>}
+            <Box marginTop={1}>{summary(inner)}</Box>
+          </Box>
+        )}
 
         {/* When the phases wrap, a blank row between lines keeps one line off the next. */}
         <Box marginTop={1} flexDirection="row" flexWrap="wrap" rowGap={1}>
           {timeline}
         </Box>
         {steps.length === 0 && <Text dimColor>{t.noPhases}</Text>}
-
-        <Box marginTop={1}>
-          <Text italic wrap="wrap">{state.goal}</Text>
-        </Box>
+        {phasesInProgress > 1 && (
+          <Text color="warning" wrap="wrap">{t.severalPhasesInProgress(phasesInProgress)}</Text>
+        )}
 
         <Box marginTop={1} flexDirection="row" justifyContent="space-between">
           <Text>
