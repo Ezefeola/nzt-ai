@@ -1,8 +1,11 @@
 <!doctype html>
 <!--
-  Mockup del panel de nzt-changes 0.4.0: la tarjeta de la 0.3.0 con alto fijo, el diff con scroll
-  propio y el índice clickeable.
-  Fuente: specs/mods/nzt-changes/spec.md (reglas RN-cambios-* y sección Diseño 0.4.0), unidad 136, 2026-10-14.
+  Mockup del panel de nzt-changes 0.5.0 (unidad 176, 2026-10-15): la tarjeta de la 0.4.0 con aire entre
+  sus partes (RN-cambios-aire), la fila de posición arriba a la derecha bajo el separador
+  (RN-cambios-diff-alto), los botones a la derecha (RN-cambios-botones) y, en HEAD, el índice agrupado
+  por estado y carpeta, con grupos que arrancan cerrados (RN-cambios-grupos, RN-cambios-grupos-abrir).
+  Pedido del usuario 2026-10-15, al ver la 0.4.1 instalada.
+  Base 0.4.0: specs/mods/nzt-changes/spec.md (reglas RN-cambios-* y sección Diseño), unidad 136, 2026-10-14.
   Pedido del usuario 2026-10-14, al ver la 0.3.0 en vivo: "dependiendo el cambio se hace muy grande o
   queda chico… el tamaño debería tener un fijo y un scroll", "cada file debería poder clickearse".
   Diseño base: Replay Theater (anthropics/claude-code-playground, Apache-2.0).
@@ -21,7 +24,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>nzt-changes 0.4.0 · mockup</title>
+<title>nzt-changes 0.5.0 · mockup</title>
 <style>
   :root {
     /* provisional: aproximación de una terminal oscura y del tema de Claude Code */
@@ -56,7 +59,16 @@
   .tab { color: var(--dim); } .tab + .tab { margin-left: 1ch; }
   .tab.on { color: var(--accent); font-weight: 700; text-decoration: underline; }
   .add { color: var(--green); } .rm { color: var(--red); }
-  .A { color: var(--green); } .M { color: var(--yellow); } .D { color: var(--red); } .R { color: var(--blue); }
+  .A { color: var(--green); } .M { color: var(--yellow); } .D { color: var(--red); } .R { color: var(--blue); } .X { color: var(--num); }
+  /* RN-cambios-aire: una fila en blanco entre las partes. */
+  .blank { height: var(--row); }
+  /* RN-cambios-grupos: el título de un estado o de una carpeta; solo el nombre es el botón. */
+  .grp { all: unset; box-sizing: border-box; display: flex; gap: 1ch; width: 100%; white-space: nowrap; min-width: 0; cursor: pointer; height: var(--row); }
+  .grp .tw { color: var(--dim); }
+  .grp .gname { overflow: hidden; text-overflow: ellipsis; min-width: 0; font-weight: 700; color: var(--text); }
+  .grp.folder-t .gname { font-weight: 400; color: var(--dim); }
+  .grp.here .gname, .grp.here .tw { color: var(--accent); }
+  .grp:hover .gname { background: #ddd; color: #111 !important; }
   /* Índice: a lo sumo --index-rows filas; si hay más, scroll propio con ↑ y ↓ en los bordes. */
   .index { max-height: calc(var(--index-rows) * var(--row)); overflow-y: auto; scrollbar-width: none; }
   .index::-webkit-scrollbar { display: none; }
@@ -96,9 +108,11 @@
   .gap { color: var(--dim); padding-left: 4ch; }
   .k { color: var(--kw); } .s { color: var(--str); } .f { color: var(--fn); } .num { color: var(--num); }
   .p { color: var(--key); } .c { color: var(--com); font-style: italic; } .h { color: var(--head); font-weight: 700; }
-  .pos { color: var(--dim); display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden; }
+  /* RN-cambios-diff-alto 0.5.0: arriba a la derecha, justo bajo el separador. */
+  .pos { color: var(--dim); display: flex; justify-content: flex-end; gap: 0 2ch; white-space: nowrap; overflow: hidden; height: var(--row); }
   .msgs { flex: 1 1 0; min-height: 0; padding: 0 0 0 2ch; }
-  .buttons { display: flex; gap: 0 2ch; white-space: nowrap; }
+  /* RN-cambios-botones: última fila, a la derecha. */
+  .buttons { display: flex; justify-content: flex-end; gap: 0 2ch; white-space: nowrap; }
   .btn { all: unset; font-weight: 700; cursor: pointer; }
   .btn.focus { background: #ddd; color: #111; }
   .btn[aria-disabled="true"] { color: var(--dim); font-weight: 400; cursor: default; }
@@ -116,6 +130,7 @@
   <a href="#" data-state="turn-1">Turno · Edit Markdown</a>
   <a href="#" data-state="turn-2">Turno · archivo nuevo largo</a>
   <a href="#" data-state="turn-3">Turno · Edit JSON</a>
+  <a href="#" data-state="headfresh">HEAD · recién abierto (todo cerrado)</a>
   <a href="#" data-state="head-4">HEAD · código</a>
   <a href="#" data-state="head-1">HEAD · documento (diff corto)</a>
   <a href="#" data-state="head-5">HEAD · diff largo con scroll</a>
@@ -132,9 +147,14 @@
 <main class="dock" id="dock"></main>
 
 <div class="note">
-  <p><b>Qué cambia contra la 0.3.0</b> (lo pediste al verla en vivo):</p>
+  <p><b>Qué cambia en la 0.5.0</b> (lo pediste al ver la 0.4.1 instalada):</p>
+  <p>A. <b>Aire.</b> Una fila en blanco bajo el encabezado (<i>paso k de n</i> no se mueve), bajo Turno/HEAD, entre la ruta y su detalle, y entre el detalle y el diff. Sale del alto del diff, no del panel.</p>
+  <p>B. <b>La fila de posición</b> (<i>6 líneas</i>, <i>líneas 12–30 de 85</i> y <i>k ▲ j ▼</i>) pasa arriba a la derecha, justo bajo la línea que separa el índice del archivo.</p>
+  <p>C. <b>Botones a la derecha</b>, en la última fila.</p>
+  <p>D. <b>HEAD agrupado.</b> El índice es un árbol: <span class="M">Modificados</span>, <span class="A">Nuevos</span>, <span class="D">Borrados</span>, <span class="R">Renombrados</span> y <span class="X">En conflicto</span> (solo los que tienen archivos), y adentro, cada carpeta. Al abrir el panel todo está cerrado ("HEAD · recién abierto"): el título de donde estás va en el color de NZT. Click en un título lo abre o lo cierra. Siguiente y Anterior abren el grupo del archivo al que van. Turno no se agrupa.</p>
+  <p>Lo de la 0.4.0 que sigue igual:</p>
   <p>1. <b>Alto fijo.</b> El panel tiene siempre el mismo alto, sea el diff de 3 líneas o de 300. Los botones no se mueven de la última fila. Sobre el prompt son 24 filas; al costado, todo el alto que haya. Pasá de "HEAD · documento" a "HEAD · diff largo": el marco no cambia.</p>
-  <p>2. <b>El diff tiene scroll propio.</b> Ocupa todo lo que queda y se mueve con la rueda, o con <b>k</b> ▲ y <b>j</b> ▼ (media ventana; también con click). En un panel con foco, Claude Code usa las flechas para recorrer los botones, por eso no son ↑ ↓. Encima de los botones dice qué líneas estás viendo: <i>líneas 12–30 de 85</i>. El encabezado, el índice y los botones quedan quietos.</p>
+  <p>2. <b>El diff tiene scroll propio.</b> Ocupa todo lo que queda y se mueve con la rueda, o con <b>k</b> ▲ y <b>j</b> ▼ (media ventana; también con click). En un panel con foco, Claude Code usa las flechas para recorrer los botones, por eso no son ↑ ↓. Arriba a la derecha dice qué líneas estás viendo: <i>líneas 12–30 de 85</i>. El encabezado, el índice y los botones quedan quietos.</p>
   <p>3. <b>Cada archivo se clickea.</b> Una fila del índice es un botón: click, o Tab hasta la fila y Enter, y el panel salta a ese cambio. Bajo el puntero la fila se ilumina.</p>
   <p>4. <b>El índice tiene alto tope</b>: hasta 4 filas sobre el prompt y 8 al costado, para dejarle el alto al diff. Con más archivos, la rueda sobre el índice lo mueve, y en los bordes dice <i>↑ 15 más</i> y <i>↓ 21 más</i>.</p>
   <p>5. <b>La regla de cambios</b>, como el margen del diff de Visual Studio: a la derecha del diff, una columna con una celda por fila; cada celda es un tramo del diff entero, <span style="color:var(--green)">▐</span> si tiene líneas sumadas, <span style="color:var(--red)">▐</span> si tiene sacadas, <span style="color:var(--yellow)">▐</span> si tiene de las dos. La barra gris es lo que se ve ahora. Solo aparece cuando el diff no entra entero. No se clickea: en Claude Code cada celda clickeable sería un botón más en el recorrido con Tab.</p>
@@ -224,8 +244,9 @@
       ] },
   ];
   const CLAUDE = '<span style="color:#d97757">● Claude</span>';
+  // HEAD, en el orden de RN-cambios-orden 0.5.0: estado, raíz, carpetas, archivos. Sin Nuevos: ese grupo no aparece.
   const HEAD = [
-    { n: 1, mark: 'M', name: 'README.md', path: 'README.md', a: 1, r: 0,
+    { n: 1, mark: 'M', folder: '', name: 'README.md', path: 'README.md', a: 1, r: 0,
       meta: `<span class="M">modificado</span> · ${kind('Markdown')}  ${counts(1, 0)}`,
       diff: [
         [' ', 40, '<span class="h">## Mods de Claude Code</span>'],
@@ -233,8 +254,7 @@
         [' ', 42, '- <span class="p">**nzt-state**</span>: el plan y el estado en un panel al costado.'],
         ['+', 43, '- <span class="p">**nzt-changes**</span>: los cambios del último turno y todos los del proyecto contra HEAD, uno por uno con su diff.'],
       ] },
-    '.claude-plugin/',
-    { n: 2, mark: 'M', name: 'marketplace.json', path: '.claude-plugin/marketplace.json', a: 5, r: 0,
+    { n: 2, mark: 'M', folder: '.claude-plugin/', name: 'marketplace.json', path: '.claude-plugin/marketplace.json', a: 5, r: 0,
       meta: `<span class="M">modificado</span> · ${kind('JSON')}  ${counts(5, 0)}`,
       diff: [
         [' ', 14, '    },'],
@@ -245,8 +265,7 @@
         ['+', 19, '    }'],
         [' ', 20, '  ]'],
       ] },
-    'Plan/',
-    { n: 3, mark: 'M', name: 'state.json', path: 'Plan/state.json', a: 2, r: 2,
+    { n: 3, mark: 'M', folder: 'Plan/', name: 'state.json', path: 'Plan/state.json', a: 2, r: 2,
       meta: `<span class="M">modificado</span> · ${kind('JSON')} · ${CLAUDE}  ${counts(2, 2)}`,
       diff: [
         ['-', 3, '  <span class="p">"updated"</span>: <span class="s">"2026-10-14T15:00:00Z"</span>,'],
@@ -256,8 +275,7 @@
         ['-', 61, '  <span class="p">"approved"</span>: <span class="k">true</span>,'],
         ['+', 61, '  <span class="p">"approved"</span>: <span class="k">false</span>,'],
       ] },
-    'mods/nzt-changes/hooks/',
-    { n: 4, mark: 'M', name: 'register.tsx', path: 'mods/nzt-changes/hooks/register.tsx', a: 3, r: 1,
+    { n: 4, mark: 'M', folder: 'mods/nzt-changes/hooks/', name: 'register.tsx', path: 'mods/nzt-changes/hooks/register.tsx', a: 3, r: 1,
       meta: `<span class="M">modificado</span> · ${kind('TypeScript')} · ${CLAUDE}  ${counts(3, 1)}`,
       diff: [
         [' ', 282, '  <span class="k">await</span> <span class="f">update</span>($, view, value =&gt; ({ ...<span class="f">viewOf</span>(value), mode }))'],
@@ -267,25 +285,38 @@
         ['+', 285, '  })'],
         [' ', 286, '  isShowing = <span class="k">true</span>'],
       ] },
-    { n: 5, mark: 'M', name: 'turn.ts', path: 'mods/nzt-changes/hooks/turn.ts', a: 31, r: 6,
+    { n: 5, mark: 'M', folder: 'mods/nzt-changes/hooks/', name: 'turn.ts', path: 'mods/nzt-changes/hooks/turn.ts', a: 31, r: 6,
       meta: `<span class="M">modificado</span> · ${kind('TypeScript')} · ${CLAUDE}  ${counts(31, 6)}`, diff: HEAD_TURN },
-    'presentation/',
-    { n: 6, mark: 'D', name: 'old-logo.png', path: 'presentation/old-logo.png', bin: true,
+    { n: 6, mark: 'D', folder: 'presentation/', name: 'old-logo.png', path: 'presentation/old-logo.png', bin: true,
       meta: `<span class="D">borrado</span> · ${kind('imagen PNG')}`, msg: 'Archivo binario: no tiene diff de texto.' },
-    'specs/mods/',
-    { n: 7, mark: 'R', name: 'nzt-changes.md', path: 'specs/draft.md → specs/mods/nzt-changes.md', a: 0, r: 0,
+    { n: 7, mark: 'R', folder: 'specs/mods/', name: 'nzt-changes.md', path: 'specs/draft.md → specs/mods/nzt-changes.md', a: 0, r: 0,
       meta: `<span class="R">renombrado</span> · ${kind('Markdown')}  ${counts(0, 0)}`, msg: 'Solo se movió: el contenido es el mismo.' },
   ];
-  // 42 archivos: el índice con su propio scroll.
+  // RN-cambios-grupos: los estados en su orden, su nombre, su clase de color y la palabra del detalle.
+  const GROUPS = [['M', 'Modificados', 'M', 'modificado'], ['A', 'Nuevos', 'A', 'nuevo'], ['D', 'Borrados', 'D', 'borrado'],
+    ['R', 'Renombrados', 'R', 'renombrado'], ['!', 'En conflicto', 'X', 'en conflicto']];
+  const RANK = Object.fromEntries(GROUPS.map(([m], i) => [m, i]));
+  const byTree = (x, y) => RANK[x.mark] - RANK[y.mark] || (x.folder !== '') - (y.folder !== '')
+    || (x.folder < y.folder ? -1 : x.folder > y.folder ? 1 : 0) || (x.name < y.name ? -1 : x.name > y.name ? 1 : 0);
+
+  // 42 archivos de los cinco estados: el índice con su propio scroll, numerado en el orden del árbol.
   const MANY = (() => {
-    const out = []; let n = 1;
+    const out = []; let k = 0;
     for (const folder of ['', 'docs/', 'mods/nzt-context/hooks/', 'mods/nzt-state/hooks/', 'mods/nzt-state/types/', 'Plan/', 'skills/nzt/', 'skills/nzt-build/references/', 'specs/']) {
-      if (folder) out.push(folder);
       const names = folder === 'mods/nzt-state/hooks/' ? ['git.ts', 'i18n.ts', 'register.tsx', 'register.test.tsx', 'state.ts', 'turn.ts']
         : ['index.md', 'notes.md', 'README.md', 'rules.md', 'SKILL.md'].slice(0, folder === '' ? 3 : 5);
-      for (const name of names) if (n <= 42) out.push({ n: n++, mark: n % 9 === 0 ? 'A' : 'M', name, path: folder + name, a: (n * 7) % 30, r: (n * 3) % 9,
-        meta: `<span class="M">modificado</span> · ${kind(name.endsWith('.md') ? 'Markdown' : 'TypeScript')}  ${counts((n * 7) % 30, (n * 3) % 9)}` });
+      for (const name of names) {
+        k++;
+        if (out.length === 42) break;
+        const mark = k === 20 ? '!' : k === 31 ? 'R' : k % 9 === 0 ? 'A' : k % 13 === 0 ? 'D' : 'M';
+        out.push({ mark, folder, name, path: folder + name, a: (k * 7) % 30, r: (k * 3) % 9 });
+      }
     }
+    out.sort(byTree).forEach((s, i) => {
+      s.n = i + 1;
+      const g = GROUPS[RANK[s.mark]];
+      s.meta = `<span class="${g[2]}">${g[3]}</span> · ${kind(s.name.endsWith('.md') ? 'Markdown' : 'TypeScript')}  ${counts(s.a, s.r)}`;
+    });
     const s = out.find(x => x.name === 'register.tsx');
     s.diff = [
       [' ', 21, '<span class="k">const</span> PANE = <span class="s">\'nzt-state\'</span>'],
@@ -302,49 +333,87 @@
   // Piezas de la tarjeta.
   const head = (k, n) => `<div class="row"><span><span class="badge">&nbsp;NZT&nbsp;</span><span class="title">Cambios</span></span><span class="bold">${n ? `paso ${k} de ${n}` : 'sin pasos'}</span></div>`;
   const tabs = (view, summary) => `<div class="row"><span><span class="tab ${view === 'turn' ? 'on' : ''}">Turno (t)</span><span class="tab ${view === 'head' ? 'on' : ''}">HEAD (h)</span></span><span class="dim">${summary || ''}</span></div>`;
-  const item = (it, on, view) => `<button class="item ${on ? 'on' : ''}" data-go="${view}-${it.n}" aria-current="${on}"><span class="ptr">${on ? '▸' : ' '}</span><span class="n">${it.n}</span>${it.mark ? `<span class="${it.mark}">${it.mark}</span>` : ''}<span class="name">${esc(it.name)}</span><span>${it.bin ? '<span class="dim">bin</span>' : counts(it.a, it.r)}</span></button>`;
+  const BLANK = '<div class="blank"></div>';
+  // Una fila de archivo: número, nombre y +n −m. En HEAD la letra del estado está en el título del grupo.
+  const item = (it, on, view, indent = 0) => `<button class="item ${on ? 'on' : ''}" data-go="${view}-${it.n}" aria-current="${on}" style="padding-left:${indent}ch"><span class="ptr">${on ? '▸' : ' '}</span><span class="n">${it.n}</span><span class="name">${esc(it.name)}</span><span>${it.bin ? '<span class="dim">bin</span>' : counts(it.a, it.r)}</span></button>`;
+  // Un título de grupo (RN-cambios-grupos): ▸ cerrado, ▾ abierto; en el acento si el paso actual está adentro.
+  const title = (key, label, count, here, indent, mark) => {
+    const open = OPEN.has(key);
+    return `<button class="grp ${mark ? '' : 'folder-t'} ${here ? 'here' : ''}" data-toggle="${esc(key)}" aria-expanded="${open}" style="padding-left:${indent}ch">`
+      + `<span class="tw">${open ? '▾' : '▸'}</span>${mark ? `<span class="${GROUPS[RANK[mark]][2]}">${mark}</span>` : ''}<span class="gname">${esc(label)}</span><span class="dim">${count}</span></button>`;
+  };
+  // El árbol de HEAD: estado > raíz y carpetas > archivos; solo lo abierto muestra lo de adentro.
+  const tree = (rows, on, view) => {
+    const cur = rows.find(r => r.n === on), out = [];
+    for (const [mark, label] of GROUPS) {
+      const group = rows.filter(r => r.mark === mark);
+      if (!group.length) continue;
+      out.push(title(mark, label, group.length, cur.mark === mark, 0, mark));
+      if (!OPEN.has(mark)) continue;
+      group.filter(r => !r.folder).forEach(r => out.push(item(r, r.n === on, view, 2)));
+      for (const folder of [...new Set(group.filter(r => r.folder).map(r => r.folder))]) {
+        const inside = group.filter(r => r.folder === folder), key = mark + '|' + folder;
+        out.push(title(key, folder, inside.length, cur.mark === mark && cur.folder === folder, 2));
+        if (OPEN.has(key)) inside.forEach(r => out.push(item(r, r.n === on, view, 4)));
+      }
+    }
+    return out.join('');
+  };
   const index = (rows, on, view) =>
     '<div class="edge" data-edge="up"></div>'
-    + '<div class="index">' + rows.map(r => typeof r === 'string' ? `<div class="folder">${esc(r)}</div>` : item(r, r.n === on, view)).join('') + '</div>'
+    + '<div class="index">' + (view === 'turn' ? rows.map(r => item(r, r.n === on, view)).join('') : tree(rows, on, view)) + '</div>'
     + '<div class="edge" data-edge="down"></div><div class="rule"></div>';
-  const buttons = (k, n) => `<div class="buttons">${n
-    ? `<button class="btn" ${k <= 1 ? 'aria-disabled="true"' : ''}>[ ◀ Anterior ]</button><button class="btn focus">[ Siguiente ▶ ]</button>` : ''}<button class="btn ${n ? '' : 'focus'}">[ Cerrar ]</button></div>`;
+  const buttons = (k, n, view) => `<div class="buttons">${n
+    ? `<button class="btn" ${k <= 1 ? 'aria-disabled="true"' : `data-go="${view}-${k - 1}"`}>[ ◀ Anterior ]</button><button class="btn focus" ${k >= n ? '' : `data-go="${view}-${k + 1}"`}>[ Siguiente ▶ ]</button>` : ''}<button class="btn ${n ? '' : 'focus'}">[ Cerrar ]</button></div>`;
   const msgs = (...ms) => `<div class="msgs">${ms.map(([t, cls = 'dim']) => `<div class="${cls}">${t}</div>`).join('')}</div>`;
 
+  // Orden de la tarjeta 0.5.0: encabezado, aire, vistas, aire, índice, separador, posición, ruta, aire, detalle, aire, diff, botones.
   const step = (view, rows, sum, s, total) => {
     const body = s.diff
-      ? `<div class="diffarea"><div class="diffwin" tabindex="0" aria-label="Diff de ${esc(s.path || s.name)}">${lines(s.diff)}</div><div class="ruler" aria-label="Dónde están los cambios"></div></div><div class="pos" data-pos></div>`
+      ? `<div class="diffarea"><div class="diffwin" tabindex="0" aria-label="Diff de ${esc(s.path || s.name)}">${lines(s.diff)}</div><div class="ruler" aria-label="Dónde están los cambios"></div></div>`
       : msgs([s.msg]);
-    return head(s.n, total) + tabs(view === 'turn' ? 'turn' : 'head', sum) + index(rows, s.n, view)
-      + `<div class="file">${esc(s.path || s.name)}</div><div class="meta">${s.meta}</div>` + body + buttons(s.n, total);
+    return head(s.n, total) + BLANK + tabs(view === 'turn' ? 'turn' : 'head', sum) + BLANK + index(rows, s.n, view)
+      + '<div class="pos" data-pos></div>'
+      + `<div class="file">${esc(s.path || s.name)}</div>` + BLANK + `<div class="meta">${s.meta}</div>` + BLANK + body + buttons(s.n, total, view);
   };
-  const steps = rows => rows.filter(r => typeof r !== 'string');
+  const empty = (view, ...ms) => head(0, 0) + BLANK + tabs(view, '') + BLANK + msgs(...ms) + buttons(0, 0);
 
   const STATES = {
-    loading: () => head(0, 0) + tabs('head', '') + msgs(['Leyendo los cambios…']) + buttons(0, 0),
-    turnempty: () => head(0, 0) + tabs('turn', '') + msgs(['Claude no editó archivos en el último turno.'], ['h muestra todo lo que cambió contra HEAD.']) + buttons(0, 0),
-    clean: () => head(0, 0) + tabs('head', '') + msgs(['✓ Sin cambios contra HEAD.', 'add']) + buttons(0, 0),
-    norepo: () => head(0, 0) + tabs('head', '') + msgs(['Esta carpeta no está en un repositorio git.'], ['fatal: not a git repository']) + buttons(0, 0),
-    error: () => head(0, 0) + tabs('head', '') + msgs(['No se pudieron leer los cambios.', 'rm'], ['fatal: index file corrupt']) + buttons(0, 0),
+    loading: () => empty('head', ['Leyendo los cambios…']),
+    turnempty: () => empty('turn', ['Claude no editó archivos en el último turno.'], ['h muestra todo lo que cambió contra HEAD.']),
+    clean: () => empty('head', ['✓ Sin cambios contra HEAD.', 'add']),
+    norepo: () => empty('head', ['Esta carpeta no está en un repositorio git.'], ['fatal: not a git repository']),
+    error: () => empty('head', ['No se pudieron leer los cambios.', 'rm'], ['fatal: index file corrupt']),
+  };
+  // El paso al que lleva un estado del mockup, o nada.
+  const stepOf = key => {
+    if (key === 'headfresh') return { view: 'head', rows: HEAD, s: HEAD[0] };
+    if (key === 'headmany') key = 'many-' + MANY.on;
+    const m = key.match(/^(turn|head|many)-(\d+)$/);
+    if (!m) return undefined;
+    const rows = { turn: TURN, head: HEAD, many: MANY.rows }[m[1]];
+    const s = rows.find(x => x.n === +m[2]);
+    return s && { view: m[1], rows, s };
   };
   const render = key => {
-    let m;
-    if (key === 'headmany' || /^many-\d+$/.test(key)) {
-      const on = key === 'headmany' ? MANY.on : +key.slice(5);
-      const s = steps(MANY.rows).find(x => x.n === on);
-      const many = { ...s, diff: s.diff || [[' ', 1, '<span class="h"># ' + esc(s.name) + '</span>'], ['+', 2, 'Una línea nueva.']] };
-      return step('many', MANY.rows, `42 archivos · ${counts(612, 140)}`, many, 42);
-    }
-    if ((m = key.match(/^(turn|head)-(\d+)$/))) {
-      const rows = m[1] === 'turn' ? TURN : HEAD;
-      const s = steps(rows).find(x => x.n === +m[2]);
-      if (s) return step(m[1], rows, m[1] === 'turn' ? turnSum : headSum, s, steps(rows).length);
-    }
-    return (STATES[key] || (() => render('turn-1')))();
+    const at = stepOf(key);
+    if (!at) return (STATES[key] || (() => render('turn-1')))();
+    const { view, rows, s } = at;
+    if (view === 'many') return step('many', rows, `42 archivos · ${counts(612, 140)}`,
+      { ...s, diff: s.diff || [[' ', 1, '<span class="h"># ' + esc(s.name) + '</span>'], ['+', 2, 'Una línea nueva.']] }, 42);
+    return step(view, rows, view === 'turn' ? turnSum : headSum, s, rows.length);
+  };
+  // RN-cambios-grupos-abrir: lo abierto; llegar a un paso abre su estado y su carpeta, y nada más.
+  let OPEN = new Set();
+  const arrive = key => {
+    const at = stepOf(key);
+    if (!at || key === 'headfresh' || at.view === 'turn') return;
+    OPEN.add(at.s.mark);
+    if (at.s.folder) OPEN.add(at.s.mark + '|' + at.s.folder);
   };
 
   // Lo que el mod escribe a mano en las filas fijas: qué líneas del diff se ven y cuánto índice queda afuera.
-  const track = card => {
+  const track = (card, keepIndexAt) => {
     const win = card.querySelector('.diffwin'), pos = card.querySelector('[data-pos]');
     if (win && pos) {
       const update = () => {
@@ -352,7 +421,7 @@
         const seen = [...win.querySelectorAll('.ln')].filter(l => { const r = l.getBoundingClientRect(); return r.bottom > top + 1 && r.top < bottom - 1; });
         const every = [...win.querySelectorAll('.ln')], all = every.length, first = every.indexOf(seen[0]);
         const fits = win.scrollHeight <= win.clientHeight + 1;
-        pos.innerHTML = fits ? `<span>${all} líneas</span><span></span>`
+        pos.innerHTML = fits ? `<span>${all} líneas</span>`
           : `<span>líneas ${first + 1}–${first + seen.length} de ${all}</span><span>rueda <button class="btn plain" data-move="-1">k: ▲</button> <button class="btn plain" data-move="1">j: ▼</button></span>`;
         drawRuler(fits);
       };
@@ -381,7 +450,8 @@
     const idx = card.querySelector('.index');
     if (idx) {
       const up = card.querySelector('[data-edge="up"]'), down = card.querySelector('[data-edge="down"]');
-      const all = [...idx.querySelectorAll('.item')];
+      // Los títulos de grupo cuentan como filas (RN-cambios-indice 0.5.0).
+      const all = [...idx.querySelectorAll('.item, .grp')];
       const update = () => {
         const t = idx.getBoundingClientRect().top, b = idx.getBoundingClientRect().bottom;
         const above = all.filter(e => e.getBoundingClientRect().bottom <= t + 1).length;
@@ -389,8 +459,10 @@
         up.style.display = above ? '' : 'none'; down.style.display = below ? '' : 'none';
         up.textContent = `↑ ${above} más`; down.textContent = `↓ ${below} más`;
       };
-      const on = idx.querySelector('.item.on');
-      if (on) idx.scrollTop = on.offsetTop - idx.offsetTop - 20;
+      // Abrir o cerrar un grupo no mueve el índice; llegar a un paso lo deja a la vista.
+      const here = idx.querySelector('.item.on') || [...idx.querySelectorAll('.grp.here')].pop();
+      if (keepIndexAt !== undefined) idx.scrollTop = keepIndexAt;
+      else if (here) idx.scrollTop = here.offsetTop - idx.offsetTop - 20;
       idx.addEventListener('scroll', update); update();
     }
   };
@@ -400,24 +472,29 @@
     return { state: h.get('state') || 'turn-1', place: h.get('place') === 'dock' ? 'dock' : 'inline' };
   };
   const go = patch => { const s = { ...parse(), ...patch }; location.hash = `state=${s.state}&place=${s.place}`; };
-  const show = () => {
+  const show = keepIndexAt => {
     const { state, place } = parse();
     const dock = document.getElementById('dock');
     dock.innerHTML = `<section class="card" data-state="${state}" style="--rows:${place === 'dock' ? 40 : 24};--index-rows:${place === 'dock' ? 8 : 4}">${render(state)}</section>`;
-    track(dock.querySelector('.card'));
+    track(dock.querySelector('.card'), typeof keepIndexAt === 'number' ? keepIndexAt : undefined);
     document.querySelectorAll('.states a').forEach(a => a.toggleAttribute('aria-current',
       a.dataset.state ? a.dataset.state === state || (a.dataset.state === 'headmany' && state.startsWith('many-')) : a.dataset.place === place));
   };
   document.addEventListener('click', ev => {
     const a = ev.target.closest('.states a');
-    if (a) { ev.preventDefault(); go(a.dataset.state ? { state: a.dataset.state } : { place: a.dataset.place }); return; }
+    // Elegir un estado del mockup es abrir el panel de nuevo: todo cerrado, salvo el camino al paso mostrado.
+    if (a) { ev.preventDefault(); if (a.dataset.state) { OPEN = new Set(); arrive(a.dataset.state); } go(a.dataset.state ? { state: a.dataset.state } : { place: a.dataset.place }); return; }
     // ▲ k y ▼ j: media ventana.
     const move = ev.target.closest('[data-move]');
     if (move) { const win = document.querySelector('.diffwin'); win.scrollTop += +move.dataset.move * Math.floor(win.clientHeight / 40) * 20; return; }
-    const it = ev.target.closest('.item');
-    if (it) go({ state: it.dataset.go });
+    // Un título abre o cierra su grupo, sin mover el índice.
+    const t = ev.target.closest('[data-toggle]');
+    if (t) { const k = t.dataset.toggle; OPEN.has(k) ? OPEN.delete(k) : OPEN.add(k); show(document.querySelector('.index').scrollTop); return; }
+    // Una fila del índice, Anterior o Siguiente: el paso, y se abre su grupo si estaba cerrado.
+    const it = ev.target.closest('[data-go]');
+    if (it) { arrive(it.dataset.go); go({ state: it.dataset.go }); }
   });
-  addEventListener('hashchange', show); show();
+  addEventListener('hashchange', show); arrive(parse().state); show();
 </script>
 </body>
 </html>

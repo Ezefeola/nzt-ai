@@ -1,4 +1,4 @@
-import type { Line, TurnStep } from '../types'
+import type { Line, Mark, TurnStep } from '../types'
 
 /** Past this many lines on either side, a diff is everything removed then everything added. */
 export const MAX_LCS_LINES = 400
@@ -308,16 +308,82 @@ export const rulerViewOf = (total: number, cells: number, first: number, count: 
   return { from: at(first), to: Math.max(at(first), at(first + count - 1)) }
 }
 
-/** One line of the index: a folder's title, or a step. */
-export type IndexLine = { kind: 'folder'; folder: string } | { kind: 'step'; step: number }
+/**
+ * One line of the index: the title of a mark's group or of a folder within it, or a step.
+ * `key` is what opens a title; `isHere` says the current step is inside it; `depth` is how
+ * many titles a step sits under.
+ */
+export type IndexLine =
+  | { kind: 'mark'; key: string; mark: Mark; count: number; isOpen: boolean; isHere: boolean }
+  | { kind: 'folder'; key: string; folder: string; count: number; isOpen: boolean; isHere: boolean }
+  | { kind: 'step'; step: number; depth: number }
 
-/** The index's lines: each step, under its folder's title when the folder changes. */
-export const indexLinesOf = (folders: string[]): IndexLine[] =>
-  folders.flatMap((folder, step): IndexLine[] =>
-    folder !== '' && folders[step - 1] !== folder
-      ? [{ kind: 'folder', folder }, { kind: 'step', step }]
-      : [{ kind: 'step', step }],
-  )
+/** The key that opens a folder's title within a mark's group. */
+export const folderKey = (mark: Mark, folder: string) => `${mark}/${folder}`
+
+/** The keys of the titles a step sits under: its mark's, and its folder's unless at the root. */
+export const pathKeysOf = (step: { mark: Mark; folder: string }) =>
+  step.folder === '' ? [step.mark] : [step.mark, folderKey(step.mark, step.folder)]
+
+/** The index of a view with no groups: one line per step. */
+export const flatLinesOf = (total: number): IndexLine[] =>
+  Array.from({ length: total }, (_, step) => ({ kind: 'step', step, depth: 0 }))
+
+/**
+ * The index of steps already in tree order: a title for each mark, and inside an open one its
+ * root steps, then a title for each folder with its steps when that folder is open.
+ */
+export const treeLinesOf = (
+  steps: { mark: Mark; folder: string }[],
+  open: readonly string[],
+  current: number,
+): IndexLine[] => {
+  const here = steps[current]
+  const counts = new Map<string, number>()
+  for (const step of steps) {
+    for (const key of pathKeysOf(step)) counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  const lines: IndexLine[] = []
+  steps.forEach((step, i) => {
+    const before = steps[i - 1]
+    const isNewMark = before?.mark !== step.mark
+    if (isNewMark) {
+      lines.push({
+        kind: 'mark',
+        key: step.mark,
+        mark: step.mark,
+        count: counts.get(step.mark) ?? 0,
+        isOpen: open.includes(step.mark),
+        isHere: here?.mark === step.mark,
+      })
+    }
+    if (!open.includes(step.mark)) return
+    if (step.folder === '') {
+      lines.push({ kind: 'step', step: i, depth: 1 })
+      return
+    }
+    const key = folderKey(step.mark, step.folder)
+    if (isNewMark || before?.folder !== step.folder) {
+      lines.push({
+        kind: 'folder',
+        key,
+        folder: step.folder,
+        count: counts.get(key) ?? 0,
+        isOpen: open.includes(key),
+        isHere: here?.mark === step.mark && here.folder === step.folder,
+      })
+    }
+    if (open.includes(key)) lines.push({ kind: 'step', step: i, depth: 2 })
+  })
+  return lines
+}
+
+/** The line that stands for step `current`: its own, or else the innermost title it is hidden in. */
+export const lineOf = (lines: IndexLine[], current: number) => {
+  const own = lines.findIndex(line => line.kind === 'step' && line.step === current)
+  if (own >= 0) return own
+  return lines.map(line => line.kind !== 'step' && line.isHere).lastIndexOf(true)
+}
 
 /** The first line of a window of `rows` lines moved as little as it takes for `line` to show. */
 export const nearestTop = (top: number, line: number, rows: number) =>
@@ -325,18 +391,15 @@ export const nearestTop = (top: number, line: number, rows: number) =>
 
 /**
  * Which index lines show in `rows` rows: from `top` once set (the person's scroll, or where a
- * step change left it), else from the top with the current step in view. Counts the steps
- * left above and below.
+ * step change left it), else from the top with the current step, or the title it is hidden in,
+ * in view. Counts the lines left above and below.
  */
 export const indexRange = (lines: IndexLine[], current: number, rows: number, top: number | null) => {
   const lastTop = Math.max(0, lines.length - rows)
-  const at = lines.findIndex(line => line.kind === 'step' && line.step === current)
-  const wanted = top ?? nearestTop(0, Math.max(0, at), rows)
+  const wanted = top ?? nearestTop(0, Math.max(0, lineOf(lines, current)), rows)
   const from = Math.max(0, Math.min(wanted, lastTop))
   const to = Math.min(lines.length, from + rows)
-  const steps = (part: IndexLine[]) => part.filter(line => line.kind === 'step').length
-  const stepLines = lines.flatMap((line, k) => (line.kind === 'step' ? [k] : []))
-  return { from, to, lastTop, above: steps(lines.slice(0, from)), below: steps(lines.slice(to)), stepLines }
+  return { from, to, lastTop, above: from, below: lines.length - to }
 }
 
 /** A text cut to `cells` cells, the cut marked with `…`. */

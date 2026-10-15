@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { addedDiffOf, diffOf, groupsOf, parseNumstat, parseStatus, relativeTo } from './git'
+import { addedDiffOf, diffOf, groupsOf, parseNumstat, parseStatus, relativeTo, treeOrderOf } from './git'
 
 describe('parseStatus', () => {
   test('marks each kind of change, renames with their old path', async () => {
@@ -62,6 +62,35 @@ describe('groupsOf', () => {
       'mods/x/hooks: mods/x/hooks/git.ts',
       'Plan: Plan/state.json',
       'specs: specs/a.md, specs/z.md',
+    ])
+  })
+})
+
+describe('treeOrderOf', () => {
+  test('by mark (modified, new, deleted, renamed, in conflict), then in folder order', async () => {
+    const file = (path: string, mark: 'A' | 'M' | 'D' | 'R' | '!') => ({
+      path,
+      mark,
+      added: 1,
+      removed: 0,
+      isBinary: false,
+      isUntracked: false,
+    })
+    const files = [
+      file('x.md', '!'),
+      file('docs/b.md', 'R'),
+      file('img/logo.png', 'D'),
+      file('specs/new.md', 'A'),
+      file('Plan/state.json', 'M'),
+      file('README.md', 'M'),
+    ]
+    expect(treeOrderOf(files).map(f => f.path)).toEqual([
+      'README.md',
+      'Plan/state.json',
+      'specs/new.md',
+      'img/logo.png',
+      'docs/b.md',
+      'x.md',
     ])
   })
 })

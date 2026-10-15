@@ -160,6 +160,13 @@ export const groupsOf = (files: Change[]): Group[] => {
     }))
 }
 
+/** The order the HEAD view groups its files in, by what happened to them. */
+export const MARK_ORDER: readonly Mark[] = ['M', 'A', 'D', 'R', '!']
+
+/** The HEAD view's steps: by mark in `MARK_ORDER`, and within one mark in folder order. */
+export const treeOrderOf = (files: Change[]): Change[] =>
+  MARK_ORDER.flatMap(mark => groupsOf(files.filter(file => file.mark === mark)).flatMap(group => group.files))
+
 /**
  * `path` relative to `root`, both with `/`; undefined when it is outside. Windows paths
  * compare without case, as the file system does.

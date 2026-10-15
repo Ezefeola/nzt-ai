@@ -51,9 +51,10 @@ export type TurnStep = {
 /**
  * Which view the pane shows and the step each view is on; the HEAD view's loaded diff. `diffTop`
  * is the first diff line the window shows; `indexTop` the first index line, null while the index
- * follows the current step.
+ * follows the current step. `open` holds the keys of the HEAD index's open titles.
  */
 export type View = {
+  open: string[]
   mode: 'turn' | 'head'
   turnIndex: number
   headIndex: number

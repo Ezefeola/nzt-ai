@@ -1,6 +1,6 @@
 # nzt-changes
 
-> Versión **0.4.0** · spec en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md)
+> Versión **0.5.0** · spec en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md)
 
 Un panel lateral de Claude Code para recorrer los cambios **un diff por vez**, con el diseño
 de [Replay Theater](https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/replay-theater),
@@ -9,30 +9,32 @@ el mod de ejemplo de Anthropic. Tiene dos vistas:
 - **Turno**: lo que Claude editó en el último turno (Write, Edit y NotebookEdit), en el
   orden en que lo hizo.
 - **HEAD**: todo lo que cambió en el proyecto contra `HEAD`, lo haya hecho quien sea y sea
-  el archivo que sea (specs, Markdown, JSON, código, imágenes), ordenado por carpeta.
+  el archivo que sea (specs, Markdown, JSON, código, imágenes), agrupado por lo que le pasó
+  a cada archivo y por carpeta, en grupos que se abren y se cierran.
 
 ```
 ╭────────────────────────────────────────────────────────╮
 │  NZT  Cambios                              paso 4 de 7 │
+│                                                        │
 │ Turno (t)  HEAD (h)         7 archivos · +139 -20      │
 │                                                        │
-│    1 M README.md                                 +1 -0 │
-│   Plan/                                                │
-│    3 M state.json                               +26 -8 │
-│   mods/nzt-changes/hooks/                              │
-│ ▸  4 M register.tsx                            +41 -12 │
-│    5 A turn.ts                                  +64 -0 │
+│ ▾ M Modificados 4                                      │
+│      1 README.md                                 +1 -0 │
+│   ▸ Plan/ 1                                            │
+│   ▾ mods/nzt-changes/hooks/ 2                          │
+│     ▸  4 register.tsx                          +41 -12 │
+│ ▸ A Nuevos 1                                           │
 │ ────────────────────────────────────────────────────── │
+│                   líneas 1–6 de 53   rueda k: ▲ j: ▼   │
 │ mods/nzt-changes/hooks/register.tsx                    │
+│                                                        │
 │ modificado · ● Claude · TypeScript  +41 -12            │
+│                                                        │
 │ 282    await update($, view, …)                      █ │
 │ 283 -  const opened = await $.ui.open({ id: PANE })  ▐ │
 │ 283 +  const opened = await $.ui.open({              ▐ │
 │ 284 +    id: PANE, rows: INLINE_ROWS, columns: 58,   █ │
-│ 285 +  })                                            │ │
-│ 286    isShowing = true                              ▐ │
-│ líneas 1–6 de 53                    rueda k: ▲ j: ▼    │
-│ [ ◀ Anterior ]  [ Siguiente ▶ ]  [ Cerrar ]            │
+│            [ ◀ Anterior ]  [ Siguiente ▶ ]  [ Cerrar ] │
 ╰────────────────────────────────────────────────────────╯
 ```
 
@@ -63,20 +65,24 @@ panel enfocado:
 | `t` | vista Turno |
 | `h` | vista HEAD |
 | `j` / `k` | mover el diff media ventana abajo / arriba (también la rueda sobre el diff) |
-| Tab y Enter | ir a un archivo del índice o a un botón |
+| Tab y Enter | ir a un archivo o a un grupo del índice, o a un botón; Enter en un grupo lo abre o lo cierra |
 | `c` o Escape | cerrar |
 
-Arriba, un índice de los cambios: en HEAD agrupado por carpeta, con la letra de lo que le
-pasó a cada archivo; en Turno, en el orden en que Claude editó. **Cada fila se clickea** y
-lleva a ese cambio. El índice ocupa hasta 4 filas sobre el prompt y 8 al costado; con más
-archivos, la rueda sobre él lo mueve. Al lado de las vistas, el resumen: cuántas ediciones o
-archivos y cuántas líneas.
+Arriba, un índice de los cambios. En HEAD es un árbol: un grupo por lo que le pasó a cada
+archivo (**Modificados**, **Nuevos**, **Borrados**, **Renombrados**, **En conflicto**; solo los
+que tienen archivos) y dentro, una carpeta por grupo. Al abrir el panel todos los grupos están
+cerrados, y el del cambio que estás mirando va en el color de NZT. **Un click en un grupo lo
+abre o lo cierra**; Anterior y Siguiente abren el grupo del archivo al que van. En Turno, una
+lista en el orden en que Claude editó. **Cada archivo se clickea** y lleva a ese cambio. El
+índice ocupa hasta 4 filas sobre el prompt y 8 al costado; con más, la rueda sobre él lo
+mueve. Al lado de las vistas, el resumen: cuántas ediciones o archivos y cuántas líneas.
 
 Cada cambio muestra el archivo, qué le pasó (en Turno: la herramienta; en HEAD: nuevo,
 modificado, borrado, renombrado o en conflicto, y `● Claude` si lo tocó Claude en la
 sesión), su tipo (Markdown, JSON, TypeScript, imagen…), las líneas sumadas y sacadas, y el
 diff con una línea de contexto alrededor de cada cambio y los números de línea del archivo.
-Debajo del diff, qué líneas se ven (`líneas 12–30 de 85`).
+Arriba a la derecha, bajo la línea que separa el índice, qué líneas se ven (`líneas 12–30 de
+85`). Los botones van abajo a la derecha.
 
 ## Dónde aparece
 

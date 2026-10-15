@@ -6,10 +6,13 @@ import {
   fit,
   gitHunks,
   hunksOf,
+  flatLinesOf,
   hunksWithin,
-  indexLinesOf,
   indexRange,
+  lineOf,
   nearestTop,
+  pathKeysOf,
+  treeLinesOf,
   MAX_LCS_LINES,
   rulerOf,
   rulerViewOf,
@@ -176,26 +179,59 @@ describe('rulerOf', () => {
 })
 
 describe('the index', () => {
-  const lines = indexLinesOf(['', 'docs', 'docs', 'src'])
+  // Already in tree order: two modified (root, docs), one new in src.
+  const steps = [
+    { mark: 'M' as const, folder: '' },
+    { mark: 'M' as const, folder: 'docs' },
+    { mark: 'M' as const, folder: 'docs' },
+    { mark: 'A' as const, folder: 'src' },
+  ]
+  const lines = treeLinesOf(steps, ['M', 'M/docs', 'A', 'A/src'], 3)
 
-  test('a folder title goes over the first of its steps', async () => {
-    expect(lines).toEqual([
-      { kind: 'step', step: 0 },
-      { kind: 'folder', folder: 'docs' },
-      { kind: 'step', step: 1 },
-      { kind: 'step', step: 2 },
-      { kind: 'folder', folder: 'src' },
-      { kind: 'step', step: 3 },
+  test('a title per mark, with its root steps and then a title per folder over its steps', async () => {
+    expect(lines.map(line => (line.kind === 'step' ? line.step : `${line.kind}:${line.key}:${line.count}`))).toEqual([
+      'mark:M:3',
+      0,
+      'folder:M/docs:2',
+      1,
+      2,
+      'mark:A:1',
+      'folder:A/src:1',
+      3,
+    ])
+    expect(lines.filter(line => line.kind !== 'step' && line.isHere).map(line => line.kind !== 'step' && line.key)).toEqual(['A', 'A/src'])
+  })
+
+  test('a closed title hides what is inside it', async () => {
+    const closed = treeLinesOf(steps, ['M'], 3)
+    expect(closed.map(line => (line.kind === 'step' ? line.step : line.key))).toEqual(['M', 0, 'M/docs', 'A'])
+    expect(treeLinesOf(steps, [], 0).map(line => line.kind)).toEqual(['mark', 'mark'])
+  })
+
+  test('a step hidden in a closed group stands as its innermost title', async () => {
+    expect(lineOf(treeLinesOf(steps, ['M'], 1), 1)).toBe(2)
+    expect(lineOf(treeLinesOf(steps, [], 3), 3)).toBe(1)
+  })
+
+  test('the keys over a step: its mark, and its folder unless at the root', async () => {
+    expect(pathKeysOf({ mark: 'M', folder: '' })).toEqual(['M'])
+    expect(pathKeysOf({ mark: 'D', folder: 'img' })).toEqual(['D', 'D/img'])
+  })
+
+  test('the Turn view is one line per step', async () => {
+    expect(flatLinesOf(2)).toEqual([
+      { kind: 'step', step: 0, depth: 0 },
+      { kind: 'step', step: 1, depth: 0 },
     ])
   })
 
-  test('the current step stays in view with the line above it', async () => {
-    expect(indexRange(lines, 3, 4, null)).toMatchObject({ from: 2, to: 6, lastTop: 2, above: 1, below: 0 })
-    expect(indexRange(lines, 0, 4, null)).toMatchObject({ from: 0, to: 4, lastTop: 2, above: 0, below: 1 })
+  test('the current step stays in view, and the lines left out are counted', async () => {
+    expect(indexRange(lines, 3, 4, null)).toMatchObject({ from: 4, to: 8, lastTop: 4, above: 4, below: 0 })
+    expect(indexRange(lines, 0, 4, null)).toMatchObject({ from: 0, to: 4, lastTop: 4, above: 0, below: 4 })
   })
 
   test('once scrolled, it stays where the person left it', async () => {
-    expect(indexRange(lines, 0, 4, 1)).toMatchObject({ from: 1, to: 5, lastTop: 2, above: 1, below: 1 })
+    expect(indexRange(lines, 0, 4, 1)).toMatchObject({ from: 1, to: 5, lastTop: 4, above: 1, below: 3 })
   })
 
   test('a window moves only as far as a line needs to show', async () => {

@@ -9,12 +9,12 @@ import {
   diffOf,
   EMPTY_TREE,
   folderOf,
-  groupsOf,
   keyOf,
   nameOf,
   parseNumstat,
   parseStatus,
   relativeTo,
+  treeOrderOf,
 } from './git'
 import type { Count, Repo } from './git'
 import { langOf, TEXTS } from './i18n'
@@ -24,25 +24,31 @@ import {
   diffLines,
   diffWindow,
   fit,
+  flatLinesOf,
   gitHunks,
-  indexLinesOf,
   indexRange,
+  lineOf,
   nearestTop,
+  pathKeysOf,
   printable,
   rulerOf,
   rulerViewOf,
   sourceOfStep,
   splitLines,
   startLineOf,
+  treeLinesOf,
   turnStepOf,
 } from './turn'
-import type { RulerMark } from './turn'
+import type { IndexLine, RulerMark } from './turn'
 
 const PANE = 'nzt-changes'
 const POLL_MS = 3000
-// The card's rows besides the index and the diff: its border, heading, views, rule, file,
-// detail, position line and buttons.
-const CARD_ROWS = 9
+// The card's rows besides the index and the diff: its border, heading, views, rule, position
+// line, file, detail and buttons, and the four blank rows between heading and views, views and
+// index, file and detail, detail and diff.
+const CARD_ROWS = 13
+// Body rows above the index: the blank row over the card, its border, heading, blank, views, blank.
+const INDEX_START = 6
 const MIN_DIFF_ROWS = 3
 const INDEX_ROWS = { inline: 4, dock: 8 } as const
 const DOCK_COLUMNS = 58
@@ -54,6 +60,7 @@ const CURRENT = 'cyan'
 
 const snapshot = atom({ plugin: 'nzt-changes', key: 'snapshot' } as const, { kind: 'idle' } as Snapshot)
 const view = atom({ plugin: 'nzt-changes', key: 'view' } as const, {
+  open: [],
   mode: 'turn',
   turnIndex: 0,
   headIndex: 0,
@@ -97,7 +104,6 @@ let layout = {
   indexFrom: 0,
   indexRows: 1,
   indexLastTop: 0,
-  stepLines: [] as number[],
   diffLastTop: 0,
 }
 
@@ -109,6 +115,7 @@ const clamp = (index: number, total: number) =>
  * an older version wrote (0.1.0 had `selected` and no `mode`) arrives here too.
  */
 const viewOf = (value: Partial<View> | undefined): View => ({
+  open: Array.isArray(value?.open) ? value.open.filter(key => typeof key === 'string') : [],
   mode: value?.mode === 'head' ? 'head' : 'turn',
   turnIndex: Number.isFinite(value?.turnIndex) ? value!.turnIndex! : 0,
   headIndex: Number.isFinite(value?.headIndex) ? value!.headIndex! : 0,
@@ -118,9 +125,22 @@ const viewOf = (value: Partial<View> | undefined): View => ({
   diff: value?.diff ?? null,
 })
 
-/** The HEAD view's steps: the files in folder order. */
-const headSteps = (state: Snapshot) =>
-  state.kind === 'ok' ? groupsOf(state.files).flatMap(group => group.files) : []
+/** The HEAD view's steps: the files by mark, then in folder order. */
+const headSteps = (state: Snapshot) => (state.kind === 'ok' ? treeOrderOf(state.files) : [])
+
+/** Where a HEAD step sits in the index's tree. */
+const placeOf = (file: Change) => ({ mark: file.mark, folder: folderOf(file.path) })
+
+/** The index's lines for a view: flat in Turn, a tree in HEAD with `open`'s titles open. */
+const indexLinesFor = (mode: View['mode'], total: number, head: Change[], open: readonly string[], k: number): IndexLine[] =>
+  mode === 'turn' ? flatLinesOf(total) : treeLinesOf(head.map(placeOf), open, k)
+
+/** `open` with the titles over HEAD step `k` opened too. */
+const openedTo = (open: readonly string[], head: Change[], k: number) => {
+  const file = head[k]
+  if (file === undefined) return [...open]
+  return [...new Set([...open, ...pathKeysOf(placeOf(file))])]
+}
 
 /** What the HEAD view's diff shows: hunks and the lines git's output lost, or one line that stands in for them. */
 const shownOfDiff = (diff: Diff): { source: string; more: number } | string =>
@@ -137,11 +157,9 @@ const kindLabel = (path: string) => {
   return kind.kind === 'named' ? kind.name : kind.kind === 'image' ? t.image(kind.format) : t.text
 }
 
-/** One row of the index: a step's name, its folder in the HEAD view, its mark and counts. */
+/** One step's row of the index: its name and counts; in HEAD its title says its mark and folder. */
 type Row = {
   name: string
-  folder: string
-  mark?: Mark
   added: number | null
   removed: number | null
   isBinary: boolean
@@ -313,14 +331,26 @@ async function stepOf($: EngineInterface, e: { tool: string } & Record<string, u
 
 async function go($: EngineInterface, by: number) {
   const now = viewOf(await read($, view))
-  const total = now.mode === 'turn' ? (await read($, turn)).length : headSteps(await read($, snapshot)).length
+  const head = headSteps(await read($, snapshot))
+  const total = now.mode === 'turn' ? (await read($, turn)).length : head.length
   if (total === 0) return
   const key = now.mode === 'turn' ? 'turnIndex' : 'headIndex'
   await update($, view, value => {
-    const step = clamp(viewOf(value)[key] + by, total)
-    const line = layout.stepLines[step] ?? 0
-    // The index moves only as far as the new step needs to show.
-    return { ...viewOf(value), [key]: step, diffTop: 0, indexTop: nearestTop(layout.indexFrom, line, layout.indexRows) }
+    const was = viewOf(value)
+    const step = clamp(was[key] + by, total)
+    // A step inside a closed group opens it; the index moves only as far as the step needs to show.
+    const open = was.mode === 'head' ? openedTo(was.open, head, step) : was.open
+    const line = Math.max(0, lineOf(indexLinesFor(was.mode, total, head, open, step), step))
+    return { ...was, [key]: step, open, diffTop: 0, indexTop: nearestTop(layout.indexFrom, line, layout.indexRows) }
+  })
+}
+
+/** Opens or closes a title of the HEAD index, which stays where it is. */
+async function toggle($: EngineInterface, key: string) {
+  await update($, view, value => {
+    const now = viewOf(value)
+    const open = now.open.includes(key) ? now.open.filter(k => k !== key) : [...now.open, key]
+    return { ...now, open, indexTop: layout.indexFrom }
   })
 }
 
@@ -342,7 +372,14 @@ async function select($: EngineInterface, step: number) {
 
 async function show($: EngineInterface, mode: View['mode']) {
   await update($, view, value => ({ ...viewOf(value), mode, diffTop: 0, indexTop: null }))
-  if (mode === 'head') await refresh($)
+  if (mode !== 'head') return
+  await refresh($)
+  // Landing on HEAD opens the groups of the step it lands on.
+  const head = headSteps(await read($, snapshot))
+  await update($, view, value => {
+    const now = viewOf(value)
+    return { ...now, open: openedTo(now.open, head, clamp(now.headIndex, head.length)) }
+  })
 }
 
 async function closePane($: EngineInterface) {
@@ -365,7 +402,8 @@ export const register: Register = (on, options) => {
   on('command.run', { command: 'nzt-changes' }, async ($, e) => {
     const steps = await read($, turn)
     const mode: View['mode'] = steps.length > 0 ? 'turn' : 'head'
-    await update($, view, value => ({ ...viewOf(value),mode }))
+    // Every opening starts with the HEAD index's groups closed.
+    await update($, view, value => ({ ...viewOf(value), mode, open: [], indexTop: null }))
     // Replay Theater's width when docked; inline, a fixed height the card fills.
     const opened = await $.ui.open({
       id: PANE,
@@ -471,15 +509,12 @@ export const register: Register = (on, options) => {
     const rows: Row[] = isTurn
       ? turnSteps.map(step => ({
           name: step.file,
-          folder: '',
           added: step.added,
           removed: step.removed,
           isBinary: false,
         }))
       : head.map(file => ({
           name: nameOf(file.path),
-          folder: folderOf(file.path),
-          mark: file.mark,
           added: file.added,
           removed: file.removed,
           isBinary: file.isBinary,
@@ -491,33 +526,48 @@ export const register: Register = (on, options) => {
       </Text>
     )
 
-    // The index: a window of its lines, the HEAD view's steps under their folder; each step a
-    // button that jumps to it, dim until the pointer or the focus is on it.
+    // The index: a window of its lines. In HEAD a tree of titles, by mark and then folder, that
+    // open and close; each step a button that jumps to it, dim until the pointer or the focus is on it.
     const index: JSX.Element[] = []
-    const lines = indexLinesOf(rows.map(row => row.folder))
+    const lines = indexLinesFor(now.mode, total, head, now.open, k)
     const range = indexRange(lines, k, INDEX_ROWS[e.props.placement], now.indexTop)
     if (total > 0) {
       if (range.above > 0) index.push(<Text key="above" dimColor>{`  ${t.above(range.above)}`}</Text>)
       for (const line of lines.slice(range.from, range.to)) {
-        if (line.kind === 'folder') {
+        if (line.kind !== 'step') {
+          const indent = line.kind === 'folder' ? '  ' : ''
+          const label = line.kind === 'folder' ? `${line.folder}/` : t.groups[line.mark]
+          const room = width - indent.length - 4 - String(line.count).length - 1
+          // Only the name is the button, as in a step's row.
           index.push(
-            <Text key={`f-${line.folder}`} dimColor wrap="truncate-start">{`  ${printable(line.folder)}/`}</Text>,
+            <Box key={`g-${line.key}`} flexDirection="row">
+              <Text color={line.isHere ? ACCENT : undefined} dimColor={!line.isHere}>
+                {`${indent}${line.isOpen ? '▾' : '▸'} `}
+              </Text>
+              {line.kind === 'mark' && <Text color={MARK_COLOR[line.mark]}>{`${line.mark} `}</Text>}
+              <Button key={`group-${line.key}`} plain dimColor={!line.isHere && line.kind === 'folder'} onPress={() => toggle($, line.key)}>
+                <Text bold={line.kind === 'mark'} color={line.isHere ? ACCENT : undefined}>
+                  {fit(printable(label), room)}
+                </Text>
+              </Button>
+              <Text dimColor>{` ${line.count}`}</Text>
+            </Box>,
           )
           continue
         }
         const i = line.step
         const row = rows[i]!
         const isCurrent = i === k
+        const indent = '  '.repeat(line.depth)
         const tally = row.isBinary ? 'bin' : row.added === null || row.removed === null ? '·' : `+${row.added} -${row.removed}`
-        const room = width - 6 - (row.mark === undefined ? 0 : 2) - tally.length - 1
+        const room = width - 6 - indent.length - tally.length - 1
         // Only the name is the button: the engine inverts a button under the pointer, and a
         // whole inverted row read as noise.
         index.push(
           <Box key={`i${i}`} flexDirection="row" justifyContent="space-between">
             <Box flexDirection="row">
-              <Text color={CURRENT}>{isCurrent ? '▸ ' : '  '}</Text>
+              <Text color={CURRENT}>{`${indent}${isCurrent ? '▸ ' : '  '}`}</Text>
               <Text dimColor>{String(i + 1).padStart(2)}</Text>
-              {row.mark !== undefined && <Text color={MARK_COLOR[row.mark]}>{` ${row.mark}`}</Text>}
               <Text> </Text>
               <Button key={`step-${i}`} plain dimColor={!isCurrent} onPress={() => select($, i)}>
                 <Text bold={isCurrent} color={isCurrent ? CURRENT : undefined}>
@@ -537,17 +587,17 @@ export const register: Register = (on, options) => {
     }
 
     // The card is exactly as tall as the body: the diff takes what the rest leaves.
-    const height = e.props.scroll.bodyRows
+    // One row less than the body: the blank row above the card keeps it off the pane's tabs.
+    const height = e.props.scroll.bodyRows - 1
     const diffRows = Math.max(MIN_DIFF_ROWS, height - CARD_ROWS - index.length)
-    const indexStart = 3
-    const diffStart = indexStart + index.length + (index.length > 0 ? 1 : 0) + 2
+    // Below the index: its rule and the position line, then file, blank, detail, blank.
+    const diffStart = INDEX_START + index.length + (index.length > 0 ? 2 : 0) + 4
     layout = {
-      index: [indexStart, indexStart + index.length],
+      index: [INDEX_START, INDEX_START + index.length],
       diff: [diffStart, diffStart + diffRows],
       indexFrom: range.from,
       indexRows: INDEX_ROWS[e.props.placement],
       indexLastTop: range.lastTop,
-      stepLines: range.stepLines,
       diffLastTop: 0,
     }
 
@@ -572,6 +622,9 @@ export const register: Register = (on, options) => {
       </Button>
     )
 
+    // Which lines of the diff are in view, drawn under the index's rule; empty for a step with no diff.
+    let position: JSX.Element | null = null
+
     // The diff as Claude Code draws its own, numbered and coloured by the file's language, in a
     // window of its own; beside it, when it does not fit, the ruler of where its changes are.
     const diffView = (source: string, path: string, more: number) => {
@@ -582,6 +635,27 @@ export const register: Register = (on, options) => {
       if (shown.total === 0) return message(t.noLines)
       const marks = fits ? [] : rulerOf(source, diffRows)
       const seen = rulerViewOf(shown.total, diffRows, shown.first, shown.count)
+      position = (
+        <Box flexDirection="row" gap={2}>
+          <Text dimColor wrap="truncate-end">
+            {(fits
+              ? t.allLines(shown.total)
+              : t.lines(shown.first + 1, shown.first + shown.count, shown.total)) +
+              (more > 0 ? t.more(more) : '')}
+          </Text>
+          {!fits && (
+            <Box flexDirection="row" gap={1} flexShrink={0}>
+              <Text dimColor>{t.scrollHint}</Text>
+              <Button key="up" plain hotkey="k" onPress={() => scrollDiff($, -Math.max(1, Math.floor(diffRows / 2)))}>
+                ▲
+              </Button>
+              <Button key="down" plain hotkey="j" onPress={() => scrollDiff($, Math.max(1, Math.floor(diffRows / 2)))}>
+                ▼
+              </Button>
+            </Box>
+          )}
+        </Box>
+      )
       return (
         <Box flexDirection="column" flexGrow={1}>
           <Box flexDirection="row" height={diffRows} gap={1}>
@@ -606,25 +680,6 @@ export const register: Register = (on, options) => {
               </Box>
             )}
           </Box>
-          <Box flexDirection="row" justifyContent="space-between">
-            <Text dimColor wrap="truncate-end">
-              {(fits
-                ? t.allLines(shown.total)
-                : t.lines(shown.first + 1, shown.first + shown.count, shown.total)) +
-                (more > 0 ? t.more(more) : '')}
-            </Text>
-            {!fits && (
-              <Box flexDirection="row" gap={1} flexShrink={0}>
-                <Text dimColor>{t.scrollHint}</Text>
-                <Button key="up" plain hotkey="k" onPress={() => scrollDiff($, -Math.max(1, Math.floor(diffRows / 2)))}>
-                  ▲
-                </Button>
-                <Button key="down" plain hotkey="j" onPress={() => scrollDiff($, Math.max(1, Math.floor(diffRows / 2)))}>
-                  ▼
-                </Button>
-              </Box>
-            )}
-          </Box>
         </Box>
       )
     }
@@ -641,9 +696,7 @@ export const register: Register = (on, options) => {
     }
 
     const message = (text: string, color?: string) => (
-      <Box marginTop={1}>
-        <Text color={color} dimColor={color === undefined} wrap="wrap">{`  ${text}`}</Text>
-      </Box>
+      <Text color={color} dimColor={color === undefined} wrap="wrap">{`  ${text}`}</Text>
     )
 
     // The step's file, its detail line and its diff, or the line that stands in for them.
@@ -659,13 +712,17 @@ export const register: Register = (on, options) => {
         ) : (
           <Box flexDirection="column">
             <Text bold color={CURRENT} wrap="truncate-start">{printable(step.file)}</Text>
-            {detail(
-              <Text dimColor>{step.tool}{step.note === undefined ? '' : ` · ${t[step.note]}`}</Text>,
-              step.file,
-              step.added,
-              step.removed,
-            )}
-            {diffView(sourceOfStep(step), step.file, step.more)}
+            <Box marginTop={1}>
+              {detail(
+                <Text dimColor>{step.tool}{step.note === undefined ? '' : ` · ${t[step.note]}`}</Text>,
+                step.file,
+                step.added,
+                step.removed,
+              )}
+            </Box>
+            <Box flexDirection="column" marginTop={1}>
+              {diffView(sourceOfStep(step), step.file, step.more)}
+            </Box>
           </Box>
         )
     } else if (state.kind === 'idle') {
@@ -697,23 +754,27 @@ export const register: Register = (on, options) => {
           <Text bold color={CURRENT} wrap="truncate-start">
             {printable(file.from === undefined ? file.path : `${file.from} → ${file.path}`)}
           </Text>
-          {detail(
-            <Text>
-              <Text color={MARK_COLOR[file.mark]}>{t.marks[file.mark]}</Text>
-              {mine.has(file.path) && <Text color="claude">{` · ${t.byClaude}`}</Text>}
-            </Text>,
-            file.path,
-            file.added ?? 0,
-            file.removed ?? 0,
-            file.isBinary,
-          )}
-          {typeof shown === 'string' ? message(shown) : diffView(shown.source, file.path, shown.more)}
+          <Box marginTop={1}>
+            {detail(
+              <Text>
+                <Text color={MARK_COLOR[file.mark]}>{t.marks[file.mark]}</Text>
+                {mine.has(file.path) && <Text color="claude">{` · ${t.byClaude}`}</Text>}
+              </Text>,
+              file.path,
+              file.added ?? 0,
+              file.removed ?? 0,
+              file.isBinary,
+            )}
+          </Box>
+          <Box flexDirection="column" marginTop={1}>
+            {typeof shown === 'string' ? message(shown) : diffView(shown.source, file.path, shown.more)}
+          </Box>
         </Box>
       )
     }
 
     return (
-      <Box flexDirection="column" height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
+      <Box flexDirection="column" marginTop={1} height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
         <Box flexDirection="row" justifyContent="space-between">
           <Text>
             <Text backgroundColor={ACCENT} color="inverseText" bold> NZT </Text>{' '}
@@ -721,7 +782,7 @@ export const register: Register = (on, options) => {
           </Text>
           <Text bold>{total === 0 ? t.noSteps : t.step(k + 1, total)}</Text>
         </Box>
-        <Box flexDirection="row" justifyContent="space-between">
+        <Box flexDirection="row" justifyContent="space-between" marginTop={1}>
           <Box flexDirection="row" flexShrink={0}>
             {tab('turn', t.turn, 't')}
             {tab('head', t.head, 'h')}
@@ -730,12 +791,21 @@ export const register: Register = (on, options) => {
             {summary}
           </Box>
         </Box>
-        {index.length > 0 && <Box flexDirection="column">{index}</Box>}
+        {index.length > 0 && (
+          <Box flexDirection="column" marginTop={1}>
+            {index}
+          </Box>
+        )}
         {index.length > 0 && <Text dimColor>{'─'.repeat(width)}</Text>}
-        <Box flexDirection="column" flexGrow={1} flexShrink={1} overflow="hidden">
+        {index.length > 0 && (
+          <Box flexDirection="row" justifyContent="flex-end" height={1}>
+            {position}
+          </Box>
+        )}
+        <Box flexDirection="column" flexGrow={1} flexShrink={1} overflow="hidden" marginTop={index.length > 0 ? 0 : 1}>
           {body}
         </Box>
-        <Box flexDirection="row" gap={2}>
+        <Box flexDirection="row" justifyContent="flex-end" gap={2}>
           {total > 0 && <Button key="prev" label={t.prev} hotkey="p" onPress={() => go($, -1)} />}
           {total > 0 && <Button key="next" label={t.next} hotkey="n" autoFocus onPress={() => go($, 1)} />}
           <Button key="close" label={t.close} hotkey="c" onPress={() => closePane($)} />

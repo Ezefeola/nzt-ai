@@ -155,15 +155,51 @@ test('the card carries the NZT label and no step strip', async ($, on) => {
   expect(await ui.findAll({ type: 'Text', text: /^ \d+ $/ })).toHaveLength(0)
 })
 
-test('the HEAD index puts files under their folder and windows a long list', async ($, on) => {
-  const status = Array.from({ length: 12 }, (_, n) => ` M src/f${String(n).padStart(2, '0')}.ts`).join('\0')
-  fakeGit(on, { ...REPO, status: `${status}\0`, numstat: '' })
+/** Twelve modified files in `src/`. */
+const TWELVE = Array.from({ length: 12 }, (_, n) => ` M src/f${String(n).padStart(2, '0')}.ts`).join('\0')
+
+test('the HEAD index opens closed, one title per mark, and a title opens to its folders and files', async ($, on) => {
+  fakeGit(on, REPO)
   await openPane($)
   const ui = await mount($, 'terminal')
-  expect(await ui.find({ type: 'Text', text: '  src/' })).toBeDefined()
+  // README.md and Plan/state.json are modified, specs/new.md new, img/logo.png deleted, docs/b.md renamed.
+  for (const title of ['Modificados', 'Nuevos', 'Borrados', 'Renombrados']) {
+    expect(await ui.find({ type: 'Text', text: title })).toBeDefined()
+  }
+  expect(await ui.find({ type: 'Text', text: 'En conflicto' })).toBeUndefined()
+  expect(await ui.find({ key: 'step-0' })).toBeUndefined()
+  await ui.press({ key: 'group-M' })
+  expect(await ui.find({ key: 'step-0' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Plan/' })).toBeDefined()
+  expect(await ui.find({ key: 'step-1' })).toBeUndefined()
+  await ui.press({ key: 'group-M/Plan' })
+  expect(await ui.find({ key: 'step-1' })).toBeDefined()
+  await ui.press({ key: 'group-M' })
+  expect(await ui.find({ key: 'step-0' })).toBeUndefined()
+  expect(await ui.find({ key: 'step-1' })).toBeUndefined()
+})
+
+test('a git conflict and an untracked file land in their own groups', async ($, on) => {
+  fakeGit(on, { ...REPO, status: ['UU a.md', '?? b.md', ' T c.md', ''].join('\0'), numstat: '' })
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  // The type change counts as modified: Modificados, Nuevos, En conflicto, in that order.
+  const titles = (await ui.findAll({ type: 'Text', text: /^(Modificados|Nuevos|Borrados|Renombrados|En conflicto)$/ })).map(
+    found => found.text,
+  )
+  expect(titles).toEqual(['Modificados', 'Nuevos', 'En conflicto'])
+})
+
+test('the HEAD index windows a long list', async ($, on) => {
+  fakeGit(on, { ...REPO, status: `${TWELVE}\0`, numstat: '' })
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  await ui.press({ key: 'group-M' })
+  await ui.press({ key: 'group-M/src' })
+  expect(await ui.find({ type: 'Text', text: 'src/' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'f00.ts' })).toBeDefined()
-  // Docked, the index takes 8 lines: the folder's title and 7 of its 12 files.
-  expect(await ui.find({ type: 'Text', text: /↓ 5 más/ })).toBeDefined()
+  // Docked, the index takes 8 lines: the two titles and 6 of the 12 files.
+  expect(await ui.find({ type: 'Text', text: /↓ 6 más/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: '12 archivos · ' })).toBeDefined()
 })
 
@@ -171,24 +207,54 @@ test('a file in the index is picked by pressing its row', async ($, on) => {
   fakeGit(on, REPO)
   await openPane($)
   const ui = await mount($, 'terminal')
-  await ui.press({ key: 'step-2' })
-  expect(await ui.find({ type: 'Text', text: /paso 3 de 5/ })).toBeDefined()
+  await ui.press({ key: 'group-M' })
+  await ui.press({ key: 'group-M/Plan' })
+  await ui.press({ key: 'step-1' })
+  expect(await ui.find({ type: 'Text', text: /paso 2 de 5/ })).toBeDefined()
 })
 
 test('picking a file leaves the index where it is; stepping moves it only as far as needed', async ($, on) => {
-  const status = Array.from({ length: 12 }, (_, n) => ` M src/f${String(n).padStart(2, '0')}.ts`).join('\0')
-  fakeGit(on, { ...REPO, status: `${status}\0`, numstat: '' })
+  fakeGit(on, { ...REPO, status: `${TWELVE}\0`, numstat: '' })
   await openPane($)
   const ui = await mount($, 'terminal')
-  // Docked: the folder's title and f00 to f06, five below.
-  await ui.press({ key: 'step-6' })
-  expect(await ui.find({ type: 'Text', text: /paso 7 de 12/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /↓ 5 más/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '  src/' })).toBeDefined()
-  // f07 is one line past the window: it moves by one, and the folder's title goes off the top.
+  await ui.press({ key: 'group-M' })
+  await ui.press({ key: 'group-M/src' })
+  // Docked: both titles and f00 to f05, six below.
+  await ui.press({ key: 'step-5' })
+  expect(await ui.find({ type: 'Text', text: /paso 6 de 12/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /↓ 6 más/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Modificados' })).toBeDefined()
+  // f06 is one line past the window: it moves by one, and the mark's title goes off the top.
   await ui.press({ key: 'next' })
-  expect(await ui.find({ type: 'Text', text: /↓ 4 más/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '  src/' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /↓ 5 más/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Modificados' })).toBeUndefined()
+})
+
+test('stepping into a closed group opens it and leaves the others as they were', async ($, on) => {
+  fakeGit(on, REPO)
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  // On step 1 (README.md) with everything closed, Siguiente goes to Plan/state.json.
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: /paso 2 de 5/ })).toBeDefined()
+  expect(await ui.find({ key: 'step-1' })).toBeDefined()
+  expect(await ui.find({ key: 'step-0' })).toBeDefined()
+  expect(await ui.find({ key: 'step-2' })).toBeUndefined()
+  // Closing Modificados and stepping on opens Nuevos alone.
+  await ui.press({ key: 'group-M' })
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ key: 'step-2' })).toBeDefined()
+  expect(await ui.find({ key: 'step-1' })).toBeUndefined()
+})
+
+test('opening the pane again closes every group', async ($, on) => {
+  fakeGit(on, REPO)
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  await ui.press({ key: 'group-M' })
+  expect(await ui.find({ key: 'step-0' })).toBeDefined()
+  await openPane($)
+  expect(await ui.find({ key: 'step-0' })).toBeUndefined()
 })
 
 /** A turn whose one edit writes a new file of `n` lines. */
@@ -203,9 +269,9 @@ test('the pane is as tall as its body whatever the diff', async ($, on) => {
   await turnWith($, [EDIT, longWrite(60)])
   await openPane($)
   const ui = await mount($, 'terminal')
-  expect(await ui.drawn()).toMatchObject({ props: { height: 40 } })
+  expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
   await ui.press({ key: 'next' })
-  expect(await ui.drawn()).toMatchObject({ props: { height: 40 } })
+  expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
 })
 
 test('a diff taller than its window scrolls, with its position and the ruler', async ($, on) => {
@@ -213,17 +279,65 @@ test('a diff taller than its window scrolls, with its position and the ruler', a
   await turnWith($, [longWrite(60), EDIT])
   await openPane($)
   const ui = await mount($, 'terminal')
-  // 40 rows less the card's 9 and two index lines leave the diff 29; ▼ moves half of them.
-  expect(await ui.find({ type: 'Text', text: 'líneas 1–29 de 60' })).toBeDefined()
+  // 40 rows less the blank row over the card, its 13 and two index lines leave the diff 24; ▼ moves half.
+  expect(await ui.find({ type: 'Text', text: 'líneas 1–24 de 60' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: '▐' })).toBeDefined()
   await ui.press({ key: 'down' })
-  expect(await ui.find({ type: 'Text', text: 'líneas 15–43 de 60' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'líneas 13–36 de 60' })).toBeDefined()
   await ui.press({ key: 'down' })
   await ui.press({ key: 'down' })
-  expect(await ui.find({ type: 'Text', text: 'líneas 32–60 de 60' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'líneas 37–60 de 60' })).toBeDefined()
   await ui.press({ key: 'next' })
   await ui.press({ key: 'prev' })
-  expect(await ui.find({ type: 'Text', text: 'líneas 1–29 de 60' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'líneas 1–24 de 60' })).toBeDefined()
+})
+
+/** The card's children as drawn, each with its props and the text it shows. */
+const cardRows = async (ui: { drawn: () => Promise<unknown> }) => {
+  type Node = { type: string; props?: Record<string, unknown>; children?: unknown[] } | string
+  const textOf = (node: unknown): string =>
+    typeof node === 'string'
+      ? node
+      : (node as { props?: { label?: string } }).props?.label ??
+        ((node as { children?: unknown[] }).children ?? []).map(textOf).join('')
+  const card = (await ui.drawn()) as Exclude<Node, string>
+  return (card.children ?? []).map(child => ({
+    props: (child as Exclude<Node, string>).props ?? {},
+    text: textOf(child),
+  }))
+}
+
+test('blank rows part the card, the position sits under the rule and the buttons on the right', async ($, on) => {
+  fakeGit(on, REPO, [], { 'C:/repo/README.md': 'old\n' })
+  await turnWith($, [longWrite(60), EDIT])
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  const rows = await cardRows(ui)
+  // Heading, views, index, rule, position, file and detail and diff, buttons.
+  expect(rows[0]!.text).toMatch(/paso 1 de 2/)
+  expect(rows[1]!.props).toMatchObject({ marginTop: 1 })
+  expect(rows[1]!.text).toMatch(/Turno/)
+  expect(rows[2]!.props).toMatchObject({ marginTop: 1 })
+  expect(rows[3]!.text).toMatch(/^─+$/)
+  expect(rows[4]!.props).toMatchObject({ justifyContent: 'flex-end' })
+  expect(rows[4]!.text).toMatch(/^líneas 1–24 de 60/)
+  const body = rows[5]!.text
+  expect(body.indexOf('long.md')).toBeLessThan(body.indexOf('Write'))
+  expect(rows[6]!.props).toMatchObject({ justifyContent: 'flex-end' })
+  expect(rows[6]!.text).toMatch(/Anterior.*Siguiente.*Cerrar/)
+  // The two blank rows inside the body: over the detail and over the diff.
+  const drawn = JSON.stringify(await ui.drawn())
+  expect(drawn.match(/"marginTop":1/g)!.length).toBeGreaterThanOrEqual(5)
+})
+
+test('a view with no steps keeps the blank row under the views', async ($, on) => {
+  fakeGit(on, { ...REPO, status: '', numstat: '' })
+  await openPane($)
+  const ui = await mount($, 'terminal')
+  const rows = await cardRows(ui)
+  expect(rows[2]!.props).toMatchObject({ marginTop: 1 })
+  expect(rows[2]!.text).toMatch(/Sin cambios contra HEAD/)
+  expect(rows[3]!.props).toMatchObject({ justifyContent: 'flex-end' })
 })
 
 test('a diff that fits has no ruler and says how many lines it has', async ($, on) => {
@@ -236,21 +350,26 @@ test('a diff that fits has no ruler and says how many lines it has', async ($, o
   expect(await ui.find({ key: 'down' })).toBeUndefined()
 })
 
-test('with no edits in the turn it opens on HEAD, ordered by folder', async ($, on) => {
+test('with no edits in the turn it opens on HEAD, ordered by mark and then folder', async ($, on) => {
   fakeGit(on, REPO)
   await openPane($)
   for (const surface of SURFACES) {
     const ui = await mount($, surface)
     expect(await ui.find({ type: 'Text', text: /paso 1 de 5/ })).toBeDefined()
-    // The root first, then docs, img, Plan, specs.
+    // Modified at the root, modified in Plan, new, deleted, renamed.
     expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /modificado/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: '  docs/' })).toBeDefined()
     expect(await ui.find({ type: 'Code', text: '@@ -1,2 +1,2 @@\n keep\n-old\n+new' })).toBeDefined()
+    await ui.press({ key: 'next' })
+    expect(await ui.find({ type: 'Text', text: 'Plan/state.json' })).toBeDefined()
+    await ui.press({ key: 'next' })
+    expect(await ui.find({ type: 'Text', text: 'specs/new.md' })).toBeDefined()
+    await ui.press({ key: 'next' })
+    expect(await ui.find({ type: 'Text', text: 'img/logo.png' })).toBeDefined()
     await ui.press({ key: 'next' })
     expect(await ui.find({ type: 'Text', text: 'docs/a.md → docs/b.md' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /renombrado/ })).toBeDefined()
-    await ui.press({ key: 'prev' })
+    for (let i = 0; i < 4; i++) await ui.press({ key: 'prev' })
   }
 })
 
