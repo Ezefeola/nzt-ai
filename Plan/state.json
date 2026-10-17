@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-17T08:00:00Z",
+  "updated": "2026-10-17T08:30:00Z",
   "goal": "Mods dentro de la instalación de NZT: el instalador ofrece en Claude Code NZT / mods / todo, la landing explica e instala los mods, y los mods se instalan y actualizan acordes a la versión de NZT. Sin plugin para NZT.",
   "phases": [
     { "name": "verify", "status": "done", "units": [
@@ -40,10 +40,10 @@
   ],
   "approved": true,
   "autonomy": {},
-  "waiting_on": "usuario: mergear PR #8 de nzt-ai-landing (install-claude-full a live). Con eso la corrida termina.",
+  "waiting_on": null,
   "notes": [
     "2026-10-16 decidido con el usuario: NZT no se distribuye como plugin (no sería igual en todos los proveedores); el instalador es la única forma; los mods siguen por marketplace y el instalador los ofrece. Instalar mods a mano sin tag tiene que seguir siendo posible.",
     "Acoplamiento: nzt-state lee Plan/state.json, nzt-context las marcas 20/30/40 del kernel, nzt-hub el catálogo de mods; nzt-changes y nzt-files no dependen de NZT. Ya existe RN-mod-lee-formatos-viejos; M2 versiona cada mod aparte.",
-    "Publicado NZT v1.3.0 (2026-10-17). Ramas installer-mods y mods-install ya mergeadas (se pueden borrar); en la landing queda abierta install-claude-full-live (PR #8)."
+    "Publicado NZT v1.3.0 (2026-10-17). Ramas installer-mods y mods-install ya mergeadas (se pueden borrar); la landing mergeó el PR #8: install-claude-full en live. Corrida terminada."
   ]
 }
