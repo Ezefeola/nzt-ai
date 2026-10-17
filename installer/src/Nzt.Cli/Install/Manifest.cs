@@ -19,6 +19,18 @@ public sealed record Manifest
     [JsonPropertyName("installedAt")] public required DateTimeOffset InstalledAt { get; init; }
     [JsonPropertyName("files")] public required List<ManifestEntry> Files { get; init; }
 
+    /// <summary>
+    /// Los mods que instaló este CLI, por nombre. Un mod instalado que no está acá
+    /// es del usuario: se actualiza, pero no se desinstala nunca.
+    /// </summary>
+    [JsonPropertyName("mods")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Mods { get; init; }
+
+    /// <summary>Lo que sigue administrando: si no queda nada, el manifiesto sobra.</summary>
+    [JsonIgnore]
+    public bool IsEmpty => Files.Count == 0 && (Mods is null || Mods.Count == 0);
+
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };
 
     public static string DirectoryPath

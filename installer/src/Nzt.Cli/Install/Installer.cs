@@ -208,7 +208,8 @@ public static class Installer
                 Provider = provider.Id,
                 Version = version,
                 InstalledAt = DateTimeOffset.Now,
-                Files = entries
+                Files = entries,
+                Mods = manifest?.Mods
             }.Save(manifestDirectory);
 
         return new InstallResult(provider, [], outcomes);
@@ -222,7 +223,8 @@ public static class Installer
         string? manifestDirectory = null)
     {
         var manifest = Manifest.Load(provider.Id, manifestDirectory);
-        if (manifest is null)
+        // Un manifiesto que solo anota mods no es una instalación del método.
+        if (manifest is null || manifest.Files.Count == 0)
             return new UninstallResult(provider, HadManifest: false, []);
 
         var outcomes = new List<FileOutcome>();
@@ -255,8 +257,9 @@ public static class Installer
 
         if (!dryRun)
         {
-            if (retained.Count == 0) Manifest.Delete(provider.Id, manifestDirectory);
-            else (manifest with { Files = retained }).Save(manifestDirectory);
+            var remaining = manifest with { Files = retained };
+            if (remaining.IsEmpty) Manifest.Delete(provider.Id, manifestDirectory);
+            else remaining.Save(manifestDirectory);
         }
 
         return new UninstallResult(provider, HadManifest: true, outcomes);

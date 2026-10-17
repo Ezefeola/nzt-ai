@@ -1,10 +1,11 @@
 # Instalador de NZT — .NET 10
 
-Versión 1.2.0. Instala NZT **globalmente**, sin plugins: el kernel como bloque en el archivo
-de instrucciones que el proveedor ya lee en toda sesión, y las 14 skills, con sus referencias, aplanadas en su
-carpeta de skills de usuario. El contenido de `core/` y `skills/` se **embebe al compilar**,
-así que el ejecutable es el set: un solo artefacto y nada que resolver en tiempo de
-ejecución.
+Versión 1.2.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
+bloque en el archivo de instrucciones que el proveedor ya lee en toda sesión, y las 14
+skills, con sus referencias, aplanadas en su carpeta de skills de usuario. En Claude Code
+puede instalar además **los mods**, que sí son plugins (sección *Mods de Claude Code*). El
+contenido de `core/`, `skills/` y el catálogo de mods se **embebe al compilar**, así que el
+ejecutable es el set: un solo artefacto y nada que resolver en tiempo de ejecución.
 
 ## Uso
 
@@ -16,16 +17,50 @@ dotnet run --project installer/src/Nzt.Cli -- verify
 dotnet run --project installer/src/Nzt.Cli -- status
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code --dry-run
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code
+dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code --mods all
 dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
 
 Sin argumentos abre el menú: **instalar, desinstalar, verificar el contenido y ver estado**,
 en un bucle hasta que elegís salir. **Se navega con ↑ ↓ y se elige con Enter** — no se
-escribe nada, ni números ni `s/n`. Primero la acción, después el destino, y las dos que
+escribe nada, ni números ni `s/n`. Primero la acción, después el destino y, si el destino
+incluye Claude Code, **qué instalar: Todo NZT, solo el método o solo los mods**. Las dos que
 escriben **muestran la simulación y recién ahí preguntan**, con `No` por defecto. Sin una
 terminal —una tubería— el menú no abre: te manda a los comandos y sale. En scripts los
-identificadores son `claude-code`, `codex` y `all`. Un identificador desconocido aborta sin
-tocar nada.
+identificadores son `claude-code`, `codex` y `all`, y `--mods` es `all`, `none` u `only`.
+Un identificador desconocido aborta sin tocar nada.
+
+## Mods de Claude Code
+
+Los mods son plugins de Claude Code que hacen visible lo que produce el método (catálogo en
+`specs/nzt-mods.md` sección 5). El instalador los instala **con los comandos de Claude Code,
+como lo harías vos**: nunca copia archivos de un mod.
+
+| | Instalar | Desinstalar |
+|---|---|---|
+| Sin `--mods` | solo el método, como siempre | el método y los mods que instaló este CLI |
+| `--mods all` | el método y los mods | lo mismo que sin `--mods` |
+| `--mods none` | solo el método | solo el método |
+| `--mods only` | solo los mods | solo los mods que instaló este CLI |
+
+- **El marketplace `nzt` es uno solo en la máquina.** Si no está, lo agrega desde
+  `Ezefeola/nzt-ai` (la rama por defecto, igual que a mano). Si ya está desde otra fuente —una
+  carpeta local, un fork— usa ese y el reporte dice de dónde viene. **Nunca lo quita**:
+  quitarlo desinstalaría también los mods que instalaste a mano.
+- **Los mods que instala quedan anotados** en el campo `mods` del manifiesto de Claude Code.
+  Un mod que instalaste a mano se actualiza al instalar, pero sigue siendo tuyo: no se
+  desinstala nunca.
+- **Volver a instalar actualiza los mods**: refresca el marketplace y corre
+  `claude plugin update` en cada uno. La actualización automática no la activa: se activa
+  una vez en `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**.
+- **Sin `claude` en la terminal, o con una versión anterior a 2.1.287**, instala el método
+  igual, deja los mods afuera sin marcarlo como falla y muestra cómo sumarlos desde la app.
+- **Un mod que falla** se nombra con su motivo y el código de salida es 1, pero el método y
+  los demás mods quedan instalados.
+- `status` lista cada mod: si está instalado, su versión y si lo instaló NZT o vos.
+
+Elegir *solo los mods* con *Todos los proveedores* no instala nada en Codex: Codex no tiene
+mods, y el método no se pidió.
 
 ## Dónde queda instalado
 
@@ -95,11 +130,13 @@ tamaño del listado contra el piso de 8.000 de Codex (R1).
 dotnet run --project installer/tests/Nzt.Cli.Checks
 ```
 
-Usa destinos y manifiestos temporales aislados — **nunca toca el HOME real**. Cubre
-instalación, idempotencia, convivencia con texto personal, backup, protección de ediciones,
-huérfanos, colisiones, simulación, desinstalación, bloque roto, aplanado de nombres, paridad
-con el build y las reglas del lint. La validación de esta versión da `PASS: 47 installer
-checks`.
+Usa destinos y manifiestos temporales aislados — **nunca toca el HOME real** — y, para los
+mods, un Claude Code falso que responde con el mismo JSON que el real: **nunca toca tus
+plugins**. Cubre instalación, idempotencia, convivencia con texto personal, backup, protección
+de ediciones, huérfanos, colisiones, simulación, desinstalación, bloque roto, aplanado de
+nombres, paridad con el build, las reglas del lint y los mods: catálogo, marketplace, sin
+Claude Code, versión vieja, falla parcial, mods instalados a mano, actualizar, desinstalar y
+estado. La validación de esta versión da `PASS: 106 installer checks`.
 
 Las comprobaciones no ejecutan conversaciones en los CLIs ni miden selección de skills. Eso
 es la suite de `evals/`.
@@ -112,19 +149,20 @@ sección 10 de `specs/nzt-installer.md`):
 | | Windows (`irm … \| iex`) | macOS / Linux (`curl -fsSL … \| sh`) |
 |---|---|---|
 | Claude Code | `releases/latest/download/install-claude.ps1` | `releases/latest/download/install-claude.sh` |
+| Claude Code, con los mods | `releases/latest/download/install-claude-full.ps1` | `releases/latest/download/install-claude-full.sh` |
 | Codex | `releases/latest/download/install-codex.ps1` | `releases/latest/download/install-codex.sh` |
 
 Cada comando baja el binario de la plataforma a una carpeta temporal, verifica su SHA256
 contra `SHA256SUMS`, corre `install --provider <id>` sin menú y borra la carpeta. El script
 no escribe nada del proveedor: eso lo hace el CLI, con las reglas de siempre.
-`NZT_UNINSTALL=1` desinstala y `NZT_DRY_RUN=1` simula; el resto de las variables está en
-la sección 10.3 de la spec. **El repositorio tiene que ser público** para que la descarga
-anónima funcione.
+`NZT_UNINSTALL=1` desinstala —en Claude Code, el método y los mods que instaló este CLI— y
+`NZT_DRY_RUN=1` simula; el resto de las variables está en la sección 10.3 de la spec. **El
+repositorio tiene que ser público** para que la descarga anónima funcione.
 
-Las cuatro variantes salen de `install/install.ps1` e `install/install.sh`:
+Las seis variantes salen de `install/install.ps1` e `install/install.sh`:
 `install/variants.sh <carpeta>` reemplaza la línea marcada `# nzt:provider` por el
-proveedor fijo. Para probar una fuente sin generar variantes, `NZT_PROVIDER` hace de
-proveedor.
+proveedor fijo y, en `install-claude-full`, la marcada `# nzt:mods` por `all`. Para probar
+una fuente sin generar variantes, `NZT_PROVIDER` y `NZT_MODS` hacen de proveedor y de mods.
 
 **Publicar una versión:**
 
@@ -132,7 +170,7 @@ proveedor.
 2. Commit, y `git tag vX.Y.Z && git push origin vX.Y.Z`.
 3. `.github/workflows/release.yml` corre el build, las comprobaciones y el lint, publica
    los seis binarios —`win`, `linux` y `osx`, en `x64` y `arm64`— y crea el release con
-   `SHA256SUMS` y los cuatro comandos. Si el tag no coincide con `<Version>`, falla sin publicar.
+   `SHA256SUMS` y los seis comandos. Si el tag no coincide con `<Version>`, falla sin publicar.
 
 Un binario local se arma igual que en CI. Con un RID, el `.csproj` ya lo publica
 self-contained, en un solo archivo y comprimido (~38 MB, sin trimming):

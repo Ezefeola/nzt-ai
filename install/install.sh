@@ -2,11 +2,13 @@
 # Instalador de una línea de NZT (D46, specs/nzt-installer.md sección 10).
 #
 #   curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.sh | sh
+#   curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.sh | sh
 #   curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh | sh
 #
-# Esta es la fuente de las dos variantes: install/variants.sh reemplaza la línea
-# marcada `nzt:provider` por el proveedor fijo. Sin variante, el proveedor sale
-# de NZT_PROVIDER, que es como se prueba.
+# Esta es la fuente de las tres variantes: install/variants.sh reemplaza la línea
+# marcada `nzt:provider` por el proveedor fijo y, en install-claude-full, la
+# marcada `nzt:mods` por `all`. Sin variante salen de NZT_PROVIDER y NZT_MODS,
+# que es como se prueba.
 #
 # Instala NZT en un proveedor, no el CLI: lo baja a una carpeta temporal,
 # verifica su SHA256, corre `install --provider` una vez y lo borra. Todo lo que
@@ -78,6 +80,7 @@ sha256_of() {
 
 main() {
     provider=${NZT_PROVIDER:-} # nzt:provider
+    mods=${NZT_MODS:-} # nzt:mods
     [ -n "$provider" ] || fail "Falta el proveedor. Usá install-claude.sh o install-codex.sh."
 
     action=install
@@ -119,12 +122,12 @@ main() {
     echo
 
     # 4. Una sola corrida, sin menú: las reglas de qué se escribe son del CLI.
+    set -- "$action" --provider "$provider"
+    if [ -n "$mods" ]; then set -- "$@" --mods "$mods"; fi
+    if [ "${NZT_DRY_RUN:-}" = 1 ]; then set -- "$@" --dry-run; fi
+
     status=0
-    if [ "${NZT_DRY_RUN:-}" = 1 ]; then
-        "$temp/nzt" "$action" --provider "$provider" --dry-run || status=$?
-    else
-        "$temp/nzt" "$action" --provider "$provider" || status=$?
-    fi
+    "$temp/nzt" "$@" || status=$?
 
     if [ "$status" -eq 0 ] && [ "$action" = install ] && [ "${NZT_DRY_RUN:-}" != 1 ]; then
         say "Para actualizar, la misma línea de nuevo."

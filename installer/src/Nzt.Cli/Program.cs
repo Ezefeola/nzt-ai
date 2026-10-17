@@ -2,6 +2,7 @@ using System.Reflection;
 using Nzt.Cli.Content;
 using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
+using Nzt.Cli.Mods;
 using Nzt.Cli.Providers;
 using Spectre.Console;
 
@@ -31,11 +32,18 @@ public static class Program
         var dryRun = args.Contains("--dry-run");
         var manifestDir = ValueOf(args, "--manifest-dir");
 
+        var modsValue = ValueOf(args, "--mods");
+        var mods = modsValue is null ? null : ModsChoiceFor(modsValue);
+        if (modsValue is not null && mods is null)
+            return Fail($"--mods desconocido: {modsValue}. Son all, none u only.");
+
+        // Instalar sin --mods es solo el método, como la línea de siempre; desinstalar
+        // saca también los mods que instaló este CLI.
         return command switch
         {
             null => Menu(),
-            "install" => Install(ProvidersFrom(args), dryRun, manifestDir),
-            "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir),
+            "install" => Install(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.MethodOnly),
+            "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.All),
             "status" => Status(manifestDir),
             "lint" or "verify" => Lint(detailed: false),
             "help" or "--help" or "-h" => Help(),
@@ -51,12 +59,14 @@ public static class Program
             NZT installer {Version}
 
               nzt                                    menú interactivo
-              nzt install --provider <id> [--dry-run]
-              nzt uninstall --provider <id> [--dry-run]
+              nzt install --provider <id> [--mods all|none|only] [--dry-run]
+              nzt uninstall --provider <id> [--mods all|none|only] [--dry-run]
               nzt status
               nzt lint | verify
 
             Proveedores: claude-code, codex, all
+            Mods (solo Claude Code): all = el método y los mods, none = solo el método,
+            only = solo los mods. Instalar sin --mods es none; desinstalar sin --mods es all.
             """);
         return 0;
     }
@@ -66,6 +76,9 @@ public static class Program
 
     /// <summary>Los destinos que ofrecen instalar y desinstalar. `Back` no elige ninguno.</summary>
     public enum ProviderChoice { ClaudeCode, Codex, All, Back }
+
+    /// <summary>Qué se instala o se saca en Claude Code. `All` va primero: es la marcada al abrir.</summary>
+    public enum ModsChoice { All, MethodOnly, ModsOnly, Back }
 
     /// <summary>
     /// El menú: instalar, desinstalar, verificar el contenido, ver estado. Se
@@ -112,8 +125,11 @@ public static class Program
         var targets = AskProvider("¿Dónde lo instalo?");
         if (targets.Count == 0) return;
 
+        var mods = AskMods(targets, "¿Qué instalo en Claude Code?");
+        if (mods is not { } choice) return;
+
         // Primero se muestra exactamente lo que haría, y recién ahí se pregunta.
-        if (Install(targets, dryRun: true, null) != 0) return;
+        if (Install(targets, dryRun: true, null, choice) != 0) return;
 
         if (!Confirm("¿Instalar?"))
         {
@@ -121,7 +137,7 @@ public static class Program
             return;
         }
 
-        Install(targets, dryRun: false, null);
+        Install(targets, dryRun: false, null, choice);
     }
 
     private static void MenuUninstall()
@@ -129,10 +145,13 @@ public static class Program
         var targets = AskProvider("¿De dónde lo saco?");
         if (targets.Count == 0) return;
 
+        var mods = AskMods(targets, "¿Qué saco de Claude Code?");
+        if (mods is not { } choice) return;
+
         // La simulación va primero acá también, y más: esto borra. Lo que se
         // conserva por estar editado aparece antes de confirmar, no después.
         Console.WriteLine("  Se remueve solamente lo que instaló este CLI, según su manifiesto.\n");
-        if (Uninstall(targets, dryRun: true, null) != 0) return;
+        if (Uninstall(targets, dryRun: true, null, choice) != 0) return;
 
         if (!Confirm("¿Desinstalar?"))
         {
@@ -140,7 +159,7 @@ public static class Program
             return;
         }
 
-        Uninstall(targets, dryRun: false, null);
+        Uninstall(targets, dryRun: false, null, choice);
     }
 
     private static IReadOnlyList<Provider> AskProvider(string question)
@@ -151,6 +170,30 @@ public static class Program
         Console.WriteLine();
         return ProvidersFor(choice);
     }
+
+    /// <summary>
+    /// La pregunta de los mods, solo si entre los destinos está Claude Code: es el
+    /// único proveedor que los tiene, y con Todos se hace una sola vez. `null` es Volver.
+    /// </summary>
+    private static ModsChoice? AskMods(IReadOnlyList<Provider> targets, string question)
+    {
+        if (!targets.Any(p => p.HasMods)) return ModsChoice.MethodOnly;
+
+        var choice = Ask(question, ModsLabel,
+            ModsChoice.All, ModsChoice.MethodOnly, ModsChoice.ModsOnly, ModsChoice.Back);
+
+        Console.WriteLine();
+        return choice == ModsChoice.Back ? null : choice;
+    }
+
+    /// <summary>El valor de `--mods`. `null` si no es uno de los tres.</summary>
+    public static ModsChoice? ModsChoiceFor(string value) => value.ToLowerInvariant() switch
+    {
+        "all" => ModsChoice.All,
+        "none" => ModsChoice.MethodOnly,
+        "only" => ModsChoice.ModsOnly,
+        _ => null
+    };
 
     /// <summary>La opción elegida, traducida a proveedores. `Back` no elige ninguno.</summary>
     public static IReadOnlyList<Provider> ProvidersFor(ProviderChoice choice) => choice switch
@@ -204,18 +247,28 @@ public static class Program
         _ => "Volver"
     };
 
+    private static string ModsLabel(ModsChoice choice) => choice switch
+    {
+        ModsChoice.All => "Todo NZT: el método y los mods",
+        ModsChoice.MethodOnly => "Solo el método",
+        ModsChoice.ModsOnly => "Solo los mods",
+        _ => "Volver"
+    };
+
     // ── Comandos ───────────────────────────────────────────────────────────────
 
-    private static int Install(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir)
+    private static int Install(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir,
+        ModsChoice mods)
     {
         if (providers.Count == 0) return 1;
 
+        var installsMethod = mods != ModsChoice.ModsOnly;
         var catalog = ContentCatalog.Load();
         var report = Linter.Run(catalog);
 
         // El instalador no escribe nada si el set no valida: una skill con el
         // name desalineado del path se instala con un nombre que nadie rutea.
-        if (!report.Ok)
+        if (installsMethod && !report.Ok)
         {
             Error($"El set no valida: {report.Issues.Count} problema(s). No se escribió nada.");
             foreach (var issue in report.Issues.Take(20))
@@ -229,30 +282,21 @@ public static class Program
         {
             Console.WriteLine($"{provider.DisplayName}{(dryRun ? "  (simulación)" : "")}");
 
-            if (provider.PathWarning is { } warning) Warn(warning);
+            if (!provider.HasMods && mods != ModsChoice.MethodOnly)
+                Console.WriteLine(installsMethod
+                    ? $"  {provider.DisplayName} no tiene mods: se instala el método."
+                    : $"  {provider.DisplayName} no tiene mods: no se instala nada.");
 
-            var result = Installer.Install(provider, catalog, Version, dryRun, manifestDir);
+            if (installsMethod && !InstallMethod(provider, catalog, dryRun, manifestDir)) failed = true;
 
-            if (result.Aborted)
-            {
-                Error("No se instaló nada en este proveedor:");
-                foreach (var conflict in result.Conflicts)
-                    Console.WriteLine($"    {conflict.TargetPath}\n      {conflict.Reason}");
+            if (provider.HasMods && mods != ModsChoice.MethodOnly
+                && !InstallMods(provider, dryRun, manifestDir, methodSkipped: !installsMethod))
                 failed = true;
-                Console.WriteLine();
-                continue;
-            }
 
-            Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
-            Console.WriteLine($"  skills         {provider.SkillsDirectory}");
-            Summary(result.Outcomes);
-
-            foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
-                Warn($"editado localmente, se conserva: {skipped.TargetPath}");
-
-            if (!dryRun) Console.WriteLine($"  {provider.Usage}");
             Console.WriteLine();
         }
+
+        if (!installsMethod) return failed ? 1 : 0;
 
         Console.WriteLine($"{report.SkillCount} skills · ~{report.ListingChars} chars de listado"
             + $" (piso de Codex: {LintReport.CodexFloor})");
@@ -263,29 +307,176 @@ public static class Program
         return failed ? 1 : 0;
     }
 
-    private static int Uninstall(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir)
+    private static bool InstallMethod(Provider provider, ContentCatalog catalog, bool dryRun, string? manifestDir)
+    {
+        if (provider.PathWarning is { } warning) Warn(warning);
+
+        var result = Installer.Install(provider, catalog, Version, dryRun, manifestDir);
+
+        if (result.Aborted)
+        {
+            Error("No se instaló el método en este proveedor:");
+            foreach (var conflict in result.Conflicts)
+                Console.WriteLine($"    {conflict.TargetPath}\n      {conflict.Reason}");
+            return false;
+        }
+
+        Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
+        Console.WriteLine($"  skills         {provider.SkillsDirectory}");
+        Summary(result.Outcomes);
+
+        foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
+            Warn($"editado localmente, se conserva: {skipped.TargetPath}");
+
+        if (!dryRun) Console.WriteLine($"  {provider.Usage}");
+        return true;
+    }
+
+    /// <summary>
+    /// Los mods, con los comandos de Claude Code. Sin Claude Code en la terminal no
+    /// es una falla: el método queda instalado y se explica cómo sumarlos desde la app.
+    /// Un mod que falla sí lo es, pero no deshace nada de lo demás.
+    /// </summary>
+    private static bool InstallMods(Provider provider, bool dryRun, string? manifestDir, bool methodSkipped)
+    {
+        var catalog = ModCatalog.Load();
+
+        if (methodSkipped && Manifest.Load(provider.Id, manifestDir) is not { Files.Count: > 0 })
+            Warn("nzt-state y nzt-context muestran lo que produce el método: sin él instalado no tienen qué mostrar.");
+
+        var result = ModInstaller.Install(Claude(), catalog, provider.Id, Version, dryRun, manifestDir);
+
+        if (result.Skipped)
+        {
+            ExplainManualMods(result.Claude, catalog, "no se instalaron");
+            return true;
+        }
+
+        var added = result.MarketplaceAdded ? (dryRun ? ", se agrega" : ", agregado") : "";
+        Console.WriteLine($"  mods           marketplace {ModCatalog.MarketplaceName} ({result.MarketplaceSource}{added})");
+
+        if (result.Problem is not null)
+        {
+            Error(result.Problem);
+            return false;
+        }
+
+        ReportMods(result.Outcomes, dryRun);
+
+        if (!dryRun)
+        {
+            Console.WriteLine("  Abrí una sesión nueva de Claude Code, o corré /reload-plugins, para ver los mods.");
+            Console.WriteLine("  Para que se actualicen solos: /plugin → Marketplaces → nzt → Enable auto-update.");
+        }
+
+        return !result.Failed;
+    }
+
+    private static void ExplainManualMods(ClaudeAvailability claude, ModCatalog catalog, string what)
+    {
+        Warn($"los mods {what}: {claude.Problem}.");
+        Console.WriteLine("  Para sumarlos desde la app de Claude Code, en una sesión:");
+        foreach (var name in catalog.Names)
+            Console.WriteLine($"    {ModCatalog.ManualCommand(name)}");
+    }
+
+    private static void ReportMods(IReadOnlyList<ModOutcome> outcomes, bool dryRun)
+    {
+        foreach (var outcome in outcomes)
+        {
+            var line = $"  {outcome.Name,-15}{DescribeMod(outcome, dryRun)}"
+                + (outcome.ByUser && outcome.Action != ModAction.Kept ? " · instalado a mano" : "");
+
+            if (outcome.Action == ModAction.Failed) Error(line.TrimStart());
+            else Console.WriteLine(line);
+        }
+    }
+
+    private static string DescribeMod(ModOutcome outcome, bool dryRun) => outcome.Action switch
+    {
+        ModAction.Installed => dryRun ? "se instala" : $"instalado, {outcome.Version}",
+        ModAction.Updated => dryRun
+            ? $"se actualiza si hay una versión nueva (hoy {outcome.Version})"
+            : $"actualizado a {outcome.Version}",
+        ModAction.Unchanged => $"al día, {outcome.Version}",
+        ModAction.Failed => $"falló: {outcome.Detail}",
+        ModAction.Removed => dryRun ? $"se desinstala ({outcome.Version})" : "desinstalado",
+        ModAction.Kept => $"{outcome.Version}, instalado a mano: se queda",
+        _ => outcome.Detail ?? "no instalado"
+    };
+
+    private static ClaudePlugins Claude() => new(new ProcessRunner());
+
+    private static int Uninstall(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir,
+        ModsChoice mods)
     {
         if (providers.Count == 0) return 1;
+
+        var failed = false;
 
         foreach (var provider in providers)
         {
             Console.WriteLine($"{provider.DisplayName}{(dryRun ? "  (simulación)" : "")}");
 
-            var result = Installer.Uninstall(provider, dryRun, manifestDir);
+            if (!provider.HasMods && mods == ModsChoice.ModsOnly)
+                Console.WriteLine($"  {provider.DisplayName} no tiene mods: no se saca nada.");
 
-            if (!result.HadManifest)
-            {
-                Console.WriteLine("  no hay manifiesto: no hay nada instalado por este CLI.\n");
-                continue;
-            }
+            if (mods != ModsChoice.ModsOnly) UninstallMethod(provider, dryRun, manifestDir);
 
-            Summary(result.Outcomes);
-            foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
-                Warn($"editado localmente, se conserva: {skipped.TargetPath}");
+            if (provider.HasMods && mods != ModsChoice.MethodOnly && !UninstallMods(provider, dryRun, manifestDir))
+                failed = true;
+
             Console.WriteLine();
         }
 
-        return 0;
+        return failed ? 1 : 0;
+    }
+
+    private static void UninstallMethod(Provider provider, bool dryRun, string? manifestDir)
+    {
+        var result = Installer.Uninstall(provider, dryRun, manifestDir);
+
+        if (!result.HadManifest)
+        {
+            Console.WriteLine("  método         no hay nada instalado por este CLI.");
+            return;
+        }
+
+        Summary(result.Outcomes);
+        foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
+            Warn($"editado localmente, se conserva: {skipped.TargetPath}");
+    }
+
+    private static bool UninstallMods(Provider provider, bool dryRun, string? manifestDir)
+    {
+        var catalog = ModCatalog.Load();
+        var result = ModInstaller.Uninstall(Claude(), catalog, provider.Id, dryRun, manifestDir);
+
+        if (result.Skipped)
+        {
+            if (Manifest.Load(provider.Id, manifestDir) is { Mods.Count: > 0 })
+            {
+                Warn($"los mods no se desinstalaron: {result.Claude.Problem}.");
+                Console.WriteLine("  Se sacan desde /plugin, en una sesión de Claude Code.");
+            }
+            return true;
+        }
+
+        if (result.Problem is not null)
+        {
+            Error(result.Problem);
+            return false;
+        }
+
+        if (result.Outcomes.Count == 0)
+        {
+            Console.WriteLine("  mods           no hay mods de NZT instalados.");
+            return true;
+        }
+
+        Console.WriteLine("  mods           solo los que instaló este CLI; el marketplace nzt queda");
+        ReportMods(result.Outcomes, dryRun);
+        return !result.Failed;
     }
 
     private static int Status(string? manifestDir)
@@ -295,30 +486,52 @@ public static class Program
             var manifest = Manifest.Load(provider.Id, manifestDir);
             Console.WriteLine(provider.DisplayName);
 
-            if (manifest is null)
-            {
-                Console.WriteLine("  no instalado\n");
-                continue;
-            }
+            if (manifest is not { Files.Count: > 0 })
+                Console.WriteLine("  método         no instalado");
+            else
+                MethodStatus(provider, manifest, manifestDir);
 
-            var missing = manifest.Files.Count(f => !File.Exists(f.Path));
-            var edited = manifest.Files.Count(f =>
-                File.Exists(f.Path)
-                && (f.ManagedBlock
-                    ? !InstructionBlock.Matches(File.ReadAllText(f.Path), f.Sha256, out _, out _)
-                    : Manifest.HashFile(f.Path) != f.Sha256));
-
-            Console.WriteLine($"  versión        {manifest.Version}");
-            Console.WriteLine($"  instalado      {manifest.InstalledAt:yyyy-MM-dd HH:mm}");
-            Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
-            Console.WriteLine($"  skills         {provider.SkillsDirectory}");
-            Console.WriteLine($"  archivos       {manifest.Files.Count}"
-                + (edited > 0 ? $", {edited} editado(s) localmente" : "")
-                + (missing > 0 ? $", {missing} faltante(s)" : ""));
-            Console.WriteLine($"  manifiesto     {Manifest.PathFor(provider.Id, manifestDir)}\n");
+            if (provider.HasMods) ModsStatus(provider, manifestDir);
+            Console.WriteLine();
         }
 
         return 0;
+    }
+
+    private static void ModsStatus(Provider provider, string? manifestDir)
+    {
+        var result = ModInstaller.Status(Claude(), ModCatalog.Load(), provider.Id, manifestDir);
+
+        if (result.Skipped || result.Problem is not null)
+        {
+            Console.WriteLine($"  mods           no se pudo consultar: {result.Claude.Problem ?? result.Problem}");
+            return;
+        }
+
+        Console.WriteLine("  mods" + (result.MarketplaceSource is { } source ? $"           marketplace nzt ({source})" : ""));
+        foreach (var outcome in result.Outcomes)
+            Console.WriteLine($"    {outcome.Name,-15}" + (outcome.Action == ModAction.Installed
+                ? $"{outcome.Version} · {(outcome.ByUser ? "instalado a mano" : "lo instaló NZT")}"
+                : "no instalado" + (outcome.Detail is { } detail ? $" ({detail})" : "")));
+    }
+
+    private static void MethodStatus(Provider provider, Manifest manifest, string? manifestDir)
+    {
+        var missing = manifest.Files.Count(f => !File.Exists(f.Path));
+        var edited = manifest.Files.Count(f =>
+            File.Exists(f.Path)
+            && (f.ManagedBlock
+                ? !InstructionBlock.Matches(File.ReadAllText(f.Path), f.Sha256, out _, out _)
+                : Manifest.HashFile(f.Path) != f.Sha256));
+
+        Console.WriteLine($"  versión        {manifest.Version}");
+        Console.WriteLine($"  instalado      {manifest.InstalledAt:yyyy-MM-dd HH:mm}");
+        Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
+        Console.WriteLine($"  skills         {provider.SkillsDirectory}");
+        Console.WriteLine($"  archivos       {manifest.Files.Count}"
+            + (edited > 0 ? $", {edited} editado(s) localmente" : "")
+            + (missing > 0 ? $", {missing} faltante(s)" : ""));
+        Console.WriteLine($"  manifiesto     {Manifest.PathFor(provider.Id, manifestDir)}");
     }
 
     /// <summary>
