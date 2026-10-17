@@ -1,13 +1,150 @@
 {
   "version": 1,
-  "updated": "2026-10-17T09:00:00Z",
-  "goal": null,
-  "phases": [],
-  "approved": false,
+  "updated": "2026-10-18T01:00:00Z",
+  "goal": "Preguntas cómodas de contestar: regla en el kernel para usar la tool de preguntas del host, mod nzt-questions, aviso en nzt-state y mods agrupados por tipo en nzt-hub",
+  "phases": [
+    {
+      "name": "analysis",
+      "status": "done",
+      "units": [
+        {
+          "id": 197,
+          "do": "Investigar la tool de preguntas de cada host (AskUserQuestion, request_user_input de Codex): límites, flag, versión, fuente oficial",
+          "status": "done"
+        },
+        {
+          "id": 198,
+          "do": "specs/nzt-core.md: regla de cómo se pregunta (tool del host si hay, lista numerada si no, el log sigue siendo el registro)",
+          "status": "done"
+        },
+        {
+          "id": 199,
+          "do": "Spec specs/mods/nzt-questions/spec.md: panel de preguntas pendientes, capa NZT (Q-/QT- del log), red sobre el texto, respuesta al prompt",
+          "status": "done"
+        },
+        {
+          "id": 200,
+          "do": "specs/nzt-mods.md: tipo genérico/NZT por mod en el catálogo y la fila de nzt-questions",
+          "status": "done"
+        },
+        {
+          "id": 201,
+          "do": "Spec de nzt-hub: agrupar las tarjetas por tipo y sumar nzt-questions",
+          "status": "done"
+        },
+        {
+          "id": 202,
+          "do": "Spec de nzt-state: aviso de preguntas abiertas que abre nzt-questions",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "ux",
+      "status": "done",
+      "units": [
+        {
+          "id": 203,
+          "do": "Mockup de nzt-questions: lista, una pregunta por vez con opciones, resumen antes de mandar",
+          "status": "done"
+        },
+        {
+          "id": 204,
+          "do": "Mockup de nzt-hub actualizado con los grupos por tipo",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "architecture",
+      "status": "done",
+      "units": [
+        {
+          "id": 205,
+          "do": "Diseño técnico de nzt-questions: de dónde lee preguntas, reglas del parser, cómo arma el mensaje, QT abiertas",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        {
+          "id": 212,
+          "do": "Recortar el kernel: duplicados internos (grupo A) y la conversión de estados viejos, sin perder reglas; D65 y rebuild de dist",
+          "status": "done",
+          "detail": "Adelantada a pedido del usuario 2026-10-17; kernel 185->176, CLAUDE.md 198->189"
+        },
+        {
+          "id": 206,
+          "do": "Kernel y adapters con la regla de preguntas, stack-axes remite a ella, rebuild de dist",
+          "status": "done",
+          "detail": "Sección Questions en el kernel; CLAUDE.md y AGENTS.md en 200 líneas (tope C3), build sin warnings"
+        },
+        {
+          "id": 207,
+          "do": "Mod nzt-questions en mods/ con tests",
+          "status": "done",
+          "detail": "validate ok, tsc ok (tsconfig del scratchpad), 22/22 tests; sin cargar en vivo (210); README del mod hecho"
+        },
+        {
+          "id": 208,
+          "do": "nzt-hub: grupos por tipo y tarjeta de nzt-questions",
+          "status": "done",
+          "detail": "validate ok, 17/17 tests; desborde de 'se abre al terminar el turno' arreglado sin test, mirar en vivo en la 210"
+        },
+        {
+          "id": 209,
+          "do": "nzt-state: aviso de preguntas abiertas",
+          "status": "done",
+          "detail": "validate ok, tsc ok, 32/32 tests; QT-05 sin dependencies, clave declarada en su contrato; falta probar en vivo con los dos mods (210)"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "status": "done",
+      "units": [
+        {
+          "id": 213,
+          "do": "nzt-questions: índice en pestañas, ir a Revisar al contestar la última, botones sin encimar y teclas al pie (Q-11..Q-14 de su spec)",
+          "status": "done",
+          "detail": "Hecho y ajustado tras probarlo (Q-15): índice en lista otra vez, foco a la respuesta al elegir fila, tecla a, atajos visibles; 24/24 tests; copiado a dev-mods/1db5e93f…"
+        },
+        {
+          "id": 210,
+          "do": "Verificar: tests, validate, los tres mods cargados de verdad, dist y links",
+          "status": "done",
+          "detail": "Todo passed; el usuario validó en vivo el resto y aceptó los tres mods el 2026-10-17 (corrida 3 en specs/testing/2026-10-17-preguntas.md)"
+        }
+      ]
+    },
+    {
+      "name": "ship",
+      "status": "doing",
+      "units": [
+        {
+          "id": 211,
+          "do": "Versiones de los mods, entrada en el marketplace, READMEs, specs cerradas; commits y push a la rama mods, sin release ni PR",
+          "status": "done",
+          "detail": "nzt-questions 0.1.0 nuevo, nzt-hub 0.2.0, nzt-state 0.5.0; validate ok, tests 25/17/32; rama mods pusheada a origin"
+        },
+        {
+          "id": 214,
+          "do": "Después del merge de la rama mods: changelog y release de NZT, tags de los mods, borrar copias de dev-mods e instalar nzt-questions del marketplace",
+          "status": "todo",
+          "detail": "Copias a borrar: ~/.claude/dev-mods/57d5260d-85bb-4667-9426-b52a669fbac3/nzt-questions y ~/.claude/dev-mods/1db5e93f-2b2c-4957-af96-5cf1e69abdd5/nzt-questions. El marketplace sale de main: antes del merge nzt-questions no se instala"
+        }
+      ]
+    }
+  ],
+  "approved": true,
   "autonomy": {},
-  "waiting_on": null,
+  "waiting_on": "El usuario sigue sumando trabajo de mods en la rama mods y arma el PR él; la 214 espera ese merge",
   "notes": [
-    "Sin corrida en curso. La anterior (mods en el instalador, unidades 180-196) terminó el 2026-10-17 con NZT v1.3.0 publicada; el usuario probó lo que faltaba (.sh, Copiar, desinstalación completa). Su historia está en git y en specs/.",
-    "La próxima corrida numera sus unidades desde 197."
+    "Usuario 2026-10-17: aprobó el plan y C' (sin tool propia del mod, sin interceptar AskUserQuestion en 0.1), tanda autónoma 197-202. Mod nuevo nzt-questions, respuesta al prompt para revisar, tipo genérico/NZT con hub agrupado, aviso en nzt-state.",
+    "Tanda 197-202 hecha el 2026-10-17. Después, Q-05 (se abre solo), Q-07 (nzt-questions genérico: reconoce por forma, no lee documentos) y el flag de Codex no se activa, ya escritos en las specs. Para la 206: con D65 (unidad 212) CLAUDE.md quedó en 189 líneas y la regla de D64 entra entera en el kernel. Diseño técnico de nzt-questions hecho (205). Tanda autónoma 206-209 hecha el 2026-10-17; ahora acompañado.",
+    "Usuario 2026-10-17: rama general 'mods' para todo el trabajo de mods (no solo este); se pushea sin release ni PR, el PR lo arma él al final. CLAUDE.md en 200 líneas (tope C3)."
   ]
 }
