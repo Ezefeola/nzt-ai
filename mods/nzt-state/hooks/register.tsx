@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Expanded, Snapshot, Unit } from '../types'
+import type { Answering, Expanded, Snapshot, Unit } from '../types'
 import { parseState } from './parse'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
@@ -41,6 +41,15 @@ const expanded = atom({ plugin: 'nzt-state', key: 'expanded' } as const, {
   dropped: false,
   notes: false,
 } as Expanded)
+const answering = atom({ plugin: 'nzt-state', key: 'answering' } as const, { kind: 'idle' } as Answering)
+// What nzt-questions publishes: how many of its questions are not sent. Undefined while it is
+// not installed or has never counted, which the pane takes as none.
+const QUESTIONS_PENDING = { plugin: 'nzt-questions', key: 'pending' } as const
+const QUESTIONS = 'nzt-questions'
+// The color of Preguntas in nzt-hub and nzt-questions.
+const QUESTIONS_COLOR = '#f48fb1'
+// A press on Contestar that has not opened nzt-questions by then is waiting for Claude's turn to end.
+const WAIT_MS = 400
 
 // The mtime last read; a reload starts over and reads the file again.
 let lastMtime = -1
@@ -88,6 +97,25 @@ const since = (iso: string, now: number, t: Texts) => {
   const hours = Math.round(minutes / 60)
   if (hours < 24) return t.hoursAgo(hours)
   return t.daysAgo(Math.round(hours / 24))
+}
+
+/** Runs nzt-questions' command as if typed; while Claude's turn runs, the notice says it waits. */
+const openQuestions = async ($: EngineInterface) => {
+  let isDone = false
+  const ran = $.command.run({ command: QUESTIONS }).finally(() => {
+    isDone = true
+  })
+  void $.clock
+    .sleep(WAIT_MS)
+    .then(() => (isDone ? undefined : update($, answering, (): Answering => ({ kind: 'waiting' }))))
+    .catch(() => undefined)
+  try {
+    await ran
+    await update($, answering, (): Answering => ({ kind: 'idle' }))
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    await update($, answering, (): Answering => ({ kind: 'failed', message }))
+  }
 }
 
 const MARK = {
@@ -184,6 +212,13 @@ export const register: Register = (on, options) => {
     const { Box, Text, Button } = $.ui.resolve(e)
     const state = await read($, snapshot)
     const open = await read($, expanded)
+    const pressed = await read($, answering)
+    // A value that is not a count, or a reading refused, is no questions: nothing shows.
+    const counted = await $.state
+      .get(QUESTIONS_PENDING)
+      .then(got => got.value)
+      .catch(() => undefined)
+    const asked = typeof counted === 'number' ? counted : 0
     const width = Math.max(24, e.props.bodyColumns - 1)
 
     if (state.kind === 'missing') {
@@ -482,6 +517,26 @@ export const register: Register = (on, options) => {
         {state.waitingOn !== null && (
           <Box marginTop={1} borderStyle="round" borderColor="warning" paddingX={1}>
             <Text color="warning" wrap="wrap">{t.waitingOn(state.waitingOn)}</Text>
+          </Box>
+        )}
+
+        {asked > 0 && (
+          <Box marginTop={1} flexDirection="column">
+            <Box flexDirection="row" justifyContent="space-between" gap={1}>
+              <Box flexShrink={1} overflow="hidden">
+                <Text color={QUESTIONS_COLOR} bold wrap="truncate-end">{t.questions(asked)}</Text>
+              </Box>
+              {pressed.kind === 'waiting' ? (
+                <Text color="warning" wrap="truncate-end">{t.answerWaiting}</Text>
+              ) : (
+                <Button key="answer-questions" plain onPress={() => openQuestions($)}>
+                  <Text backgroundColor={QUESTIONS_COLOR} color="inverseText" bold>{` ${t.answer} `}</Text>
+                </Button>
+              )}
+            </Box>
+            {pressed.kind === 'failed' && (
+              <Text color="error" wrap="wrap">{t.answerFailed(pressed.message)}</Text>
+            )}
           </Box>
         )}
 

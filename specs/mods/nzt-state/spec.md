@@ -1,8 +1,10 @@
 # Mod · nzt-state — panel del plan y el estado
 
-> Estado: **construido**, versión 0.4.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
+> Estado: **construido**, versión 0.5.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
 > unidades 84 a 88; fases plegables y personajes en 91 a 95; aviso de varias fases en curso
-> en la 164; Plan y Modo al lado del personaje en la 166) · Depende de: `specs/nzt-mods.md`,
+> en la 164; Plan y Modo al lado del personaje en la 166; aviso de preguntas abiertas,
+> RN-panel-preguntas y -preguntas-espera, aprobado en la 202, construido en la 209 y aceptado
+> por el usuario tras probarlo en vivo el 2026-10-17, unidad 210) · Depende de: `specs/nzt-mods.md`,
 > `specs/nzt-core.md` sección 7 (formato de `Plan/state.json`), D61 y D62.
 > Escrita el 2026-10-13 leyendo el código; los hallazgos R-01 a R-08 los resolvió el usuario
 > el 2026-10-14 (sección **Hallazgos resueltos**).
@@ -39,7 +41,8 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
   (`RN-mod-lee-no-escribe` de `specs/nzt-mods.md`); avisa lo que está mal y no lo arregla.
 - **Codex.** Un mod es solo de Claude Code (D63).
 - **Otros artefactos**, como specs, historias o el glosario. El panel lee únicamente
-  `Plan/state.json`.
+  `Plan/state.json`. Las preguntas abiertas no las busca en los documentos: toma la
+  cuenta que da `nzt-questions` (RN-panel-preguntas), que es el mod que las lee.
 - **Historial de corridas.** Una corrida nueva reescribe el estado (D62), y el panel
   muestra solo la corrida actual.
 - **Buscar el estado en carpetas de más arriba.** El usuario decidió que lea solo la
@@ -134,6 +137,17 @@ usuario (no hay ningún dato de idioma ni región en los tipos del motor, versi�
 adivinarlo del texto del estado puede fallar con un objetivo corto o mezclado. `es` por
 defecto porque es lo que el panel hace hoy. **Se reabre** si el motor empieza a exponer el
 idioma, o si el usuario prefiere que se adivine del estado.
+
+### RN-panel-preguntas · origin: usuario 2026-10-17 ("me gusta lo de que nzt-state avise lo de las preguntas"); la forma, propuesta del agente
+Si `nzt-questions` está instalado y tiene preguntas pendientes, el panel muestra, debajo de lo
+que se está esperando, **`? n preguntas para contestar`** con un botón **Contestar ›** que abre
+`nzt-questions`, igual que si la persona escribiera su comando. Las ya llevadas al prompt no
+cuentan. Sin preguntas pendientes, o sin `nzt-questions` instalado, no muestra nada: el panel no
+le pide a nadie que instale otro mod.
+
+### RN-panel-preguntas-espera · origin: mismo criterio que RN-hub-espera de `nzt-hub`
+Si Claude está trabajando en un turno cuando se aprieta Contestar, el aviso dice que
+`nzt-questions` se abre al terminar el turno, y se abre entonces.
 
 ### RN-panel-fases-plegables · origin: usuario 2026-10-14
 Dentro de **Pendientes**, **Hechas** y **Descartadas**, las unidades se agrupan por fase y
@@ -246,6 +260,16 @@ Leídos del código el 2026-10-13 y resueltos por el usuario el 2026-10-14.
   Tampoco está probado si la animación CSS del SVG corre dibujado como imagen o necesita
   `isInteractive`; los tipos del motor solo lo afirman de la animación SMIL.
 - **Terminal de 256 colores:** no se probó cómo se ve el personaje.
+- **Cómo sabe `nzt-state` cuántas preguntas tiene `nzt-questions`** (RN-panel-preguntas, unidad
+  202): el motor deja que un mod lea el estado de sesión de otro que declara como dependencia,
+  pero no está verificado si declararlo obliga a tener instalado `nzt-questions`, lo que
+  rompería *sin `nzt-questions` instalado, no muestra nada*. Se decide en el diseño técnico de
+  `nzt-questions` (unidad 205). **Probado en la unidad 209:** `nzt-state` no declara la
+  dependencia y declara en su propio contrato la única clave que lee (`nzt-questions.pending`).
+  `claude plugin validate` lo acepta y avisa que la clave de otro plugin no la puede comprobar.
+  En el test, sin `nzt-questions`, la lectura se rechaza, el panel la toma como cero y no muestra
+  nada. **Verificado en vivo en la unidad 210** (usuario, 2026-10-17): con los dos mods cargados
+  el aviso aparece, Contestar abre `nzt-questions` y no hay quejas por los dos contratos.
 
 ## Tests
 
@@ -258,4 +282,5 @@ aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos 
 se pliegan, los cuadros y sombreros de cada personaje, las celdas, el personaje y los mini
 sombreros en la terminal, y el SVG en el escritorio; Plan y Modo al lado del personaje
 desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el objetivo con su
-etiqueta, arriba de las fases. 28 tests.
+etiqueta, arriba de las fases; el aviso de preguntas pendientes con Contestar, y su ausencia
+sin `nzt-questions` o sin preguntas. 32 tests.

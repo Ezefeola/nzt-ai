@@ -585,3 +585,62 @@ test('an autonomous batch reads as a range with its progress and kept stops', as
   expect(await ui.find({ type: 'Text', text: /69–72 sin frenar · 2 de 4 hechas · frena en 71/ })).toBeDefined()
   await ui.unmount()
 })
+
+/** A session with the state file, a pane that seats, and nzt-questions counting `pending`, or not installed. */
+const questionsSession = (on: Parameters<TestBody>[1], pending?: number) => {
+  on('fs.stat', async () => ({
+    value: { kind: 'file', size: STATE.length, mtimeMs: 1, isLink: false },
+  }))
+  on('fs.read', async () => ({ value: STATE }))
+  on('ui.open', async () => ({ value: { isPlaced: true } }))
+  on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
+  if (pending !== undefined) {
+    on('state.get', { plugin: 'nzt-questions', key: 'pending' }, async () => ({ value: { value: pending, version: 1 } }) as never)
+  }
+  const ran: string[] = []
+  on('command.run', { command: 'nzt-questions' }, async () => {
+    ran.push('nzt-questions')
+    return { text: 'Panel de preguntas abierto.' }
+  })
+  return ran
+}
+
+const mountState = async ($: Parameters<TestBody>[0]) => {
+  await $.command.run({
+    command: 'nzt-state',
+    args: '',
+    origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 120 },
+  })
+  return $.ui.mount({
+    plugin: 'nzt-state',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: 'nzt-state',
+    viewport: { columns: 80, rows: 40 },
+    props: {
+      title: 'Estado',
+      isFocused: false,
+      bodyColumns: 76,
+      placement: 'dock',
+      scroll: { offset: 0, bodyRows: 36 },
+      view: {},
+    },
+  })
+}
+
+test('with questions pending in nzt-questions, the pane says how many and Contestar opens it', async ($, on) => {
+  const ran = questionsSession(on, 3)
+  const ui = await mountState($)
+  expect(await ui.find({ type: 'Text', text: '? 3 preguntas para contestar' })).toBeDefined()
+  await ui.press({ key: 'answer-questions' })
+  expect(ran).toEqual(['nzt-questions'])
+})
+
+test('without nzt-questions, or with nothing pending, the pane says nothing about questions', async ($, on) => {
+  questionsSession(on)
+  const ui = await mountState($)
+  expect(await ui.find({ type: 'Text', text: /para contestar/ })).toBeUndefined()
+  expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
+})

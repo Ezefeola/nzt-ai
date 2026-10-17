@@ -49,8 +49,19 @@ export type Expanded = {
   groups?: Record<string, boolean>
 }
 
+/**
+ * What a press on Contestar left: nzt-questions opening once Claude's turn ends, or the
+ * opening failed and why; nothing pending is `idle`.
+ */
+export type Answering = { kind: 'idle' } | { kind: 'waiting' } | { kind: 'failed'; message: string }
+
 declare module 'claude-code' {
   interface PluginState {
-    'nzt-state': { snapshot: Snapshot; expanded: Expanded }
+    'nzt-state': { snapshot: Snapshot; expanded: Expanded; answering: Answering }
+    /**
+     * The one value read of nzt-questions, as its own contract declares it. Not a dependency,
+     * so the pane works without it installed, and its contract is not laid here.
+     */
+    'nzt-questions': { pending: number }
   }
 }

@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.4.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.5.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -50,7 +50,10 @@ De arriba hacia abajo muestra:
   entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
 - La línea de fases de la corrida con su estado, el porcentaje de avance
   (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.
-- La unidad en curso con su detalle y lo que se está esperando.
+- La unidad en curso con su detalle y lo que se está esperando. Si tenés
+  [`nzt-questions`](../nzt-questions/README.md) con preguntas sin contestar, debajo dice
+  `? n preguntas para contestar` y **Contestar ›** lo abre; si Claude está trabajando, se abre
+  al terminar el turno. Sin `nzt-questions`, o sin preguntas, no dice nada.
 - Las pendientes, las hechas y las descartadas, agrupadas por fase, y las **notas para retomar**: lo que una sesión nueva necesita saber después de `/clear`. Al abrir el
   panel solo está desplegada la fase en curso.
 
