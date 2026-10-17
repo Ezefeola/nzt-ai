@@ -1,9 +1,8 @@
 # NZT
 
 You work under NZT. It does not restrict what you know, which tools you use, or how you
-solve problems. It defines **how you work**: understand the request, propose a plan,
-execute it in small reviewable units, verify what you built, and record where you are.
-Follow it on every request, scaled to the request. Small work does not run the full method.
+solve problems. It defines **how you work**, in the loop below. Follow it on every request,
+scaled to the request. Small work does not run the full method.
 
 ## Language
 
@@ -19,16 +18,10 @@ that is not the output language.
    the project has specs or state, read them before asking.
 2. **Propose.** Give the user a plan: what you will do, cut into units, which documents it
    will produce, and which phases you are skipping and why. The user keeps or drops each
-   document. Show it in your reply and write it into `Plan/state.json`. Do not execute
-   until they approve it and `approved` is `true`.
+   document. Show it in your reply, write it into `Plan/state.json`, and wait for approval.
 3. **Execute.** One unit at a time, marking progress in the spec the unit belongs to.
 4. **Verify.** Check what the unit built with the checks its phase owns, and record them.
 5. **Record.** Update `Plan/state.json`. Then stop.
-
-## Entry point
-
-Not every project starts from zero, and not every request needs every phase. `nzt`
-classifies the request and picks the phases. When you skip one, be able to say why.
 
 ## Work units and stops
 
@@ -37,18 +30,28 @@ one module in reverse engineering, one story, one spec's test set.
 
 Every unit ends the same way, in this order: land on a safe point — nothing half-written,
 no open question left hanging — then write `Plan/state.json`, then report in 3–5 lines what
-you did and what comes next **and where the context stands**, then **stop and wait**. A
-report written before the state is persisted is lost if the session ends between the two.
+you did and what comes next **and where the context stands, and whether clearing the session
+is worth it**, then **stop and wait**. A report written before the state is persisted is
+lost if the session ends between the two.
 
-Specs are written one at a time, never in batches. Accompanied is the default: chain units
-without stopping only for a batch the user authorised for that run. Autonomy is offered
-once, when the plan is presented — not answering is accompanied, approving the plan does
-not select it, and "continue" advances the next agreed stretch without changing mode.
+Accompanied is the default: chain units without stopping only for a batch the user
+authorised for that run. Autonomy is offered once, when the plan is presented — not
+answering is accompanied, approving the plan does not select it, and "continue" advances
+the next agreed stretch without changing mode.
+
+## Questions
+
+A question with options goes through the host's question tool if the session has one: one
+question per decision, its id first (`QT-03 · …?`), each option's consequence in its
+description, the recommended one first and marked, several calls in a row if the tool takes
+few; what does not fit stays in the log, cited. Without it, one block: each question numbered
+with its id in bold (`**QT-03 · …?**`), a bullet per option (`- **A · <option>** —
+<consequence>`), the recommended first and marked *(recommended)*. Either way it is written in
+its log before it is asked and the answer when it arrives; an open question is plain text.
 
 ## Context
 
-The session is disposable; the state file is not. **At the end of every run, once the state
-is written, say where the context stands and whether it is worth clearing the session.**
+The session is disposable; the state file is not.
 
 - **Read it from the signal the host gives you** — a remaining budget, a compaction warning,
   whatever this session exposes. **If there is no signal, say that, and say what you can
@@ -90,13 +93,11 @@ user anything.
   `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
   phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
   next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
-  A state with `phase`, or with `units` at the top, is converted on its next write.
 - `approved` is the lock on the main stop: without `true`, nothing executes.
 - `autonomy` records the batch the user selected: which units run without stopping, and
-  which stops are kept anyway. **Absent or empty means accompanied.** Write it when the
-  user selects it, not when they approve the plan.
-- Write the file when a unit ends, not while you are inside one. Rewrite `phases` when the
-  user changes the plan. **A new run rewrites the file** with its own goal, phases and
+  which stops are kept anyway. **Absent or empty means accompanied.**
+- Never write the file while you are inside a unit. Rewrite `phases` when the user changes
+  the plan. **A new run rewrites the file** with its own goal, phases and
   units, ids counting on from the last run; inside a run, nothing `done` or `dropped` goes.
 - **Write it for a session that has none of this conversation.** The test is literal: if
   picking the work up again would need something that exists only in the chat — a decision
@@ -114,7 +115,7 @@ guidance you need inside it, unless that router is already loaded in this sessio
 
 | The work is about | Load |
 |---|---|
-| Starting, resuming, or an unclear phase | `nzt` |
+| Starting, resuming, or an unclear phase: classifying the request and picking its phases | `nzt` |
 | Building, changing or executing the plan, or closing a feature the user accepted | `nzt-plan` |
 | Functional analysis: requirements, business rules, scope, specs and stories, the product and its vocabulary, changing what an existing feature does, specs from existing code | `nzt-discovery` |
 | How to solve it: components, stack, technical design, the domain model and its contexts, decision records and RFCs, deferred technical debt, reviewing an existing structure, and the diagrams those documents earn | `nzt-architecture` |
