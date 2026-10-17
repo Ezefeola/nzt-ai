@@ -99,8 +99,15 @@ En una sesión de Claude Code en la terminal (versión 2.1.275 o posterior):
 Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerlo en todos
 los proyectos.
 
-Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-files`. Para
-actualizarlo: `claude plugin update nzt-files`.
+También viene con NZT: la línea `install-claude-full`, o el instalador con `--mods all`,
+instala todos los mods (sección **Mods** del [`README.md`](../../README.md) del repo).
+
+**Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
+`/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
+versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-files@nzt` en
+la terminal, o volver a correr el instalador de NZT.
+
+Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-files@nzt`.
 
 ## Desarrollo
 

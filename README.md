@@ -118,9 +118,21 @@ powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/re
 curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh | sh
 ```
 
+**Claude Code con los mods** — el método y los [mods](#mods), sin preguntar nada
+
+```powershell
+# Windows
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.ps1 | iex"
+```
+
+```bash
+# macOS y Linux
+curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.sh | sh
+```
+
 Cada línea baja el instalador a una carpeta temporal, verifica su SHA256, instala NZT en ese
-proveedor —el bloque en `CLAUDE.md` o `AGENTS.md` y las skills— y lo borra. **Para
-actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
+proveedor —el bloque en `CLAUDE.md` o `AGENTS.md` y las skills, y los mods si es la línea
+`install-claude-full`— y lo borra. **Para actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
 `$env:NZT_UNINSTALL='1'; irm … | iex` en Windows o `curl … | NZT_UNINSTALL=1 sh` en el resto.
 
 Desde el repo, con .NET 10, está el instalador completo:
@@ -130,7 +142,8 @@ dotnet run --project installer/src/Nzt.Cli
 ```
 
 El menú tiene cuatro acciones —**instalar, desinstalar, verificar el contenido y ver
-estado**—, te deja elegir Claude Code, Codex o los dos, y **te muestra la simulación y recién
+estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
+método o solo los mods—, y **te muestra la simulación y recién
 ahí pregunta**. Instala un bloque delimitado en el archivo de instrucciones —respetando lo
 que ya tengas, con backup— y las skills en la carpeta de usuario del proveedor.
 
@@ -140,7 +153,8 @@ dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
 
 **No es un plugin.** Son skills sueltas y un bloque de texto: nada que tengas que aprender a
-manejar, y nada que dependa de un mecanismo que Codex no tiene. El detalle está en
+manejar, y el mismo NZT en cada proveedor: ningún sistema de plugins carga el kernel igual
+en todos. El detalle está en
 [`installer/README.md`](installer/README.md).
 
 ## Mods
@@ -157,9 +171,39 @@ completo sin ellos. Existen solo para Claude Code, porque Codex no tiene mods.
 | [`nzt-files`](mods/nzt-files/README.md) | Panel lateral que recorre el proyecto como el explorador de VS Code: carpetas que se abren y cierran, marcas de git y el archivo elegido debajo, solo para leer | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
 | [`nzt-hub`](mods/nzt-hub/README.md) | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | `/plugin install nzt-hub --marketplace Ezefeola/nzt-ai` |
 
-La línea se escribe en una sesión de Claude Code en la terminal. Más adelante, el instalador
-va a preguntar si se instalan también los mods. Cómo se arma un mod y qué tiene que traer
-está en [`specs/nzt-mods.md`](specs/nzt-mods.md).
+### Instalarlos
+
+- **Con el instalador.** La línea `install-claude-full` instala el método y todos los mods.
+  Desde el repo, `dotnet run --project installer/src/Nzt.Cli -- install --provider
+  claude-code --mods all` hace lo mismo, `--mods only` instala solo los mods, y el menú
+  pregunta qué querés. Necesita el comando `claude` en la terminal, versión 2.1.287 o
+  posterior; sin eso instala el método y te dice cómo sumar los mods a mano.
+- **A mano, uno por vez.** La línea de la tabla, en una sesión de Claude Code en la terminal.
+  La primera vez pregunta si agrega el marketplace: contestá `y` y elegí el scope **user**
+  para tenerlo en todos los proyectos.
+
+Las dos formas usan el mismo marketplace `nzt`, que sale de la rama `main` de este repo: un
+mod que instalaste a mano el instalador lo actualiza, pero no lo desinstala nunca.
+
+### Actualizarlos
+
+Cada mod tiene su propia versión, independiente de la de NZT, y Claude Code baja una nueva
+solo cuando esa versión sube.
+
+- **Automático.** Viene apagado, como en todo marketplace que no es de Anthropic. Se activa
+  una vez: `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**. Desde ahí cada sesión
+  nueva baja las versiones nuevas y avisa `Run /reload-plugins` para cargarlas.
+- **A mano.** `claude plugin update <mod>@nzt` en la terminal (por ejemplo,
+  `claude plugin update nzt-state@nzt`), **Update marketplace** en esa misma pestaña de
+  `/plugin`, o volver a correr el instalador, que actualiza todos los mods que haya.
+
+### Desinstalarlos
+
+`claude plugin uninstall <mod>@nzt` quita uno. El instalador, al desinstalar, quita solo los
+mods que instaló él (`uninstall --provider claude-code --mods only` deja el método). **No
+quites el marketplace `nzt`**: eso desinstala de una vez todos los mods que vinieron de él.
+
+Cómo se arma un mod y qué tiene que traer está en [`specs/nzt-mods.md`](specs/nzt-mods.md).
 
 ## Qué no hace
 
