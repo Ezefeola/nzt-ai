@@ -1,9 +1,21 @@
 import { expect, test } from 'claude-code/testing'
 
-import { CATALOG, installCommand, installedFileOf, isInstalled, versionsOf } from './catalog'
+import { CATALOG, groupsOf, installCommand, installedFileOf, isInstalled, versionsOf } from './catalog'
 
-test('the catalog lists the four NZT mods in order, and not the hub', async () => {
-  expect(CATALOG.map(mod => mod.id)).toEqual(['nzt-state', 'nzt-context', 'nzt-changes', 'nzt-files'])
+test('the catalog lists the five NZT mods in order, and not the hub', async () => {
+  expect(CATALOG.map(mod => mod.id)).toEqual(['nzt-state', 'nzt-context', 'nzt-changes', 'nzt-files', 'nzt-questions'])
+})
+
+test('the mods of the method come first, then the generic ones, each group in the catalog order', async () => {
+  const groups = groupsOf(CATALOG.map(mod => ({ id: mod.id })))
+  expect(groups.map(group => [group.kind, group.mods.map(mod => mod.id)])).toEqual([
+    ['nzt', ['nzt-state']],
+    ['generic', ['nzt-context', 'nzt-changes', 'nzt-files', 'nzt-questions']],
+  ])
+})
+
+test('a group with no mods is left out', async () => {
+  expect(groupsOf([{ id: 'nzt-files' }]).map(group => group.kind)).toEqual(['generic'])
 })
 
 test('the install command names the mod and this repository as its marketplace', async () => {

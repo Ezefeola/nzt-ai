@@ -1,7 +1,8 @@
 # Mod · nzt-hub — panel principal de los mods
 
 > Estado: **aceptado** por el usuario en 0.1.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
-> queda todo aprobado") y cerrado (unidad 157); código en `mods/nzt-hub/`; Historia al final · mockup en
+> queda todo aprobado") y cerrado (unidad 157); 0.2.0, grupos por tipo y `nzt-questions`,
+> aceptado tras probarlo en vivo el 2026-10-17 (unidad 210) y cerrado; código en `mods/nzt-hub/`; Historia al final · mockup en
 > `specs/mods/nzt-hub/mockup.html` (unidades 153 y 158, dirección C) · Depende de: `specs/nzt-mods.md` (reglas de todo mod y catálogo de la sección 5).
 > El usuario pidió el mod el 2026-10-14: "un panel principal que tenga botones por cada MOD de
 > NZT para poder verlos en un lugar y para que es cada uno y que desde el mismo se pueda
@@ -47,9 +48,19 @@ No se abre solo al empezar la sesión.
 ### RN-hub-tarjetas · origin: usuario 2026-10-14 ("botones por cada MOD de NZT ... para que es cada uno")
 El panel muestra una tarjeta por cada mod de NZT, con su nombre y para qué sirve en una línea.
 
-### RN-hub-catalogo · origin: propuesta del agente
-Los mods que aparecen son los del catálogo de `specs/nzt-mods.md` (sección 5), en ese orden.
-El panel no se muestra a sí mismo.
+### RN-hub-catalogo · origin: propuesta del agente; los grupos, usuario 2026-10-17
+Los mods que aparecen son los del catálogo de `specs/nzt-mods.md` (sección 5), agrupados por
+tipo (RN-hub-grupos) y, dentro de cada grupo, en el orden del catálogo. El panel no se muestra
+a sí mismo.
+
+### RN-hub-grupos · origin: usuario 2026-10-17 ("me gusta tu propuesta con lo de que nzt-hub agrupe por tipo"); el orden y los títulos, propuesta del agente
+Las tarjetas van en dos grupos, cada uno con su título: primero **Con el método NZT** (los mods
+de tipo NZT) y después **Para cualquier proyecto** (los genéricos, con o sin capa NZT), según
+`RN-mod-tipo` de `specs/nzt-mods.md`. Un grupo sin mods no se muestra.
+
+### RN-hub-capa-nzt · origin: propuesta del agente
+La tarjeta de un mod genérico con capa NZT lo dice en su línea de para qué sirve, para que se
+entienda por qué está entre los genéricos y nombra cosas del método.
 
 ### RN-hub-version · origin: usuario 2026-10-14 (Q-03: "Versión de cada mod")
 La tarjeta de un mod instalado muestra la versión instalada.
@@ -100,6 +111,30 @@ mod, que se elige al instalarlo.
 ## Requisitos no funcionales
 - Abrir el panel o apretar un botón con la sesión libre se ve en menos de medio segundo
   (propuesta del agente).
+
+## Diseño (0.2.0, unidad 204)
+
+Mockup `specs/mods/nzt-hub/mockup.html` actualizado; lo demás de la sección Diseño de 0.1.0, abajo,
+sigue valiendo.
+- **Dos grupos** debajo del separador, cada uno con su título tenue en mayúsculas, como las
+  secciones de `nzt-state`: `CON EL MÉTODO NZT` (Estado) y `PARA CUALQUIER PROYECTO` (Contexto,
+  Cambios, Archivos, Preguntas). Una fila en blanco antes del segundo título (RN-hub-grupos).
+- **Preguntas**: glifo `?` en rosa; *Las preguntas del agente, de a una y con opciones, al prompt
+  en un mensaje.* El glifo, el color y el texto, propuesta del agente (Q-08 de
+  `specs/mods/nzt-questions/spec.md`).
+- **Contexto** dice *con las marcas 20/30/40 de NZT* (RN-hub-capa-nzt).
+- La portada cuenta `n de 5 instalados`, con un punto por mod.
+- **Arreglo del mockup de 0.1.0:** a 320 px, `se abre al terminar el turno` se salía de la tarjeta
+  en el estado *Claude trabajando* (medido el 2026-10-17; la medición de 0.1.0 miraba solo el
+  scroll horizontal). Ahora en un panel angosto dice `al terminar el turno` y cede con `…` antes
+  que el nombre. **La unidad 208 revisa si el código tiene el mismo desborde.** Lo tenía: la
+  caja del texto no podía achicarse. Ahora se achica y corta con `…`, y debajo de 40 columnas
+  de fila dice `al terminar el turno`. Revisado leyendo el código, sin test: el estado necesita
+  un comando que no termine; mirado en vivo en la 210 por el usuario, sin desborde.
+- **Medido** (Chrome sin ventana, 2026-10-17): a 320 px y a 800 px, al costado y sobre el prompt,
+  los 9 estados sin scroll horizontal ni elementos fuera de la tarjeta (36 combinaciones), y el
+  mismo alto en todos (802 y 482 px). Contraste nuevo: títulos de grupo 5,4 y `Abrir ›` sobre el
+  rosa 8,5, los dos AA.
 
 ## Diseño (0.1.0, unidades 153 y 158 · dirección C, "Portada")
 
@@ -255,11 +290,13 @@ aprieta y Escape cierra.
 
 ## Tests
 
-`claude plugin test mods/nzt-hub`: 14 tests.
-- 5 de la lógica pura: el catálogo, el comando de instalación, cuándo un mod está instalado,
-  dónde está la lista de instalados y cómo se leen sus versiones.
-- 9 del panel dibujado: lista y botones, aire bajo la pestaña, nzt-context sin botón, copiar, copia rechazada, Abrir
-  cierra el hub, panel angosto, lista con scroll y cierre con el comando.
+`claude plugin test mods/nzt-hub`: 17 tests.
+- 7 de la lógica pura: el catálogo, los grupos por tipo y el grupo vacío que no se muestra, el
+  comando de instalación, cuándo un mod está instalado, dónde está la lista de instalados y cómo
+  se leen sus versiones.
+- 10 del panel dibujado: lista y botones, aire bajo la pestaña, nzt-context sin botón, copiar, copia rechazada, Abrir
+  cierra el hub, los dos títulos de grupo con Preguntas entre los genéricos, panel angosto,
+  lista con scroll y cierre con el comando.
 
 **No cubierto hasta probar en vivo:**
 - La versión en la fila: en el host de tests la carpeta del plugin no está bajo `.claude`.
@@ -271,6 +308,13 @@ aprieta y Escape cierra.
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba (va acá, como en `nzt-changes`,
 porque este repo guarda sus documentos en `specs/`).
+
+### 2026-10-17 · Grupos por tipo y nzt-questions — 0.2.0
+Type:     modify
+Change:   las tarjetas van en dos grupos, *Con el método NZT* y *Para cualquier proyecto*, y el catálogo suma `nzt-questions`: cinco mods en lugar de cuatro.
+Reason:   el usuario, el 2026-10-17: "me gusta tu propuesta con lo de que nzt-hub agrupe por tipo"; los tipos son `RN-mod-tipo` de `specs/nzt-mods.md`.
+Impact:   RN-hub-catalogo modificada · RN-hub-grupos · RN-hub-capa-nzt nuevas
+Decision: títulos de grupo y glifo de Preguntas, propuesta del agente aceptada; aceptado tras probarlo en vivo (unidad 210).
 
 ### 2026-10-16 · Panel principal de los mods — 0.1.0
 Type:     add

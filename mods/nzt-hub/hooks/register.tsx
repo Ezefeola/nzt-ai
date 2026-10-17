@@ -2,7 +2,8 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, UiPressArgument } from 'claude-code'
 
 import type { Action, Found, Mods } from '../types'
-import { CATALOG, installCommand, installedFileOf, isInstalled, versionsOf } from './catalog'
+import { CATALOG, groupsOf, installCommand, installedFileOf, isInstalled, versionsOf } from './catalog'
+import type { Kind } from './catalog'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 
@@ -30,6 +31,9 @@ let isShowing = false
 let listTop = 0
 let listLastTop = 0
 let t: Texts = TEXTS.es
+
+/** One row of the list: a group's title or a mod. */
+type Entry = { kind: 'title'; group: Kind } | { kind: 'mod'; mod: Found }
 
 const reasonOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
@@ -201,8 +205,14 @@ export const register: Register = (on, options) => {
       return card(<Text dimColor>{t.searching}</Text>)
     }
 
-    // Which mods fit from listTop; when some stay below, the last row says how many.
-    const sizes = known.mods.map(mod => rowsOf(pending[mod.id], commandRows(mod.id)))
+    // The list in order: each group's title, then its mods. A mod's own blank row after it is
+    // the blank row above the next group's title.
+    const entries: Entry[] = groupsOf(known.mods).flatMap(group => [
+      { kind: 'title', group: group.kind } as const,
+      ...group.mods.map(mod => ({ kind: 'mod', mod }) as const),
+    ])
+    // Which entries fit from listTop; when some stay below, the last row says how many mods.
+    const sizes = entries.map(entry => (entry.kind === 'title' ? 1 : rowsOf(pending[entry.mod.id], commandRows(entry.mod.id))))
     listLastTop = 0
     for (let used = 0, i = sizes.length - 1; i >= 0; i--) {
       used += sizes[i]!
@@ -218,10 +228,18 @@ export const register: Register = (on, options) => {
       used += sizes[shownTo]!
       shownTo++
     }
-    const below = sizes.length - shownTo
+    const below = entries.slice(shownTo).filter(entry => entry.kind === 'mod').length
 
-    const rows = known.mods.slice(listTop, shownTo).map(mod => {
-      const spec = CATALOG.find(entry => entry.id === mod.id)!
+    const rows = entries.slice(listTop, shownTo).map(entry => {
+      if (entry.kind === 'title') {
+        return (
+          <Text key={`group:${entry.group}`} dimColor bold wrap="truncate-end">
+            {t.groups[entry.group]}
+          </Text>
+        )
+      }
+      const mod = entry.mod
+      const spec = CATALOG.find(one => one.id === mod.id)!
       const words = t.mods[spec.id]
       const action = pending[mod.id]
       const lines = rowsOf(action, commandRows(mod.id)) - 1
@@ -241,7 +259,11 @@ export const register: Register = (on, options) => {
           </Text>
         )
       } else if (action?.kind === 'waiting') {
-        right = <Text color="yellow">{t.waiting}</Text>
+        right = (
+          <Text color="yellow" wrap="truncate-end">
+            {rowWidth < NARROW ? t.waitingShort : t.waiting}
+          </Text>
+        )
       } else {
         right = (
           <Button key={`open:${mod.id}`} plain onPress={() => openMod($, mod.id)}>
@@ -289,7 +311,7 @@ export const register: Register = (on, options) => {
                   </Text>
                 </Box>
               </Box>
-              <Box flexShrink={spec.hasPane || !mod.isInstalled ? 0 : 1} overflow="hidden">
+              <Box flexShrink={action?.kind === 'waiting' || (!spec.hasPane && mod.isInstalled) ? 1 : 0} overflow="hidden">
                 {right}
               </Box>
             </Box>

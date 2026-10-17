@@ -56,7 +56,7 @@ test('the pane lists every NZT mod with what it is for, and a button on the inst
   expect(await ui.find({ key: 'open:nzt-state' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Plan\/state\.json/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'Archivos' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: / 2 de 4 instalados$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: / 2 de 5 instalados$/ })).toBeDefined()
 })
 
 test('the card keeps a blank row under the pane tabs and still fills the body', async ($, on) => {
@@ -100,6 +100,17 @@ test('Abrir runs the mod command and the hub gives up its place', async ($, on) 
   const ui = await mount($)
   await ui.press({ key: 'open:nzt-state' })
   expect(closed).toBe(true)
+})
+
+test('the cards go under two group titles, and Preguntas is among the generic ones with its install button', async ($, on) => {
+  fakeSession(on)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: 'CON EL MÉTODO NZT' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'PARA CUALQUIER PROYECTO' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Preguntas' })).toBeDefined()
+  expect(await ui.find({ key: 'copy:nzt-questions' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /marcas 20\/30\/40 de NZT/ })).toBeDefined()
 })
 
 test('a narrow pane keeps the names and shortens the copy button', async ($, on) => {
