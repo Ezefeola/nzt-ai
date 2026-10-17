@@ -1,7 +1,7 @@
 # Mod · nzt-hub — panel principal de los mods
 
-> Estado: **construida** en 0.1.0 (unidad 154), código en `mods/nzt-hub/`; falta la prueba en
-> vivo y la aceptación del usuario · mockup en
+> Estado: **aceptado** por el usuario en 0.1.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
+> queda todo aprobado") y cerrado (unidad 157); código en `mods/nzt-hub/`; Historia al final · mockup en
 > `specs/mods/nzt-hub/mockup.html` (unidades 153 y 158, dirección C) · Depende de: `specs/nzt-mods.md` (reglas de todo mod y catálogo de la sección 5).
 > El usuario pidió el mod el 2026-10-14: "un panel principal que tenga botones por cada MOD de
 > NZT para poder verlos en un lugar y para que es cada uno y que desde el mismo se pueda
@@ -266,3 +266,15 @@ aprieta y Escape cierra.
 - "No se pudo abrir": el host de tests no rechaza `command.run`, porque un hook que falla se
   saltea.
 - "Se abre al terminar el turno": el host de tests no tiene reloj.
+
+## Historia
+
+Una entrada por ciclo de cambio cerrado, la más nueva arriba (va acá, como en `nzt-changes`,
+porque este repo guarda sus documentos en `specs/`).
+
+### 2026-10-16 · Panel principal de los mods — 0.1.0
+Type:     add
+Change:   un panel al costado, `/nzt-hub`, con una tarjeta por mod de NZT: para qué es, su versión, un botón que lo abre y, si no está instalado, un botón que copia el comando para instalarlo.
+Reason:   el usuario, el 2026-10-14: "un panel principal que tenga botones por cada MOD de NZT para poder verlos en un lugar y para que es cada uno y que desde el mismo se pueda navegar a cada uno".
+Impact:   RN-hub-ubicacion · RN-hub-tarjetas · RN-hub-catalogo · RN-hub-version · RN-hub-no-instalado · RN-hub-copiar · RN-hub-abrir · RN-hub-cede · RN-hub-espera · todas nuevas
+Decision: dirección visual C, "Portada", con botón Copiar instalación (Q-07); el panel se cierra al abrir otro mod (Q-04).

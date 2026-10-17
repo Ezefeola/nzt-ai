@@ -1,10 +1,8 @@
 # Mod · nzt-changes — panel de los cambios del proyecto
 
-> Estado: **aceptado** por el usuario en 0.4.0 el 2026-10-14 ("perfecto lo acepto") y cerrado
-> (unidad 140); código en `mods/nzt-changes/`. Cómo llegó hasta acá, en **Historia** al final.
-> **Cambio 0.5.0 en curso** (aprobado en el chat el 2026-10-15, unidades 175-179): las reglas
-> marcadas `[add]` y `[modify]` todavía no están construidas; las marcas se van al cerrarlo.
-> · Depende de: `specs/nzt-mods.md` (reglas de todo mod).
+> Estado: **aceptado** por el usuario en 0.5.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
+> queda todo aprobado") y cerrado (unidad 190); código en `mods/nzt-changes/`. Cómo llegó
+> hasta acá, en **Historia** al final. · Depende de: `specs/nzt-mods.md` (reglas de todo mod).
 > El usuario pidió el mod el 2026-10-14 ("ver los cambios a los archivos realizados", "que no
 > sirva solo para código", "debe verse ordenado"), y para la 0.2.0 que se vea "tal cual
 > Replay Theater", que siga llamándose como NZT, sin aviso sobre el prompt y con la vista del
@@ -95,14 +93,14 @@ archivo sin extensión.
 En la vista HEAD cada paso dice qué le pasó al archivo: nuevo, modificado, borrado,
 renombrado (`viejo → nuevo`) o en conflicto.
 
-### RN-cambios-orden · [modify] · origin: usuario 2026-10-14 ("debe verse ordenado", "bien organizado"); por estado, usuario 2026-10-15
+### RN-cambios-orden · origin: usuario 2026-10-14 ("debe verse ordenado", "bien organizado"); por estado, usuario 2026-10-15
 Los pasos de la vista HEAD van ordenados **primero por estado**, en el orden de
 RN-cambios-grupos; dentro de cada estado, por carpeta: la raíz primero, después las carpetas en
 orden alfabético, y dentro de cada una los archivos en orden alfabético. `paso k de n`, Anterior
 y Siguiente siguen ese orden. Los de la vista Turno van en el orden en que Claude los editó, con
 la ruta completa.
 
-### RN-cambios-grupos · [add] · origin: usuario 2026-10-15 ("que en los cambios haya tipos de desplegables… modificados… añadidos… eliminados"; "que no se muestren todos los archivos de una sino agrupados por su carpeta")
+### RN-cambios-grupos · origin: usuario 2026-10-15 ("que en los cambios haya tipos de desplegables… modificados… añadidos… eliminados"; "que no se muestren todos los archivos de una sino agrupados por su carpeta")
 En la vista HEAD el índice es un árbol de dos niveles. Arriba, un grupo por estado, en este
 orden: **Modificados**, **Nuevos**, **Borrados**, **Renombrados** y **En conflicto**. Dentro de
 cada uno, un grupo por carpeta; los archivos de la raíz van directo bajo su estado, sin título
@@ -116,7 +114,7 @@ línea de detalle de cada archivo (RN-cambios-estado); se reabre si el usuario p
 La vista Turno no se agrupa: su orden es el de las ediciones (decisión del agente con el plan
 aprobado el 2026-10-15).
 
-### RN-cambios-grupos-abrir · [add] · origin: usuario 2026-10-15 ("los grupos arrancan cerrados"; Siguiente hacia un grupo cerrado: "que lo abra si")
+### RN-cambios-grupos-abrir · origin: usuario 2026-10-15 ("los grupos arrancan cerrados"; Siguiente hacia un grupo cerrado: "que lo abra si")
 Al abrir el panel, **todos los grupos están cerrados**: se ven solo los títulos de estado. Un
 click en un título, o Tab hasta él y Enter, lo abre o lo cierra; abrir un estado muestra sus
 carpetas cerradas y sus archivos de la raíz. Cuando Anterior, Siguiente o un cambio de vista
@@ -126,7 +124,7 @@ van en el acento aunque estén cerrados, para que se sepa dónde se está. Lo ab
 cuando la vista se relee (RN-cambios-vivo); al cerrar el panel y volver a abrirlo, todo arranca
 cerrado otra vez. *Que el paso actual se marque en su título cerrado es propuesta del agente.*
 
-### RN-cambios-indice · [modify] · origin: usuario 2026-10-14 (Q-01: "índice"; 0.4.0: "cada file debería poder clickearse"); grupos, usuario 2026-10-15
+### RN-cambios-indice · origin: usuario 2026-10-14 (Q-01: "índice"; 0.4.0: "cada file debería poder clickearse"); grupos, usuario 2026-10-15
 Encima del archivo actual, un índice con una fila por paso visible: su número, el nombre y
 `+n −m` (`bin` si es binario). En HEAD las filas van dentro de sus grupos (RN-cambios-grupos), y
 la letra del estado está en el título del grupo y no en cada fila. La fila actual va resaltada,
@@ -148,13 +146,13 @@ El panel mide siempre lo mismo, sea cual sea el paso o la vista: **24 filas sobr
 contenido queda vacío. Los botones están siempre en la última fila. Se comprueba con que dos
 pasos de diff muy distinto (3 líneas y 300) dibujan el panel del mismo alto.
 
-### RN-cambios-aire · [add] · origin: usuario 2026-10-15 ("margen en la sección de t: turno con el contenido de abajo"; "paso k de n" queda donde está y "lo de abajo más abajo"; "el nombre del file un poco separado del modificado y el modificado un poco separado del contenido")
+### RN-cambios-aire · origin: usuario 2026-10-15 ("margen en la sección de t: turno con el contenido de abajo"; "paso k de n" queda donde está y "lo de abajo más abajo"; "el nombre del file un poco separado del modificado y el modificado un poco separado del contenido")
 Una fila en blanco separa cada una de estas partes de la siguiente: el encabezado (con `paso k de
 n` a la derecha, que no se mueve) de las vistas; las vistas del índice; la ruta del archivo de su
 línea de detalle; y la línea de detalle del diff. Las filas en blanco salen del alto del diff, no
 del alto del panel (RN-cambios-alto).
 
-### RN-cambios-botones · [add] · origin: usuario 2026-10-15 ("la sección de anterior, siguiente y cerrar abajo de todo alineado a la derecha")
+### RN-cambios-botones · origin: usuario 2026-10-15 ("la sección de anterior, siguiente y cerrar abajo de todo alineado a la derecha")
 Los botones van en la última fila del panel, **alineados a la derecha**, en el mismo orden:
 `◀ Anterior`, `Siguiente ▶`, `Cerrar`.
 
@@ -183,7 +181,7 @@ En la vista HEAD los números son los del archivo antes y después. En la vista 
 la edición en el archivo como estaba antes de hacerla; un archivo nuevo empieza en 1. Si la
 edición no se puede ubicar en el archivo (la herramienta la va a rechazar), se numera desde 1.
 
-### RN-cambios-diff-alto · [modify] · origin: usuario 2026-10-14 ("el tamaño debería tener un fijo y un scroll"); lugar de la fila de posición, usuario 2026-10-15
+### RN-cambios-diff-alto · origin: usuario 2026-10-14 ("el tamaño debería tener un fijo y un scroll"); lugar de la fila de posición, usuario 2026-10-15
 El diff ocupa todo el alto entre el detalle del archivo y los botones, y **se desplaza
 solo él**: con la rueda sobre el diff (una fila por paso de la rueda), y con `k` ▲ y `j` ▼
 (media ventana), que también se clickean. El encabezado, las vistas, el índice y los botones no
@@ -263,7 +261,7 @@ defecto). Rutas y diffs se muestran tal cual. Las teclas son las mismas en los d
 - La vista HEAD no redibuja si git devuelve lo mismo.
 - Se dibuja en la terminal y en la app de escritorio. Los tests montan el panel en las dos.
 
-## Diseño (0.5.0, unidad 176 — en curso; la 0.4.0 fue aceptada el 2026-10-14: "muy bueno", "perfecto")
+## Diseño (0.5.0, unidad 176 — aceptado el 2026-10-16)
 
 Mockup: `specs/mods/nzt-changes/mockup.html`, un estado por hash (`#state=head-5&place=inline`).
 
@@ -453,6 +451,15 @@ los suyos y no cargó (`$` pasado a una función importada). Eso se prueba en vi
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. *Va acá y no en
 `Docs/Product/history.md` porque este repo guarda sus documentos en `specs/` (decisión del
 agente al cerrar, unidad 140).*
+
+### 2026-10-16 · Índice de HEAD agrupado y desplegable, más aire y botones a la derecha — 0.5.0
+Type:     modify
+Change:   en la vista HEAD los archivos se agrupan por estado y por carpeta en grupos desplegables; el panel separa más sus partes, la posición del diff va arriba a la derecha y los botones abajo a la derecha.
+Reason:   el usuario, el 2026-10-15: "que no se muestren todos los archivos de una sino agrupados por su carpeta", "debe verse ordenado", "margen" entre las partes y "anterior, siguiente y cerrar abajo de todo alineado a la derecha".
+Before:   el índice de HEAD listaba todos los archivos en una lista plana; la fila de posición del diff iba sobre los botones y los botones a la izquierda, con las partes pegadas.
+Now:      grupos Modificados / Nuevos / Borrados y carpetas dentro, cerrados al abrir; Siguiente abre el grupo del paso al que va; fila en blanco entre las partes; posición arriba a la derecha bajo el separador; botones abajo a la derecha. La vista Turno no se agrupa.
+Impact:   RN-cambios-grupos nueva · RN-cambios-grupos-abrir nueva · RN-cambios-aire nueva · RN-cambios-botones nueva · RN-cambios-orden cambiada · RN-cambios-indice cambiada · RN-cambios-diff-alto cambiada
+Decision: "Nuevos" y "Borrados" en vez de añadidos y eliminados, y el título del paso actual en acento (propuestas del agente, aceptadas con el mod).
 
 ### 2026-10-15 · Aire bajo la pestaña — 0.4.1
 Type:     modify

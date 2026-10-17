@@ -96,7 +96,7 @@ Consecuencias directas:
   **Matiz leído el 2026-09-17**: la doc de Claude Code dice que **un plugin sí admite
   subcarpetas de skills** y que adentro de un plugin la skill se llama `plugin:skill`. No se
   verificó hasta qué profundidad ni con qué nombre quedan las de NZT, y **la decisión de
-  aplanar no depende de eso**: Codex no tiene plugins.
+  aplanar no depende de eso**: NZT no se distribuye como plugin (D24).
 - **C6.** **Hay un harness de evals oficial: `claude plugin eval`** (leído y probado el
   2026-09-17 con la v2.1.274; pide ≥ 2.1.269). Lo que fija el diseño de la fase 6:
   **(1)** el target tiene que ser **un plugin** —carpeta con `.claude-plugin/plugin.json`—,
@@ -1049,7 +1049,23 @@ que se tira.
   plugin es un mecanismo que el usuario tendría que conocer, **no existe en Codex**, y
   namespacea las skills (`nzt:nzt-build`) rompiendo los nombres que nombran las tablas de
   ruteo. Lo que se instala son skills sueltas en la carpeta de usuario más un bloque
-  delimitado en el archivo de instrucciones global. Tres consecuencias:
+  delimitado en el archivo de instrucciones global.
+  **Revisado el 2026-10-16** (el usuario preguntó plugin o mod; la decisión se mantiene,
+  cambia el motivo): **Codex sí tiene plugins** (`.codex-plugin/plugin.json`, directorio
+  compartido con ChatGPT), así que "no existe en Codex" ya no es cierto. Lo que sostiene
+  D24 es que **ningún mecanismo de plugins carga el kernel igual en todos los proveedores**:
+  en Claude Code un `CLAUDE.md` dentro de un plugin no se carga, un hook `SessionStart`
+  corta en 10.000 caracteres (el kernel tiene ~12.300) y solo un mod (`prompt.compose`)
+  podría inyectarlo; en Codex no hay forma documentada de que un plugin traiga
+  instrucciones siempre cargadas. Un plugin daría un NZT distinto en cada proveedor; el
+  archivo de instrucciones más la carpeta de skills existen en todos y dan el mismo.
+  Decidido por el usuario: *"no vamos a hacer un plugin entonces para NZT"*. Fuentes, leídas
+  el 2026-10-16: [plugins-reference](https://code.claude.com/docs/en/plugins-reference),
+  [hooks](https://code.claude.com/docs/en/hooks),
+  [mods reference](https://code.claude.com/docs/en/plugins/mods/reference),
+  [skills](https://code.claude.com/docs/en/skills),
+  [Codex build plugins](https://developers.openai.com/codex/plugins/build/).
+  Tres consecuencias:
   **(1)** cierra **I3** —la versión sale del `<Version>` del `.csproj`— y **resuelve I2 sin
   eliminarla**: `install/build.*` sigue siendo el loop de desarrollo, el CLI es lo que
   instala, y lo que evita que diverjan es una comprobación que compara **byte a byte** el
@@ -1804,7 +1820,9 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Cómo se resuelve:** el núcleo sigue sin plugins y sin hooks. Un mod es una capa aparte
     —`mods/`, con su propia spec en `specs/nzt-mods.md`— que **el método no necesita**: nada
     del kernel ni de las skills le pide algo que solo un mod da. La sección 2 lo dice ahora.
-  - **Solo Claude Code:** un mod es un plugin de *function hooks*, y Codex no tiene plugins.
+  - **Solo Claude Code:** un mod es un plugin de *function hooks*, y Codex no tiene mods
+    (sus plugins traen skills, MCP y apps, no código que dibuje en la interfaz; revisado
+    el 2026-10-16, ver D24).
   - **Un mod lee los artefactos de NZT y no los escribe** (propuesta del agente, aceptada
     por el usuario el 2026-10-14): el estado tiene un solo dueño.
   - **El repo es el marketplace de los mods** (`.claude-plugin/marketplace.json` en la
@@ -3220,7 +3238,9 @@ curiosidad.
 >   `architecture.md` es obligatorio desde el primer stack, con la columna de carpeta.
 > - **Mods (D63, 2026-10-13):** capa aparte, opcional y solo de Claude Code, en `mods/`,
 >   especificada en `specs/nzt-mods.md`; cada mod con su spec en `specs/mods/`. El primero
->   es el panel `nzt-state`. El instalador de mods queda para otra corrida.
+>   es el panel `nzt-state`. **El instalador los ofrece en Claude Code** (2026-10-17):
+>   Todo NZT, solo el método o solo los mods, y la línea `install-claude-full`
+>   (`specs/nzt-installer.md` sección 11, M3 de `specs/nzt-mods.md`).
 > - **Evals:** la última suite completa es la 24a (2026-10-07, juez sonnet: routing 0.97,
 >   stack 0.89, restraint 0.90; `Plan/mejoras/05-linea-base.md`). Lo posterior (D56-D59) se
 >   probó sobre el texto, sin evals, por decisión del usuario; los fixtures siguen con las
