@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-17T07:10:00Z",
+  "updated": "2026-10-17T08:00:00Z",
   "goal": "Mods dentro de la instalación de NZT: el instalador ofrece en Claude Code NZT / mods / todo, la landing explica e instala los mods, y los mods se instalan y actualizan acordes a la versión de NZT. Sin plugin para NZT.",
   "phases": [
     { "name": "verify", "status": "done", "units": [
@@ -31,19 +31,19 @@
       { "id": 189, "do": "Landing: 320/800 sin scroll horizontal, comandos copiables, enlaces; el usuario acepta", "status": "done", "detail": "aceptado por el usuario 2026-10-17 ('perfecto'); L-01..05 passed, L-06 copiar con clic real no lo probó nadie (blocked en Chrome automatizado)" },
       { "id": 192, "do": "Cerrar el cambio de nzt-installer §11: marcas fuera, Historia, decisiones del agente aceptadas, nzt-core §14", "status": "done", "detail": "14 marcas barridas; exit 0 sin claude y 'solo mods + Todos' escritas en sus reglas; Historia add 2026-10-17; core §14 al día; Plan/state.real.json borrado (ok del usuario)" }
     ] },
-    { "name": "ship", "status": "doing", "units": [
+    { "name": "ship", "status": "done", "units": [
       { "id": 193, "do": "nzt-ai: commits de installer-mods y PR a main", "status": "done", "detail": "3 commits + este del estado, PR #4 (github.com/Ezefeola/nzt-ai/pull/4) abierto desde el navegador (no hay gh); lo mergea el usuario" },
       { "id": 194, "do": "landing: commits de mods-install y PR a main (con install-claude-full en 'pending')", "status": "done", "detail": "2 commits, PR #6 (github.com/Ezefeola/nzt-ai-landing/pull/6); se puede mergear antes de la release (full queda pending)" },
-      { "id": 195, "do": "Release de NZT con los mods en el instalador (versión a proponer, 1.3.0) tras el merge; verificar assets install-claude-full", "status": "todo", "detail": "pedido 2026-10-17; necesita el PR de 193 mergeado" },
-      { "id": 196, "do": "Landing: install-claude-full a 'live' en config/install.ts y probar las líneas de un comando con mods", "status": "todo", "detail": "después de 195" }
+      { "id": 195, "do": "Release de NZT con los mods en el instalador (versión a proponer, 1.3.0) tras el merge; verificar assets install-claude-full", "status": "done", "detail": "PR #4 mergeado; f22d2f7 en main sube a 1.3.0, tag v1.3.0; workflow release success; 13 assets con install-claude-full.ps1/.sh; dry-run real de la línea full y de NZT_UNINSTALL ok" },
+      { "id": 196, "do": "Landing: install-claude-full a 'live' en config/install.ts y probar las líneas de un comando con mods", "status": "done", "detail": "rama install-claude-full-live, PR #8 de nzt-ai-landing (lo mergea el usuario); assets 200; check/build/check:dist ok. Sin probar: la línea .sh en macOS/Linux" }
     ] }
   ],
   "approved": true,
   "autonomy": {},
-  "waiting_on": "usuario: mergear PR #4 de nzt-ai (y #6 de la landing) para seguir con la release 195",
+  "waiting_on": "usuario: mergear PR #8 de nzt-ai-landing (install-claude-full a live). Con eso la corrida termina.",
   "notes": [
     "2026-10-16 decidido con el usuario: NZT no se distribuye como plugin (no sería igual en todos los proveedores); el instalador es la única forma; los mods siguen por marketplace y el instalador los ofrece. Instalar mods a mano sin tag tiene que seguir siendo posible.",
     "Acoplamiento: nzt-state lee Plan/state.json, nzt-context las marcas 20/30/40 del kernel, nzt-hub el catálogo de mods; nzt-changes y nzt-files no dependen de NZT. Ya existe RN-mod-lee-formatos-viejos; M2 versiona cada mod aparte.",
-    "Ramas 2026-10-16 desde main sincronizado: nzt-ai installer-mods, nzt-ai-landing mods-install. La landing se sirve en localhost:4329 con astro preview (se para con 'npx astro preview stop' en nzt-ai-landing)."
+    "Publicado NZT v1.3.0 (2026-10-17). Ramas installer-mods y mods-install ya mergeadas (se pueden borrar); en la landing queda abierta install-claude-full-live (PR #8)."
   ]
 }
