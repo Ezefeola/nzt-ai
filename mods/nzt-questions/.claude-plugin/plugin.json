@@ -1,0 +1,16 @@
+{
+  "name": "nzt-questions",
+  "version": "0.1.0",
+  "description": "The questions the agent wrote as text, answered one at a time with their options, and taken to the prompt as one message",
+  "author": { "name": "Ezefeola" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The language the pane speaks: es (español) or en (English)",
+      "default": "es",
+      "options": ["es", "en"]
+    }
+  }
+}

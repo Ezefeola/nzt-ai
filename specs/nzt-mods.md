@@ -64,6 +64,19 @@ pestañas. Pedido del usuario al ver `nzt-state` en vivo (*"esta deberia decir s
 asi, asi cuando tengo mas de una ventana abierta … puedo identificar bien cada una"* y *"no
 debe estar tan pegado"*); los nombres los propuso el agente y el usuario los aprobó.
 
+### RN-mod-tipo · origin: usuario 2026-10-17 ("tendriamos mods genericos y mods que necesitan del metodo NZT")
+Cada mod es de uno de dos tipos, y el catálogo lo dice:
+
+- **Genérico:** sirve en cualquier proyecto, use NZT o no. Puede tener una **capa NZT**: en un
+  proyecto con NZT muestra algo más, pero sin NZT funciona completo. Ejemplo: `nzt-context`
+  dibuja el contexto de cualquier sesión, y sus marcas 20/30/40 son las del kernel.
+- **NZT:** necesita un artefacto del método para mostrar algo. Sin él, dice que no lo hay.
+  Ejemplo: `nzt-state` sin `Plan/state.json`.
+
+El tipo lo decide qué lee el mod, no su nombre: todos se llaman `nzt-*` porque los trae NZT.
+`nzt-hub` agrupa las tarjetas por tipo (`specs/mods/nzt-hub/spec.md`). Los nombres de los
+tipos y la regla, propuesta del agente aceptada por el usuario el 2026-10-17.
+
 ## 3. Estructura en el repo
 
 ```
@@ -117,16 +130,19 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 
 ## 5. Catálogo
 
-| Mod | Qué hace | Lee | Spec | Estado |
-|---|---|---|---|---|
-| `nzt-state` | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.4.0, en `mods/nzt-state/` |
-| `nzt-context` | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
-| `nzt-changes` | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 aceptado y cerrado (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable), en `mods/nzt-changes/` |
-| `nzt-files` | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña, en `mods/nzt-files/` |
-| `nzt-hub` | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | los comandos y las opciones de la sesión y la lista de plugins instalados de Claude Code (ningún artefacto de NZT) | `specs/mods/nzt-hub/` (spec y mockup) | aceptado y cerrado, 0.1.0, en `mods/nzt-hub/` |
+| Mod | Tipo | Qué hace | Lee | Spec | Estado |
+|---|---|---|---|---|---|
+| `nzt-state` | NZT | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.4.0; 0.5.0 aceptado y cerrado (aviso de preguntas abiertas), en `mods/nzt-state/` |
+| `nzt-context` | Genérico | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
+| `nzt-changes` | Genérico | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 aceptado y cerrado (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable), en `mods/nzt-changes/` |
+| `nzt-files` | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña, en `mods/nzt-files/` |
+| `nzt-hub` | Genérico | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | los comandos y las opciones de la sesión y la lista de plugins instalados de Claude Code (ningún artefacto de NZT) | `specs/mods/nzt-hub/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.2.0 aceptado y cerrado (grupos por tipo y `nzt-questions`), en `mods/nzt-hub/` |
+| `nzt-questions` | Genérico | Panel lateral para contestar de a una, con opciones, las preguntas que el agente escribió en el chat; deja las respuestas en un solo mensaje en el prompt | las respuestas del agente en la sesión (ningún artefacto de NZT) | `specs/mods/nzt-questions/` (spec y mockup) | aceptado y cerrado, 0.1.0, en `mods/nzt-questions/` |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
-cambia las dos.
+cambia las dos. **Un mod entra al `README.md` cuando se publica**, no cuando se especifica: la
+fila del `README.md` trae el comando de instalación, y con el mod sin publicar ese comando
+falla.
 
 ## 6. Instalación
 

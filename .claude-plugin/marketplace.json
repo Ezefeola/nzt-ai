@@ -27,6 +27,11 @@
       "name": "nzt-hub",
       "source": "./mods/nzt-hub",
       "description": "One pane with every NZT mod: what each is for, its version, a button that opens it, and the install command for the missing ones"
+    },
+    {
+      "name": "nzt-questions",
+      "source": "./mods/nzt-questions",
+      "description": "Answer the questions the agent wrote in the chat one at a time, with options, and take the answers to the prompt in one message"
     }
   ]
 }
