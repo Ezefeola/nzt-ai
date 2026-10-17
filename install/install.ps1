@@ -1,11 +1,13 @@
 # Instalador de una linea de NZT (D46, specs/nzt-installer.md seccion 10).
 #
 #   powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.ps1 | iex"
+#   powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.ps1 | iex"
 #   powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.ps1 | iex"
 #
-# Esta es la fuente de las dos variantes: install/variants.sh reemplaza la linea
-# marcada `nzt:provider` por el proveedor fijo. Sin variante, el proveedor sale
-# de NZT_PROVIDER, que es como se prueba.
+# Esta es la fuente de las tres variantes: install/variants.sh reemplaza la linea
+# marcada `nzt:provider` por el proveedor fijo y, en install-claude-full, la
+# marcada `nzt:mods` por `all`. Sin variante salen de NZT_PROVIDER y NZT_MODS,
+# que es como se prueba.
 #
 # Instala NZT en un proveedor, no el CLI: lo baja a una carpeta temporal,
 # verifica su SHA256, corre `install --provider` una vez y lo borra. Todo lo que
@@ -28,6 +30,7 @@
 
     $repo = 'https://github.com/Ezefeola/nzt-ai'
     $provider = $env:NZT_PROVIDER # nzt:provider
+    $mods = $env:NZT_MODS # nzt:mods
 
     if (-not $provider) {
         Write-Host '  Falta el proveedor. Usa install-claude.ps1 o install-codex.ps1.' -ForegroundColor Red
@@ -100,6 +103,7 @@
 
         # 4. Una sola corrida, sin menu: las reglas de que se escribe son del CLI.
         $arguments = @($action, '--provider', $provider)
+        if ($mods) { $arguments += @('--mods', $mods) }
         if ($env:NZT_DRY_RUN -eq '1') { $arguments += '--dry-run' }
         & $binary @arguments
     } finally {

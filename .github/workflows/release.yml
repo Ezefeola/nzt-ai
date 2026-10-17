@@ -1,7 +1,7 @@
 # Release de NZT (D46, specs/nzt-installer.md sección 10.1).
 #
 # Un tag vX.Y.Z publica los seis binarios self-contained, SHA256SUMS y los
-# cuatro comandos de una línea: install-claude e install-codex, en .ps1 y .sh. Antes corren las mismas puertas que en local: si una
+# seis comandos de una línea: install-claude, install-claude-full e install-codex, en .ps1 y .sh. Antes corren las mismas puertas que en local: si una
 # falla, no hay release.
 
 name: release

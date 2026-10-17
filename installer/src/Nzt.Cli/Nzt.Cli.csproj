@@ -51,6 +51,10 @@
     <EmbeddedResource Include="$(ContentRoot)skills\**\references\*.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
+    <!-- La lista de mods: la misma que ve quien los instala a mano. -->
+    <EmbeddedResource Include="$(ContentRoot).claude-plugin\marketplace.json">
+      <LogicalName>content/marketplace.json</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

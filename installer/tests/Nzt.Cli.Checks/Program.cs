@@ -1,6 +1,7 @@
 using Nzt.Cli.Content;
 using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
+using Nzt.Cli.Mods;
 using Nzt.Cli.Providers;
 
 namespace Nzt.Cli.Checks;
@@ -36,6 +37,23 @@ public static class Program
         DoesNotTouchADamagedBlock();
         LintCatchesNamePathMismatch();
         MenuChoiceResolvesTheProvider();
+        ModsFlagResolvesTheChoice();
+        ModCatalogIsTheRepoMarketplace();
+        InstallsEveryModWhenClaudeIsThere();
+        UsesTheNztMarketplaceAlreadyRegistered();
+        InstallsNoModsWithoutClaude();
+        TreatsAnOldClaudeAsMissing();
+        AFailingModDoesNotStopTheOthers();
+        UpdatesAModInstalledByHandWithoutOwningIt();
+        ModsDryRunChangesNothing();
+        TheMethodKeepsTheModsInTheManifest();
+        ReinstallingUpdatesTheModsItInstalled();
+        UninstallRemovesOnlyTheModsItInstalled();
+        UninstallForgetsAModTheUserAlreadyRemoved();
+        AModThatFailsToUninstallStaysOwned();
+        ModsUninstallDryRunChangesNothing();
+        UninstallingTheModsKeepsTheMethod();
+        StatusSaysWhoInstalledEachMod();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -349,6 +367,280 @@ public static class Program
             report.Issues.Any(i => i.Message.Contains("deriva")));
         Check("el lint ve la description faltante",
             report.Issues.Any(i => i.Message.Contains("sin description")));
+    }
+
+    // ── Mods ───────────────────────────────────────────────────────────────────
+
+    private static void ModsFlagResolvesTheChoice()
+    {
+        Check("--mods all es el método y los mods", Cli.Program.ModsChoiceFor("all") == Cli.Program.ModsChoice.All);
+        Check("--mods none es solo el método", Cli.Program.ModsChoiceFor("none") == Cli.Program.ModsChoice.MethodOnly);
+        Check("--mods only es solo los mods", Cli.Program.ModsChoiceFor("only") == Cli.Program.ModsChoice.ModsOnly);
+        Check("--mods con otro valor no elige nada", Cli.Program.ModsChoiceFor("todos") is null);
+    }
+
+    /// <summary>
+    /// "Los mods" son los del marketplace del repo: el embebido tiene que ser ese
+    /// mismo archivo, o el instalador ofrecería una lista distinta a la de a mano.
+    /// </summary>
+    private static void ModCatalogIsTheRepoMarketplace()
+    {
+        var root = RepoRoot();
+        if (root is null)
+        {
+            Failures.Add("no se encontró la raíz del repo para comparar el marketplace");
+            return;
+        }
+
+        var repo = ModCatalog.Parse(File.ReadAllText(Path.Combine(root, ".claude-plugin", "marketplace.json")));
+        var embedded = ModCatalog.Load();
+
+        Check("el marketplace embebido tiene mods", embedded.Names.Count > 0);
+        Check("el marketplace embebido es el del repo, en su orden", embedded.Names.SequenceEqual(repo.Names));
+    }
+
+    private static void InstallsEveryModWhenClaudeIsThere() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("agrega el marketplace del repo publicado",
+            fake.Marketplaces.GetValueOrDefault("nzt") == ModCatalog.MarketplaceSource && result.MarketplaceAdded);
+        Check("instala cada mod del catálogo", mods.Names.All(fake.Installed.ContainsKey));
+        Check("instala para toda la máquina",
+            fake.Calls.Where(c => c.StartsWith("plugin install", StringComparison.Ordinal))
+                .All(c => c.Contains("--scope user")));
+        Check("reporta la versión que quedó instalada",
+            result.Outcomes.All(o => o is { Action: ModAction.Installed, Version: "1.0.0" }));
+        Check("anota en el manifiesto los mods que instaló",
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods?.SequenceEqual(mods.Names) == true);
+    });
+
+    private static void UsesTheNztMarketplaceAlreadyRegistered() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Marketplaces["nzt"] = @"C:\dev\nzt-ai";
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("no agrega otro marketplace nzt",
+            !fake.Calls.Any(c => c.StartsWith("plugin marketplace add", StringComparison.Ordinal)));
+        Check("dice de dónde viene el que usa", result.MarketplaceSource == @"C:\dev\nzt-ai" && !result.MarketplaceAdded);
+        Check("lo refresca para ver versiones nuevas", fake.Calls.Contains("plugin marketplace update nzt"));
+    });
+
+    private static void InstallsNoModsWithoutClaude() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.VersionOutput = null;
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("sin claude los mods quedan afuera y no es una falla", result.Skipped && !result.Failed);
+        Check("sin claude dice por qué", result.Claude.Problem?.Contains("claude") == true);
+        Check("sin claude no anota nada", Manifest.Load(Provider.ClaudeCodeId, manifests) is null);
+    });
+
+    private static void TreatsAnOldClaudeAsMissing() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.VersionOutput = "2.1.286 (Claude Code)";
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("una versión anterior a 2.1.287 no instala mods", result.Skipped && !fake.Changes.Any());
+        Check("y dice qué versión hace falta", result.Claude.Problem?.Contains("2.1.287") == true);
+    });
+
+    private static void AFailingModDoesNotStopTheOthers() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Failing.Add("nzt-files");
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("un mod que falla se reporta como falla", result.Failed);
+        Check("nombra el que falló y el motivo",
+            result.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Failed, Detail: not null });
+        Check("los demás quedan instalados",
+            fake.Installed.ContainsKey("nzt-state") && fake.Installed.ContainsKey("nzt-context"));
+        Check("el que falló no queda en el manifiesto",
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods?.Contains("nzt-files") == false);
+    });
+
+    private static void UpdatesAModInstalledByHandWithoutOwningIt() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Marketplaces["nzt"] = ModCatalog.MarketplaceSource;
+        fake.Installed["nzt-state"] = "0.3.0";
+        fake.Latest["nzt-state"] = "0.4.0";
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("actualiza el mod instalado a mano", fake.Installed["nzt-state"] == "0.4.0");
+        Check("no lo instala dos veces", !fake.Calls.Contains("plugin install nzt-state@nzt --scope user --json"));
+        Check("lo reporta actualizado y de usuario",
+            result.Outcomes.Single(o => o.Name == "nzt-state") is { Action: ModAction.Updated, Version: "0.4.0", ByUser: true });
+        Check("no lo anota como suyo",
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods?.Contains("nzt-state") == false);
+    });
+
+    private static void ModsDryRunChangesNothing() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Installed["nzt-state"] = "0.4.0";
+
+        var result = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", dryRun: true,
+            manifestDirectory: manifests);
+
+        Check("la simulación no instala ni agrega nada", !fake.Changes.Any());
+        Check("la simulación no escribe el manifiesto", Manifest.Load(Provider.ClaudeCodeId, manifests) is null);
+        Check("la simulación lista cada mod con lo que haría",
+            result.Outcomes.Count == mods.Names.Count
+            && result.Outcomes.Single(o => o.Name == "nzt-state") is { Action: ModAction.Updated, Version: "0.4.0" }
+            && result.Outcomes.Single(o => o.Name == "nzt-files").Action == ModAction.Installed);
+    });
+
+    /// <summary>
+    /// El método y los mods comparten el manifiesto de Claude Code: reinstalar o
+    /// sacar el método no puede olvidar qué mods son del instalador.
+    /// </summary>
+    private static void TheMethodKeepsTheModsInTheManifest() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        var (provider, catalog, _) = Setup(home);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Installer.Install(provider, catalog, "1.2.0", manifestDirectory: manifests);
+        Check("instalar el método conserva los mods",
+            Manifest.Load(provider.Id, manifests)?.Mods?.Count == mods.Names.Count);
+
+        Installer.Uninstall(provider, manifestDirectory: manifests);
+        var left = Manifest.Load(provider.Id, manifests);
+        Check("sacar el método deja el manifiesto con los mods", left is { Files.Count: 0 } && left.Mods?.Count == mods.Names.Count);
+        Check("sin el método, desinstalarlo otra vez no encuentra nada",
+            !Installer.Uninstall(provider, manifestDirectory: manifests).HadManifest);
+    });
+
+    private static void ReinstallingUpdatesTheModsItInstalled() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+        fake.Latest["nzt-state"] = "1.1.0";
+        fake.Calls.Clear();
+
+        var again = ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        Check("reinstalar actualiza el mod que tiene versión nueva",
+            again.Outcomes.Single(o => o.Name == "nzt-state") is { Action: ModAction.Updated, Version: "1.1.0", ByUser: false });
+        Check("reinstalar deja al día los que no cambiaron",
+            again.Outcomes.Where(o => o.Name != "nzt-state").All(o => o.Action == ModAction.Unchanged));
+        Check("reinstalar no instala de nuevo",
+            !fake.Calls.Any(c => c.StartsWith("plugin install", StringComparison.Ordinal)));
+    });
+
+    private static void UninstallRemovesOnlyTheModsItInstalled() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Installed["nzt-files"] = "0.1.1";
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, manifestDirectory: manifests);
+
+        Check("desinstala los mods que instaló",
+            !fake.Installed.ContainsKey("nzt-state") && !fake.Installed.ContainsKey("nzt-context"));
+        Check("deja el que el usuario instaló a mano",
+            fake.Installed.ContainsKey("nzt-files")
+            && result.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Kept, ByUser: true });
+        Check("nunca quita el marketplace",
+            !fake.Calls.Any(c => c.StartsWith("plugin marketplace remove", StringComparison.Ordinal))
+            && fake.Marketplaces.ContainsKey("nzt"));
+        Check("sin nada que administrar, el manifiesto se borra", Manifest.Load(Provider.ClaudeCodeId, manifests) is null);
+    });
+
+    private static void UninstallForgetsAModTheUserAlreadyRemoved() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+        fake.Installed.Remove("nzt-state");
+
+        var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, dryRun: false,
+            manifestDirectory: manifests);
+
+        Check("no intenta desinstalar un mod que ya no está",
+            !fake.Calls.Contains("plugin uninstall nzt-state@nzt --scope user --json"));
+        Check("lo reporta como que ya no estaba",
+            result.Outcomes.Single(o => o.Name == "nzt-state").Action == ModAction.Missing && !result.Failed);
+    });
+
+    private static void AModThatFailsToUninstallStaysOwned() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+        fake.Failing.Add("nzt-context");
+
+        var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, manifestDirectory: manifests);
+
+        Check("un mod que no se pudo desinstalar es una falla", result.Failed);
+        Check("sigue siendo del instalador, para la próxima vez",
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods is ["nzt-context"]);
+    });
+
+    private static void ModsUninstallDryRunChangesNothing() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+        fake.Calls.Clear();
+
+        var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, dryRun: true,
+            manifestDirectory: manifests);
+
+        Check("la simulación de desinstalar no saca nada", !fake.Changes.Any() && fake.Installed.Count == 3);
+        Check("la simulación lista lo que sacaría", result.Outcomes.All(o => o.Action == ModAction.Removed));
+        Check("la simulación no toca el manifiesto",
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods?.Count == 3);
+    });
+
+    private static void UninstallingTheModsKeepsTheMethod() => InTemp(home =>
+    {
+        var (_, claude, mods, manifests) = ModsSetup(home);
+        var (provider, catalog, _) = Setup(home);
+        Installer.Install(provider, catalog, "1.2.0", manifestDirectory: manifests);
+        ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
+
+        ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, manifestDirectory: manifests);
+        var left = Manifest.Load(provider.Id, manifests);
+
+        Check("sacar solo los mods deja el método instalado",
+            File.Exists(provider.InstructionsFile) && left is { Files.Count: 4 });
+        Check("y el manifiesto ya no anota mods", left?.Mods is null or []);
+    });
+
+    private static void StatusSaysWhoInstalledEachMod() => InTemp(home =>
+    {
+        var (fake, claude, mods, manifests) = ModsSetup(home);
+        fake.Installed["nzt-files"] = "0.1.1";
+        ModInstaller.Install(claude, ModCatalog.From(["nzt-state", "nzt-files"]), Provider.ClaudeCodeId, "1.2.0",
+            manifestDirectory: manifests);
+        fake.Calls.Clear();
+
+        var status = ModInstaller.Status(claude, mods, Provider.ClaudeCodeId, manifests);
+
+        Check("el estado no cambia nada", !fake.Changes.Any());
+        Check("el estado dice el que instaló NZT, con su versión",
+            status.Outcomes.Single(o => o.Name == "nzt-state") is { Action: ModAction.Installed, Version: "1.0.0", ByUser: false });
+        Check("el estado dice el instalado a mano",
+            status.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Installed, ByUser: true });
+        Check("el estado dice el que no está",
+            status.Outcomes.Single(o => o.Name == "nzt-context").Action == ModAction.Missing);
+    });
+
+    private static (FakeClaude fake, ClaudePlugins claude, ModCatalog mods, string manifests) ModsSetup(string home)
+    {
+        var fake = new FakeClaude();
+        return (fake, new ClaudePlugins(fake), ModCatalog.From(["nzt-state", "nzt-context", "nzt-files"]),
+            Path.Combine(home, "manifests"));
     }
 
     // ── Andamio ────────────────────────────────────────────────────────────────

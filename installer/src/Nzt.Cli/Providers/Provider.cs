@@ -7,6 +7,9 @@ namespace Nzt.Cli.Providers;
 /// </summary>
 public sealed class Provider
 {
+    /// <summary>El único proveedor con mods.</summary>
+    public const string ClaudeCodeId = "claude-code";
+
     public required string Id { get; init; }
     public required string DisplayName { get; init; }
 
@@ -25,6 +28,8 @@ public sealed class Provider
 
     public static IReadOnlyList<Provider> All => [ClaudeCode(), Codex()];
 
+    public bool HasMods => Id == ClaudeCodeId;
+
     public static Provider? ById(string id) =>
         All.FirstOrDefault(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase));
 
@@ -41,7 +46,7 @@ public sealed class Provider
         var root = Path.Combine(homeDirectory ?? Home, ".claude");
         return new Provider
         {
-            Id = "claude-code",
+            Id = ClaudeCodeId,
             DisplayName = "Claude Code",
             InstructionsFile = Path.Combine(root, "CLAUDE.md"),
             SkillsDirectory = Path.Combine(root, "skills"),
