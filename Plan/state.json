@@ -162,7 +162,7 @@
   ],
   "approved": true,
   "autonomy": { "units": [292, 293, 287, 289], "keep_stops": [287] },
-  "waiting_on": "usuario: ver en vivo el diff entero y la barra en dos columnas (V-11, H-09..H-11), confirmar la forma de ± Cambios (resto de Q-13) y aceptar; cargado en vivo en ~/.claude/dev-mods/d41a6bb1-4330-44f9-a8e1-3f59e3cd8e82 con nzt-files@nzt deshabilitado por el usuario. Después: prueba en vivo V-06..V-11 y re-ver H-01..H-08 (lista en specs/mods/nzt-files/testing/2026-10-19-en-vivo.md), Q-13 y aceptación de nzt-files 0.2.0",
+  "waiting_on": "290-293 commiteadas y pusheadas a mods (6e8c48e, 2026-10-19, a pedido del usuario, antes del cierre); el usuario ya vio el diff y el mapa en vivo y los aprobó ('perfecto'). Falta: usuario: ver en vivo el diff entero y la barra en dos columnas (V-11, H-09..H-11), confirmar la forma de ± Cambios (resto de Q-13) y aceptar; cargado en vivo en ~/.claude/dev-mods/d41a6bb1-4330-44f9-a8e1-3f59e3cd8e82 con nzt-files@nzt deshabilitado por el usuario. Después: prueba en vivo V-06..V-11 y re-ver H-01..H-08 (lista en specs/mods/nzt-files/testing/2026-10-19-en-vivo.md), Q-13 y aceptación de nzt-files 0.2.0",
   "notes": [
     "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno. Contexto cero: nada en prompt.submit ni al iniciar sesión, tool.call solo mira; la selección se reemplaza por copiar ruta y @ruta",
     "Pendiente fuera de esta corrida: merge de mods (lo hace el usuario), release/tags, borrar copias de ~/.claude/dev-mods; la 0.1.1 instalada (nzt-files@nzt) carga en vez de la 0.2.0 hasta reinstalar",
