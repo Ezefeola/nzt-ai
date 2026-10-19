@@ -132,7 +132,7 @@ skills e instrucciones, nada de contabilidad.
     { "Path": "C:\\Users\\x\\.claude\\CLAUDE.md", "Sha256": "…", "ManagedBlock": true },
     { "Path": "C:\\Users\\x\\.claude\\skills\\nzt\\SKILL.md", "Sha256": "…" }
   ],
-  "mods": ["nzt-state", "nzt-context"]
+  "mods": ["nzt-state", "nzt-files"]
 }
 ```
 
@@ -339,8 +339,9 @@ seleccionar que queres instalar, si los mods de NZT, NZT o todos"*.
 #### RN-inst-que-instalar · origin: usuario 2026-10-16; "solo los mods" sin el método, Q-03
 Al instalar en Claude Code se elige qué instalar: **Todo NZT** (el método y los mods), **solo
 el método** o **solo los mods**. Todo NZT va primero y es el marcado al abrir. Solo los mods se
-permite aunque el método no esté instalado, y la simulación avisa que `nzt-state` y
-`nzt-context` muestran el método y sin él no tienen qué mostrar.
+permite aunque el método no esté instalado, y la simulación avisa que `nzt-state` muestra el
+método y sin él no tiene qué mostrar. (Hasta el 2026-10-17 el aviso nombraba también a
+`nzt-context`, retirado: M4 de `specs/nzt-mods.md`.)
 
 #### RN-inst-mods-solo-claude · origin: RN-mod-solo-claude de `specs/nzt-mods.md`
 Al elegir solo Codex, la pregunta no aparece. Al elegir Todos los proveedores se hace una sola

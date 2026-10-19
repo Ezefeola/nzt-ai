@@ -1,0 +1,33 @@
+{
+  "name": "NZT oscuro",
+  "base": "dark",
+  "overrides": {
+    "claude": "#5ccaa9",
+    "claudeShimmer": "#e2d36e",
+    "suggestion": "#5ccaa9",
+    "permission": "#5ccaa9",
+    "permissionShimmer": "#e2d36e",
+    "promptBorder": "#72f4cd",
+    "autoAccept": "#72f4cd",
+    "promptBorderShimmer": "#e2d36e",
+    "remember": "#5ccaa9",
+    "success": "#5ccaa9",
+    "text": "#d3dfdb",
+    "inverseText": "#07100f",
+    "inactive": "#7f9893",
+    "subtle": "#71908a",
+    "warning": "#e2d36e",
+    "warningShimmer": "#f0e6a0",
+    "error": "#e8909a",
+    "diffAdded": "#21483d",
+    "diffRemoved": "#4b3639",
+    "diffAddedWord": "#2d6454",
+    "diffRemovedWord": "#785055",
+    "userMessageBackground": "#0f2422",
+    "userMessageBackgroundHover": "#163a35",
+    "selectionBg": "#244146",
+    "composerSidebarBackground": "#07100f",
+    "rate_limit_fill": "#5ccaa9",
+    "rate_limit_empty": "#244146"
+  }
+}

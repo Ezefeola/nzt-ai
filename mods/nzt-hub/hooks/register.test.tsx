@@ -4,13 +4,13 @@ import type { TestBody } from 'claude-code/testing'
 type Engine = Parameters<TestBody>[0]
 type On = Parameters<TestBody>[1]
 
-/** A session with nzt-state (command) and nzt-context (options only); the others missing. */
+/** A session with nzt-state (command) and nzt-changes (options only); the others missing. */
 const fakeSession = (on: On, opts: { copy?: boolean; onClose?: (id: string) => void } = {}) => {
   on('command.list', async () => ({
     value: [{ name: 'nzt-state', description: '', source: 'plugin', plugin: 'nzt-state' }],
   }) as never)
   on('config.list', async () => ({
-    value: [{ key: 'nzt-context.language', label: 'Language', kind: 'choice', value: 'es', provider: 'plugin', isLocked: false }],
+    value: [{ key: 'nzt-changes.language', label: 'Language', kind: 'choice', value: 'es', provider: 'plugin', isLocked: false }],
   }) as never)
   on('command.run', { command: 'nzt-state' }, async () => {
     return { text: 'Panel abierto.' }
@@ -59,6 +59,16 @@ test('the pane lists every NZT mod with what it is for, and a button on the inst
   expect(await ui.find({ type: 'Text', text: / 2 de 5 instalados$/ })).toBeDefined()
 })
 
+test('Aspecto is the last of the generic mods, and without nzt-look it copies its install', async ($, on) => {
+  fakeSession(on)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: 'Aspecto' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /marcas 20\/30\/40/ })).toBeDefined()
+  expect(await ui.find({ key: 'open:nzt-look' })).toBeUndefined()
+  expect(await ui.find({ key: 'copy:nzt-look' })).toBeDefined()
+})
+
 test('the card keeps a blank row under the pane tabs and still fills the body', async ($, on) => {
   fakeSession(on)
   await openPane($)
@@ -66,12 +76,13 @@ test('the card keeps a blank row under the pane tabs and still fills the body', 
   expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
 })
 
-test('a mod with no pane says where it shows, with no button', async ($, on) => {
+test('every installed mod has its button, and none is the context bar any more', async ($, on) => {
   fakeSession(on)
   await openPane($)
   const ui = await mount($)
-  expect(await ui.find({ type: 'Text', text: 'barra sobre el prompt' })).toBeDefined()
-  expect(await ui.find({ key: 'open:nzt-context' })).toBeUndefined()
+  expect(await ui.find({ key: 'open:nzt-changes' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'barra sobre el prompt' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'Contexto' })).toBeUndefined()
 })
 
 test('a missing mod copies its install command and says to paste it', async ($, on) => {
@@ -88,9 +99,9 @@ test('when the terminal refuses the copy, the command shows whole to select', as
   fakeSession(on, { copy: false })
   await openPane($)
   const ui = await mount($)
-  await ui.press({ key: 'copy:nzt-changes' })
+  await ui.press({ key: 'copy:nzt-questions' })
   expect(await ui.find({ type: 'Text', text: /No se pudo copiar/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '/plugin install nzt-changes --marketplace Ezefeola/nzt-ai' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '/plugin install nzt-questions --marketplace Ezefeola/nzt-ai' })).toBeDefined()
 })
 
 test('Abrir runs the mod command and the hub gives up its place', async ($, on) => {
@@ -110,7 +121,6 @@ test('the cards go under two group titles, and Preguntas is among the generic on
   expect(await ui.find({ type: 'Text', text: 'PARA CUALQUIER PROYECTO' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'Preguntas' })).toBeDefined()
   expect(await ui.find({ key: 'copy:nzt-questions' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /marcas 20\/30\/40 de NZT/ })).toBeDefined()
 })
 
 test('a narrow pane keeps the names and shortens the copy button', async ($, on) => {

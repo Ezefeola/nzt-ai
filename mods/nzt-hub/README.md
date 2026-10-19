@@ -1,6 +1,6 @@
 # nzt-hub
 
-> Versión **0.2.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
+> Versión **0.4.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
 
 Un panel lateral de Claude Code que **junta los mods de NZT en un lugar**: qué hay, para qué
 es cada uno, qué versión tenés y un botón que lo abre. Los que no tenés instalados también
@@ -10,15 +10,15 @@ aparecen, con un botón que copia el comando para instalarlos.
 ╭────────────────────────────────────────────────────────╮
 │ █▄ █ ▀▀█ ▀█▀                                           │
 │ █ ▀█ █▄▄  █                                            │
-│ los mods de Claude Code        ● ● ● ● ● 2 de 5 inst…  │
+│ los mods de Claude Code          ● ● ● ● 2 de 4 inst…  │
 │ ────────────────────────────────────────────────────── │
 │ CON EL MÉTODO NZT                                      │
 │ ┃ ◆ Estado v0.5.0                            Abrir ›   │
 │ ┃ El plan y el estado de la corrida, leídos de Plan/…  │
 │                                                        │
 │ PARA CUALQUIER PROYECTO                                │
-│ ┃ ◔ Contexto v0.2.0                barra sobre el prompt│
-│ ┃ Cuánto contexto lleva la sesión, con las marcas 20/… │
+│ ┃ ▤ Archivos v0.1.1                          Abrir ›   │
+│ ┃ El proyecto como el explorador de VS Code, solo pa…  │
 │                                                        │
 │ ┃ ± Cambios no instalado         ⧉ Copiar instalación  │
 │ ┃ Lo que Claude editó en el último turno o contra HE…  │
@@ -29,8 +29,7 @@ aparecen, con un botón que copia el comando para instalarlos.
 ```
 
 Las tarjetas van en dos grupos: arriba los mods que necesitan el método NZT para mostrar algo
-(Estado) y abajo los que sirven en cualquier proyecto (Contexto, Cambios, Archivos,
-Preguntas). Cada mod lleva una barra y un glifo de su color. El mockup completo, con todos sus estados,
+(Estado) y abajo los que sirven en cualquier proyecto (Cambios, Archivos, Preguntas, Aspecto). Cada mod lleva una barra y un glifo de su color. El mockup completo, con todos sus estados,
 está en [`specs/mods/nzt-hub/mockup.html`](../../specs/mods/nzt-hub/mockup.html).
 
 **Es opcional.** NZT funciona completo sin el panel, y cada mod se sigue abriendo con su
@@ -54,8 +53,6 @@ Abre el panel; `/nzt-hub` otra vez lo cierra. Con el panel enfocado:
 **Abrir ›** corre el comando del mod, como si lo escribieras, y el hub se cierra para dejarle
 su lugar. Para volver, `/nzt-hub`. Si Claude está trabajando, la fila dice que el mod se abre
 al terminar el turno: Claude Code corre el comando cuando la sesión queda libre.
-
-**nzt-context** no tiene panel, es la barra sobre el prompt: su fila dice eso, sin botón.
 
 **Copiar instalación** pone en el portapapeles
 `/plugin install <mod> --marketplace Ezefeola/nzt-ai`; pegalo en el prompt y apretá Enter. Si

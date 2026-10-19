@@ -68,8 +68,8 @@ debe estar tan pegado"*); los nombres los propuso el agente y el usuario los apr
 Cada mod es de uno de dos tipos, y el catálogo lo dice:
 
 - **Genérico:** sirve en cualquier proyecto, use NZT o no. Puede tener una **capa NZT**: en un
-  proyecto con NZT muestra algo más, pero sin NZT funciona completo. Ejemplo: `nzt-context`
-  dibuja el contexto de cualquier sesión, y sus marcas 20/30/40 son las del kernel.
+  proyecto con NZT muestra algo más, pero sin NZT funciona completo. Ejemplo: `nzt-look`
+  dibuja la banda de uso de cualquier sesión, y sus marcas 20/30/40 son las del kernel.
 - **NZT:** necesita un artefacto del método para mostrar algo. Sin él, dice que no lo hay.
   Ejemplo: `nzt-state` sin `Plan/state.json`.
 
@@ -133,16 +133,17 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 | Mod | Tipo | Qué hace | Lee | Spec | Estado |
 |---|---|---|---|---|---|
 | `nzt-state` | NZT | Panel lateral con el plan y el estado de la corrida: objetivo, fases, unidad en curso, pendientes, lo que espera | `Plan/state.json` | `specs/mods/nzt-state/spec.md` | construido, 0.4.0; 0.5.0 aceptado y cerrado (aviso de preguntas abiertas), en `mods/nzt-state/` |
-| `nzt-context` | Genérico | Barra del contexto consumido sobre el prompt, con las marcas 20/30/40 del kernel; le pasa la misma cifra al agente | la cifra de contexto de la sesión (ningún artefacto) | `specs/mods/nzt-context/spec.md` | construido, 0.2.0, en `mods/nzt-context/` |
 | `nzt-changes` | Genérico | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 aceptado y cerrado (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable), en `mods/nzt-changes/` |
 | `nzt-files` | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña, en `mods/nzt-files/` |
-| `nzt-hub` | Genérico | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | los comandos y las opciones de la sesión y la lista de plugins instalados de Claude Code (ningún artefacto de NZT) | `specs/mods/nzt-hub/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.2.0 aceptado y cerrado (grupos por tipo y `nzt-questions`), en `mods/nzt-hub/` |
+| `nzt-hub` | Genérico | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | los comandos y las opciones de la sesión y la lista de plugins instalados de Claude Code (ningún artefacto de NZT) | `specs/mods/nzt-hub/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.2.0 aceptado y cerrado (grupos por tipo y `nzt-questions`); 0.3.0 sin Contexto (M4) construido en la 226, sin aceptar; 0.4.0 con la tarjeta Aspecto de `nzt-look` construido en la 239, sin aceptar; en `mods/nzt-hub/` |
 | `nzt-questions` | Genérico | Panel lateral para contestar de a una, con opciones, las preguntas que el agente escribió en el chat; deja las respuestas en un solo mensaje en el prompt | las respuestas del agente en la sesión (ningún artefacto de NZT) | `specs/mods/nzt-questions/` (spec y mockup) | aceptado y cerrado, 0.1.0, en `mods/nzt-questions/` |
+| `nzt-look` | Genérico | Temas (los 15 de la referencia y NZT, oscuro y claro, también para `/theme`), banda de uso configurable sobre el prompt (contexto con las marcas 20/30/40 del kernel, límites del plan, costo, modelo y effort de la sesión, botón `/clear`) y la conversación redibujada; le pasa la cifra de contexto al agente. Reemplaza a `nzt-context`, ya retirado (M4) | la cifra de contexto, los límites, el costo, el modelo y el effort de la sesión, y lo que dibuja la conversación (ningún artefacto de NZT) | `specs/mods/nzt-look/` (spec y mockups) | construido, 0.1.0 (unidades 227 a 239), sin probar en vivo ni aceptar; cambio 0.2.0 (modelo y effort, unidades 241 y 242), probado en vivo por el usuario (224); cambio 0.3.0 (fila de skill, filas plegables tocándolas, temas que no cansen; unidades 256 a 262); cambio 0.4.0 (banda en una línea con rótulos a la izquierda y naranja desde el 30; unidades 263 y 264); en `mods/nzt-look/` |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
 cambia las dos. **Un mod entra al `README.md` cuando se publica**, no cuando se especifica: la
 fila del `README.md` trae el comando de instalación, y con el mod sin publicar ese comando
-falla.
+falla. Sale cuando el usuario lo retira, de esta tabla y del `README.md` en la misma unidad; si
+tiene reemplazo, la decisión dice si espera a que se publique (M4: `nzt-context` no esperó).
 
 ## 6. Instalación
 
@@ -244,6 +245,28 @@ por delante del kernel instalado, nunca por detrás; RN-mod-lee-formatos-viejos 
     registrado en las máquinas.
   - Decidido por el usuario el 2026-10-16: QT-02 A, QT-03 B, el resto con las propuestas del
     agente en una ronda (modo "juntos").
+
+- **M4 · `nzt-look` reemplaza a `nzt-context`.** El contexto con las marcas del kernel y la
+  línea al agente pasan a la banda de `nzt-look` (`specs/mods/nzt-look/spec.md`). Decidido por
+  el usuario el 2026-10-17 (*"reemplazar nzt-context"*, todo el alcance de la referencia).
+  - **Objeción del agente, dicha una vez:** partir el mod en 0.1 (temas y banda) y 0.2
+    (conversación redibujada), para tener antes el reemplazo de `nzt-context`. El usuario lo
+    mantiene en uno.
+  - **Cómo se retira: ya, sin esperar a `nzt-look`.** El usuario lo cambió el 2026-10-17
+    (*"ese se elimina directo no va a estar mas en el marketplace ni los mods que tenemos en este
+    repo hay que volarlo"*). Sale de esta tabla, del `README.md`, del marketplace y de `nzt-hub`
+    (0.3.0); su carpeta y su spec se borran (unidades 225 y 226). Hasta que `nzt-look` se publique,
+    NZT no tiene mod de contexto.
+  - **Sin aviso a quien lo tenga instalado.** Objeción del agente, dicha una vez: Claude Code no
+    desinstala un plugin porque salga del marketplace, así que esa persona vería dos bandas y el
+    agente recibiría dos líneas de contexto. El usuario decide sacar el aviso del panel de
+    `nzt-look` igual; quien lo tenga lo desinstala a mano.
+  - **Revertirlo** es volver a publicar `nzt-context` desde el tag local `nzt-context--v0.2.0`,
+    que la unidad 226 crea antes de borrarlo (sin pushear: los tags de los mods son la 214).
+  - **El mod se llamaba `nzt-skins`** hasta el 2026-10-18. El usuario lo renombró a `nzt-look`
+    (*"que no se llame nzt-skins mejor ... porque trae un set de cosas muy buenas"*). El agente
+    objetó una vez su primera idea, `nzt-beautifier`, porque suena a formateador de código, y
+    el usuario eligió `nzt-look` entre las opciones.
 
 ## 10. Preguntas técnicas: el instalador y los mods (unidad 182)
 

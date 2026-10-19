@@ -1,41 +1,59 @@
 {
   "version": 1,
-  "updated": "2026-10-18T01:00:00Z",
-  "goal": "Preguntas cómodas de contestar: regla en el kernel para usar la tool de preguntas del host, mod nzt-questions, aviso en nzt-state y mods agrupados por tipo en nzt-hub",
+  "updated": "2026-10-19T03:10:00Z",
+  "goal": "Mod nzt-look (antes nzt-skins) para Claude Code que reemplaza a nzt-context: temas (15 como la referencia + NZT oscuro y claro), banda de uso configurable y conversación redibujada, en terminal y escritorio",
   "phases": [
     {
       "name": "analysis",
       "status": "done",
       "units": [
         {
-          "id": 197,
-          "do": "Investigar la tool de preguntas de cada host (AskUserQuestion, request_user_input de Codex): límites, flag, versión, fuente oficial",
-          "status": "done"
+          "id": 215,
+          "do": "Documento de marca de NZT: la paleta del usuario, qué color va dónde y la landing como referencia",
+          "status": "done",
+          "detail": "specs/nzt-brand.md con roles y contraste medido; Q-01 (colores de error y aviso) y Q-02 (variante clara) pendientes"
         },
         {
-          "id": 198,
-          "do": "specs/nzt-core.md: regla de cómo se pregunta (tool del host si hay, lista numerada si no, el log sigue siendo el registro)",
-          "status": "done"
+          "id": 219,
+          "do": "Spike: tema de plugin en terminal y escritorio, $.config.set del tema, convivir en AbovePrompt; resultados observados",
+          "status": "done",
+          "detail": "S-01..03 y S-04b observados (el mod no ve ni activa temas; un tema de usuario en ~/.claude/themes/ aparece en /theme y recolorea). S-04c..07 pasan a la unidad 224 por decisión del usuario; spike en ~/.claude/jobs/1db5e93f/tmp/spike-skin y ~/.claude/dev-mods/1db5e93f-2b2c-4957-af96-5cf1e69abdd5/nzt-spike-skin, y ~/.claude/themes/nzt-spike.json: borrarlos en la 224"
         },
         {
-          "id": 199,
-          "do": "Spec specs/mods/nzt-questions/spec.md: panel de preguntas pendientes, capa NZT (Q-/QT- del log), red sobre el texto, respuesta al prompt",
-          "status": "done"
+          "id": 216,
+          "do": "Spec del mod: nombre, temas, banda y sus partes, panel de opciones, conversación redibujada, capa NZT, reemplazo de nzt-context",
+          "status": "done",
+          "detail": "specs/mods/nzt-skins/spec.md; Q-01..04 confirmadas por el usuario; Q-05 (banda como la referencia) se decide en la 220"
         },
         {
-          "id": 200,
-          "do": "specs/nzt-mods.md: tipo genérico/NZT por mod en el catálogo y la fila de nzt-questions",
-          "status": "done"
+          "id": 217,
+          "do": "specs/nzt-mods.md: fila del mod nuevo y retiro de nzt-context del catálogo",
+          "status": "done",
+          "detail": "fila de nzt-skins, nzt-context marcado 'se retira al publicar nzt-skins', decisión M4 con cómo se retira; el README del repo no cambia hasta publicar"
         },
         {
-          "id": 201,
-          "do": "Spec de nzt-hub: agrupar las tarjetas por tipo y sumar nzt-questions",
-          "status": "done"
+          "id": 218,
+          "do": "Spec de nzt-hub: el mod nuevo en lugar de nzt-context",
+          "status": "done",
+          "detail": "Cambio 0.3.0 aprobado y mergeado en specs/mods/nzt-hub/spec.md (marcas, criterios del cambio, Q-08 y Q-09) y mockup; change.md borrado. Sale con la publicación de nzt-skins; el código del hub es de build; medición del mockup pendiente para esa unidad"
+        }
+      ]
+    },
+    {
+      "name": "retiro de nzt-context",
+      "status": "done",
+      "units": [
+        {
+          "id": 225,
+          "do": "Specs: M4 'se retira ahora' y fila fuera del catálogo; nzt-skins sin RN-skin-una-linea ni estado 'nzt-context instalado'; nzt-hub 0.3.0 solo quita Contexto y Skins pasa a 0.4.0; borrar specs/mods/nzt-context/",
+          "status": "done",
+          "detail": "nzt-mods.md (M4, catálogo, regla de salida del README, ejemplo de RN-mod-tipo), spec y mockup de nzt-skins, spec y mockup de nzt-hub (el mockup dibuja 0.4.0); specs/mods/nzt-context/ borrado con git rm, sin commit"
         },
         {
-          "id": 202,
-          "do": "Spec de nzt-state: aviso de preguntas abiertas que abre nzt-questions",
-          "status": "done"
+          "id": 226,
+          "do": "Código: tag local nzt-context--v0.2.0 en HEAD (sin push; HEAD todavía tiene la carpeta y la spec), borrar mods/nzt-context/, marketplace, README, catálogo/i18n/tests/README/sección Tests de la spec de nzt-hub, aviso y tests del instalador; correr tests del hub y del instalador",
+          "status": "done",
+          "detail": "Tag local nzt-context--v0.2.0 creado; mods/nzt-context borrado (git rm); marketplace, README, hub 0.3.0 (catálogo, i18n, panel sin tarjeta sin botón, tests, README) e instalador (aviso, tests, spec). PASS 106 installer checks, nzt-hub validate ok y 17/17 tests. Sin commit; hub 0.3.0 sin aceptar ni probar en vivo"
         }
       ]
     },
@@ -44,14 +62,22 @@
       "status": "done",
       "units": [
         {
-          "id": 203,
-          "do": "Mockup de nzt-questions: lista, una pregunta por vez con opciones, resumen antes de mandar",
-          "status": "done"
+          "id": 220,
+          "do": "Mockup de la banda y del panel de opciones con vista previa",
+          "status": "done",
+          "detail": "specs/mods/nzt-skins/mockup-banda.html + sección 'Diseño · banda y panel' de la spec; usuario 2026-10-17: botón /clear en lugar de compactar (RN-skin-limpiar), marcas del tamaño de una celda en su color, sin anillos en terminal (no dibuja Svg); 117 combinaciones medidas; Q-06 y Q-07 (confirmar /clear) pendientes, no bloquean la 221"
         },
         {
-          "id": 204,
-          "do": "Mockup de nzt-hub actualizado con los grupos por tipo",
-          "status": "done"
+          "id": 221,
+          "do": "Mockup de la conversación redibujada: filas de herramientas, diff, consola, tablas, código",
+          "status": "done",
+          "detail": "specs/mods/nzt-skins/mockup-conversacion.html + sección 'Diseño · conversación' de la spec; 13 estados x terminal/escritorio, 52 combinaciones medidas sin scroll; Q-08 (textos) pendiente; diagramas, fórmulas, avisos, comandos y enlaces sin mockup (como la referencia)"
+        },
+        {
+          "id": 222,
+          "do": "Tema NZT oscuro y claro: tokens de Claude Code y paleta del mod, con contraste medido",
+          "status": "done",
+          "detail": "nzt-brand.md: Estados, Derivados y variante clara medidos, Q-01/Q-02 cerradas por delegación; spec nzt-skins: sección 'Diseño · tema nzt' (tokens por rol, paleta del mod, palabras), Q-09 'ajustar' los 13 temas que no pasan 4,5:1 (solo noir y github pasan); comentarios de los mockups al día"
         }
       ]
     },
@@ -60,9 +86,10 @@
       "status": "done",
       "units": [
         {
-          "id": 205,
-          "do": "Diseño técnico de nzt-questions: de dónde lee preguntas, reglas del parser, cómo arma el mensaje, QT abiertas",
-          "status": "done"
+          "id": 223,
+          "do": "Diseño técnico del mod: módulos, paletas, qué componentes redibuja, cómo cae a lo de Claude Code, cómo se prueba",
+          "status": "done",
+          "detail": "Spec nzt-skins: 'Diseño técnico (0.1.0, unidad 223)' y 'Preguntas técnicas' QT-01..19. Usuario: QT-01 escribir todo nuevo (la referencia, solo como guía), modo propuestas; detalles decididos por el agente, objetables. Diagrama de secuencia ofrecido, sin dibujar"
         }
       ]
     },
@@ -71,34 +98,196 @@
       "status": "done",
       "units": [
         {
-          "id": 212,
-          "do": "Recortar el kernel: duplicados internos (grupo A) y la conversión de estados viejos, sin perder reglas; D65 y rebuild de dist",
+          "id": 240,
+          "do": "Renombre nzt-skins → nzt-look en specs (carpeta, spec, mockups, catálogo, hub, marca, spike) y QT-18 superada: Mermaid propio, sin vendor",
           "status": "done",
-          "detail": "Adelantada a pedido del usuario 2026-10-17; kernel 185->176, CLAUDE.md 198->189"
+          "detail": "specs/mods/nzt-look/ (movida con mv: no estaba en git), Q-01 superada, QT-18 superada, hub Q-10 (Aspecto/Look), catálogo y M4, marca y spike al día; slugs RN-skin-* sin cambiar. Usuario 2026-10-18: nombre nzt-look (objeción del agente a 'nzt-beautifier': suena a formateador de código, dicha una vez); 'construyamos eso también' = diagramas escritos por NZT. Tarjeta del hub: Aspecto/Look"
         },
         {
-          "id": 206,
-          "do": "Kernel y adapters con la regla de preguntas, stack-axes remite a ella, rebuild de dist",
+          "id": 227,
+          "do": "nzt-look · esqueleto: plugin, /nzt-look on/off/<tema>, prefs, i18n, panel vacío; tests y carga en vivo",
           "status": "done",
-          "detail": "Sección Questions en el kernel; CLAUDE.md y AGENTS.md en 200 líneas (tope C3), build sin warnings"
+          "detail": "mods/nzt-look: plugin.json (idioma por userConfig, como los otros mods), types, palette/contrast/light/prefs/i18n, register con comando y panel provisorio; validate ok, 10/10 tests; vivo: MSYS_NO_PATHCONV=1 claude -p '/nzt-look <tema>' --plugin-dir (dejar el store en nzt)"
         },
         {
-          "id": 207,
-          "do": "Mod nzt-questions en mods/ con tests",
+          "id": 228,
+          "do": "Paletas: nzt y 15 temas, variante clara calculada, ajuste a 4,5:1 con test 16x2, themes/nzt-dark y nzt-light",
           "status": "done",
-          "detail": "validate ok, tsc ok (tsconfig del scratchpad), 22/22 tests; sin cargar en vivo (210); README del mod hecho"
+          "detail": "palette.ts (16 temas, palabras es/en propias), contrast.ts, light.ts, themes/*.json con los valores de la marca; 49/49 tests (32 casos de contraste); validate no lista themes/: se ve en vivo en la 224 (S-04c)"
         },
         {
-          "id": 208,
-          "do": "nzt-hub: grupos por tipo y tarjeta de nzt-questions",
+          "id": 229,
+          "do": "Banda y línea al agente: marcas, límites, costo, /clear con confirmación, ancho, sin lectura, animaciones, cruce",
           "status": "done",
-          "detail": "validate ok, 17/17 tests; desborde de 'se abre al terminar el turno' arreglado sin test, mirar en vivo en la 210"
+          "detail": "kernel.ts, band.tsx (terminal y anillos Svg en escritorio), band-live.tsx (animación, solo terminal), hooks de cifras/línea/cruce/clear; 64/64 tests, validate ok, vivo ok; diferencias en spec 'Lo que cambió al construir'"
         },
         {
-          "id": 209,
-          "do": "nzt-state: aviso de preguntas abiertas",
+          "id": 230,
+          "do": "Panel de opciones: temas, variante, carpeta, partes, colores/repintar y vista previa",
           "status": "done",
-          "detail": "validate ok, tsc ok, 32/32 tests; QT-05 sin dependencies, clave declarada en su contrato; falta probar en vivo con los dos mods (210)"
+          "detail": "panel.tsx + acciones en register (tema, variante, fijar/soltar/hacerlo el de siempre, partes, repintar a mi-<tema>); elegir tema con carpeta fijada cambia el fijado; 71/71 tests, validate ok, vivo ok"
+        },
+        {
+          "id": 231,
+          "do": "Filas de herramientas: nodos, lecturas agrupadas, ▸, solo lectura plegada",
+          "status": "done",
+          "detail": "tools.ts, rows.tsx, hooks ToolUse/ToolGroup/ToolResult + tiempos y cifras del turno en tool.call; el escáner pide átomos en línea o memberOf, no funciones que los devuelvan; 80/80 tests, validate ok, vivo ok"
+        },
+        {
+          "id": 232,
+          "do": "Consola y diff",
+          "status": "done",
+          "detail": "shell.tsx: tarjeta de consola (✓/✗ exit N, color, stderr aparte, 8+4 con ▾) en terminal y escritorio; diff numerado solo en escritorio; el comando se guarda por llamada en tool.call; 89/89 tests, validate ok, vivo ok"
+        },
+        {
+          "id": 233,
+          "do": "Respuesta del agente: tablas, avisos, tareas, enlaces, rutas, plegado y copiar",
+          "status": "done",
+          "detail": "markdown.ts (segmentos), reply.tsx (tabla con cebra y pliegue a 14, avisos, tareas, copiar); la prosa queda en el Markdown del motor: rutas/números en prosa sin color (anotado en spec); 96/96 tests, validate ok, vivo ok"
+        },
+        {
+          "id": 234,
+          "do": "Código resaltado",
+          "status": "done",
+          "detail": "highlight.ts propio (familias C/JS/Java/Go/Rust, Python, shell, JSON, YAML, TOML, SQL, CSS, HTML/XML, diff), code.tsx con marco, lenguaje, números en escritorio, pliegue a 24 y copiar; lenguaje desconocido y shell en escritorio quedan de Claude Code; 102/102, validate ok, vivo ok"
+        },
+        {
+          "id": 235,
+          "do": "Fórmulas",
+          "status": "done",
+          "detail": "math.ts propio (TeX a Unicode: griegas, relaciones, sub/superíndices, \\frac y límites apilados, \\sqrt); $$…$$ y ```math como tarjeta, $…$ en la prosa (no precios ni código); lo que no lee queda como está; 108/108, validate ok, vivo ok"
+        },
+        {
+          "id": 236,
+          "do": "Diagramas Mermaid escritos por NZT, terminal y escritorio (sin librería de terceros); si no entra en una unidad, se parte",
+          "status": "done",
+          "detail": "canvas.ts + mermaid.ts propios: flujo (4 direcciones, ciclos por carril), estados, secuencia, torta, mapa mental; 5 de 17 tipos, el resto queda como texto (en spec); escritorio = tarjeta de texto, no Svg; 117/117, validate ok, vivo ok"
+        },
+        {
+          "id": 237,
+          "do": "Spinner, pie, contorno del prompt y salida de comandos",
+          "status": "done",
+          "detail": "spinner.tsx + spinner-live.tsx (braille y banda de luz en terminal; ícono por fase quieto en escritorio), pie con palabra/tiempo/herramientas/líneas, contorno del prompt solo en terminal, salida de comandos con pares clave: valor; 126/126, validate ok, vivo ok"
+        },
+        {
+          "id": 238,
+          "do": "Diseñar un tema con Claude y nota de diagramas",
+          "status": "done",
+          "detail": "design.ts + herramienta mcp__nzt-look__design (valida 15 colores, deriva la clara, guarda y aplica; si falta algo lo rechaza y dice qué); nota de diagramas en prompt.compose solo con interfaz; 132/132, validate ok, vivo ok"
+        },
+        {
+          "id": 239,
+          "do": "Salida: tarjeta Aspecto de nzt-hub 0.4.0, catálogo, README del repo y marketplace",
+          "status": "done",
+          "detail": "hub 0.4.0 (catálogo, i18n, tests 18/18), marketplace y fila del README del repo, README del mod, catálogo de nzt-mods.md, spec del hub con 0.4.0 código ✓; 106 checks del instalador y validate del marketplace ok. Sin commit"
+        }
+      ]
+    },
+    {
+      "name": "cambio: modelo y effort en la banda",
+      "status": "done",
+      "units": [
+        {
+          "id": 241,
+          "do": "Spec nzt-look: parte 'modelo · effort' de la banda (regla, lugar, orden de caída por ancho, escritorio, opción del panel) y mockup-banda",
+          "status": "done",
+          "detail": "Spec 0.2.0: RN-skin-modelo [add], -banda-partes y -banda-ancho [modify], diseño, flujo 3.4 y hooks; mockup-banda con estado Modelo sin effort, 96 combinaciones medidas sin scroll; desde el 20% a 120 col se van costo y effort; catálogo de nzt-mods.md. Sin change.md: el usuario autorizó la tanda"
+        },
+        {
+          "id": 242,
+          "do": "Código: modelo y effort en la banda (terminal y escritorio), parte apagable en el panel, tests, validate, vivo y L-19 en el plan de pruebas",
+          "status": "done",
+          "detail": "nzt-look 0.2.0: Running en types, parte model en prefs/i18n/panel, modelNameOf/effortOf, banda terminal y escritorio, hooks turn.step, classic.PostModelSwitch y session.model; 139/139 tests, validate ok, vivo -p ok (carga y turno); README del mod y del repo, hub spec v0.2.0, L-19; copia de dev-mods 1f00cc3b actualizada"
+        }
+      ]
+    },
+    {
+      "name": "cambio: textos de Claude Code y sin la referencia",
+      "status": "done",
+      "units": [
+        {
+          "id": 243,
+          "do": "Barrido: quitar toda mención de la referencia (specs, mockups, README, comentarios del código, estado); orígenes reescritos sin el nombre",
+          "status": "done",
+          "detail": "0 menciones en el repo, el estado y la memoria; orígenes reescritos (alcance del usuario 2026-10-17); README sin el crédito; nada commiteado ni el tag la tenía; 139/139 tests"
+        },
+        {
+          "id": 244,
+          "do": "Spec nzt-look: el mod no cambia los textos de Claude Code (nombre de la herramienta, palabra del spinner y del pie, Interrupted); Q-08 reemplazada",
+          "status": "done",
+          "detail": "RN-skin-textos-claude [add], RN-skin-palabras [modify] (palabra de Claude Code por defecto), diseño de conversación y tabla al día, Q-08 reemplazada por Q-10; pendiente en vivo (L-20): unión palabra-tiempo del pie y texto de consola sin salida. README del mod y L-10 los cambia la 246"
+        },
+        {
+          "id": 245,
+          "do": "mockup-conversacion.html con los textos de Claude Code, medido",
+          "status": "done",
+          "detail": "mockup-conversacion con Bash/Read/Edit/Grep, Interrupted y la palabra de Claude marcada pendiente (Q-10); 52 combinaciones medidas sin scroll ni desbordes; a 320 px el pie baja de línea"
+        },
+        {
+          "id": 247,
+          "do": "Spec nzt-look: spinner del mod con las cifras de Claude Code, pie de Claude Code más lo del mod, viñeta, tablas anchas partidas, filas legibles, diff legible en la terminal, diff del tema NZT",
+          "status": "done",
+          "detail": "Reglas RN-skin-spinner-cifras, -pie-claude, -vineta, -tabla-ancha, -filas-legibles, -diff-legible [add]; tabla Qué se redibuja, diseño de conversación, selector de palabras y umbrales de diff del tema [modify]; Q-11 con las respuestas; L-20 mira forma de las cifras y consola sin salida"
+        },
+        {
+          "id": 248,
+          "do": "mockup-conversacion con lo de la 247, medido",
+          "status": "done",
+          "detail": "mockup-conversacion: diff resaltado en la terminal, spinner con cifras y pie de Claude marcados pendientes, viñeta, estado Tabla más ancha; 56 combinaciones sin scroll ni desbordes"
+        },
+        {
+          "id": 246,
+          "do": "Código: textos de Claude Code (nombre de la herramienta, grupo, Interrupted), palabras de Claude por defecto y el selector palabras claude/mod como los demás",
+          "status": "done",
+          "detail": "Fila con el nombre del tool tal cual (nameOf y t.tools fuera; MCP sin objetivo repetido), grupo Read 2 · Grep 1, INTERRUPTED en fila y consola, words claude por defecto (un pref guardado 'theme' se respeta), selector palabras claude·mod en el panel; README y L-10; validate ok, tests 145/145 junto con la 249"
+        },
+        {
+          "id": 249,
+          "do": "Código: spinner de Claude Code (solo cambia la palabra con palabras mod), pie de Claude Code más lo del mod, viñeta, color del objetivo; tests, vivo",
+          "status": "done",
+          "detail": "Spinner terminal con figuresOf '(12s, 300 tokens, high effort)' (tiempo por secondAtom solo con isTurning, tokens de turn.step, effort de running; escritorio sin cifras); pie = next(e) + footerExtra (con palabras mod reescribe word); viñeta drawBulleted solo terminal; objetivo en muted; L-20 sumada; spec 'Lo que cambió al construir'; 145/145, validate ok, vivo -p ok (carga y turno, sin ver UI)"
+        },
+        {
+          "id": 250,
+          "do": "Código: tablas más anchas que la terminal partidas en líneas dentro de la grilla; tests, vivo",
+          "status": "done",
+          "detail": "reply.tsx: fitColumns (las más anchas ceden primero, mínimo 6; si no entra, null y Claude Code) y wrapCell (corta entre palabras, parte una palabra más ancha); fila = tantas líneas como su celda más alta; 147/147, validate ok"
+        },
+        {
+          "id": 251,
+          "do": "Tema NZT oscuro y claro: colores de diff legibles, medidos; nzt-brand.md y themes/; copia de dev-mods y L-20/L-21 en el plan de pruebas",
+          "status": "done",
+          "detail": "themes: diff oscura #21483d/#4b3639 (palabras #2d6454/#785055), clara #aecfc6/#fbb4bc (#8bbaae/#fe9aa5), medidos en nzt-brand.md; tarjeta del mod al 22% sobre Superficie, número fuera del fondo, comentario de línea cambiada en el texto del código; L-21; dev-mods 1f00cc3b/nzt-look copiado con todo (246-255); vivo -p ok"
+        },
+        {
+          "id": 252,
+          "do": "Código: diff de una edición en la terminal, numerado y resaltado como código; tests, vivo",
+          "status": "done",
+          "detail": "drawDiffCard en las dos superficies, cada línea resaltada por languageOfPath (extensión que highlight conoce; si no, sin resaltar con colores de diff); diffs apagado = Claude Code; README y L-09; 149/149, validate ok"
+        }
+      ]
+    },
+    {
+      "name": "cambio: NZT oscuro más apagado y código legible",
+      "status": "done",
+      "units": [
+        {
+          "id": 253,
+          "do": "nzt-brand.md y spec nzt-look (Diseño · tema nzt): tonos de lectura de la oscura (texto, acento, contraste, error, tenue) y paleta de código, medidos",
+          "status": "done",
+          "detail": "Vista previa para el usuario: copia del mockup de conversación con selector Actual/Propuesta en el scratchpad (mockup-oscuro-propuesta.html, se pierde con la sesión; los valores están acá). La copia arregla 'wide' faltante en STATES del mockup real (bug a corregir en la 254). Valores APROBADOS por el usuario 2026-10-18 tal cual (con cian y violeta): texto #d3dfdb, acento #5ccaa9, contraste #e2d36e, error #e8909a, tenue #7f9893; código base #b9c7c3 sobre #0a1514, kw #62c4a8, str #d4c77a, num #e0a08f, com #6f8a85, fn #9fd4e0, tipo #c8b4e8, prop #a9c4be. La paleta del usuario sigue siendo la marca (landing); el tema usa los tonos de lectura"
+        },
+        {
+          "id": 254,
+          "do": "mockup-conversacion y mockup-banda con los tonos nuevos y el código con función/tipo/propiedad, medidos",
+          "status": "done",
+          "detail": "Hoy el mockup pinta función, tipo y propiedad en Texto #f4faf7 (lo que el usuario ve muy blanco) y número en Error"
+        },
+        {
+          "id": 255,
+          "do": "Código: paleta nzt oscura, themes/nzt-dark.json y colores de código por token (función, tipo, propiedad) en code.tsx; tests, vivo",
+          "status": "done",
+          "detail": "Theme.code opcional (CodeColors en types) solo en nzt, oscura y clara; los otros 15 resaltan con sus claves (ya distintas); codeColorsOf en prefs, look() lo pasa a drawCode (fondo del bloque) y a drawDiffCard; paleta nzt oscura y nzt-dark.json con tonos de lectura; 152/152, validate ok"
         }
       ]
     },
@@ -107,44 +296,134 @@
       "status": "done",
       "units": [
         {
-          "id": 213,
-          "do": "nzt-questions: índice en pestañas, ir a Revisar al contestar la última, botones sin encimar y teclas al pie (Q-11..Q-14 de su spec)",
+          "id": 224,
+          "do": "Pruebas en vivo del usuario con el mod construido: lista de qué probar, más S-04c..S-07 del spike; borrar los restos del spike",
           "status": "done",
-          "detail": "Hecho y ajustado tras probarlo (Q-15): índice en lista otra vez, foco a la respuesta al elegir fila, tecla a, atajos visibles; 24/24 tests; copiado a dev-mods/1db5e93f…"
+          "detail": "specs/testing/2026-10-18-nzt-look.md: A-01 y C-01 passed (agente); L-* passed en bloque por el usuario ('se ve todo bien'), sin las anotaciones de L-15/L-18/L-20; BUG-001 (fila 'Skill Skill') abierto; L-04 pasa a la 261. Mods en ~/.claude/dev-mods/1f00cc3b-88c0-46f7-b6cc-166a6f621885/"
+        }
+      ]
+    },
+    {
+      "name": "cambio: banda con rótulos, fila de skill y temas que no cansen",
+      "status": "done",
+      "units": [
+        {
+          "id": 256,
+          "do": "Spec nzt-look y mockup-banda: modelo·effort al inicio, rótulo sobre cada barra, lugar del aviso del tramo, arriba/abajo del prompt; medido",
+          "status": "done",
+          "detail": "RN-skin-banda-rotulos [add]: dos filas (rótulo arriba, medidor abajo), modelo primero, palabra del tramo junto a Contexto, cuenta regresiva junto a cada límite, todo arriba del prompt (debajo solo PromptHint.tail, terminal); 'Límite 5h' no 'D' (objeción dicha); mockup-banda 96 combinaciones medidas sin scroll; a 120 col entra todo"
         },
         {
-          "id": 210,
-          "do": "Verificar: tests, validate, los tres mods cargados de verdad, dist y links",
+          "id": 257,
+          "do": "Código: la banda de la 256 en terminal y escritorio, panel y tests; validate, vivo, copia a dev-mods",
           "status": "done",
-          "detail": "Todo passed; el usuario validó en vivo el resto y aceptó los tres mods el 2026-10-17 (corrida 3 en specs/testing/2026-10-17-preguntas.md)"
+          "detail": "band.tsx en dos filas (column por parte, rótulos en i18n: Modelo/Contexto/Límite 5h/Límite semanal/Costo), palabra del tramo fuera del medidor vivo, panel con la vista previa en dos filas; nzt-look 0.3.0, README y catálogo; 154/154, validate ok; sin copiar a dev-mods todavía (al final de la tanda)"
+        },
+        {
+          "id": 258,
+          "do": "BUG-001: fila de una skill con 'Skill' una vez y el nombre de la skill en tenue; regla en la spec, test, vivo",
+          "status": "done",
+          "detail": "targetOf: Skill lleva skill/command como objetivo y descarta uno igual al nombre; el test con las props documentadas daba '┃ ● Skill' (la repetición no se reprodujo); BUG-001 fixed, pending verification; regla en RN-skin-textos-claude"
+        },
+        {
+          "id": 262,
+          "do": "Fila de herramienta plegable tocando el nombre o el comando, no solo ▸: regla, mockup, código, tests",
+          "status": "done",
+          "detail": "RN-skin-plegar-tocando [add]; rows.tsx: el texto de la fila es un Button plain (row:<id>, row:group:<id>) con el mismo toggle que ▸; 158/158, validate ok"
+        },
+        {
+          "id": 259,
+          "do": "Medir qué temas cansan la vista (brillo del texto y del fondo, contraste excesivo, acentos saturados) y proponer ajustes; el usuario elige cuáles",
+          "status": "done",
+          "detail": "Criterios del codelab de Material (tema oscuro): texto sobre 14,19:1 (87% blanco en #121212) y croma >= 0,6 (propuesta); 10 de 16 paletas oscuras marcadas; el usuario delegó ('hacé todas las fases directo'): decisión del agente ajustar todas, objetable. Spec: RN-skin-no-cansa y 'Temas que no cansan la vista' con la tabla antes→ahora"
+        },
+        {
+          "id": 260,
+          "do": "Código: ajustar los temas que eligió el usuario en la 259, contraste 4,5:1 sostenido, tests",
+          "status": "done",
+          "detail": "palette.ts: 10 paletas oscuras ajustadas (mismo tono, croma 0,58; texto bajo 14,19:1); test de que ninguna paleta oscura deslumbra; 174/174 (16x2 contraste ok), validate ok; mockup-banda sincronizado; copia 0.3.0 en dev-mods 1f00cc3b"
+        }
+      ]
+    },
+    {
+      "name": "cambio: banda en una línea",
+      "status": "done",
+      "units": [
+        {
+          "id": 263,
+          "do": "Spec y mockup-banda: una línea, sin 'Modelo' ni palabra del tramo, rótulo a la izquierda de cada barra, 20 amarillo/30 naranja/40 rojo; medido",
+          "status": "done",
+          "detail": "Spec (RN-skin-banda-rotulos, -marcas-kernel con naranja = mitad aviso/error, -banda-ancho con cuentas regresivas antes que el costo) y mockup-banda en una línea: 96 combinaciones sin scroll; a 120 col quedan modelo, contexto, 5h, semanal y botón"
+        },
+        {
+          "id": 264,
+          "do": "Código: band.tsx en una línea, color naranja del 30, i18n, tests, validate, copia a dev-mods",
+          "status": "done",
+          "detail": "band.tsx en una línea (hasLabels, drop countdown/labels, orangeOf), sin palabra del tramo (i18n tier y 'Modelo' fuera), panel; nzt-look 0.4.0, README, catálogo; 174/174, validate ok; copia en dev-mods 1f00cc3b"
+        }
+      ]
+    },
+    {
+      "name": "cambio: prompt en menta y pestañas con estilo",
+      "status": "done",
+      "units": [
+        {
+          "id": 265,
+          "do": "NZT oscuro: marca #72f4cd en borde del prompt, títulos, pastillas, botones y barras; amarillo #efe07a; shimmer #fff069",
+          "status": "dropped",
+          "detail": "Primera propuesta descartada por el usuario 2026-10-18 ('prefiero mantener el actual'); la reemplazan 266-268"
+        },
+        {
+          "id": 266,
+          "do": "Investigar: por qué promptBorder #5ccaa9 no se ve y si un mod puede dar estilo a las pestañas del panel (Estado/Cambios/Archivos)",
+          "status": "done",
+          "detail": "Pestañas: del motor, el mod solo pone el title (documentado, tipos 2.1.302). Borde: en modo auto Claude Code probablemente usa autoAccept, que el tema dejaba al preset (sin verificar en la terminal); además ~/.claude/settings.json tiene theme 'custom:nzt-spike' y ~/.claude/themes/ está vacía (observado): el tema elegido no existe, el usuario tiene que elegir NZT oscuro en /theme"
+        },
+        {
+          "id": 267,
+          "do": "Spec nzt-look y nzt-brand.md: borde del prompt #72f4cd y regla de pestañas según lo hallado; propuesta-color.html corregida con el recorrido real",
+          "status": "done",
+          "detail": "Spec (fila promptBorder/autoAccept [modify], nota de pestañas), nzt-brand.md (excepción del borde, #72f4cd 14,25:1) y propuesta-color.html con el recorrido real; pintar autoAccept es decisión del agente, objetable"
+        },
+        {
+          "id": 268,
+          "do": "Código: promptBorder en themes/nzt-dark.json y paleta nzt, pestañas si el mod puede, tests, validate, vivo, copia a dev-mods",
+          "status": "done",
+          "detail": "themes/nzt-dark.json: promptBorder y autoAccept #72f4cd; palette.ts sin cambio (el contorno del mod es el del mensaje enviado); validate ok, 174/174; copiado a dev-mods 1f00cc3b. Pestañas: sin cambio, son del motor. Falta verlo en vivo (261)"
+        }
+      ]
+    },
+    {
+      "name": "verify del cambio",
+      "status": "doing",
+      "units": [
+        {
+          "id": 261,
+          "do": "Pruebas en vivo: banda en una línea, borde del prompt y pestañas de la 268, retest BUG-001 (fila 'Skill nzt') y L-04 (/clear) al final",
+          "status": "todo",
+          "detail": "L-22..L-26 de la 0.3.0 corridos en bloque por el usuario ('se ve bien'); L-24/BUG-001 sin mención explícita; falta escribir el escenario de la banda en una línea"
         }
       ]
     },
     {
       "name": "ship",
-      "status": "doing",
+      "status": "todo",
       "units": [
-        {
-          "id": 211,
-          "do": "Versiones de los mods, entrada en el marketplace, READMEs, specs cerradas; commits y push a la rama mods, sin release ni PR",
-          "status": "done",
-          "detail": "nzt-questions 0.1.0 nuevo, nzt-hub 0.2.0, nzt-state 0.5.0; validate ok, tests 25/17/32; rama mods pusheada a origin"
-        },
         {
           "id": 214,
           "do": "Después del merge de la rama mods: changelog y release de NZT, tags de los mods, borrar copias de dev-mods e instalar nzt-questions del marketplace",
           "status": "todo",
-          "detail": "Copias a borrar: ~/.claude/dev-mods/57d5260d-85bb-4667-9426-b52a669fbac3/nzt-questions y ~/.claude/dev-mods/1db5e93f-2b2c-4957-af96-5cf1e69abdd5/nzt-questions. El marketplace sale de main: antes del merge nzt-questions no se instala"
+          "detail": "Viene de la corrida anterior. Copias: ~/.claude/dev-mods/57d5260d-85bb-4667-9426-b52a669fbac3/nzt-questions y ~/.claude/dev-mods/1db5e93f-2b2c-4957-af96-5cf1e69abdd5/nzt-questions. El marketplace sale de main"
         }
       ]
     }
   ],
   "approved": true,
-  "autonomy": {},
-  "waiting_on": "El usuario sigue sumando trabajo de mods en la rama mods y arma el PR él; la 214 espera ese merge",
+  "autonomy": { "units": [266, 267, 268], "keep_stops": [] },
+  "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-17: aprobó el plan y C' (sin tool propia del mod, sin interceptar AskUserQuestion en 0.1), tanda autónoma 197-202. Mod nuevo nzt-questions, respuesta al prompt para revisar, tipo genérico/NZT con hub agrupado, aviso en nzt-state.",
-    "Tanda 197-202 hecha el 2026-10-17. Después, Q-05 (se abre solo), Q-07 (nzt-questions genérico: reconoce por forma, no lee documentos) y el flag de Codex no se activa, ya escritos en las specs. Para la 206: con D65 (unidad 212) CLAUDE.md quedó en 189 líneas y la regla de D64 entra entera en el kernel. Diseño técnico de nzt-questions hecho (205). Tanda autónoma 206-209 hecha el 2026-10-17; ahora acompañado.",
-    "Usuario 2026-10-17: rama general 'mods' para todo el trabajo de mods (no solo este); se pushea sin release ni PR, el PR lo arma él al final. CLAUDE.md en 200 líneas (tope C3)."
+    "Usuario 2026-10-17: reemplazar nzt-context; alcance 'todo como la referencia' (objeción del agente: partir en 0.1 y 0.2, dicha una vez, registrada en M4). Todo en la rama mods; el PR lo arma el usuario. Pruebas en vivo al final (unidad 224). Usuario 2026-10-17: nzt-context se borra ya del repo y del marketplace, sin aviso en nzt-skins (objeción del agente: quien lo tenga instalado ve dos bandas; dicha una vez); hub 0.3.0 solo quita Contexto, la tarjeta Skins va en 0.4.0 con nzt-skins.",
+    "Tanda 2026-10-18: renombre + todo el build (240, 227-239) sin parar, un reporte al final; cada unidad cierra con tests y carga en vivo. Hub 0.3.0 construido sin aceptar ni probar en vivo; nzt-context retirado del repo (226, sin commit). Copias locales de la referencia en ~/.claude/plugins/cache/ y ~/.claude/jobs/1db5e93f/tmp/ (pueden borrarse si el usuario lo pide). El código de nzt-skins se escribe nuevo (QT-01).",
+    "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }

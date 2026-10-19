@@ -2,7 +2,11 @@
 
 > Estado: **aceptado** por el usuario en 0.1.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
 > queda todo aprobado") y cerrado (unidad 157); 0.2.0, grupos por tipo y `nzt-questions`,
-> aceptado tras probarlo en vivo el 2026-10-17 (unidad 210) y cerrado; código en `mods/nzt-hub/`; Historia al final · mockup en
+> aceptado tras probarlo en vivo el 2026-10-17 (unidad 210) y cerrado; **0.3.0 en curso**: sin
+> `nzt-context`, que se retira ya (M4 de `specs/nzt-mods.md`, unidad 226); **0.4.0 construida**
+> en la unidad 239 (2026-10-18), sin aceptar: la tarjeta Aspecto de `nzt-look`, que sale con su
+> publicación (aprobado el 2026-10-17, unidades 218 y 225).
+> Marcas `[add]`, `[modify]` y `[remove]` hasta cerrar cada una; código en `mods/nzt-hub/`; Historia al final · mockup en
 > `specs/mods/nzt-hub/mockup.html` (unidades 153 y 158, dirección C) · Depende de: `specs/nzt-mods.md` (reglas de todo mod y catálogo de la sección 5).
 > El usuario pidió el mod el 2026-10-14: "un panel principal que tenga botones por cada MOD de
 > NZT para poder verlos en un lugar y para que es cada uno y que desde el mismo se pueda
@@ -12,7 +16,7 @@
 
 ## Qué resuelve
 
-Los mods de NZT son varios (`nzt-state`, `nzt-context`, `nzt-changes`, `nzt-files`) y cada uno
+Los mods de NZT son varios (`nzt-state`, `nzt-changes`, `nzt-files`, `nzt-questions` y, desde 0.4.0, `nzt-look`) y cada uno
 se abre con su propio comando. Para usarlos hay que recordar que existen, cómo se llaman y para
 qué sirve cada uno. El panel los junta en un lugar: qué hay, para qué es cada uno, y un botón
 que lleva a cada uno.
@@ -31,7 +35,7 @@ que lleva a cada uno.
   configuración de Claude Code; el panel solo copia el comando para instalarlo (Q-02, Q-07).
 - **Resumen de la corrida, contexto usado y atajos a las skills NZT.** Se ofrecieron como
   extras y el usuario eligió solo la versión (Q-03). El resumen está en `nzt-state` y el
-  contexto en `nzt-context`.
+  contexto en la banda de `nzt-look`. [modify]
 - **Abrirse solo al empezar la sesión.** Propuesta del agente (Q-05): se abre cuando se pide.
 - **Cambiar las opciones de un mod** (su idioma, por ejemplo). Se hacen donde Claude Code las
   maneja.
@@ -89,9 +93,10 @@ con `/nzt-hub`.
 Mientras Claude está trabajando en un turno, un botón apretado no abre el panel enseguida: la
 tarjeta dice que se abre al terminar el turno, y se abre entonces.
 
-### RN-hub-sin-comando · origin: propuesta del agente
-Un mod que no tiene panel que abrir (`nzt-context` es la barra sobre el prompt) tiene tarjeta
-pero no botón: la tarjeta dice dónde se lo ve.
+### RN-hub-sin-comando · [remove] · código —
+Deja de existir la tarjeta sin botón que dice dónde se ve el mod (*barra sobre el prompt*). Solo
+la usaba `nzt-context`; con él fuera del catálogo, todos los mods tienen panel (Q-09). Si un mod
+futuro no tiene panel, la regla vuelve con ese caso.
 
 ### RN-hub-error · origin: RN-mod-lee-formatos-viejos de `specs/nzt-mods.md`
 Si abrir un mod falla, entonces su tarjeta dice que no se pudo y el resto del panel sigue
@@ -111,6 +116,45 @@ mod, que se elige al instalarlo.
 ## Requisitos no funcionales
 - Abrir el panel o apretar un botón con la sesión libre se ve en menos de medio segundo
   (propuesta del agente).
+
+## Diseño (0.3.0 y 0.4.0, unidades 218 y 225) · [modify]
+
+Mockup `specs/mods/nzt-hub/mockup.html`, que dibuja **0.4.0**; 0.3.0 es el mismo sin la fila de
+Aspecto y con `n de 4`. Lo demás de 0.2.0 y 0.1.0, abajo, sigue valiendo salvo lo que nombra a
+Contexto. La 0.3.0 se separó de la 0.4.0 en la 225: `nzt-context` se retira ya, y una tarjeta de
+`nzt-look` antes de publicarlo copiaría un comando de instalación que falla (usuario 2026-10-17:
+"ok").
+
+**0.3.0, ahora:**
+- **Sale Contexto** (◔ azul, *barra sobre el prompt*). Con ella se va lo que cedía en un panel
+  angosto `barra sobre el prompt`. [remove]
+- La portada cuenta `n de 4 instalados`. [modify]
+
+**0.4.0, con la publicación de `nzt-look`:**
+- **Entra Aspecto** (`nzt-look`), última del grupo *Para cualquier proyecto*, en el orden del
+  catálogo: glifo **◐** en el azul que tenía Contexto; título **Aspecto** / **Look** (Q-10); línea
+  *Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.* /
+  *Themes, a usage band with NZT's 20/30/40 marks and a redrawn conversation.* Lleva **Abrir ›**,
+  que corre `/nzt-look`, o **Copiar instalación** si no está (Q-08). [add]
+- La portada vuelve a contar `n de 5 instalados`.
+- **Sin medir todavía:** el mockup cambió una fila por otra del mismo largo; la medición a 320 y
+  800 px se repite al construir cada versión.
+
+**Criterios de 0.3.0** (código ✓ · qa —; construido en la 226, el test *every installed mod has
+its button, and none is the context bar any more* prueba la ausencia):
+- [ ] Con `nzt-context` 0.2.0 todavía instalado en la máquina, el hub muestra cuatro tarjetas, la
+  portada dice `4 de 4 instalados` y ninguna tarjeta se llama *Contexto*. [remove]
+- [ ] Con los cuatro mods instalados, ninguna tarjeta dice *barra sobre el prompt*: todas llevan
+  **Abrir ›**. [remove]
+
+**Criterios de 0.4.0** (código ✓ · qa —; construido en la 239: el primero y el tercero los prueba
+el test *Aspecto is the last of the generic mods, and without nzt-look it copies its install*; el
+segundo usa el mismo **Abrir ›** de los otros mods y no tiene test propio):
+- [ ] Con los cinco mods instalados, el grupo *Para cualquier proyecto* muestra Cambios, Archivos,
+  Preguntas y Aspecto, en ese orden, y Aspecto dice `v0.2.0` y **Abrir ›**. [add]
+- [ ] Apretar Abrir en Aspecto abre `/nzt-look` y el hub se cierra (RN-hub-abrir, RN-hub-cede). [add]
+- [ ] Sin `nzt-look` instalado, su tarjeta dice `no instalado` y Copiar instalación copia
+  `/plugin install nzt-look --marketplace Ezefeola/nzt-ai`. [add]
 
 ## Diseño (0.2.0, unidad 204)
 
@@ -266,6 +310,25 @@ aprieta y Escape cierra.
   como con un boton que tenga para copiar el comando de instalacion, me explico? asi es mas
   amigable". El agente había recomendado la A. · 2026-10-14
 
+### Q-08 · ¿Cómo se ve la tarjeta de `nzt-skins`?
+- bloquea: la fila de Skins en el mockup y en el código de 0.3.0
+- propuesta del agente: título **Skins** en los dos idiomas, glifo ◐ en el azul de Contexto, y la
+  línea *Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.*
+- respuesta: "perfecto". · 2026-10-17 · *el título lo supera Q-10*
+
+### Q-10 · El mod se renombra a `nzt-look`: ¿cómo se llama su tarjeta?
+- contexto: el usuario renombró `nzt-skins` a `nzt-look` el 2026-10-18 (`specs/mods/nzt-look/spec.md`,
+  Q-01).
+- propuesta del agente: **Aspecto** en español y **Look** en inglés (RN-mod-pestaña: una palabra en el
+  idioma del mod). Glifo, color y línea, como en Q-08.
+- respuesta: elegida con el nombre (*"nzt-look … En el hub: Aspecto / Look"*) · usuario 2026-10-18
+
+### Q-09 · RN-hub-sin-comando, sin ningún mod que la use: ¿se quita o queda dormida?
+- bloquea: si 0.3.0 borra la tarjeta sin botón del código
+- propuesta del agente: quitarla; una regla sin caso real no se prueba en vivo, y vuelve con el
+  primer mod sin panel.
+- respuesta: "ok perfecto la quitamos". · 2026-10-17
+
 ## Notas técnicas
 - Verificado en los tipos de Claude Code 2.1.299 (`types/claude-code.d.ts` del
   plugin-authoring): `$.command.list()` lista los comandos disponibles y `$.command.run` corre
@@ -275,8 +338,9 @@ aprieta y Escape cierra.
   `borderColor`, `backgroundColor` y padding.
 - Resuelto al construir (unidad 154), decisión del agente:
   - **Instalado** quiere decir que la sesión tiene el comando del mod (`$.command.list()`) o sus
-    opciones en `/config` (`$.config.list()`, clave `<mod>.<opción>`). Así entra `nzt-context`,
-    que no tiene comando. Todos los mods de NZT tienen la opción de idioma.
+    opciones en `/config` (`$.config.list()`, clave `<mod>.<opción>`). Todos los mods de NZT
+    tienen la opción de idioma. [modify: desde 0.3.0 ningún mod del catálogo depende solo de las
+    opciones; la detección no cambia]
   - **La versión** sale de `~/.claude/plugins/installed_plugins.json`. La carpeta `.claude` se
     deduce de la del propio plugin. **No está documentado:** el archivo se observó en esta
     máquina, no en la documentación de Claude Code. Si no está o no se puede leer, la fila va sin
@@ -294,7 +358,7 @@ aprieta y Escape cierra.
 - 7 de la lógica pura: el catálogo, los grupos por tipo y el grupo vacío que no se muestra, el
   comando de instalación, cuándo un mod está instalado, dónde está la lista de instalados y cómo
   se leen sus versiones.
-- 10 del panel dibujado: lista y botones, aire bajo la pestaña, nzt-context sin botón, copiar, copia rechazada, Abrir
+- 10 del panel dibujado: lista y botones, aire bajo la pestaña, toda tarjeta instalada con botón y ninguna de Contexto (0.3.0), copiar, copia rechazada, Abrir
   cierra el hub, los dos títulos de grupo con Preguntas entre los genéricos, panel angosto,
   lista con scroll y cierre con el comando.
 

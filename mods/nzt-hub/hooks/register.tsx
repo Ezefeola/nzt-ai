@@ -252,12 +252,6 @@ export const register: Register = (on, options) => {
             <Text backgroundColor={COPY_BG} bold>{` ⧉ ${rowWidth < NARROW ? t.copyShort : t.copy} `}</Text>
           </Button>
         )
-      } else if (!spec.hasPane) {
-        right = (
-          <Text dimColor italic wrap="truncate-end">
-            {t.where}
-          </Text>
-        )
       } else if (action?.kind === 'waiting') {
         right = (
           <Text color="yellow" wrap="truncate-end">
@@ -311,7 +305,7 @@ export const register: Register = (on, options) => {
                   </Text>
                 </Box>
               </Box>
-              <Box flexShrink={action?.kind === 'waiting' || (!spec.hasPane && mod.isInstalled) ? 1 : 0} overflow="hidden">
+              <Box flexShrink={action?.kind === 'waiting' ? 1 : 0} overflow="hidden">
                 {right}
               </Box>
             </Box>

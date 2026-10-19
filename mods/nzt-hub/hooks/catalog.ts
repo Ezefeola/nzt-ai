@@ -4,11 +4,11 @@
  */
 export const CATALOG = [
   // 'claude' is a theme key: NZT's accent, so it follows the theme.
-  { id: 'nzt-state', kind: 'nzt', icon: '◆', color: 'claude', hasPane: true },
-  { id: 'nzt-context', kind: 'generic', icon: '◔', color: '#82aaff', hasPane: false },
-  { id: 'nzt-changes', kind: 'generic', icon: '±', color: '#c792ea', hasPane: true },
-  { id: 'nzt-files', kind: 'generic', icon: '▤', color: '#6cc070', hasPane: true },
-  { id: 'nzt-questions', kind: 'generic', icon: '?', color: '#f48fb1', hasPane: true },
+  { id: 'nzt-state', kind: 'nzt', icon: '◆', color: 'claude' },
+  { id: 'nzt-changes', kind: 'generic', icon: '±', color: '#c792ea' },
+  { id: 'nzt-files', kind: 'generic', icon: '▤', color: '#6cc070' },
+  { id: 'nzt-questions', kind: 'generic', icon: '?', color: '#f48fb1' },
+  { id: 'nzt-look', kind: 'generic', icon: '◐', color: '#82aaff' },
 ] as const
 
 export type ModId = (typeof CATALOG)[number]['id']
@@ -30,7 +30,7 @@ export const installCommand = (id: string) => `/plugin install ${id} --marketpla
 
 /**
  * Whether the session has a mod: it registered its command, or its options show in /config
- * (every NZT mod has a language option, and a band like nzt-context has no command).
+ * (every NZT mod has a language option, so a mod whose command failed to load still counts).
  */
 export const isInstalled = (
   id: string,

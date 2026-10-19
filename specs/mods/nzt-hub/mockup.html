@@ -19,12 +19,15 @@
   y después "Para cualquier proyecto" (RN-hub-grupos, usuario 2026-10-17: "me gusta tu propuesta con lo
   de que nzt-hub agrupe por tipo"), entra nzt-questions (Preguntas, ? rosa, propuesta del agente, Q-08
   de su spec) y las versiones son las de este repo el 2026-10-17.
+  0.4.0 (unidades 218 y 225, 2026-10-17; 0.3.0 es esto sin la fila de Aspecto y con "n de 4"): sale nzt-context y entra nzt-look (Aspecto, ◐ en el azul que tenía
+  Contexto, Q-08 y Q-10), con Abrir como los demás; ya no hay tarjeta sin botón (RN-hub-sin-comando se quitó,
+  Q-09). Usuario 2026-10-17: "reemplazar nzt-context"; el mod se llamaba nzt-skins hasta el 2026-10-18.
 -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>nzt-hub 0.2.0 · mockup</title>
+<title>nzt-hub 0.4.0 · mockup</title>
 <style>
   :root {
     /* provisional: la misma aproximación de terminal oscura que specs/mods/nzt-files/mockup.html */
@@ -32,7 +35,7 @@
     --accent: #d97757; /* color 'claude' del tema: el acento de los mods de NZT */
     --cyan: #29b8db; --green: #6cc070; --red: #f07178; --yellow: #e5c07b;
     /* provisional: un color por mod, propuesta del agente; amarillo y rojo quedan para espera y error */
-    --c-state: #d97757; --c-context: #82aaff; --c-changes: #c792ea; --c-files: #6cc070; --c-questions: #f48fb1;
+    --c-state: #d97757; --c-skins: #82aaff; --c-changes: #c792ea; --c-files: #6cc070; --c-questions: #f48fb1;
     --row: 20px;                                     /* una fila de la terminal */
   }
   * { box-sizing: border-box; }
@@ -69,8 +72,6 @@
   .who > .ico, .who > .name { flex: none; }
   .row > .who { flex: 0 1 auto; min-width: var(--nm); }
   .who > .dim { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  /* "barra sobre el prompt" cede antes que el nombre. */
-  .row > .end.it { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   /* Sin ancho, el botón dice solo "Copiar" (el mod elige el texto por las columnas del panel). */
   @container (max-width: 40ch) { .long { display: none; } }
   .ico { color: var(--mc); font-weight: 700; }
@@ -120,7 +121,7 @@
 
 <div class="note">
   <p><b>Cómo se lee:</b> arriba NZT en letras grandes y cuántos mods hay instalados. Debajo, dos grupos: <b>Con el método NZT</b>, los que necesitan un artefacto del método, y <b>Para cualquier proyecto</b>, los genéricos (RN-hub-grupos). En cada grupo, un mod por fila en el orden del catálogo, con una barra de su color a la izquierda: su glifo, su nombre, su versión y para qué sirve.</p>
-  <p><b>Abrir ›</b> corre el comando del mod y este panel se cierra (RN-hub-cede); se vuelve con <code>/nzt-hub</code>. Si Claude está trabajando, el mod dice que se abre al terminar el turno (RN-hub-espera). <b>nzt-context</b> no tiene panel: dice dónde se lo ve.</p>
+  <p><b>Abrir ›</b> corre el comando del mod y este panel se cierra (RN-hub-cede); se vuelve con <code>/nzt-hub</code>. Si Claude está trabajando, el mod dice que se abre al terminar el turno (RN-hub-espera). Todos los mods del catálogo tienen panel, así que toda tarjeta instalada lleva Abrir.</p>
   <p><b>No instalado</b> (Q-07): barra gris y el botón <b>Copiar instalación</b>, que copia <code>/plugin install &lt;mod&gt; --marketplace Ezefeola/nzt-ai</code>; la fila dice <i>Copiado · pegalo en el prompt</i>. Si la terminal no deja copiar, lo dice y muestra el comando para seleccionarlo a mano.</p>
   <p>Teclas con el panel enfocado: Tab recorre los botones, Enter aprieta, Escape cierra.</p>
 </div>
@@ -131,14 +132,14 @@
 
   // El catálogo de specs/nzt-mods.md sección 5, en su orden. La línea de cada uno resume su fila.
   // icon y color: propuesta del agente, un glifo y un color por mod.
-  // type: el tipo de su fila del catálogo (RN-mod-tipo). nzt-context es genérico con capa NZT y lo dice
+  // type: el tipo de su fila del catálogo (RN-mod-tipo). nzt-look es genérico con capa NZT y lo dice
   // en su línea (RN-hub-capa-nzt).
   const MODS = [
     { id: 'nzt-state', type: 'nzt', title: 'Estado', version: '0.4.0', icon: '◆', c: 'state', desc: 'El plan y el estado de la corrida, leídos de Plan/state.json.' },
-    { id: 'nzt-context', type: 'gen', title: 'Contexto', version: '0.2.0', icon: '◔', c: 'context', desc: 'Cuánto contexto lleva la sesión, con las marcas 20/30/40 de NZT.', where: 'barra sobre el prompt' },
     { id: 'nzt-changes', type: 'gen', title: 'Cambios', version: '0.5.0', icon: '±', c: 'changes', desc: 'Lo que Claude editó en el último turno o contra HEAD, un diff por vez.' },
     { id: 'nzt-files', type: 'gen', title: 'Archivos', version: '0.1.1', icon: '▤', c: 'files', desc: 'El proyecto como el explorador de VS Code, solo para leer.' },
     { id: 'nzt-questions', type: 'gen', title: 'Preguntas', version: '0.1.0', icon: '?', c: 'questions', desc: 'Las preguntas del agente, de a una y con opciones, al prompt en un mensaje.' },
+    { id: 'nzt-look', type: 'gen', title: 'Aspecto', version: '0.2.0', icon: '◐', c: 'skins', desc: 'Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.' },
   ];
   const GROUPS = [['nzt', 'CON EL MÉTODO NZT'], ['gen', 'PARA CUALQUIER PROYECTO']];
   const OFF = ['nzt-changes', 'nzt-files'];
@@ -154,9 +155,8 @@
   const COUNT = { all: 5, some: 3, none: 0, copied: 3, copyfail: 3, wait: 5, fail: 5 };
   const isOff = h => ['off', 'copied', 'copyfail'].includes(h);
 
-  // Lo que va a la derecha de un mod: el botón, o por qué no hay.
+  // Lo que va a la derecha de un mod: el botón, o que se abre al terminar el turno.
   const action = (m, h) => isOff(h) ? `<span class="end"><button class="ghost" data-copy="${m.id}" aria-label="Copiar el comando para instalar ${m.title}">⧉ Copiar<span class="long"> instalación</span></button></span>`
-    : m.where ? `<span class="end dim it">${m.where}</span>`
     : h === 'wait' ? '<span class="end wait"><span class="long">se abre </span>al terminar el turno</span>'
     : `<span class="end"><button class="pill" data-open="${m.id}" aria-label="Abrir ${m.title}">Abrir ›</button></span>`;
   // La línea de debajo, cuando hay algo que decir además de para qué sirve.

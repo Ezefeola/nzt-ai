@@ -464,7 +464,7 @@ public static class Program
         Check("nombra el que falló y el motivo",
             result.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Failed, Detail: not null });
         Check("los demás quedan instalados",
-            fake.Installed.ContainsKey("nzt-state") && fake.Installed.ContainsKey("nzt-context"));
+            fake.Installed.ContainsKey("nzt-state") && fake.Installed.ContainsKey("nzt-changes"));
         Check("el que falló no queda en el manifiesto",
             Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods?.Contains("nzt-files") == false);
     });
@@ -549,7 +549,7 @@ public static class Program
         var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, manifestDirectory: manifests);
 
         Check("desinstala los mods que instaló",
-            !fake.Installed.ContainsKey("nzt-state") && !fake.Installed.ContainsKey("nzt-context"));
+            !fake.Installed.ContainsKey("nzt-state") && !fake.Installed.ContainsKey("nzt-changes"));
         Check("deja el que el usuario instaló a mano",
             fake.Installed.ContainsKey("nzt-files")
             && result.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Kept, ByUser: true });
@@ -578,13 +578,13 @@ public static class Program
     {
         var (fake, claude, mods, manifests) = ModsSetup(home);
         ModInstaller.Install(claude, mods, Provider.ClaudeCodeId, "1.2.0", manifestDirectory: manifests);
-        fake.Failing.Add("nzt-context");
+        fake.Failing.Add("nzt-changes");
 
         var result = ModInstaller.Uninstall(claude, mods, Provider.ClaudeCodeId, manifestDirectory: manifests);
 
         Check("un mod que no se pudo desinstalar es una falla", result.Failed);
         Check("sigue siendo del instalador, para la próxima vez",
-            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods is ["nzt-context"]);
+            Manifest.Load(Provider.ClaudeCodeId, manifests)?.Mods is ["nzt-changes"]);
     });
 
     private static void ModsUninstallDryRunChangesNothing() => InTemp(home =>
@@ -633,13 +633,13 @@ public static class Program
         Check("el estado dice el instalado a mano",
             status.Outcomes.Single(o => o.Name == "nzt-files") is { Action: ModAction.Installed, ByUser: true });
         Check("el estado dice el que no está",
-            status.Outcomes.Single(o => o.Name == "nzt-context").Action == ModAction.Missing);
+            status.Outcomes.Single(o => o.Name == "nzt-changes").Action == ModAction.Missing);
     });
 
     private static (FakeClaude fake, ClaudePlugins claude, ModCatalog mods, string manifests) ModsSetup(string home)
     {
         var fake = new FakeClaude();
-        return (fake, new ClaudePlugins(fake), ModCatalog.From(["nzt-state", "nzt-context", "nzt-files"]),
+        return (fake, new ClaudePlugins(fake), ModCatalog.From(["nzt-state", "nzt-changes", "nzt-files"]),
             Path.Combine(home, "manifests"));
     }
 
