@@ -5,7 +5,7 @@ import type { Answering, Expanded, Snapshot, Unit } from '../types'
 import { parseState } from './parse'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
-import { colorOf, idOf, labelOf, timelineOf } from './phases'
+import { colorOf, idOf, knownPhasesOf, labelOf, timelineOf, unknownPhasesOf } from './phases'
 import {
   animatedSvgOf,
   cellsOf,
@@ -351,6 +351,7 @@ export const register: Register = (on, options) => {
 
     const steps = timelineOf(state.phases, state.legacyPhase, isComplete, lang)
     const phasesInProgress = steps.filter(step => step.status === 'doing').length
+    const unknownPhases = unknownPhasesOf(state.phases)
     // A phase's hat in miniature, before its name: in the timeline and in each group heading.
     const mini = (phase: string, key: string) => {
       const rows = miniOf(idOf(phase))
@@ -493,6 +494,9 @@ export const register: Register = (on, options) => {
         {steps.length === 0 && <Text dimColor>{t.noPhases}</Text>}
         {phasesInProgress > 1 && (
           <Text color="warning" wrap="wrap">{t.severalPhasesInProgress(phasesInProgress)}</Text>
+        )}
+        {unknownPhases.length > 0 && (
+          <Text color="warning" wrap="wrap">{t.unknownPhases(unknownPhases, knownPhasesOf(lang))}</Text>
         )}
 
         <Box marginTop={1} flexDirection="row" justifyContent="space-between">

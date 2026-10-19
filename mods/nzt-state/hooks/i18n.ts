@@ -40,6 +40,8 @@ export const TEXTS = {
     noneInProgress: 'Ninguna unidad en curso.',
     severalInProgress: (count: number) => `⚠ ${count} unidades en curso: el kernel permite una sola`,
     severalPhasesInProgress: (count: number) => `⚠ ${count} fases en curso: el kernel permite una sola`,
+    unknownPhases: (names: readonly string[], known: string) =>
+      `⚠ ${names.map(name => `«${name}»`).join(', ')} ${names.length === 1 ? 'no es una fase' : 'no son fases'} de NZT: las fases son ${known}`,
     pending: 'PENDIENTES',
     nothingPending: 'Nada pendiente.',
     done: 'HECHAS',
@@ -85,6 +87,8 @@ export const TEXTS = {
     noneInProgress: 'No unit in progress.',
     severalInProgress: (count: number) => `⚠ ${count} units in progress: the kernel allows one`,
     severalPhasesInProgress: (count: number) => `⚠ ${count} phases in progress: the kernel allows one`,
+    unknownPhases: (names: readonly string[], known: string) =>
+      `⚠ ${names.map(name => `“${name}”`).join(', ')} ${names.length === 1 ? 'is not an NZT phase' : 'are not NZT phases'}: the phases are ${known}`,
     pending: 'PENDING',
     nothingPending: 'Nothing pending.',
     done: 'DONE',

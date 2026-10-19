@@ -1,6 +1,7 @@
 # Mod · nzt-state — panel del plan y el estado
 
-> Estado: **construido**, versión 0.5.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
+> Estado: **construido**, versión 0.6.0 (aviso de fase que NZT no conoce, unidad 271, sin
+> aceptar), en `mods/nzt-state/` (B-01 a B-04 e idioma en las
 > unidades 84 a 88; fases plegables y personajes en 91 a 95; aviso de varias fases en curso
 > en la 164; Plan y Modo al lado del personaje en la 166; aviso de preguntas abiertas,
 > RN-panel-preguntas y -preguntas-espera, aprobado en la 202, construido en la 209 y aceptado
@@ -74,6 +75,13 @@ el motivo, y la sesión sigue funcionando.
 ### RN-panel-fases-tal-cual · origin: D61 (unidad 71)
 Si el estado trae `phases`, la línea de fases muestra esas fases y no otras, en el orden
 del archivo y cada una con su estado. Una fase `dropped` aparece tachada.
+
+### RN-panel-fase-desconocida · origin: usuario 2026-10-19 ("eso no es una fase, no? las fases son análisis, ux, build, etc") · [add]
+Si `phases` trae un nombre que no es ninguna fase de NZT (ni en ninguna de sus grafías), la
+línea de fases lo muestra igual, tal como viene (RN-panel-fases-tal-cual), y debajo avisa cuáles
+no son fases y cuáles son: *⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las
+fases son Análisis, Arquitectura, UX, Build, Verificación, Release*. Se encontró con el estado de
+este repo: el agente había escrito cada cambio como una fase.
 
 ### RN-panel-unidad-en-su-fase · origin: D62 (unidad 76)
 Las unidades se leen dentro de su fase (`phases[].units`), y las pendientes se muestran
@@ -278,7 +286,7 @@ fases en los tres formatos, la lectura del estado, el JSON roto, el panel con la
 curso, las pendientes por fase, las secciones que se pliegan (en terminal y en escritorio)
 y la tanda autónoma con sus paradas; la apertura con y sin estado (B-01), el status
 inválido (B-02), varias unidades en curso (B-03), varias fases en curso y una sola sin
-aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
+aviso, una fase que NZT no conoce con su aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
 se pliegan, los cuadros y sombreros de cada personaje, las celdas, el personaje y los mini
 sombreros en la terminal, y el SVG en el escritorio; Plan y Modo al lado del personaje
 desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el objetivo con su

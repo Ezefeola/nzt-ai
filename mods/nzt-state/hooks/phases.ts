@@ -36,6 +36,13 @@ export const colorOf = (phase: string) => PHASES[indexOf(phase)]?.color ?? NEUTR
 export const labelOf = (phase: string, lang: Lang = 'es') =>
   PHASES[indexOf(phase)]?.label[lang] ?? phase
 
+/** The names in `phases` that are none of NZT's, each once, in the file's order. */
+export const unknownPhasesOf = (phases: Phase[] | null): string[] => [
+  ...new Set((phases ?? []).map(one => one.name).filter(name => idOf(name) === undefined)),
+]
+
+export const knownPhasesOf = (lang: Lang = 'es') => PHASES.map(one => one.label[lang]).join(', ')
+
 /**
  * The steps the timeline draws. A state with `phases` is drawn as it says.
  * An older one with a single `phase` gets all six, the ones before it done;

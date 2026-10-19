@@ -301,6 +301,25 @@ test('every phase in progress is lit, with a warning when there is more than one
   await ui.unmount()
 })
 
+test('a phase NZT does not know is drawn as written, with a warning naming the real ones', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'A change written as a phase',
+    phases: [
+      { name: 'build', status: 'done', units: [{ id: 1, do: 'Band', status: 'done' }] },
+      { name: 'cambio: modelo y effort en la banda', status: 'doing', units: [{ id: 2, do: 'Model', status: 'doing' }] },
+    ],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /cambio: modelo y effort en la banda/ })).toBeDefined()
+  expect(
+    await ui.find({
+      type: 'Text',
+      text: '⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las fases son Análisis, Arquitectura, UX, Build, Verificación, Release',
+    }),
+  ).toBeDefined()
+  await ui.unmount()
+})
+
 test('a single phase in progress draws no phase warning', async ($, on) => {
   const ui = await mountPane($, on, {
     goal: 'One phase',
@@ -311,6 +330,7 @@ test('a single phase in progress draws no phase warning', async ($, on) => {
     approved: true,
   })
   expect(await ui.find({ type: 'Text', text: /fases en curso/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /no es una fase de NZT/ })).toBeUndefined()
   await ui.unmount()
 })
 
