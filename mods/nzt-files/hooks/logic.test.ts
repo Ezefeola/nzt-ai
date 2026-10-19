@@ -4,6 +4,7 @@ import { foundOf, isShown, MAX_FOUND, shellReadOf, touchOf } from './activity'
 import { branchOf, countsOf, gitOpsOf, linesOf } from './git'
 import { TEXTS } from './i18n'
 import { blocksOf, blockWindow, hasHugeBlock, MARKDOWN_LIMIT } from './markdown'
+import { statesOf, tokensOf } from './csharp'
 import { matchesOf, MAX_MATCHES, searchTreeOf } from './search'
 import { settingsOf } from './settings'
 import { marksOf, relativeTo, rowsOf } from './tree'
@@ -120,6 +121,68 @@ describe('blocksOf', () => {
       [7, 12],
       [12, 14],
     ])
+  })
+
+  test('a front matter at the top is one YAML code block, not a rule and a heading', async () => {
+    const blocks = blocksOf(['---', 'update-when: a color changes', '---', '# Brand'])
+    expect(blocks.map(block => [block.from, block.to])).toEqual([
+      [0, 3],
+      [3, 4],
+    ])
+    expect(blocks[0]!.text).toBe('```yaml\nupdate-when: a color changes\n```')
+  })
+})
+
+describe('tokensOf (C#)', () => {
+  const kinds = (line: string) => tokensOf(line).tokens.filter(token => token.kind !== 'plain').map(token => [token.text, token.kind])
+
+  test('tells methods, types, members, variables and keywords apart as Visual Studio colors them', async () => {
+    expect(kinds('var owners = skills.Select(s => s.RepoPath).ToHashSet(StringComparer.Ordinal);')).toEqual([
+      ['var', 'keyword'],
+      ['owners', 'variable'],
+      ['skills', 'variable'],
+      ['Select', 'method'],
+      ['s', 'variable'],
+      ['s', 'variable'],
+      ['RepoPath', 'member'],
+      ['ToHashSet', 'method'],
+      ['StringComparer', 'type'],
+      ['Ordinal', 'member'],
+    ])
+  })
+
+  test('a type after new, control keywords, strings, numbers and comments', async () => {
+    expect(kinds('if (x) throw new InvalidOperationException($"a {b}", 42); // why')).toEqual([
+      ['if', 'control'],
+      ['x', 'variable'],
+      ['throw', 'control'],
+      ['new', 'keyword'],
+      ['InvalidOperationException', 'type'],
+      ['$"a {b}"', 'string'],
+      ['42', 'number'],
+      ['// why', 'comment'],
+    ])
+  })
+
+  test('an interface, a generic call and an escaped quote', async () => {
+    expect(kinds('IService svc = Get<IService>("a\\"b");')).toEqual([
+      ['IService', 'interface'],
+      ['svc', 'variable'],
+      ['Get', 'method'],
+      ['IService', 'interface'],
+      ['"a\\"b"', 'string'],
+    ])
+  })
+
+  test('a block comment and a verbatim string carry over to the next lines', async () => {
+    expect(statesOf(['/* one', 'two */ int a;', 'var s = @"x', 'y";', 'int b;'])).toEqual([
+      'code',
+      'comment',
+      'code',
+      'verbatim',
+      'code',
+    ])
+    expect(tokensOf('two */ int a;', 'comment').tokens[0]).toEqual({ text: 'two */', kind: 'comment' })
   })
 })
 

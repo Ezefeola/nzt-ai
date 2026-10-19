@@ -163,6 +163,7 @@ test('the card keeps a blank row under the pane tabs and still fills the body', 
   await openPane($)
   const ui = await mount($)
   expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
+  expect(await ui.find({ type: 'Box', key: 'body' })).toMatchObject({ props: { marginTop: 1 } })
 })
 
 test('a folder opens with a click and its file shows beneath, numbered, with its detail', async ($, on) => {
@@ -178,6 +179,46 @@ test('a folder opens with a click and its file shows beneath, numbered, with its
   expect(await ui.find({ type: 'Code', text: "export const a = 1\nexport const b = 'two'" })).toBeDefined()
   await ui.press({ key: 'n:src' })
   expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+})
+
+test('a C# file is colored by the pane, methods and types too, with its line numbers', async ($, on) => {
+  const disk = {
+    ...DISK,
+    folders: { ...DISK.folders, [ROOT]: [...DISK.folders[ROOT]!, { name: 'App.cs', kind: 'file' as const }] },
+    files: { ...DISK.files, [`${ROOT}/App.cs`]: 'var list = items.ToList();\r\nreturn new Catalog(list);\r\n' },
+  }
+  fakeDisk(on, disk)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:App.cs' })
+  expect(await ui.find({ type: 'Code' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^ToList$/ })).toMatchObject({ props: { color: '#DCDCAA' } })
+  expect(await ui.find({ type: 'Text', text: /^Catalog$/ })).toMatchObject({ props: { color: '#4EC9B0' } })
+  expect(await ui.find({ type: 'Text', text: /^return$/ })).toMatchObject({ props: { color: '#D8A0DF' } })
+  expect(await ui.find({ type: 'Text', text: /^2 $/ })).toBeDefined()
+})
+
+test('a file longer than the viewer has a scroll bar, and a click on its last row goes to the end', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const bar = await ui.find({ type: 'Box', key: 'bar' })
+  expect(bar).toBeDefined()
+  const rows = (bar as { children: unknown[] }).children.length
+  await ui.press({ key: `bar:${rows - 1}` })
+  expect(await ui.find({ type: 'Code', text: /export const v300 = 300/ })).toBeDefined()
+})
+
+test('a file that fits has no scroll bar', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  expect(await ui.find({ type: 'Box', key: 'bar' })).toBeUndefined()
 })
 
 test('a binary file shows what it is, not its bytes', async ($, on) => {
@@ -455,6 +496,14 @@ test('with notices off the git init line is gone', { options: { notices: false }
 
 // Markdown.
 
+test('a drawn Markdown keeps its line breaks, from a file saved with Windows line endings too', async ($, on) => {
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/README.md`]: '# Proj\r\n\r\n> state: written\r\n\r\n- one\r\n- two\r\n' } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Markdown', text: '# Proj\n\n> state: written\n\n- one\n- two' })).toBeDefined()
+})
+
 const LONG_MD = Array.from({ length: 30 }, (_, i) => `## Part ${i + 1}\n\nText of part ${i + 1}.`).join('\n\n')
 
 test('a Markdown file is drawn, with its box checked, and unchecking it shows the source', async ($, on) => {
@@ -549,15 +598,29 @@ test('the search does not walk into heavy folders', async ($, on) => {
   expect(await nameRow(ui, 'main-lib.js')).toBeUndefined()
 })
 
-test('j and k walk the rows, l opens a folder and h closes it', async ($, on) => {
-  fakeDisk(on, DISK)
+test('Unfold opens every folder but the heavy ones, reading them; Fold closes them all', async ($, on) => {
+  const disk = {
+    ...DISK,
+    folders: {
+      ...DISK.folders,
+      [ROOT]: [...DISK.folders[ROOT]!, { name: 'node_modules', kind: 'dir' as const }],
+      [`${ROOT}/src`]: [{ name: 'main.ts', kind: 'file' as const }, { name: 'lib', kind: 'dir' as const }],
+      [`${ROOT}/src/lib`]: [{ name: 'deep.ts', kind: 'file' as const }],
+      [`${ROOT}/node_modules`]: [{ name: 'pkg', kind: 'dir' as const }],
+    },
+  }
+  fakeDisk(on, disk)
   await openPane($)
   const ui = await mount($)
-  await ui.press({ key: 'down' })
-  await ui.press({ key: 'in' })
+  expect(await ui.find({ type: 'Button', key: 'up' })).toBeUndefined()
+  await ui.press({ key: 'open-all' })
   expect(await nameRow(ui, 'main.ts')).toBeDefined()
-  await ui.press({ key: 'out' })
+  expect(await nameRow(ui, 'deep.ts')).toBeDefined()
+  expect(await nameRow(ui, 'node_modules/')).toBeDefined()
+  expect(await nameRow(ui, 'pkg/')).toBeUndefined()
+  await ui.press({ key: 'close-all' })
   expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+  expect(await nameRow(ui, 'src/')).toBeDefined()
 })
 
 test('copy path puts the row path from the project folder on the clipboard and says so', async ($, on) => {

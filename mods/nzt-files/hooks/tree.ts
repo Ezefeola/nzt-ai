@@ -192,6 +192,9 @@ export const treeWindow = (total: number, rows: number, top: number | null, chos
 /** Tab and the other control characters a `Text` refuses, made visible as spaces or `?`. */
 export const printable = (text: string) => text.replace(/\t/g, '  ').replace(/[\u0000-\u001f\u007f]/g, '?')
 
+/** Text of many lines the engine draws as written: tab and newline are its only control characters. */
+export const printableLines = (text: string) => text.replace(/\r/g, '').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '?')
+
 /** A text cut to `cells` cells, the cut marked with `…`. */
 export const fit = (text: string, cells: number) =>
   text.length <= cells ? text : `${text.slice(0, Math.max(0, cells - 1))}…`
@@ -215,6 +218,19 @@ export const contentOf = (text: string) => {
   }
   return { lines: kept, total: all.length }
 }
+
+/**
+ * The scroll bar's thumb in a track of `rows` rows: as long as the part shown is of the whole
+ * (`count` of `total`), and as far down as `first` is of the last top, `lastTop`.
+ */
+export const thumbOf = (rows: number, first: number, count: number, total: number, lastTop: number) => {
+  const size = Math.max(1, Math.min(rows, Math.round((rows * count) / Math.max(1, total))))
+  const from = lastTop <= 0 ? 0 : Math.round(((rows - size) * Math.min(first, lastTop)) / lastTop)
+  return { from, size }
+}
+
+/** The top a click on row `row` of a track of `rows` rows scrolls to. */
+export const topAtRow = (row: number, rows: number, lastTop: number) => Math.round((lastTop * row) / Math.max(1, rows - 1))
 
 /**
  * The lines a window of `rows` rows shows from line `top` at `columns` cells, a long line

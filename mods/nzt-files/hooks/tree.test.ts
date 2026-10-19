@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, treeWindow, withDeleted } from './tree'
+import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, thumbOf, topAtRow, treeWindow, withDeleted } from './tree'
 
 const status = (...entries: string[]) => [...entries, ''].join('\0')
 const file = (name: string) => ({ name, isDir: false, size: 0, mtimeMs: 0 })
@@ -97,6 +97,20 @@ describe('contentOf', () => {
   })
 })
 
+describe('thumbOf and topAtRow', () => {
+  test('the thumb is as long as the part shown and moves from the top to the bottom of the track', async () => {
+    expect(thumbOf(10, 0, 20, 100, 80)).toEqual({ from: 0, size: 2 })
+    expect(thumbOf(10, 40, 20, 100, 80)).toEqual({ from: 4, size: 2 })
+    expect(thumbOf(10, 80, 20, 100, 80)).toEqual({ from: 8, size: 2 })
+    expect(thumbOf(10, 0, 1, 5000, 4999)).toMatchObject({ size: 1 })
+  })
+
+  test('a click on the first row goes to the top and on the last to the end', async () => {
+    expect(topAtRow(0, 10, 80)).toBe(0)
+    expect(topAtRow(9, 10, 80)).toBe(80)
+  })
+})
+
 describe('textWindow', () => {
   const lines = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`)
 
@@ -111,5 +125,4 @@ describe('textWindow', () => {
   test('a long line takes the rows it wraps to', async () => {
     const wide = ['x'.repeat(100), 'short', 'short']
     expect(textWindow(wide, 0, 3, 40)).toMatchObject({ first: 0, count: 1 })
-  })
-})
+  })})

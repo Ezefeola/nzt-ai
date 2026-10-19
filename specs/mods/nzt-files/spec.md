@@ -90,18 +90,29 @@ Un clic en una carpeta la abre si estaba cerrada y la cierra si estaba abierta. 
 abiertas y el archivo elegido se recuerdan mientras dura la sesión, aunque se cierre y se
 vuelva a abrir el panel.
 
+### RN-files-plegar-todo · [add] · origin: usuario 2026-10-19 en la prueba en vivo ("un boton para compactar todas las carpetas o abrirlas todas"); las carpetas pesadas y el tope, propuesta del agente
+**⊞ Desplegar** (`d`), a la derecha de la búsqueda, abre todas las carpetas del proyecto y lee
+las que no se habían leído, salvo las pesadas (`node_modules`, `bin`, `obj`, `dist`, `target`),
+que quedan a la vista pero cerradas; abre hasta 500 carpetas. **⊟ Plegar** (`p`) cierra todas.
+
 ### RN-files-ocultos · origin: usuario 2026-10-14 (Q-02: "solo .git")
 El árbol oculta solo la carpeta `.git`. Todo lo demás se muestra, también lo que git ignora
 (`node_modules`, `bin`, `obj`, `dist`).
 
 ### RN-files-visor · origin: usuario 2026-10-14 ("abrir los files"); la forma, propuesta del agente
 Un clic en un archivo lo muestra abajo: arriba su ruta, su tamaño y su tipo; después el
-contenido con el número de cada línea. Si Claude Code sabe colorear ese tipo de archivo, el
+contenido con el número de cada línea, separado por una fila en blanco de las herramientas del
+archivo (Markdown, Ampliar, Copiar ruta, Abrir; usuario en la prueba en vivo, 2026-10-19). [modify] Si Claude Code sabe colorear ese tipo de archivo, el
 contenido se ve coloreado; si no, en texto plano.
 
 ### RN-files-scroll · origin: propuesta del agente (mismo manejo que `nzt-changes`)
 El contenido del archivo se recorre con la rueda del mouse y con teclas, y debajo dice en qué
 líneas está (`líneas 41–64 de 312`). El árbol se recorre con la rueda cuando no entra.
+
+### RN-files-barra · [add] · origin: usuario 2026-10-19 en la prueba en vivo ("no tiene barra de scroll cuando abro uno, deberia tenerla"); la forma, propuesta del agente
+Cuando el archivo no entra en el visor, a su derecha hay una barra de scroll: una guía tenue y
+un tramo resaltado tan largo como la parte que se ve y a la altura donde está. Un clic en una
+fila de la barra lleva el archivo a esa altura. Si el archivo entra entero, no hay barra.
 
 ### RN-files-binario · origin: propuesta del agente
 Si el archivo no es texto (una imagen, un `.dll`, un `.zip`), entonces el visor no muestra
@@ -162,10 +173,10 @@ Si una carpeta o un archivo no se puede leer (sin permiso, bloqueado por otro pr
 entonces lo dice en su fila o en el visor, y el resto del panel sigue funcionando.
 
 ### RN-files-teclas · [modify] · origin: propuesta del agente (lo que funcionó en `nzt-changes` 0.4.0); 0.2.0, propuesta del agente (Q-11)
-Las flechas, `j` y `k` recorren las filas del árbol; `l` abre la carpeta de la fila y `h` la
-cierra o sube a la carpeta que la contiene; Enter abre o cierra la carpeta, o muestra el
+Las flechas recorren las filas del árbol; Enter abre o cierra la carpeta, o muestra el
 archivo en el visor. El archivo se mueve con Mayús+↑ y Mayús+↓ de a una línea y con RePág y
-AvPág de a una página. `s` va a la búsqueda, `c` copia la ruta, `a` amplía, `m` marca o
+AvPág de a una página. `s` va a la búsqueda, `d` despliega y `p` pliega todas las carpetas
+(RN-files-plegar-todo; reemplazan a `j` `k` `h` `l`, que el usuario sacó en la prueba en vivo), `c` copia la ruta, `a` amplía, `m` marca o
 desmarca la casilla Markdown, `o` abre con la app. Escape, en este orden: vacía la búsqueda, sale de lo
 ampliado o cierra el panel.
 
@@ -235,6 +246,9 @@ mientras dura la sesión. Los demás archivos no tienen la casilla.
 En la vista dibujada, el archivo avanza y retrocede de a bloque (un título, un párrafo, una
 lista, una tabla, un bloque de código), nunca por la mitad de uno: una tabla o un bloque de
 código no se ve cortado por arriba. Debajo sigue diciendo qué líneas del archivo se ven.
+Un encabezado entre líneas `---` al principio del archivo (front matter) se ve como un bloque
+de código YAML: dibujado como Markdown sería una raya y un título *(propuesta del agente, al
+arreglar H-04 de la prueba en vivo)*.
 
 ### RN-files-markdown-grande · [add] · origin: propuesta del agente (Claude Code dibuja hasta 100.000 caracteres de una vez, tipos de `Markdown`)
 Si un solo bloque es más grande de lo que Claude Code dibuja de una vez, entonces ese archivo
@@ -244,6 +258,20 @@ se muestra como fuente y el visor dice por qué.
 Un botón **Ampliar** muestra el archivo en todo el panel, sin el árbol; **← Árbol**, o Escape,
 vuelve a como estaba, con las mismas carpetas abiertas y el mismo archivo elegido. Ampliado,
 el archivo se recorre igual que abajo.
+
+### RN-files-colores-cs · [add] · origin: usuario 2026-10-19 en la prueba en vivo ("que tengan como el color que tienen en visual studio"; H-06: solo C#)
+Un archivo `.cs` o `.csx` se ve con los colores del tema oscuro de Visual Studio: métodos
+amarillos, tipos verde agua, interfaces verde claro, variables celestes, propiedades y miembros
+claros, palabras clave azules, las de control (`if`, `return`, `throw`…) violetas, textos
+naranja, números verde pálido y comentarios verdes. Se reconocen por la forma del texto, sin
+compilar: un nombre seguido de `(` es un método, uno con mayúscula es un tipo, o un miembro si
+va después de un punto. Puede equivocarse donde Visual Studio no (una propiedad suelta se ve
+como tipo). Los demás lenguajes siguen con los colores de Claude Code.
+
+### RN-files-ajustar · [add] · origin: usuario 2026-10-19 en la prueba en vivo ("no quiero que se corte si es muy largo, que se vea lineas abajo pero si agrando la ventana que se vea bien")
+Una línea de código más ancha que el visor nunca se corta: sigue en las filas de abajo, debajo
+de los números de línea. Si el panel se agranda o se achica, las líneas se vuelven a partir con
+el ancho nuevo. **Ampliar** da más ancho para ver una línea en menos filas.
 
 ### RN-files-buscar · [add] · origin: usuario 2026-10-19 (funciones acordadas)
 Mientras se escribe en **Buscar**, el árbol muestra los archivos y carpetas cuya ruta desde el
@@ -372,7 +400,8 @@ elegida daba 4,15 y se aclaró (5,9). En el mod los colores los pone el tema; se
 **Teclado**: el orden de Tab sigue el del mockup: filas del árbol, contenido, `k` y `j`,
 Cerrar. Se revisó por el orden de los elementos, no recorriéndolo con teclado. El mockup
 mueve el contenido con las flechas como cualquier página; en el mod son `k`, `j`, RePág y
-AvPág (RN-files-teclas).
+AvPág (RN-files-teclas). *En vivo, `j` `k` `h` `l` se cambiaron por Desplegar y Plegar
+(RN-files-plegar-todo); el mockup no se redibujó.*
 
 ## Diseño 0.2.0 (unidad 279) · [add]
 
@@ -531,17 +560,30 @@ orden de los elementos, no recorrido con teclado.
       Unicode simple. Los puntos de código de Nerd Font no se probaron con la fuente.
     - **Los avisos breves** (ruta copiada, no se pudo abrir) no flotan: ocupan 3 segundos la
       fila de git. Un panel no dibuja una capa encima de otra.
-    - **`j` `k` `h` `l` son botones** (`↑ ↓ ← →` a la derecha de la búsqueda): un panel solo
-      toma una letra como tecla de un botón dibujado. Las flechas del teclado recorren el árbol
-      solo si el motor las manda al panel con el árbol entero a la vista: a probar en vivo.
+    - **`j` `k` `h` `l` eran botones** (`↑ ↓ ← →` a la derecha de la búsqueda): un panel solo
+      toma una letra como tecla de un botón dibujado. En la prueba en vivo el usuario los sacó y
+      en su lugar quedaron Desplegar y Plegar (RN-files-plegar-todo). Las flechas del teclado
+      recorren el árbol solo si el motor las manda al panel con el árbol entero a la vista: a
+      probar en vivo.
     - **`c` ya no cierra** (RN-files-teclas); Cerrar queda sin tecla, con Escape y el botón.
+- **Color del código** (prueba en vivo, 2026-10-19): el usuario lo vio con poco color. Los colores
+  los pone el resaltador de Claude Code con el tema elegido; el mod solo le pasa la ruta, y los
+  tipos dicen que el color en pantalla es del motor, nunca del mod (`CodeProps`, 2.1.303). El
+  resaltador de 2.1.303 conoce C# (`csharp`, alias `cs`), leído en el ejecutable; `/theme` con
+  Ctrl+T prende o apaga el resaltado. Que un tema de nzt-look pueda darle más colores no se
+  investigó. Los tipos nombran gramáticas aportadas por un plugin, pero ni la referencia de mods
+  ni el ejecutable dicen cómo se aportan: por eso C# lo colorea el mod (RN-files-colores-cs,
+  `csharp.ts`), con `Text` anidados en lugar de `Code`; lo partido sigue debajo del código y no
+  debajo de los números. La barra de scroll (RN-files-barra) también la dibuja el mod: los tipos
+  no traen una para paneles; cada fila es un `Button`. **Los colores son fijos del tema oscuro**: con un tema claro de Claude
+  Code se verían lavados (sin probar).
 
 ## Tests
 
-`claude plugin test mods/nzt-files`: **95 tests** en 0.2.0 (2026-10-19), todos pasan: 18 de la
-lógica del árbol (`tree.test.ts`), 30 de la lógica nueva (`logic.test.ts`: rama, líneas,
+`claude plugin test mods/nzt-files`: **106 tests** en 0.2.0 (2026-10-19), todos pasan: 20 de la
+lógica del árbol (`tree.test.ts`), 35 de la lógica nueva (con los colores de C#) (`logic.test.ts`: rama, líneas,
 conteos, operaciones de git, qué hace cada herramienta, comandos que solo leen, bloques de
-Markdown, búsqueda, rutas, edad y ajustes) y 47 del panel dibujado (`register.test.tsx`: lo de
+Markdown, búsqueda, rutas, edad y ajustes) y 51 del panel dibujado (con la barra de scroll) (`register.test.tsx`: lo de
 0.1.0, contexto cero, actividad y su fundido, seguir, git, Markdown, ampliar, búsqueda, teclas,
 copiar, abrir con la app, `@ruta`, columna, íconos y abrir al empezar). También pasan
 `claude plugin validate` y `tsc` con los tipos de 2.1.303.

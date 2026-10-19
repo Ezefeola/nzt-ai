@@ -9,13 +9,19 @@ const FENCE = /^\s{0,3}(`{3,}|~{3,})/
 export const isMarkdownFile = (path: string) => /\.(md|markdown|mdx)$/i.test(path)
 
 /**
- * A Markdown file's lines cut into the blocks it draws as: a fenced block whole, blank lines
- * within it included; a heading by itself; any other run of lines that are not blank, one
- * block. `from` and `to` are line indexes, `to` past the last.
+ * A Markdown file's lines cut into the blocks it draws as: a front matter between `---` lines
+ * at the top, as a YAML code block, since drawn as Markdown it turns into a rule and a heading;
+ * a fenced block whole, blank lines within it included; a heading by itself; any other run of
+ * lines that are not blank, one block. `from` and `to` are line indexes, `to` past the last.
  */
 export const blocksOf = (lines: string[]): Block[] => {
   const blocks: Block[] = []
   let i = 0
+  const close = lines[0]?.trimEnd() === '---' ? lines.findIndex((line, at) => at > 0 && line.trimEnd() === '---') : -1
+  if (close > 0) {
+    blocks.push({ from: 0, to: close + 1, text: ['```yaml', ...lines.slice(1, close), '```'].join('\n') })
+    i = close + 1
+  }
   while (i < lines.length) {
     const line = lines[i]!
     if (line.trim() === '') {

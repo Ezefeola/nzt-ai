@@ -10,6 +10,8 @@ import { iconOf } from './icons'
 import { isPictureFile, kindOf } from './kinds'
 import { blocksOf, blockWindow, hasHugeBlock, isMarkdownFile } from './markdown'
 import type { Block } from './markdown'
+import { CSHARP_COLORS, isCSharpFile, statesOf, tokensOf } from './csharp'
+import type { LineState } from './csharp'
 import { HEAVY, matchesOf, searchTreeOf } from './search'
 import type { Indexed } from './search'
 import { settingsOf } from './settings'
@@ -23,6 +25,9 @@ import {
   marksOf,
   nameOf,
   printable,
+  printableLines,
+  thumbOf,
+  topAtRow,
   relativeTo,
   rowsOf,
   textWindow,
@@ -33,8 +38,8 @@ import type { Row } from './tree'
 const PANE = 'nzt-files'
 const POLL_MS = 3000
 // The card's rows besides the tree and the file: its border, heading, search, rule, path,
-// detail, the file's tools, position line, git line and button.
-const CARD_ROWS = 11
+// detail, the file's tools, the blank row under them, position line, git line and button.
+const CARD_ROWS = 12
 const MIN_VIEW_ROWS = 3
 const TREE_ROWS = { inline: 7, dock: 15 } as const
 const DOCK_COLUMNS = 58
@@ -50,6 +55,8 @@ const DOUBLE_PRESS_MS = 450
 const SIZE_LIMIT_MS = 15_000
 // A project past this many entries is searched in what was walked so far.
 const INDEX_LIMIT = 50_000
+// Unfolding stops opening folders past this many, each one a read of the disk.
+const OPEN_ALL_LIMIT = 500
 // The accent of NZT's mods, the one nzt-state uses: a theme key, so it follows the theme.
 const ACCENT = 'claude'
 const CURRENT = 'cyan'
@@ -92,6 +99,8 @@ let t: Texts = TEXTS.es
 let settings: Settings = settingsOf({})
 let index: Indexed[] | undefined
 let indexing: Promise<Indexed[]> | undefined
+// Where each line of the shown C# file starts, worked out once per file and not on every drawing.
+let csharpStates: { lines: string[]; states: LineState[] } | undefined
 let lastPress: { path: string; at: number } | undefined
 // The row Claude's work brought into view, which the tree keeps in view until the person moves.
 let followed: string | null = null
@@ -253,6 +262,11 @@ function refresh($: EngineInterface): Promise<void> {
     running = undefined
   })
   return running
+}
+
+function csharpStatesOf(lines: string[]) {
+  if (csharpStates?.lines !== lines) csharpStates = { lines, states: statesOf(lines) }
+  return csharpStates.states
 }
 
 /** Every file and folder of the project the search looks at, walked once per search. */
@@ -501,6 +515,11 @@ async function scrollView($: EngineInterface, by: number) {
   })
 }
 
+/** Puts the file's window at `top`, within what the last drawing allowed. */
+async function scrollTo($: EngineInterface, top: number) {
+  await update($, explorer, value => ({ ...explorerOf(value), viewTop: Math.max(0, Math.min(top, layout.viewLastTop)) }))
+}
+
 /** Moves the row the keys act on by `by` rows of the tree, and the focus ring with it. */
 async function moveCursor($: EngineInterface, by: number) {
   const rows = layout.rows
@@ -513,34 +532,38 @@ async function moveCursor($: EngineInterface, by: number) {
   await $.ui.focus({ requestId: PANE, key: `n:${next}` }).catch(() => undefined)
 }
 
-/** `l`: opens the cursor's folder, or shows its file. */
-async function cursorIn($: EngineInterface) {
-  const now = explorerOf(await read($, explorer))
-  const path = now.cursor ?? now.selected
-  if (path === null) return moveCursor($, 0)
-  const parent = (await read($, listings))[folderOf(path)]
-  const entry = parent?.kind === 'ok' ? parent.entries.find(own => own.name === nameOf(path)) : undefined
-  if (entry?.isDir) {
-    if (!now.open.includes(path)) await toggle($, path)
-    return
+/**
+ * Opens every folder of the project but the heavy ones, reading the ones not read yet, up to
+ * OPEN_ALL_LIMIT folders so a huge project does not hold the pane.
+ */
+async function openAll($: EngineInterface) {
+  const files = await read($, marks)
+  const known = { ...(await read($, listings)) }
+  const open: string[] = []
+  const queue = ['']
+  while (queue.length > 0 && open.length < OPEN_ALL_LIMIT) {
+    const folder = queue.shift()!
+    if (folder !== '') open.push(folder)
+    known[folder] ??= await listFolder($, folder, files.kind === 'ok' ? files.files : {})
+    const listing = known[folder]!
+    if (listing.kind !== 'ok') continue
+    for (const entry of listing.entries) {
+      if (entry.isDir && !HEAVY.has(entry.name)) queue.push(folder === '' ? entry.name : `${folder}/${entry.name}`)
+    }
   }
-  lastPress = undefined
-  await choose($, path)
+  followed = null
+  await update($, listings, () => known)
+  await update($, explorer, value => ({ ...explorerOf(value), open, treeTop: null }))
 }
 
-/** `h`: closes the cursor's folder, or goes up to the folder that holds the cursor's row. */
-async function cursorOut($: EngineInterface) {
-  const now = explorerOf(await read($, explorer))
-  const path = now.cursor ?? now.selected
-  if (path === null) return
-  if (now.open.includes(path)) {
-    await toggle($, path)
-    return
-  }
-  const up = folderOf(path)
-  if (up === '') return
-  await update($, explorer, value => ({ ...explorerOf(value), cursor: up, treeTop: null }))
-  await $.ui.focus({ requestId: PANE, key: `n:${up}` }).catch(() => undefined)
+/** Closes every folder; the cursor goes back to the top-level row that held it. */
+async function closeAll($: EngineInterface) {
+  followed = null
+  await update($, explorer, value => {
+    const now = explorerOf(value)
+    const cursor = now.cursor === null ? null : now.cursor.split('/')[0]!
+    return { ...now, open: [], cursor, treeTop: 0 }
+  })
 }
 
 /** The row the file's tools act on: the cursor's, else the chosen file. */
@@ -843,6 +866,49 @@ export const register: Register = (on, options) => {
       <Text key={text} color={color} dimColor={color === undefined} wrap="wrap">{`  ${text}`}</Text>
     )
 
+    // The engine draws no scroll bar for a pane: a track with a thumb, each row a jump to that point.
+    const scrollBar = (at: { first: number; count: number; total: number; lastTop: number }) => {
+      const thumb = thumbOf(viewRows, at.first, at.count, at.total, at.lastTop)
+      return (
+        <Box key="bar" flexDirection="column" flexShrink={0} marginLeft={1} width={1}>
+          {Array.from({ length: viewRows }, (_, row) => {
+            const isThumb = row >= thumb.from && row < thumb.from + thumb.size
+            return (
+              <Button key={`bar:${row}`} plain label={t.scrollTo} onPress={() => scrollTo($, topAtRow(row, viewRows, at.lastTop))}>
+                <Text color={isThumb ? ACCENT : undefined} dimColor={!isThumb}>{isThumb ? '┃' : '│'}</Text>
+              </Button>
+            )
+          })}
+        </Box>
+      )
+    }
+
+    // C# the mod colors itself: a line's number, then its tokens, what does not fit wrapping under the code.
+    const csharpLines = (lines: string[], first: number, count: number) => {
+      const states = csharpStatesOf(lines)
+      const digits = String(lines.length).length
+      return lines.slice(first, first + count).map((line, at) => {
+        const number = first + at
+        const { tokens } = tokensOf(line.replace(/\r$/, '').replace(/\t/g, '    '), states[number] ?? 'code')
+        return (
+          <Box key={`l:${number}`} flexDirection="row">
+            <Text dimColor>{`${String(number + 1).padStart(digits)} `}</Text>
+            <Box flexShrink={1}>
+              <Text wrap="wrap">
+                {tokens.length === 0
+                  ? ' '
+                  : tokens.map((token, which) => (
+                      <Text key={String(which)} color={token.kind === 'plain' ? undefined : CSHARP_COLORS[token.kind]}>
+                        {printable(token.text)}
+                      </Text>
+                    ))}
+              </Text>
+            </Box>
+          </Box>
+        )
+      })
+    }
+
     const changed = Object.keys(files).length
     const branch = git.kind === 'ok' ? git.branch : undefined
     const heading = (
@@ -894,7 +960,7 @@ export const register: Register = (on, options) => {
     // The search, and the keys that walk the tree, which a pane only takes as Buttons.
     const search = now.expanded || Input === undefined ? null : (
       <Box flexDirection="row" justifyContent="space-between">
-        <Box flexDirection="row" flexShrink={1} overflow="hidden">
+        <Box flexDirection="row" gap={1} flexShrink={1} overflow="hidden">
           <Button key="find" plain hotkey="s" dimColor onPress={() => $.ui.focus({ requestId: PANE, key: 'search' }).then(() => undefined)}>
             ⌕
           </Button>
@@ -913,10 +979,8 @@ export const register: Register = (on, options) => {
           )}
         </Box>
         <Box flexDirection="row" gap={1} flexShrink={0}>
-          <Button key="up" plain hotkey="k" dimColor onPress={() => moveCursor($, -1)}>↑</Button>
-          <Button key="down" plain hotkey="j" dimColor onPress={() => moveCursor($, 1)}>↓</Button>
-          <Button key="out" plain hotkey="h" dimColor onPress={() => cursorOut($)}>←</Button>
-          <Button key="in" plain hotkey="l" dimColor onPress={() => cursorIn($)}>→</Button>
+          <Button key="open-all" plain hotkey="d" dimColor onPress={() => openAll($)}>{t.openAll}</Button>
+          <Button key="close-all" plain hotkey="p" dimColor onPress={() => closeAll($)}>{t.closeAll}</Button>
         </Box>
       </Box>
     )
@@ -1053,6 +1117,10 @@ export const register: Register = (on, options) => {
     let body: JSX.Element
     let position: string | null = null
     let isScrollable = false
+    // Where the file's window stands, for the scroll bar; null when nothing scrolls.
+    let bar: { first: number; count: number; total: number; lastTop: number } | null = null
+    // The scroll bar and the blank column before it.
+    const viewWidth = width - 2
     const isMarkdown = path !== null && isMarkdownFile(path)
     if (path === null) {
       body = message(t.pick)
@@ -1078,37 +1146,43 @@ export const register: Register = (on, options) => {
         const isHuge = blocks !== undefined && hasHugeBlock(blocks)
         if (lines.length === 0) body = message(t.empty)
         else if (isMarkdown && now.markdown && blocks !== undefined && !isHuge) {
-          const view = blockWindow(blocks, now.viewTop, viewRows, width)
+          const view = blockWindow(blocks, now.viewTop, viewRows, viewWidth)
           layout.viewLastTop = view.lastTop
           layout.viewPage = Math.max(1, view.count)
           const fits = view.first === 0 && view.count === blocks.length
           isScrollable = !fits
+          bar = { first: view.first, count: view.count, total: blocks.length, lastTop: view.lastTop }
           const from = blocks[view.first]!.from
           const to = blocks[view.first + view.count - 1]!.to
           position = fits ? t.allLines(opened.lines) : t.blockLines(from + 1, to, opened.lines)
           body = (
             <Box height={viewRows} overflow="hidden">
-              <Markdown key="drawn" text={printable(blocks.slice(view.first, view.first + view.count).map(block => block.text).join('\n\n'))} />
+              <Markdown key="drawn" text={printableLines(blocks.slice(view.first, view.first + view.count).map(block => block.text).join('\n\n'))} />
             </Box>
           )
         } else {
           const hint = isMarkdown && now.markdown && isHuge
-          const view = textWindow(lines, now.viewTop, viewRows - (hint ? 1 : 0), width)
+          const view = textWindow(lines, now.viewTop, viewRows - (hint ? 1 : 0), viewWidth)
           layout.viewLastTop = view.lastTop
           const fits = view.count === view.total
           isScrollable = !fits
+          bar = { first: view.first, count: view.count, total: view.total, lastTop: view.lastTop }
           position = fits
             ? t.allLines(view.total)
             : t.lines(view.first + 1, view.first + view.count, view.total, opened.shown < opened.lines)
           body = (
             <Box flexDirection="column" height={viewRows} overflow="hidden">
               {hint ? <Text color="yellow" wrap="truncate-end">{t.markdownHuge}</Text> : null}
-              <Code
-                key="file"
-                source={lines.slice(view.first, view.first + view.count).join('\n')}
-                path={path}
-                startLine={view.first + 1}
-              />
+              {isCSharpFile(path) ? (
+                csharpLines(lines, view.first, view.count)
+              ) : (
+                <Code
+                  key="file"
+                  source={lines.slice(view.first, view.first + view.count).join('\n')}
+                  path={path}
+                  startLine={view.first + 1}
+                />
+              )}
             </Box>
           )
         }
@@ -1188,8 +1262,11 @@ export const register: Register = (on, options) => {
       <Text key="path" bold color={CURRENT} wrap="truncate-start">{path === null ? ' ' : printable(path)}</Text>,
       detail ?? <Text key="detail"> </Text>,
       tools ?? <Text key="tools"> </Text>,
-      <Box key="body" flexDirection="column" flexGrow={1} flexShrink={1} overflow="hidden">
-        {body}
+      <Box key="body" flexDirection="row" marginTop={1} flexGrow={1} flexShrink={1} overflow="hidden">
+        <Box flexDirection="column" flexGrow={1} flexShrink={1} overflow="hidden">
+          {body}
+        </Box>
+        {isScrollable && bar !== null && scrollBar(bar)}
       </Box>,
       <Box key="position" flexDirection="row" justifyContent="space-between">
         <Text dimColor wrap="truncate-end">{position ?? ' '}</Text>
