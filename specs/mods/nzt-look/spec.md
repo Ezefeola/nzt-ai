@@ -1,23 +1,23 @@
 # Mod · nzt-look — temas, banda de uso y conversación redibujada
 
-> Estado: **especificada** en la unidad 216 (2026-10-17), propuestas confirmadas por el usuario
-> ese día; tema `nzt` en la 222 y diseño técnico en la 223 (2026-10-18); **0.1.0 construido** en
-> las unidades 227 a 239 (2026-10-18), código en `mods/nzt-look/`, sin probar en vivo ni aceptar ·
-> **Cambio 0.2.0 (unidades 241 y 242, 2026-10-18; código ✓, sin probar en vivo): modelo y effort en la banda**, pedido del usuario: *"ver
-> además de los datos del context, limite semanal y diario el modelo que esta corriendo actualmente
-> y su effort"*; marcas `[add]` y `[modify]` hasta aceptarlo · **Cambio de textos (unidad 244, 2026-10-18):
-> el mod no cambia los textos de Claude Code**, pedido del usuario: *"me gusta el cambio de estilo
-> digamos pero no me gusta que se le cambien sus textos"*; marcas hasta aceptarlo ·
-> **Ajustes de la prueba en vivo (unidad 247, 2026-10-18, Q-11):** spinner con las cifras de Claude
-> Code, pie de Claude Code, viñeta, tablas anchas, filas y diffs legibles; marcas hasta aceptarlo ·
-> **NZT oscuro más apagado y código legible (unidad 253, 2026-10-18, Q-03 de la marca)**, pedido del
-> usuario: *"esta como super brillante"*, *"se ve muy blanco el texto"* en el código; marcas hasta
-> aceptarlo ·
-> **Cambio 0.4.0 (unidades 263 y 264, 2026-10-18):** la banda vuelve a una línea, con los rótulos a la
-> izquierda de cada medidor, sin la palabra del tramo y con naranja desde el 30 ·
-> **Cambio 0.3.0 (unidades 256 a 262, 2026-10-18), después de la prueba en vivo:** banda en dos
-> filas con rótulos y el modelo primero (reemplazada por 0.4.0), fila de una skill (BUG-001), filas que se pliegan tocándolas
-> y temas que no cansen la vista; marcas hasta aceptarlo ·
+> Estado: **aceptada por el usuario el 2026-10-19 con nzt-look 0.5.0**: *"así como está
+> funcionando va perfecto"*; marcas barridas en el cierre (unidad 272). Queda **una** marca `[add]`,
+> la de la fila de una skill en RN-skin-textos-claude: BUG-001 sigue *fixed, pending verification*
+> porque nadie miró esa fila en vivo · Cómo llegó acá: **especificada** en la unidad 216
+> (2026-10-17); tema `nzt` en la 222 y diseño técnico en la 223; **0.1.0** en las 227 a 239
+> (2026-10-18), código en `mods/nzt-look/` · **0.2.0** (241 y 242): modelo y effort en la banda,
+> pedido del usuario: *"ver además de los datos del context, limite semanal y diario el modelo que
+> esta corriendo actualmente y su effort"* · **Textos (244):** el mod no cambia los textos de Claude
+> Code: *"me gusta el cambio de estilo digamos pero no me gusta que se le cambien sus textos"* ·
+> **Ajustes de la prueba en vivo (247, Q-11):** spinner con las cifras de Claude Code, pie de
+> Claude Code, viñeta, tablas anchas, filas y diffs legibles · **NZT oscuro más apagado y código
+> legible (253, Q-03 de la marca):** *"esta como super brillante"*, *"se ve muy blanco el texto"* ·
+> **0.3.0 (256 a 262):** banda en dos filas con rótulos y el modelo primero (reemplazada por 0.4.0),
+> fila de una skill (BUG-001), filas que se pliegan tocándolas y temas que no cansen la vista ·
+> **0.4.0 (263 y 264):** la banda vuelve a una línea, con los rótulos a la izquierda de cada
+> medidor, sin la palabra del tramo y con naranja desde el 30 · **0.5.0 (269 y 270, 2026-10-19):**
+> el look sigue tras `/clear` (*"cuando limpio contexto se pierde el look elegido"*) y botón que
+> lleva NZT oscuro y claro a `/theme` ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
@@ -49,7 +49,7 @@ siguen estando, como en `nzt-context`.
   prompt, el spinner propio y los textos de Claude Code también lleven la marca.
 - **La banda de uso** sobre el prompt, con sus partes prendidas o apagadas una por una: contexto con
   las marcas 20/30/40, límite de 5 horas, límite semanal, costo de la sesión, **modelo y effort de
-  la sesión** [add] y botón para limpiar la sesión (`/clear`).
+  la sesión** y botón para limpiar la sesión (`/clear`).
 - **El panel de opciones** (`/nzt-look`): elegir tema con vista previa, prender y apagar partes,
   repintar un color.
 - **La conversación redibujada:** filas de herramientas, diff de las ediciones, consola, tablas,
@@ -89,7 +89,7 @@ siguen estando, como en `nzt-context`.
 Al instalarlo, el tema del mod es `nzt` en la variante que corresponde al tema de Claude Code. Se
 cambia con `/nzt-look <tema>` o en el panel, y la elección se recuerda entre sesiones.
 
-#### RN-skin-tras-clear · origin: usuario 2026-10-19 ("cuando limpio contexto se pierde el look elegido") · [add]
+#### RN-skin-tras-clear · origin: usuario 2026-10-19 ("cuando limpio contexto se pierde el look elegido")
 Después de `/clear`, `/resume` o `/branch` el look sigue siendo el elegido: tema, variante, partes,
 banda, temas propios y el tema fijado a la carpeta. Claude Code sigue el proceso con otra sesión
 sin avisarle al mod, así que el mod vuelve a leer lo guardado cuando ve que la sesión cambió.
@@ -103,7 +103,7 @@ El tema `nzt` usa la paleta y los roles de `specs/nzt-brand.md`, y ese documento
 Los colores de error y aviso y la variante clara salen de sus preguntas Q-01 y Q-02 (cerradas en
 la 222). Qué rol toma cada color está en *Diseño · tema nzt*.
 
-#### RN-skin-tema-claude · origin: spike S-01, S-02 y S-04b (unidad 219); usuario 2026-10-19 (opción 1) · [modify]
+#### RN-skin-tema-claude · origin: spike S-01, S-02 y S-04b (unidad 219); usuario 2026-10-19 (opción 1)
 NZT oscuro y NZT claro llegan a `/theme` de Claude Code con la paleta de `nzt`. El mod no puede
 elegir el tema de Claude Code (observado con 2.1.303: la opción `theme` solo acepta sus 7 temas),
 así que el panel tiene un botón que copia los dos a la carpeta de temas de la persona
@@ -114,7 +114,7 @@ Claude Code solo cambia la variante (RN-skin-variante). Elegir un tema del mod n
 Claude Code. El borde del prompt y el spinner de Claude Code solo llevan la marca con NZT oscuro
 o claro elegido en `/theme`.
 
-#### RN-skin-no-cansa · origin: usuario 2026-10-18 ("que los colores no sean dañinos a la vista, no muy brillosos") · [add]
+#### RN-skin-no-cansa · origin: usuario 2026-10-18 ("que los colores no sean dañinos a la vista, no muy brillosos")
 Ninguna paleta oscura escribe texto más brillante que el texto de alto énfasis de Material, ni un
 color tan saturado que vibre sobre el fondo. Los cortes y lo que cambió están en *Temas que no
 cansan la vista*.
@@ -139,12 +139,12 @@ RN-skin-al-agente).
 
 ### Banda de uso
 
-#### RN-skin-banda-partes · origin: usuario 2026-10-17 ("banda de uso configurable"); modelo, usuario 2026-10-18 · [modify]
+#### RN-skin-banda-partes · origin: usuario 2026-10-17 ("banda de uso configurable"); modelo, usuario 2026-10-18
 La banda tiene seis partes, y cada una se prende o se apaga sola: **contexto**, **límite de 5
 horas**, **límite semanal**, **costo**, **modelo** y **botón limpiar**. Por defecto están todas
 prendidas. Con todas apagadas, la banda no se dibuja.
 
-#### RN-skin-modelo · origin: usuario 2026-10-18 ("el modelo que esta corriendo actualmente y su effort") · [add]
+#### RN-skin-modelo · origin: usuario 2026-10-18 ("el modelo que esta corriendo actualmente y su effort")
 La parte modelo muestra el modelo con el que corre la sesión y, al lado, su effort: `Opus 5.5 ·
 high`. Es el de la conversación principal, no el de un subagente.
 - **El effort se conoce recién con el primer pedido al modelo** de la sesión: antes, la parte
@@ -158,7 +158,7 @@ high`. Es el de la conversación principal, no el de un subagente.
 - **Si el modelo no se puede leer, la parte no se dibuja** y el resto de la banda sigue
   (RN-skin-no-interrumpe).
 
-#### RN-skin-banda-rotulos · origin: usuario 2026-10-18 ("modelo y effort deben estar al inicio"; después de verlo en dos filas: "debe ir todo en una sola linea y quedar legible") · [add]
+#### RN-skin-banda-rotulos · origin: usuario 2026-10-18 ("modelo y effort deben estar al inicio"; después de verlo en dos filas: "debe ir todo en una sola linea y quedar legible")
 La banda es una sola línea. El orden es modelo, contexto, límite de 5 horas, límite semanal, costo y,
 contra el borde derecho, el botón limpiar. Cada parte lleva su rótulo **a la izquierda** de su
 medidor: `Contexto`, `Límite 5h`, `Límite semanal`, `Costo` (en inglés `Context`, `5h limit`,
@@ -176,7 +176,7 @@ medidor: `Contexto`, `Límite 5h`, `Límite semanal`, `Costo` (en inglés `Conte
 #### RN-skin-marcas-kernel · origin: kernel (Context), RN-ctx-tramos y RN-ctx-marcas de `nzt-context`
 El contexto se muestra de 0 a 100% con las marcas 20, 30 y 40 a la vista, y su color cambia en esos
 cortes: neutro por debajo del 20%, amarillo (aviso) desde el 20%, naranja desde el 30% y rojo
-(error) desde el 40% [modify] (usuario 2026-10-18). El naranja es la mitad entre el aviso y el error
+(error) desde el 40% (usuario 2026-10-18). El naranja es la mitad entre el aviso y el error
 del tema, porque los temas no traen uno (*propuesta del agente*). Los cortes son los del kernel y no se configuran.
 
 #### RN-skin-limites · origin: investigado 2026-10-17 (`$.session.usage()`)
@@ -206,10 +206,10 @@ La banda se actualiza cada vez que la sesión tiene una cifra nueva, en el mismo
 animaciones de `nzt-context` se mantienen —la cifra que avanza, el destello durante el turno, la
 marca que titila al cruzarla, el latido pasado el 40%— y se apagan con el modo calmo.
 
-#### RN-skin-banda-ancho · origin: RN-ctx-ancho de `nzt-context`; modelo, propuesta del agente 2026-10-18 · [modify]
+#### RN-skin-banda-ancho · origin: RN-ctx-ancho de `nzt-context`; modelo, propuesta del agente 2026-10-18
 Si la banda no entra en el ancho, se sacan partes en este orden: los tokens del contexto, las
 cuentas regresivas, costo, effort, modelo, límite semanal, límite de 5 horas, botón limpiar y, al
-final, los rótulos [modify]. El contexto con sus marcas y su `%` queda siempre. En una línea, a 120
+final, los rótulos. El contexto con sus marcas y su `%` queda siempre. En una línea, a 120
 columnas se van tokens, cuentas regresivas y costo, y queda el modelo (medido 2026-10-18; la línea
 entera pide unas 145). *Que las cuentas regresivas se vayan antes que el costo es propuesta del
 agente.*
@@ -239,7 +239,7 @@ prompt, plegado. Lo que dibuja cada una, por superficie, es la tabla *Qué se re
 #### RN-skin-solo-dibujo · origin: alcance del usuario 2026-10-17
 El mod cambia solo cómo se ve. La conversación guardada y lo que lee el modelo quedan iguales.
 
-#### RN-skin-textos-claude · origin: usuario 2026-10-18 (Q-10) · [add]
+#### RN-skin-textos-claude · origin: usuario 2026-10-18 (Q-10)
 El mod cambia el estilo, no los textos que escribe Claude Code. Donde Claude Code pone una palabra,
 el mod pone la misma:
 - **la fila de una herramienta** lleva el nombre de la herramienta como Claude Code se lo da al mod
@@ -257,7 +257,7 @@ cantidad de herramientas y de líneas del pie, `▾ N más`, `Copiar`— sigue e
 (RN-skin-idioma). Si Claude Code no le da al mod su texto, el mod no inventa uno parecido: usa el
 nombre que sí recibe (Q-10).
 
-#### RN-skin-spinner-cifras · origin: usuario 2026-10-18 (Q-11) · [add]
+#### RN-skin-spinner-cifras · origin: usuario 2026-10-18 (Q-11)
 El spinner del mod muestra lo mismo que el de Claude Code: la palabra, el tiempo que lleva el turno,
 los tokens que generó y el effort, en el orden y la forma en que Claude Code los muestra. El estilo
 (el cuadro braille y la banda de luz) es del mod.
@@ -268,31 +268,31 @@ los tokens que generó y el effort, en el orden y la forma en que Claude Code lo
 - **Mientras Claude Code muestra un mensaje propio** en lugar de la palabra, el spinner queda como lo
   dibuja Claude Code.
 
-#### RN-skin-pie-claude · origin: usuario 2026-10-18 (Q-11) · [add]
+#### RN-skin-pie-claude · origin: usuario 2026-10-18 (Q-11)
 El pie del turno es la línea de Claude Code tal cual, y a continuación lo que suma el mod: `· 6
 herramientas · +18 −3`.
 
-#### RN-skin-vineta · origin: usuario 2026-10-18 (Q-11) · [add]
+#### RN-skin-vineta · origin: usuario 2026-10-18 (Q-11)
 Una respuesta que el mod redibuja empieza con la viñeta `●` de Claude Code, igual que una que no
 redibuja.
 
-#### RN-skin-tabla-ancha · origin: usuario 2026-10-18 (Q-11) · [add]
+#### RN-skin-tabla-ancha · origin: usuario 2026-10-18 (Q-11)
 Una tabla más ancha que la terminal la dibuja igual el mod: las columnas se achican y el texto de
 las celdas baja de línea dentro de su celda, sin cortar palabras salvo que una sola no entre. Solo si
 ni así entra (cada columna con menos de 6 columnas de ancho), queda el dibujo de Claude Code. *El
 mínimo de 6 es propuesta del agente.*
 
-#### RN-skin-filas-legibles · origin: usuario 2026-10-18 (Q-11) · [add]
+#### RN-skin-filas-legibles · origin: usuario 2026-10-18 (Q-11)
 En una fila de herramienta se lee primero el nombre y después lo demás: el nombre va en el color de
 su tipo y en negrita, y el comando o la ruta en el tono tenue del tema. Un archivo creado sigue en
 *bien* y uno editado en *aviso*.
 
-#### RN-skin-plegar-tocando · origin: usuario 2026-10-18 ("donde dice Edit, o Bash que clickeando ahi se pliegue o despliegue directo") · [add]
+#### RN-skin-plegar-tocando · origin: usuario 2026-10-18 ("donde dice Edit, o Bash que clickeando ahi se pliegue o despliegue directo")
 Una fila de herramienta, y la de lecturas agrupadas, se abre y se cierra tocándola en cualquier
 parte de su texto (el nombre, el objetivo), no solo en `▸`. `▸` sigue estando y hace lo mismo. Una
 fila que no tiene nada para abrir no reacciona.
 
-#### RN-skin-diff-legible · origin: usuario 2026-10-18 (Q-11, "visualizar lo que cambio de forma legible como leer code") · [add]
+#### RN-skin-diff-legible · origin: usuario 2026-10-18 (Q-11, "visualizar lo que cambio de forma legible como leer code")
 Una edición se ve como código: en la terminal y en el escritorio, una tarjeta con la ruta, `+N −M`,
 las líneas numeradas, `+` y `−` en *bien* y *error* con su fondo, y el resaltado del lenguaje del
 archivo (el de RN-skin-partes, código). Un lenguaje que el resaltado no conoce se ve sin resaltar,
@@ -311,7 +311,7 @@ lectura y muestra los fallos siempre enteros. Al apagarlo vuelve lo que la perso
 Cada tarjeta tiene un botón de copiar, y `/nzt-look copy` copia la última respuesta del agente
 (`copy code`, su último bloque de código).
 
-#### RN-skin-palabras · origin: alcance del usuario 2026-10-17; por defecto, usuario 2026-10-18 (Q-10) · [modify]
+#### RN-skin-palabras · origin: alcance del usuario 2026-10-17; por defecto, usuario 2026-10-18 (Q-10)
 El spinner y el pie del turno dicen la palabra de Claude Code. Las palabras del tema son una opción
 que la persona prende en el panel; por defecto está apagada.
 
@@ -333,17 +333,17 @@ convive con la referencia si la persona también lo tiene instalado.
 
 | Parte | App de escritorio | Terminal |
 |---|---|---|
-| Filas de herramientas | ícono por tipo, spinner mientras corre, líneas cambiadas, tiempo; `▸` abre la entrada y la respuesta, y también tocar la fila (RN-skin-plegar-tocando) [modify]; un fallo se abre solo | un nodo en el riel del turno, con el mismo `▸` y la fila tocable [modify] |
-| Ediciones | tarjeta de diff con `+N −M`, líneas numeradas y resaltado [modify] | la misma tarjeta, en celdas (RN-skin-diff-legible) [modify] |
+| Filas de herramientas | ícono por tipo, spinner mientras corre, líneas cambiadas, tiempo; `▸` abre la entrada y la respuesta, y también tocar la fila (RN-skin-plegar-tocando); un fallo se abre solo | un nodo en el riel del turno, con el mismo `▸` y la fila tocable |
+| Ediciones | tarjeta de diff con `+N −M`, líneas numeradas y resaltado | la misma tarjeta, en celdas (RN-skin-diff-legible) |
 | Consola | tarjeta con estado, stderr aparte, salida larga plegada, rutas, números y palabras de error, aviso y éxito en color | tarjeta con el comando, la salida en color, `✓` o `✗ exit N`, stderr en rojo, cada flujo plegado a 8 + 4 líneas |
 | Salida de solo lectura (apagada por defecto) | lecturas y búsquedas en una fila; un fallo deja su línea de error | igual |
-| Tablas | tarjeta con encabezado y filas alternadas | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) [modify] |
+| Tablas | tarjeta con encabezado y filas alternadas | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) |
 | Diagramas | bloques Mermaid como tarjeta (los 17 tipos de la referencia) | los mismos, en celdas |
 | Fórmulas | tarjeta tipográfica; `$…$` en línea como Unicode | fracciones y límites apilados |
 | Salida de comandos | `/cost`, `/context` y salida de plugins: tablas, código y pares `clave: valor` como tarjetas | como grillas |
 | Avisos y tareas | `> [!NOTE]` como caja con título; `- [ ]` con tildes y conteo | igual |
 | Código | tarjeta con lenguaje, números de línea y resaltado; los bloques de shell conservan el botón Run | enmarcado, con el lenguaje en el marco y resaltado en los colores del tema |
-| Spinner | ícono animado por fase | la palabra de Claude Code con una banda de luz, el tiempo, los tokens y el effort (RN-skin-spinner-cifras) [modify] |
+| Spinner | ícono animado por fase | la palabra de Claude Code con una banda de luz, el tiempo, los tokens y el effort (RN-skin-spinner-cifras) |
 | Sobre el prompt | la banda de uso | la banda de uso |
 | Prompt del usuario | el de Claude Code (copiar, rebobinar y seleccionar siguen) | contorno redondeado, o una marca al inicio |
 | Enlaces y archivos | los enlaces de la app; archivos creados en el turno en color *bien* y editados en *aviso* | enlaces clickeables donde la terminal los dibuja; rutas con `:línea`, números y versiones en color |
@@ -364,7 +364,7 @@ deja elegir. Referencia: la referencia, leída en su código (`rows.tsx`, `svg-u
 sesión si quiere. **Acción principal: `/clear`**, y solo desde la marca 20. Antes de eso la banda
 solo informa y el botón va tenue.
 
-**Una línea (cambio 0.4.0, RN-skin-banda-rotulos) [modify]:** cada rótulo a la izquierda de su
+**Una línea (cambio 0.4.0, RN-skin-banda-rotulos):** cada rótulo a la izquierda de su
 medidor, sin la palabra del tramo, naranja desde el 30; mockup `mockup-banda.html`, 96 combinaciones
 medidas el 2026-10-18 sin scroll ni banda cortada (a 120 columnas: modelo, contexto, 5h, semanal y
 botón; en escritorio a 1000 px entra todo). Lo que sigue, de 0.3.0, queda como historia.
@@ -400,7 +400,7 @@ botón contra el borde derecho:
    (`41% 5h · 2h15`). En aviso desde el 80% y en error desde el 95%: los cortes de la referencia para
    los límites; los del kernel son solo para el contexto.
 3. **Costo** (RN-skin-costo), `$1.84`, tenue.
-4. **Modelo** (RN-skin-modelo) [add]: `◇ Opus 5.5 · high`. El nombre corto del modelo, no su id
+4. **Modelo** (RN-skin-modelo): `◇ Opus 5.5 · high`. El nombre corto del modelo, no su id
    (`claude-opus-5-5` se lee `Opus 5.5`; un nombre que no sigue esa forma va tal cual), en el texto
    del tema; `· high` tenue, con la palabra del effort como la nombra Claude Code (`low`, `medium`,
    `high`, `xhigh`, `max`). Sin effort, solo `◇ Opus 5.5`. El `◇` en el acento. Igual en los dos
@@ -413,18 +413,18 @@ botón contra el borde derecho:
 **Colores**, del tema activo: bajo el 20%, el acento del tema; después aviso, error y error en
 negrita. Así cambia el color en los 16 temas sin una paleta aparte.
 
-**Angosta** (RN-skin-banda-ancho): se sacan, en orden, los tokens, el costo, el effort, el modelo
-[modify], el semanal, el de 5 h y el botón. Si ni así entra, se va la palabra del tramo (desde 0.3.0
-el rótulo `Contexto` no ocupa ancho propio: está sobre las celdas) [modify]. Sin lectura, a lo más
+**Angosta** (RN-skin-banda-ancho): se sacan, en orden, los tokens, el costo, el effort, el modelo,
+el semanal, el de 5 h y el botón. Si ni así entra, se va la palabra del tramo (desde 0.3.0
+el rótulo `Contexto` no ocupa ancho propio: está sobre las celdas). Sin lectura, a lo más
 angosto, `sin lectura todavía` pasa a `sin lectura`. Siempre
 quedan las celdas, las marcas y el porcentaje, que dicen el tramo sin color. *Sacar los tokens antes
 que las partes es propuesta del agente, como RN-ctx-ancho de `nzt-context`.*
 
 **Estados** (todos en el mockup): bajo el 20%; desde el 20, el 30 y el 40; Claude trabajando
 (destello en el relleno, sin botón); confirmar limpiar; cruza una marca (titila tres veces); límites casi llenos; sin
-lectura todavía (riel gris, marcas apagadas, `sin lectura todavía`, sin botón, con el modelo
-[add]; también cuando una parte falla, RN-skin-no-interrumpe); cuenta sin límites (solo contexto,
-costo, modelo y botón); modelo sin effort (`◇ Opus 5.5`) [add]; partes
+lectura todavía (riel gris, marcas apagadas, `sin lectura todavía`, sin botón, con el modelo;
+también cuando una parte falla, RN-skin-no-interrumpe); cuenta sin límites (solo contexto,
+costo, modelo y botón); modelo sin effort (`◇ Opus 5.5`); partes
 apagadas; todas apagadas (no se dibuja); angosta; encuesta sobre el prompt (no se dibuja); modo calmo
 (lo mismo, quieto).
 - *Cargando* es *sin lectura todavía*. Después de limpiar, la sesión no tiene cifras: *sin lectura
@@ -451,11 +451,10 @@ fija en el README.*
 4. **Vista previa**: un turno dibujado con el tema elegido (prompt, comando, edición, lecturas
    agrupadas, tabla, pie) y la banda debajo. *La referencia no muestra la banda en la vista previa;
    sumarla es propuesta.*
-5. **Banda**: contexto, 5h, semanal, costo, modelo [add], limpiar y **línea al agente**
+5. **Banda**: contexto, 5h, semanal, costo, modelo, limpiar y **línea al agente**
    (RN-skin-banda-partes, RN-skin-al-agente).
 6. **Conversación**: una parte por regla de RN-skin-partes, más solo lectura plegada (apagada por
    defecto), desplegar lecturas (apagada), copiar, calmo (RN-skin-calmo) y **palabras**, un selector `claude · mod` como el de la variante, en `claude` por defecto
-   (RN-skin-palabras) [modify]
    (RN-skin-palabras).
 7. **Colores**: los 11 colores del tema con su muestra. Al elegir uno aparecen su valor, un campo
    `#rrggbb` y `pintar`. Si el color no es válido, lo dice en error y no cambia nada; si es válido,
@@ -482,13 +481,13 @@ elementos del mockup, no recorrido con teclado.*
   el semanal: son 5 segundos.
 - El panel mide lo mismo en sus 8 estados de tarjeta, a todos los anchos (802 px).
 - A 120 columnas entra la banda entera bajo el 20%; desde el 20% se van solo los tokens.
-- **Con el modelo (cambio 0.2.0, medido 2026-10-18)** [add]: 96 combinaciones (16 estados de la
+- **Con el modelo (cambio 0.2.0, medido 2026-10-18)**: 96 combinaciones (16 estados de la
   banda × terminal y escritorio × 320, 1000 y 1200 px), ninguna con scroll ni banda cortada. A 120
   columnas bajo el 20% entra todo menos los tokens, con `◇ Opus 5.5 · high`; **desde el 20% se van
   los tokens, el costo y el effort** y queda `◇ Opus 5.5`; confirmando limpiar se va también el
   modelo y el semanal. En escritorio entra todo a 1000 px. A 320 px quedan celdas, marcas y
   porcentaje, como antes.
-- **Con dos filas (cambio 0.3.0, medido 2026-10-18)** [add]: las mismas 96 combinaciones, ninguna
+- **Con dos filas (cambio 0.3.0, medido 2026-10-18)**: las mismas 96 combinaciones, ninguna
   con scroll ni banda cortada. La banda ocupa 2 filas en la terminal y 52 px en el escritorio. **A 120
   columnas entra todo en todos los tramos**, tokens y effort incluidos: la palabra del tramo y la
   cuenta regresiva ya no suman ancho a la fila de los medidores. Confirmando limpiar se van tokens,
@@ -528,31 +527,31 @@ acción principal**; lo que se aprieta es secundario: `▸` abre una fila, `▾ 
 2. **Filas de herramientas**:
    - en la terminal, un nodo por herramienta en un riel `┃` del acento. El glifo del nodo dice el
      estado por la forma: `○` corriendo, `●` bien, `✕` falló, `◌` cortado. Después van el nombre
-     de la herramienta como lo da Claude Code (RN-skin-textos-claude) [modify],
-     el objetivo en el tono tenue (RN-skin-filas-legibles) [modify] y, a la derecha, `+N −M` y el
+     de la herramienta como lo da Claude Code (RN-skin-textos-claude),
+     el objetivo en el tono tenue (RN-skin-filas-legibles) y, a la derecha, `+N −M` y el
      tiempo. Un archivo editado en el turno va en *aviso*
      y uno creado, en *bien*. Las lecturas y búsquedas seguidas se juntan en una fila
-     `Read 2 · Grep 1 ▸` [modify];
+     `Read 2 · Grep 1 ▸`;
    - en el escritorio, un ícono por tipo en lugar del nodo, y `▸` abre la entrada y la respuesta.
-3. **Diff** (RN-skin-diff-legible) [modify]: en la terminal y en el escritorio, tarjeta con la ruta,
+3. **Diff** (RN-skin-diff-legible): en la terminal y en el escritorio, tarjeta con la ruta,
    `+N −M` y las líneas numeradas, con fondo de agregado y de borrado y el resaltado del lenguaje.
 4. **Consola**: tarjeta con `$ comando`, `✓` o `✗ exit N`, la salida coloreada (palabras de bien,
    error y aviso, y números) y stderr aparte, en error. Si no hay salida, lo dice.
 5. **Tablas**:
    - en la terminal, una grilla con banda de encabezado y filas alternadas en *cebra*; más ancha que
-     la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) [modify];
+     la terminal, las celdas bajan de línea (RN-skin-tabla-ancha);
    - en el escritorio, una tarjeta.
 6. **Código**: marco con el lenguaje en el borde y resaltado en los colores del tema; en el escritorio,
    con números de línea.
 7. **Spinner** (RN-skin-palabras, RN-skin-spinner-cifras): el cuadro braille y la palabra de Claude
    Code con una banda de luz que la recorre, y después el tiempo, los tokens y el effort como los
-   muestra Claude Code [modify].
+   muestra Claude Code.
 8. **Pie** (RN-skin-pie-claude): la línea de Claude Code tal cual y lo que suma el mod: `<línea de
-   Claude Code> · 6 herramientas · +18 −3` [modify].
-9. **Respuesta**: empieza con la viñeta `●` (RN-skin-vineta) [add].
+   Claude Code> · 6 herramientas · +18 −3`.
+9. **Respuesta**: empieza con la viñeta `●` (RN-skin-vineta).
 
 **Estados** (todos en el mockup): turno terminado; Claude trabajando; un comando falló (nodo `✕`,
-tarjeta entera, sin plegar); turno cortado (`◌` y `Interrupted`) [modify]; salida y código largos, plegados (consola 8 + 4,
+tarjeta entera, sin plegar); turno cortado (`◌` y `Interrupted`); salida y código largos, plegados (consola 8 + 4,
 código 24, tablas 14); plegado abierto; comando sin salida; cae al dibujo de Claude Code (un lenguaje
 que el resaltado no conoce, o una parte que falla: RN-skin-cae-al-original); una parte apagada
 (tablas); solo lectura plegada; modo calmo; dibujo apagado (`/nzt-look off`: la banda sigue);
@@ -562,7 +561,7 @@ angosta.
 
 **Angosta** (60 columnas): el objetivo de cada fila se corta con `…` antes que los datos de la
 derecha, y las tarjetas toman el ancho que hay. Una tabla que no entra baja el texto de sus celdas
-de línea (RN-skin-tabla-ancha) [modify].
+de línea (RN-skin-tabla-ancha).
 
 **Fuera de este mockup:** diagramas, fórmulas, avisos y tareas, salida de comandos y enlaces. Se
 dibujan como en la referencia, sin nada propio de NZT, y la tabla *Qué se redibuja* los describe.
@@ -571,14 +570,14 @@ Si se quiere verlos antes de construir, es otra unidad.
 **Medido** (Chrome sin ventana, 2026-10-17): 52 combinaciones (13 estados, terminal y escritorio,
 a 320 y 1000 px). Ninguna tiene scroll horizontal, y ninguna fila, tarjeta ni grilla se sale del
 marco. Los pares de color son los mismos de la banda, ya medidos arriba.
-- **Con los textos de Claude Code (unidad 245, 2026-10-18)** [add]: las mismas 52 combinaciones, sin
+- **Con los textos de Claude Code (unidad 245, 2026-10-18)**: las mismas 52 combinaciones, sin
   scroll ni filas fuera del marco y sin ningún texto viejo (`Correr`, `Leer`, `Pensando`, `Listo
   en`). La palabra de Claude Code va marcada pendiente; a 320 px el pie baja de línea.
-- **Con los ajustes de Q-11 (unidad 248, 2026-10-18)** [add]: 56 combinaciones (14 estados, con *tabla
+- **Con los ajustes de Q-11 (unidad 248, 2026-10-18)**: 56 combinaciones (14 estados, con *tabla
   más ancha que la terminal*), sin scroll ni filas fuera del marco. La edición es tarjeta de diff
   resaltada también en la terminal, la respuesta empieza con `●`, y el spinner (con sus cifras) y el
   pie bajan de línea a 320 px. Las cifras y la línea del pie de Claude Code van marcadas pendientes.
-- **Con los tonos de lectura y los colores del código (unidad 254, 2026-10-18)** [add]: los dos
+- **Con los tonos de lectura y los colores del código (unidad 254, 2026-10-18)**: los dos
   mockups toman los valores de *Tonos de lectura* de `nzt-brand.md`, y el código tiene función, tipo y
   propiedad en su color y el bloque con su fondo. 56 combinaciones medidas en Chrome sin ventana (320
   y 1280 px), sin scroll. El estado *tabla más ancha que la terminal* no estaba en la lista de estados
@@ -588,7 +587,7 @@ marco. Los pares de color son los mismos de la banda, ya medidos arriba.
 ## Diseño · tema nzt (unidad 222)
 
 Los valores están en `specs/nzt-brand.md` (*Derivados*), que manda. Acá va **qué rol de la marca
-toma cada color**. **[modify]** En la oscura, Texto, Acento, Contraste, Error y Tenue toman su
+toma cada color**. En la oscura, Texto, Acento, Contraste, Error y Tenue toman su
 *tono de lectura* (`nzt-brand.md`, Q-03, unidad 253): la paleta tal cual se veía demasiado
 brillante en una conversación larga. Se revisa cuando la marca suma o cambia un rol, o cuando Claude Code cambia su
 lista de tokens. Fuente de los tokens: *Create a custom theme* en
@@ -605,7 +604,7 @@ here fall through to the base preset"*).
 | Token | Rol de la marca |
 |---|---|
 | `claude`, `suggestion`, `permission`, `remember`, `success`, `rate_limit_fill` | Acento |
-| `promptBorder`, `autoAccept` | **[modify]** El Acento **de la paleta** (`#72f4cd`), no el tono de lectura: es un trazo de una línea, no texto, y es el color del recuadro de la captura del 2026-10-17 que el usuario pidió volver a ver (2026-10-18). `autoAccept` porque en modo auto el borde del prompt toma ese token y no `promptBorder` *(sin verificar en la terminal, solo por el nombre del token: se mira en vivo en la 261)*; la leyenda `auto mode on` sigue avisando el modo. *La decisión de pintar `autoAccept` es del agente, objetable* |
+| `promptBorder`, `autoAccept` | El Acento **de la paleta** (`#72f4cd`), no el tono de lectura: es un trazo de una línea, no texto, y es el color del recuadro de la captura del 2026-10-17 que el usuario pidió volver a ver (2026-10-18). `autoAccept` porque en modo auto el borde del prompt toma ese token y no `promptBorder` *(sin verificar en la terminal, solo por el nombre del token: se mira en vivo en la 261)*; la leyenda `auto mode on` sigue avisando el modo. *La decisión de pintar `autoAccept` es del agente, objetable* |
 | `claudeShimmer`, `promptBorderShimmer`, `permissionShimmer` | Contraste en la oscura; `#2a8f74` en la clara (un Acento más claro, 3,76:1: es el brillo que pasa, no el texto) |
 | `text` | Texto |
 | `inverseText` | Texto sobre acción en la clara; Fondo en la oscura (14,25:1 sobre Acento) |
@@ -614,7 +613,7 @@ here fall through to the base preset"*).
 | `warning` | Contraste (aviso) |
 | `warningShimmer` | `#fff7b0` en la oscura; `#8a7a10` en la clara |
 | `error` | Error |
-| `diffAdded`, `diffRemoved`, `diffAddedWord`, `diffRemovedWord` | Agregado, Borrado y sus palabras. **[modify]** Con los valores de la 222 casi no se distinguían del fondo (usuario 2026-10-18, Q-11): cada fondo de diff tiene que separarse del Fondo al menos 1,5:1 y dejar el Texto encima en 4,5:1 o más; medidos en la 251 (`nzt-brand.md`, *Derivados*). *Los dos umbrales son propuesta del agente.* |
+| `diffAdded`, `diffRemoved`, `diffAddedWord`, `diffRemovedWord` | Agregado, Borrado y sus palabras. Con los valores de la 222 casi no se distinguían del fondo (usuario 2026-10-18, Q-11): cada fondo de diff tiene que separarse del Fondo al menos 1,5:1 y dejar el Texto encima en 4,5:1 o más; medidos en la 251 (`nzt-brand.md`, *Derivados*). *Los dos umbrales son propuesta del agente.* |
 | `userMessageBackground` | Mensaje |
 | `userMessageBackgroundHover` | `#163a35` en la oscura; `#d6ebe3` en la clara (Texto encima: 11,75 y 15,46) |
 | `selectionBg` | Secundario en la oscura (Texto encima: 10,35); `#c4ebdd` en la clara (14,93) |
@@ -668,7 +667,7 @@ En las dos variantes, cada clave toma el valor de su rol en la columna que le co
 **Medido:** con ellos, todo texto del mod pasa 4,5:1 sobre Superficie y Cebra (el peor caso,
 Tenue sobre Cebra, da 5,35:1 en la oscura con el tono de lectura y 5,41:1 en la clara).
 
-**El código del tema `nzt`** [add] (unidad 253, Q-03 de la marca): cada parte lleva su color de
+**El código del tema `nzt`** (unidad 253, Q-03 de la marca): cada parte lleva su color de
 *Colores del código* (`nzt-brand.md`) y el bloque, su fondo propio, en la terminal y en el
 escritorio. El resaltado de los otros 15 temas sale de sus claves (palabra clave en `user`, cadena en
 `ok`, número en `warn`, comentario en `muted`, tipo en `read`, función en `web`, propiedad en
@@ -676,7 +675,7 @@ escritorio. El resaltado de los otros 15 temas sale de sus claves (palabra clave
 por eso el código se veía de un solo color. Un tema repintado desde `nzt` (`mi-nzt`) resalta con sus
 claves, como los demás.
 
-**Las palabras del tema `nzt`**, solo con la opción prendida (RN-skin-palabras) [modify]:
+**Las palabras del tema `nzt`**, solo con la opción prendida (RN-skin-palabras):
 - el spinner dice `Pensando`, `Trabajando`, `Armando`, `Midiendo` o `Ajustando`, y en inglés
   `Thinking`, `Working`, `Building`, `Measuring` o `Tuning`;
 - el pie dice `Listo` o `Hecho`, y en inglés `Done` o `Finished`.
@@ -701,7 +700,7 @@ texto de la paleta (`user`, `fg`, `muted`, `ok`, `err`, `warn`, `read`, `write`,
 paletas tal cual deja tenue ilegible en casi todos los temas oscuros y avisos ilegibles en los claros.
 La salida es Q-09.
 
-### Temas que no cansan la vista (cambio 0.3.0, unidades 259 y 260) [add]
+### Temas que no cansan la vista (cambio 0.3.0, unidades 259 y 260)
 
 Pedido del usuario 2026-10-18: *"Evaluar que los colores no sean dañinos a la vista, no muy
 brillosos que no cansen la vista"*, *"va por algunos para evaluarlo"*.
@@ -775,13 +774,13 @@ que `register.tsx` obtiene de `$.ui.resolve(e)` y les pasa.** Por eso se pueden 
 | Hook | Para qué | Reglas |
 |---|---|---|
 | `session.start` | leer `prefs`, `folders` y `custom`; resolver tema y variante; registrar `/nzt-look` y la herramienta de diseño | RN-skin-tema-por-defecto, -por-carpeta, -comando |
-| `classic.SessionStart` (`clear`, `resume`, `fork`) y, de respaldo, `session.append` [modify] | si el id de la sesión cambió, leer todo de nuevo (flujo 1); el respaldo cubre los planes Team o Enterprise, donde una protección de Claude Code puede no pasarle `classic.SessionStart` a un mod de usuario | RN-skin-tras-clear |
+| `classic.SessionStart` (`clear`, `resume`, `fork`) y, de respaldo, `session.append` | si el id de la sesión cambió, leer todo de nuevo (flujo 1); el respaldo cubre los planes Team o Enterprise, donde una protección de Claude Code puede no pasarle `classic.SessionStart` a un mod de usuario | RN-skin-tras-clear |
 | `config.set` (`theme`) | recalcular la variante cuando cambia el tema de Claude Code | RN-skin-variante |
 | `command.run` (`nzt-look`) | abrir el panel, o `off`, `on`, `<tema>`, `copy`, `copy code` | RN-skin-apagado, -copiar |
 | `ui.render` `Pane` | el panel de opciones | sección *Panel de opciones* |
 | `ui.render` `AbovePrompt` | la banda; debajo, `next(e)` | RN-skin-banda-*, -limpiar, -cede-la-banda |
 | `session.measure`, `turn.start`, `turn.complete` | refrescar las cifras y los tiempos del turno | RN-skin-banda-refresco |
-| `turn.step`, `classic.PostModelSwitch` [add] | el modelo y el effort de la sesión | RN-skin-modelo |
+| `turn.step`, `classic.PostModelSwitch` | el modelo y el effort de la sesión | RN-skin-modelo |
 | `prompt.submit`, `tool.call` | la línea al agente y el aviso de cruce | RN-skin-al-agente |
 | `prompt.compose` | la nota de diagramas, si están prendidos | RN-skin-pista-diagramas |
 | `ui.render` `ToolUse`, `ToolGroup`, `ToolResult` | filas, lecturas agrupadas, consola y diff | RN-skin-partes |
@@ -816,7 +815,7 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
    2. `AbovePrompt` arma la banda con las partes prendidas y el ancho que da el evento. Con
       `hasSurvey`, o con todas las partes apagadas, devuelve solo `next(e)`.
    3. Sin porcentaje todavía, dibuja *sin lectura todavía* (RN-skin-sin-lectura).
-   4. **Modelo y effort** [add] (RN-skin-modelo) van en otro átomo de la sesión: `session.start` y
+   4. **Modelo y effort** (RN-skin-modelo) van en otro átomo de la sesión: `session.start` y
       `classic.PostModelSwitch` leen `$.session.model()`; `turn.step` del loop principal (sin
       `agentId`) deja su `model` y su `effort`, y sigue con `next(e)` sin tocarlo. Ningún hook espera
       al otro: lo último que llega gana.
@@ -870,7 +869,7 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
 ### Datos
 
 - **`$.store`, entre sesiones**, declarado en `types/index.d.ts` (QT-12):
-  - `prefs`: tema, variante (`auto`, `dark`, `light`), idioma, las 6 partes de la banda [modify], la línea
+  - `prefs`: tema, variante (`auto`, `dark`, `light`), idioma, las 6 partes de la banda, la línea
     al agente, una opción por parte de la conversación, calmo, palabras, solo lectura plegada,
     desplegar lecturas y dibujo prendido o apagado;
   - `folders`: carpeta → tema;
@@ -1149,7 +1148,7 @@ de la 223; mientras tanto, los flujos van en lista.
   `~/.claude/themes/`): la opción `theme` es `choice` con los 7 temas de Claude Code; ni los del
   plugin ni los del usuario figuran, así que `$.config.set` no los elige (S-02). Un mod sí escribe
   en `~/.claude/themes/` con `$.fs.write` (probado y borrado).
-- respuesta [modify]: el mod sigue trayendo `themes/`, y además el panel los copia a la carpeta de
+- respuesta: el mod sigue trayendo `themes/`, y además el panel los copia a la carpeta de
   temas de la persona con un botón (usuario 2026-10-19, opción 1 de tres: copiar, solo seguir
   `/theme`, solo documentarlo). RN-skin-tema-claude. · decidido por el usuario
 

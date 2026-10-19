@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-19T14:00:00Z",
+  "updated": "2026-10-19T18:00:00Z",
   "goal": "Ajustes de la prueba del 2026-10-18: nzt-look conserva el look tras /clear y se aclara su relación con /theme; el estado usa solo fases de NZT; terminar la verificación pendiente y el ship",
   "phases": [
     {
@@ -29,13 +29,19 @@
     },
     {
       "name": "verify",
-      "status": "doing",
+      "status": "done",
       "units": [
         {
           "id": 261,
           "do": "Pruebas en vivo: banda en una línea, borde del prompt con NZT oscuro en /theme, look tras /clear, lo de la 270, retest BUG-001 (fila 'Skill nzt') y L-04 (/clear) al final",
-          "status": "doing",
-          "detail": "Escenarios L-27..L-32 escritos en specs/testing/2026-10-18-nzt-look.md (sección 'Cambios 0.4.0 y 0.5.0'); corrida del agente con -p anotada. Espera la corrida del usuario en una sesión nueva: L-27..L-30, L-32, L-24, y al final L-04 y L-31"
+          "status": "done",
+          "detail": "Usuario 2026-10-19 tras /clear: el look sigue (L-31 passed) y 'así como está funcionando va perfecto' (resto en bloque). Sin anotar: L-04 (limpió con /clear, no con 0), S-06 y nzt ● de L-30, L-24/BUG-001 (fixed, pending verification)"
+        },
+        {
+          "id": 272,
+          "do": "Cerrar nzt-look 0.5.0 aceptado por el usuario: barrer marcas de la spec, resultados en pruebas, catálogo",
+          "status": "done",
+          "detail": "Spec: estado 'aceptada', marcas fuera salvo el [add] de la fila de skill (BUG-001); resultados en specs/testing/2026-10-18-nzt-look.md; catálogo de nzt-mods.md. Sin commit todavía"
         }
       ]
     },
@@ -53,9 +59,9 @@
     }
   ],
   "approved": true,
-  "waiting_on": "Corrida en vivo del usuario de la 261 (L-27..L-32, L-24, L-04)",
+  "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-19: plan aprobado; 269-271, 261 y 214 en autónomo, un reporte al final; 270 = opción 1 (la recomendada); 271 va",
+    "Usuario 2026-10-19: nzt-look aceptado y cerrado en 0.5.0; se retoma más adelante solo si hay que modificar algo. Pendiente fuera de la corrida: commit del cierre, release/tags y borrar copias de ~/.claude/dev-mods tras el merge",
     "Corrida anterior (nzt-look 0.1.0 a 0.4.0, retiro de nzt-context, unidades 214-268) commiteada en 8d48dc5 en la rama mods; el PR lo arma el usuario. Sus fases tenían nombres 'cambio: …', que no son fases de NZT: los cambios van como unidades dentro de las fases del kernel.",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ],
