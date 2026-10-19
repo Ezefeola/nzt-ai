@@ -1,9 +1,24 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderSurface, Timer } from 'claude-code'
 
-import type { Doing, Explorer, GitOp, Listing, Mark, Marks, Opened, Size } from '../types'
+import type { BarMark, Doing, Explorer, GitOp, Listing, Mark, Marks, Opened, Size } from '../types'
 import { FADE_MS, foundOf, isShown, shellReadOf, touchOf } from './activity'
-import { branchOf, COUNT_ORDER, countsOf, gitOpsOf, linesOf, wordsOf } from './git'
+import {
+  allAddedOf,
+  branchOf,
+  changedTreeOf,
+  changeOf,
+  COUNT_ORDER,
+  countsOf,
+  diffLinesOf,
+  diffWindow,
+  gitOpsOf,
+  hasChange,
+  linesOf,
+  sourceOfDiff,
+  wordsOf,
+} from './git'
+import type { DiffLine } from './git'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { iconOf } from './icons'
@@ -64,6 +79,10 @@ const CHOSEN_BG = '#263a42'
 const CURSOR_BG = '#1f2c31'
 
 const MARK_COLOR = { M: 'yellow', U: 'green', A: 'green', D: 'red' } as const satisfies Record<Mark, string>
+// The change map beside the scroll bar: anything removed in a stretch paints it red, as the diff does.
+const CHANGE_COLOR = { add: 'green', change: 'red', delete: 'red' } as const satisfies Record<BarMark, string>
+// Lines shown above a change the scroll bar jumps to.
+const CHANGE_CONTEXT = 2
 const DOING_COLOR = { read: '#c084fc', write: '#fb923c', commit: '#4ade80' } as const satisfies Record<Doing['kind'], string>
 // When a closed folder holds files of several kinds of work, the strongest paints it.
 const DOING_RANK = { read: 1, commit: 2, write: 3 } as const satisfies Record<Doing['kind'], number>
@@ -81,6 +100,7 @@ const explorer = atom({ plugin: 'nzt-files', key: 'explorer' } as const, {
   markdown: true,
   search: '',
   sized: null,
+  changesOnly: false,
 } as Explorer)
 const activity = atom({ plugin: 'nzt-files', key: 'activity' } as const, {} as Record<string, Doing>)
 const gitOp = atom({ plugin: 'nzt-files', key: 'gitOp' } as const, null as GitOp | null)
@@ -90,7 +110,10 @@ const notice = atom({ plugin: 'nzt-files', key: 'notice' } as const, null as str
 // Module state a reload starts over: the project's folder, the chosen file's lines, whether
 // the pane is showing, the search's walk of the project and the timers that put colors out.
 let root: string | undefined
-let content: { path: string; mtimeMs: number; lines: string[]; blocks?: Block[] } | undefined
+// `changesKey` is what git said of the file when its diff was read; `diff` that diff, when it has a change.
+let content:
+  | { path: string; mtimeMs: number; lines: string[]; isWhole: boolean; blocks?: Block[]; changesKey: string; diff?: DiffLine[] }
+  | undefined
 let isShowing = false
 let isOpenedAtStart = false
 let running: Promise<void> | undefined
@@ -124,6 +147,7 @@ const explorerOf = (value: Partial<Explorer> | undefined): Explorer => ({
   markdown: value?.markdown !== false,
   search: typeof value?.search === 'string' ? value.search : '',
   sized: typeof value?.sized === 'boolean' ? value.sized : null,
+  changesOnly: value?.changesOnly === true,
 })
 
 const reasonOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
@@ -138,6 +162,18 @@ const kindLabel = (path: string) => {
 const isWindows = () => root !== undefined && /^[A-Za-z]:/.test(root)
 
 const opName = (op: string) => t.gitOps[op] ?? op
+
+/**
+ * Where the file's window stands, for the scroll bar, and, with a diff, the change each row of
+ * its change map stands for and jumps to.
+ */
+type Bar = {
+  first: number
+  count: number
+  total: number
+  lastTop: number
+  changeAt?: (row: number) => { kind: BarMark; top: number } | undefined
+}
 
 // The engine follows $ only into functions declared in this file, so everything that reads
 // the disk, runs git or draws lives here; what they return is shaped in the other files.
@@ -201,15 +237,36 @@ async function readMarks($: EngineInterface): Promise<Marks> {
   }
 }
 
+/** The file whole as a diff against the last commit, or undefined with no change to show. */
+async function diffOf($: EngineInterface, path: string, mark: Mark | undefined, lines: string[], isWhole: boolean) {
+  if (mark === 'U') return allAddedOf(lines)
+  if (mark !== 'M' && mark !== 'A') return undefined
+  const diff = await git($, ['diff', 'HEAD', '-U0', '--no-color', '--no-ext-diff', '--', path])
+  // With no commit yet there is no HEAD: a file added to the index is new whole.
+  if (diff === undefined) return mark === 'A' ? allAddedOf(lines) : undefined
+  const whole = diffLinesOf(diff, lines, isWhole)
+  return hasChange(whole) ? whole : undefined
+}
+
 /** Reads the chosen file into the viewer, unless it is the one already read and unchanged. */
 async function loadFile($: EngineInterface, path: string, force = false) {
   const files = await read($, marks)
+  const mark = files.kind === 'ok' ? files.files[path] : undefined
+  const changesKey = files.kind === 'ok' ? `${mark ?? ''}:${files.lines[path]?.join(',') ?? ''}` : ''
   const stat = await $.fs.stat(pathOf(path)).catch(() => undefined)
   let opened: Opened
   if (stat === undefined) {
-    const isDeleted = files.kind === 'ok' && files.files[path] === 'D'
-    opened = { kind: isDeleted ? 'deleted' : 'gone' }
+    opened = { kind: mark === 'D' ? 'deleted' : 'gone' }
   } else if (!force && content?.path === path && content.mtimeMs === stat.mtimeMs) {
+    if (content.changesKey === changesKey) return
+    // The same text against another commit, or staged: only its diff is read again.
+    content.changesKey = changesKey
+    content.diff = await diffOf($, path, mark, content.lines, content.isWhole)
+    const changes = content.diff === undefined ? null : changesKey
+    await update($, explorer, value => {
+      const now = explorerOf(value)
+      return now.selected === path && now.opened?.kind === 'text' ? { ...now, opened: { ...now.opened, changes } } : now
+    })
     return
   } else if (stat.size > READ_LIMIT) {
     opened = { kind: 'tooBig', size: stat.size }
@@ -221,9 +278,12 @@ async function loadFile($: EngineInterface, path: string, force = false) {
     else if (isBinaryText(text)) opened = { kind: 'binary', size: stat.size }
     else {
       const kept = contentOf(text)
-      content = { path, mtimeMs: stat.mtimeMs, lines: kept.lines }
+      const isWhole = kept.lines.length === kept.total
+      content = { path, mtimeMs: stat.mtimeMs, lines: kept.lines, isWhole, changesKey }
       if (isMarkdownFile(path)) content.blocks = blocksOf(kept.lines)
-      opened = { kind: 'text', lines: kept.total, shown: kept.lines.length, size: stat.size }
+      content.diff = await diffOf($, path, mark, kept.lines, isWhole)
+      const changes = content.diff === undefined ? null : changesKey
+      opened = { kind: 'text', lines: kept.total, shown: kept.lines.length, size: stat.size, changes }
     }
   }
   if (opened.kind !== 'text') content = undefined
@@ -241,7 +301,9 @@ async function readOnce($: EngineInterface) {
   const now = explorerOf(await read($, explorer))
   const known = await read($, listings)
   const next: Record<string, Listing> = {}
-  for (const folder of ['', ...now.open]) next[folder] = await listFolder($, folder, files)
+  // ± Changes takes each changed file's size and date from its folder's listing.
+  const held = now.changesOnly ? Object.keys(files).map(folderOf) : []
+  for (const folder of new Set(['', ...now.open, ...held])) next[folder] = await listFolder($, folder, files)
   if (JSON.stringify(next) !== JSON.stringify(known)) await update($, listings, () => next)
   if (now.selected !== null) await loadFile($, now.selected)
 }
@@ -556,6 +618,16 @@ async function openAll($: EngineInterface) {
   await update($, explorer, value => ({ ...explorerOf(value), open, treeTop: null }))
 }
 
+/** Shows only what changed since the last commit, or the whole tree again with its folders as they were. */
+async function toggleChanges($: EngineInterface) {
+  followed = null
+  await update($, explorer, value => {
+    const now = explorerOf(value)
+    return { ...now, changesOnly: !now.changesOnly, treeTop: null }
+  })
+  await refresh($)
+}
+
 /** Closes every folder; the cursor goes back to the top-level row that held it. */
 async function closeAll($: EngineInterface) {
   followed = null
@@ -867,23 +939,47 @@ export const register: Register = (on, options) => {
     )
 
     // The engine draws no scroll bar for a pane: a track with a thumb, each row a jump to that point.
-    const scrollBar = (at: { first: number; count: number; total: number; lastTop: number }) => {
+    // With a diff, a change map goes before it, so the colors never hide how far the person is.
+    const scrollBar = (at: Bar) => {
       const thumb = thumbOf(viewRows, at.first, at.count, at.total, at.lastTop)
+      const changeAt = at.changeAt
       return (
-        <Box key="bar" flexDirection="column" flexShrink={0} marginLeft={1} width={1}>
-          {Array.from({ length: viewRows }, (_, row) => {
-            const isThumb = row >= thumb.from && row < thumb.from + thumb.size
-            return (
-              <Button key={`bar:${row}`} plain label={t.scrollTo} onPress={() => scrollTo($, topAtRow(row, viewRows, at.lastTop))}>
-                <Text color={isThumb ? ACCENT : undefined} dimColor={!isThumb}>{isThumb ? '┃' : '│'}</Text>
-              </Button>
-            )
-          })}
+        <Box key="bar" flexDirection="row" flexShrink={0} marginLeft={1}>
+          {changeAt === undefined ? null : (
+            <Box key="map" flexDirection="column" width={1}>
+              {Array.from({ length: viewRows }, (_, row) => {
+                const change = changeAt(row)
+                if (change === undefined) return <Text key={`map:${row}`}> </Text>
+                return (
+                  <Button key={`map:${row}`} plain label={t.scrollToChange} onPress={() => scrollTo($, change.top)}>
+                    <Text color={CHANGE_COLOR[change.kind]}>▌</Text>
+                  </Button>
+                )
+              })}
+            </Box>
+          )}
+          <Box key="track" flexDirection="column" width={1}>
+            {Array.from({ length: viewRows }, (_, row) => {
+              const isThumb = row >= thumb.from && row < thumb.from + thumb.size
+              return (
+                <Button key={`bar:${row}`} plain label={t.scrollTo} onPress={() => scrollTo($, topAtRow(row, viewRows, at.lastTop))}>
+                  <Text color={isThumb ? ACCENT : undefined} dimColor={!isThumb}>{isThumb ? '┃' : '│'}</Text>
+                </Button>
+              )
+            })}
+          </Box>
         </Box>
       )
     }
 
-    // C# the mod colors itself: a line's number, then its tokens, what does not fit wrapping under the code.
+    // The stretch of items each row of the scroll bar stands for, out of `total`, from 0, end out.
+    const stretchOf = (row: number, total: number) => {
+      const from = Math.floor((row * total) / viewRows)
+      return { from, to: Math.max(from + 1, Math.floor(((row + 1) * total) / viewRows)) }
+    }
+
+    // C# the mod colors itself: a line's number, then its tokens, what does not fit wrapping
+    // under the code.
     const csharpLines = (lines: string[], first: number, count: number) => {
       const states = csharpStatesOf(lines)
       const digits = String(lines.length).length
@@ -957,7 +1053,11 @@ export const register: Register = (on, options) => {
       )
     }
 
-    // The search, and the keys that walk the tree, which a pane only takes as Buttons.
+    const isChangesOnly = now.changesOnly && git.kind === 'ok'
+
+    // The search, and the keys that walk the tree, which a pane only takes as Buttons. Showing
+    // only what changed, every folder is open, so Unfold and Fold go, and the whole tree's
+    // folders wait as they were.
     const search = now.expanded || Input === undefined ? null : (
       <Box flexDirection="row" justifyContent="space-between">
         <Box flexDirection="row" gap={1} flexShrink={1} overflow="hidden">
@@ -979,16 +1079,34 @@ export const register: Register = (on, options) => {
           )}
         </Box>
         <Box flexDirection="row" gap={1} flexShrink={0}>
-          <Button key="open-all" plain hotkey="d" dimColor onPress={() => openAll($)}>{t.openAll}</Button>
-          <Button key="close-all" plain hotkey="p" dimColor onPress={() => closeAll($)}>{t.closeAll}</Button>
+          {git.kind === 'ok' && (
+            <Button key="changes" plain hotkey="g" label={t.changesOnly} onPress={() => toggleChanges($)}>
+              <Text color={isChangesOnly ? ACCENT : undefined} bold={isChangesOnly} dimColor={!isChangesOnly}>
+                {t.changesOnly}
+              </Text>
+            </Button>
+          )}
+          {!isChangesOnly && (
+            <Button key="open-all" plain hotkey="d" dimColor onPress={() => openAll($)}>{t.openAll}</Button>
+          )}
+          {!isChangesOnly && (
+            <Button key="close-all" plain hotkey="p" dimColor onPress={() => closeAll($)}>{t.closeAll}</Button>
+          )}
         </Box>
       </Box>
     )
 
-    // The tree: the folders as the person left them, or the search's matches under their folders.
+    // The tree: the folders as the person left them, only what changed, or the search's matches
+    // under their folders, among what changed when that is all the tree shows.
     const isSearching = now.search.trim() !== ''
-    const matches = isSearching && index !== undefined ? matchesOf(index, now.search) : []
-    const shownTree = isSearching ? searchTreeOf(matches, files) : { listings: known, open: now.open, marks: files }
+    const holdsChange = (item: { path: string; isDir: boolean }) =>
+      files[item.path] !== undefined || (item.isDir && Object.keys(files).some(held => held.startsWith(`${item.path}/`)))
+    const matches = isSearching && index !== undefined ? matchesOf(isChangesOnly ? index.filter(holdsChange) : index, now.search) : []
+    const shownTree = isSearching
+      ? searchTreeOf(matches, files)
+      : isChangesOnly
+        ? { ...changedTreeOf(files, known), marks: files }
+        : { listings: known, open: now.open, marks: files }
     const rows: Row[] = isSearching && index === undefined ? [] : rowsOf(shownTree.listings, shownTree.open, shownTree.marks)
     const counts = countsOf(shownTree.marks)
     const anchor = followed ?? now.cursor ?? now.selected
@@ -1026,6 +1144,7 @@ export const register: Register = (on, options) => {
     const shownFolders: string[] = []
     if (isSearching && index === undefined) tree.push(message(t.reading))
     else if (isSearching && matches.length === 0) tree.push(message(t.noMatch(printable(now.search.trim()))))
+    else if (isChangesOnly && changed === 0) tree.push(message(t.noChanges))
     for (let i = shown.from; i < shown.to; i++) {
       if (i === shown.from && shown.above > 0) {
         tree.push(<Text key="above" dimColor>{`  ${t.above(shown.above)}`}</Text>)
@@ -1084,7 +1203,7 @@ export const register: Register = (on, options) => {
             <Button
               key={`n:${row.path}`}
               plain
-              onPress={() => (row.isDir ? toggle($, row.path) : choose($, row.path))}
+              onPress={() => (!row.isDir ? choose($, row.path) : isChangesOnly && !isSearching ? undefined : toggle($, row.path))}
             >
               <Text
                 bold={row.isDir || isChosen || (work !== undefined && !work.isFading)}
@@ -1118,7 +1237,7 @@ export const register: Register = (on, options) => {
     let position: string | null = null
     let isScrollable = false
     // Where the file's window stands, for the scroll bar; null when nothing scrolls.
-    let bar: { first: number; count: number; total: number; lastTop: number } | null = null
+    let bar: Bar | null = null
     // The scroll bar and the blank column before it.
     const viewWidth = width - 2
     const isMarkdown = path !== null && isMarkdownFile(path)
@@ -1151,7 +1270,23 @@ export const register: Register = (on, options) => {
           layout.viewPage = Math.max(1, view.count)
           const fits = view.first === 0 && view.count === blocks.length
           isScrollable = !fits
-          bar = { first: view.first, count: view.count, total: blocks.length, lastTop: view.lastTop }
+          const diff = content!.diff
+          // A block has no lines to draw as a diff: drawn, the changes show only on the change map.
+          const changeAt =
+            diff === undefined
+              ? undefined
+              : (row: number) => {
+                  const stretch = stretchOf(row, blocks.length)
+                  const from = blocks[stretch.from]!.from + 1
+                  // The last stretch holds what was removed after the last line too.
+                  const to = stretch.to === blocks.length ? Infinity : blocks[stretch.to - 1]!.to
+                  const held = diff.filter(line => line.now >= from && line.now <= to)
+                  const change = changeOf(held)
+                  if (change === undefined) return undefined
+                  const top = blocks.findIndex(block => held[change.at]!.now <= block.to)
+                  return { kind: change.kind, top: top < 0 ? stretch.from : top }
+                }
+          bar = { first: view.first, count: view.count, total: blocks.length, lastTop: view.lastTop, changeAt }
           const from = blocks[view.first]!.from
           const to = blocks[view.first + view.count - 1]!.to
           position = fits ? t.allLines(opened.lines) : t.blockLines(from + 1, to, opened.lines)
@@ -1162,27 +1297,52 @@ export const register: Register = (on, options) => {
           )
         } else {
           const hint = isMarkdown && now.markdown && isHuge
-          const view = textWindow(lines, now.viewTop, viewRows - (hint ? 1 : 0), viewWidth)
-          layout.viewLastTop = view.lastTop
-          const fits = view.count === view.total
-          isScrollable = !fits
-          bar = { first: view.first, count: view.count, total: view.total, lastTop: view.lastTop }
-          position = fits
-            ? t.allLines(view.total)
-            : t.lines(view.first + 1, view.first + view.count, view.total, opened.shown < opened.lines)
+          const rows = viewRows - (hint ? 1 : 0)
+          const diff = content!.diff
+          let drawn
+          if (diff === undefined) {
+            const view = textWindow(lines, now.viewTop, rows, viewWidth)
+            layout.viewLastTop = view.lastTop
+            const fits = view.count === view.total
+            isScrollable = !fits
+            bar = { first: view.first, count: view.count, total: view.total, lastTop: view.lastTop }
+            position = fits
+              ? t.allLines(view.total)
+              : t.lines(view.first + 1, view.first + view.count, view.total, opened.shown < opened.lines)
+            drawn = isCSharpFile(path) ? (
+              csharpLines(lines, view.first, view.count)
+            ) : (
+              <Code
+                key="file"
+                source={lines.slice(view.first, view.first + view.count).join('\n')}
+                path={path}
+                startLine={view.first + 1}
+              />
+            )
+          } else {
+            // The whole file as a diff: its window counts removed lines as rows too.
+            const view = diffWindow(diff, now.viewTop, rows, viewWidth)
+            layout.viewLastTop = view.lastTop
+            const fits = view.count === view.total
+            isScrollable = !fits
+            const changeAt = (row: number) => {
+              const stretch = stretchOf(row, view.total)
+              const change = changeOf(diff.slice(stretch.from, stretch.to))
+              return change === undefined ? undefined : { kind: change.kind, top: Math.max(0, stretch.from + change.at - CHANGE_CONTEXT) }
+            }
+            bar = { first: view.first, count: view.count, total: view.total, lastTop: view.lastTop, changeAt }
+            const shown = diff.slice(view.first, view.first + view.count)
+            // The position names lines of the file now, whatever removed lines sit between them.
+            const kept = shown.filter(line => line.op !== '-')
+            const from = kept[0]?.now ?? shown[0]!.now
+            const to = kept[kept.length - 1]?.now ?? from
+            position = fits ? t.allLines(lines.length) : t.lines(from, Math.max(from, to), lines.length, opened.shown < opened.lines)
+            drawn = <Code key="diff" source={printableLines(sourceOfDiff(shown))} path={path} format="diff" />
+          }
           body = (
             <Box flexDirection="column" height={viewRows} overflow="hidden">
               {hint ? <Text color="yellow" wrap="truncate-end">{t.markdownHuge}</Text> : null}
-              {isCSharpFile(path) ? (
-                csharpLines(lines, view.first, view.count)
-              ) : (
-                <Code
-                  key="file"
-                  source={lines.slice(view.first, view.first + view.count).join('\n')}
-                  path={path}
-                  startLine={view.first + 1}
-                />
-              )}
+              {drawn}
             </Box>
           )
         }

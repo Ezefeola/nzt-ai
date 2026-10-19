@@ -52,7 +52,9 @@
   .M { color: var(--yellow); } .U, .A, .add { color: var(--green); } .D, .rem { color: var(--red); }
   .ahead { color: #2dd4bf; } .behind { color: #60a5fa; }
   /* Búsqueda (RN-files-buscar) */
-  .search { display: flex; gap: 1ch; height: var(--row); white-space: nowrap; }
+  .search { display: flex; gap: 1ch; height: var(--row); white-space: nowrap; overflow: hidden; }
+  .search .btn { flex: none; }
+  .search .btn.dim { color: var(--dim); }
   .search .box { flex: 1; min-width: 0; border-bottom: 1px solid var(--border); color: var(--dim); overflow: hidden; text-overflow: ellipsis; }
   .search .box.typed { color: var(--text); }
   .hint { color: var(--dim); height: var(--row); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -97,8 +99,23 @@
   /* El visor: ocupa lo que queda y se desplaza solo. */
   .view { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: none; }
   .view::-webkit-scrollbar { display: none; }
-  .ln { display: grid; grid-template-columns: 5ch 1fr; }
-  .ln > span:first-child { color: var(--dim); text-align: right; padding-right: 1ch; }
+  /* El visor y su barra de scroll, una al lado del otro (RN-files-barra). */
+  .viewwrap { flex: 1 1 0; min-height: 0; display: flex; gap: 1ch; }
+  .viewwrap .view { flex: 1 1 0; }
+  /* Con cambios, dos columnas: el mapa de cambios y, aparte, la de posición, que los colores no tocan (Q-14). */
+  .vbars { flex: none; display: flex; }
+  .vbar { flex: none; width: 1ch; display: flex; flex-direction: column; }
+  .vbar span { flex: 1; text-align: center; color: var(--dim); line-height: 1; overflow: hidden; }
+  .vbar .thumb { color: var(--accent); }
+  .vbar .mk-add { color: var(--green); } .vbar .mk-change { color: #4ea1ff; } .vbar .mk-del { color: var(--red); }
+  /* Un archivo cambiado se ve entero como diff (RN-files-cambios-lineas): el signo, el número y la línea. */
+  .ln { display: grid; grid-template-columns: 1ch 5ch 1fr; }
+  .ln > .g { white-space: pre; }
+  .ln > .n { color: var(--dim); text-align: right; padding-right: 1ch; }
+  .ln.add { background: color-mix(in srgb, var(--green) 18%, transparent); } .ln.add > .g { color: var(--green); }
+  .ln.rem { background: color-mix(in srgb, var(--red) 18%, transparent); } .ln.rem > .g { color: var(--red); }
+  .mk-add { color: var(--green); } .mk-change { color: #4ea1ff; } .mk-del { color: var(--red); }
+  .btn.lit { color: var(--accent); font-weight: 700; }
   .ln .t { white-space: pre-wrap; overflow-wrap: anywhere; }
   .k { color: var(--kw); } .s { color: var(--str); } .f { color: var(--fn); } .num { color: var(--num); }
   .p { color: var(--key); } .c { color: var(--com); font-style: italic; } .h { color: var(--head); font-weight: 700; }
@@ -140,6 +157,8 @@
   <a href="#" data-state="commit">Claude commitea</a>
   <a href="#" data-state="gitrun">Claude hace push</a>
   <a href="#" data-state="gitfail">Push falló</a>
+  <a href="#" data-state="lines">Líneas cambiadas y barra</a>
+  <a href="#" data-state="changes">± Cambios encendido</a>
   <a href="#" data-state="search">Buscando</a>
   <a href="#" data-state="nomatch">Búsqueda sin resultados</a>
   <a href="#" data-state="age">Columna: edad</a>
@@ -168,7 +187,8 @@
   <p><b>Actividad de Claude</b> (Q-08): el nombre se pinta <span style="color:var(--read)">violeta</span> mientras Claude lee, <span style="color:var(--write)">naranja</span> mientras escribe y <span style="color:var(--commit)">verde</span> cuando commitea; al terminar se apaga en unos 3 segundos. Una carpeta cerrada toma el color de lo que tiene adentro. Con <i>Seguir a Claude</i>, el árbol abre y va hasta el archivo. Nada de esto le llega a Claude (RN-files-contexto-cero).</p>
   <p><b>Fila de un archivo</b>, de izquierda a derecha: nombre, líneas cambiadas (<span class="add">+12</span> <span class="rem">-3</span>), la columna (fecha, edad o tamaño; <b>Σ</b> cambia) y la marca de git. Una carpeta con cambios lleva sus conteos (<span class="U">U:2</span> <span class="M">M:5</span>); angosta, el punto.</p>
   <p><b>Markdown</b> (Q-11): abre dibujado con <b>☑ Markdown</b>; desmarcada, como texto. Avanza de a bloque, nunca por la mitad de una tabla.</p>
-  <p>Teclas: flechas, <b>j</b>/<b>k</b> el árbol, <b>l</b>/<b>h</b> abrir y cerrar, Enter muestra, <b>o</b> o doble clic abre con la app, Mayús+↑/↓ y RePág/AvPág el archivo, <b>s</b> buscar, <b>c</b> copiar ruta, <b>a</b> ampliar, <b>m</b> Markdown, Escape vacía la búsqueda, sale de lo ampliado o cierra.</p>
+  <p>Un <b>archivo cambiado</b> contra el último commit se ve entero como diff: agregado en verde, borrado en rojo intercalado donde estaba. A la derecha, el <b>mapa de cambios</b> (<span class="mk-add">▌</span> agregado, <span class="mk-del">▌</span> si se borró algo; un clic lleva al cambio) y, aparte, la <b>barra de posición</b>, que los colores no tocan. <b>± Cambios</b> deja en el árbol solo lo cambiado. El dibujo exacto del diff es el de Claude Code; acá, aproximado.</p>
+  <p>Teclas: flechas el árbol, Enter muestra, <b>o</b> o doble clic abre con la app, rueda, <b>▲</b>/<b>▼</b> y RePág/AvPág el archivo, <b>s</b> buscar, <b>g</b> ± Cambios, <b>d</b> desplegar, <b>p</b> plegar, <b>c</b> copiar ruta, <b>a</b> ampliar, <b>m</b> Markdown, Escape vacía la búsqueda, sale de lo ampliado o cierra. Los avisos (ruta copiada, sin app) ocupan 3 segundos la fila de git (Q-12).</p>
 </div>
 
 <script>
@@ -296,13 +316,44 @@
   const BRANCH = `⑂ mods → origin/mods <span class="ahead">↑2</span>`;
   // Encabezado (RN-files-rama, RN-files-columna): rama, cambios y el botón Σ.
   const head = (right = `${BRANCH} · ${SUM}`) => `<div class="row"><span><span class="badge">&nbsp;NZT&nbsp;</span><span class="title">Archivos</span></span><span class="dim">${right} · <button class="btn plain" data-col title="Cambia entre tamaño y fecha o edad">Σ</button></span></div>`;
-  const searchRow = (text = '') => `<div class="search"><span class="dim">⌕</span><span class="box ${text ? 'typed' : ''}">${text ? esc(text) + '▏' : 'Buscar (s)'}</span>${text ? '<button class="btn plain">×</button>' : ''}</div>`;
+  // Búsqueda y, a la derecha, ± Cambios, Desplegar y Plegar (RN-files-solo-cambios, -plegar-todo).
+  const searchRow = (text = '', { changes = false, git = true } = {}) => `<div class="search"><span class="dim">⌕</span><span class="box ${text ? 'typed' : ''}">${text ? esc(text) + '▏' : 'Buscar (s)'}</span>${text ? '<button class="btn plain">×</button>' : ''}`
+    + (git ? `<button class="btn plain ${changes ? 'lit' : 'dim'}" data-changes><span class="key">g:</span>± Cambios</button>` : '')
+    + (changes ? '' : '<button class="btn plain dim"><span class="key">d:</span>⊞ Desplegar</button><button class="btn plain dim"><span class="key">p:</span>⊟ Plegar</button>') + '</div>';
+  const onlyChanged = nodes => nodes.filter(n => (n.d ? n.c : n.m)).map(n => (n.d ? { ...n, o: true, kids: onlyChanged(n.kids) } : n));
   const treeBox = (nodes, sel, extra = '') => `<div class="tree" aria-label="Árbol del proyecto"><div class="edge up"></div>${extra}${rows(nodes, sel).join('')}<div class="edge down"></div></div><div class="rule"></div>`;
   const gitRow = (html = '') => `<div class="gitline">${html}</div>`;
   const buttons = `<div class="buttons"><button class="btn">[ Cerrar ]</button></div>`;
   const msgs = (...ms) => `<div class="msgs">${ms.map(([t, cls = 'dim']) => `<div class="${cls}">${t}</div>`).join('')}</div>`;
-  const viewer = (lines, label) => `<div class="view" tabindex="0" aria-label="Contenido de ${esc(label)}">${lines.map((h, i) => `<div class="ln"><span>${i + 1}</span><span class="t">${h}</span></div>`).join('')}</div><div class="pos" data-pos></div>`;
-  const drawn = (html, label, total) => `<div class="view" tabindex="0" aria-label="Contenido de ${esc(label)}">${html}</div><div class="pos"><span>líneas 1–26 de ${total} · de a bloque</span><span><button class="btn plain">▲</button> <button class="btn plain">▼</button></span></div>`;
+  // La barra de scroll: 20 tramos del archivo. Con cambios, primero el mapa (verde agregado, rojo
+  // borrado, también si además se agregó) y después la de posición, con el tramo visto en el acento.
+  const vbar = (marks = {}, total = 1) => {
+    const kindsAt = r => {
+      const from = Math.floor(r * total / 20), to = Math.max(from, Math.floor((r + 1) * total / 20) - 1);
+      const kinds = Object.entries(marks).filter(([l]) => +l >= from && +l <= to).map(([, k]) => k);
+      const add = kinds.some(k => k !== 'del'), del = kinds.some(k => k !== 'add');
+      return del ? 'del' : add ? 'add' : '';
+    };
+    const map = Object.keys(marks).length === 0 ? '' : `<div class="vbar">${Array.from({ length: 20 }, (_, r) => {
+      const k = kindsAt(r);
+      return k ? `<span class="mk-${k}" title="Ir a este cambio">▌</span>` : '<span> </span>';
+    }).join('')}</div>`;
+    const track = `<div class="vbar">${Array.from({ length: 20 }, (_, r) => `<span class="${r < 6 ? 'thumb' : ''}" title="Ir a esta altura del archivo">${r < 6 ? '┃' : '│'}</span>`).join('')}</div>`;
+    return `<div class="vbars" aria-hidden="true">${map}${track}</div>`;
+  };
+  // `marks`: línea (desde 0) → 'add' | 'change' | 'del' (borradas después de esa línea). Con
+  // marcas, el archivo se ve como diff: lo cambiado, viejo en rojo y nuevo en verde.
+  const ln = (cls, sign, n, h) => `<div class="ln ${cls}"><span class="g">${sign}</span><span class="n">${n}</span><span class="t">${h}</span></div>`;
+  const viewer = (lines, label, marks = {}) => `<div class="viewwrap"><div class="view" tabindex="0" aria-label="Contenido de ${esc(label)}">${lines.flatMap((h, i) => {
+    const k = marks[i];
+    const rows = k === 'change' ? [ln('rem', '-', '', h.replace(/\d+/, d => String(+d + 1)))] : [];
+    rows.push(k === 'add' || k === 'change' ? ln('add', '+', i + 1, h) : ln('', ' ', i + 1, h));
+    if (k === 'del') rows.push(ln('rem', '-', '', '<span>// la línea que se borró</span>'));
+    return rows;
+  }).join('')}</div>${vbar(marks, lines.length)}</div><div class="pos" data-pos></div>`;
+  const drawn = (html, label, total, marks = {}) => `<div class="viewwrap"><div class="view" tabindex="0" aria-label="Contenido de ${esc(label)}">${html}</div>${vbar(marks, total)}</div><div class="pos"><span>líneas 1–26 de ${total} · de a bloque</span><span><button class="btn plain">▲</button> <button class="btn plain">▼</button></span></div>`;
+  const CODE_MARKS = { 2: 'change', 9: 'add', 10: 'add', 18: 'del', 27: 'change' };
+  const SPEC_MARKS = { 40: 'change', 200: 'add', 380: 'add' };
   const fileHead = (path, meta) => `<div class="file">${esc(path)}</div><div class="meta">${meta}</div>`;
   // Herramientas del archivo (RN-files-markdown, -ampliar, -copiar, -abrir-app).
   const tools = ({ md, expanded } = {}) => `<div class="tools">${md !== undefined ? `<button class="btn plain" role="checkbox" aria-checked="${md}">${md ? '☑' : '☐'} Markdown</button>` : ''}<button class="btn plain">${expanded ? '← Árbol' : 'Ampliar'} <span class="key">a</span></button><button class="btn plain">Copiar ruta <span class="key">c</span></button><button class="btn plain">Abrir ↗ <span class="key">o</span></button></div>`;
@@ -313,7 +364,10 @@
 
   const STATES = {
     start: () => head() + searchRow() + treeBox(tree()) + empty() + gitRow() + buttons,
-    md: () => head() + searchRow() + treeBox(tree(specOpen), SPEC) + fileHead(SPEC, MDMETA) + tools({ md: true }) + drawn(MD_DRAWN, 'spec.md', 412) + gitRow() + buttons,
+    md: () => head() + searchRow() + treeBox(tree(specOpen), SPEC) + fileHead(SPEC, MDMETA) + tools({ md: true }) + drawn(MD_DRAWN, 'spec.md', 412, SPEC_MARKS) + gitRow() + buttons,
+    lines: () => head() + searchRow() + treeBox(tree({ mods: true, files: true, hooks: true }), 'mods/nzt-files/hooks/register.tsx')
+      + fileHead('mods/nzt-files/hooks/register.tsx', `<span class="M">M modificado</span> · ${kind('TypeScript')} · 18 KB · 32 líneas`) + tools() + viewer(CODE, 'register.tsx', CODE_MARKS) + gitRow() + buttons,
+    changes: () => head() + searchRow('', { changes: true }) + treeBox(onlyChanged(tree()), '') + empty() + gitRow() + buttons,
     mdsrc: () => head() + searchRow() + treeBox(tree(specOpen), SPEC) + fileHead(SPEC, MDMETA) + tools({ md: false }) + viewer(MD_LINES.map(mdSrc), 'spec.md') + gitRow() + buttons,
     mdbig: () => head() + searchRow() + treeBox(tree(), '')
       + fileHead('docs/export/tabla-gigante.md', `${kind('Markdown')} · 640 KB · 2.140 líneas`) + tools({ md: false })
@@ -331,10 +385,11 @@
     nomatch: () => head() + searchRow('zzz') + `<div class="tree" style="--tree-rows:15"><div class="dim">Nada con «zzz»</div></div><div class="rule"></div>` + empty() + gitRow() + buttons,
     age: () => { colMode = 'age'; const h = head() + searchRow() + treeBox(tree({ plan: true }), 'Plan/state.json') + fileHead('Plan/state.json', `<span class="M">M modificado</span> · ${kind('JSON')} · 3 KB · 31 líneas`) + tools() + viewer(JSON_, 'state.json') + gitRow() + buttons; colMode = 'date'; return h; },
     size: () => { colMode = 'size'; const h = head() + searchRow() + treeBox(tree(), '') + empty() + gitRow() + buttons; colMode = 'date'; return h; },
-    copied: () => head() + searchRow() + treeBox(tree(specOpen), SPEC) + fileHead(SPEC, MDMETA) + tools({ md: true }) + drawn(MD_DRAWN, 'spec.md', 412) + gitRow() + buttons
-      + `<div class="toast" role="status">Copiada: ${SPEC}</div>`,
-    openfail: () => head() + searchRow() + treeBox(tree({ pres: true }), 'presentation/logo.png') + fileHead('presentation/logo.png', `${kind('imagen PNG')} · 48 KB`) + tools() + msgs(['Archivo binario: no se muestra su contenido.']) + '<div class="pos"></div>' + gitRow() + buttons
-      + `<div class="toast" role="status">No hay una app para abrir .png</div>`,
+    // Los avisos ocupan 3 segundos la fila de git: un panel no dibuja una capa encima de otra (Q-12).
+    copied: () => head() + searchRow() + treeBox(tree(specOpen), SPEC) + fileHead(SPEC, MDMETA) + tools({ md: true }) + drawn(MD_DRAWN, 'spec.md', 412)
+      + gitRow(`<span role="status" style="color:var(--cyan)">Copiada: ${SPEC}</span>`) + buttons,
+    openfail: () => head() + searchRow() + treeBox(tree({ pres: true }), 'presentation/logo.png') + fileHead('presentation/logo.png', `${kind('imagen PNG')} · 48 KB`) + tools() + msgs(['Archivo binario: no se muestra su contenido.']) + '<div class="pos"></div>'
+      + gitRow('<span role="status" style="color:var(--cyan)">No se pudo abrir: no hay una app para .png</span>') + buttons,
     code: () => head() + searchRow() + treeBox(tree({ mods: true, files: true, hooks: true }), 'mods/nzt-files/hooks/register.tsx')
       + fileHead('mods/nzt-files/hooks/register.tsx', `<span class="M">M modificado</span> · ${kind('TypeScript')} · 18 KB · 497 líneas`) + tools() + viewer(CODE, 'register.tsx') + gitRow() + buttons,
     json: () => head() + searchRow() + treeBox(tree({ plan: true }), 'Plan/state.json')
@@ -350,7 +405,7 @@
       + fileHead('Plan/state.real.json', '') + msgs(['Este archivo ya no existe.', 'D'], ['Lo borraron mientras estaba abierto.']) + '<div class="pos"></div>' + gitRow() + buttons,
     err: () => head() + searchRow() + treeBox(tree({ err: true }), '') + empty() + gitRow() + buttons,
     loading: () => head('nzt-ai') + msgs(['Leyendo el proyecto…']) + buttons,
-    norepo: () => head('<span class="dim">sin git</span>') + `<div class="hint">Las marcas de git aparecen después de git init.</div>` + searchRow() + treeBox(strip(tree(specOpen)), SPEC)
+    norepo: () => head('<span class="dim">sin git</span>') + `<div class="hint">Las marcas de git aparecen después de git init.</div>` + searchRow('', { git: false }) + treeBox(strip(tree(specOpen)), SPEC)
       + fileHead(SPEC, `${kind('Markdown')} · 31 KB · 412 líneas`) + tools({ md: true }) + drawn(MD_DRAWN, 'spec.md', 412) + gitRow() + buttons,
   };
 
@@ -364,7 +419,7 @@
         const first = [...all].indexOf(seen[0]), fits = win.scrollHeight <= win.clientHeight + 1;
         const total = pos.hasAttribute('data-big') ? '5.000 · sigue' : all.length;
         pos.innerHTML = fits ? `<span>${all.length} líneas</span><span></span>`
-          : `<span>líneas ${first + 1}–${first + seen.length} de ${total}</span><span><button class="btn plain" data-move="-1">⇧↑</button> <button class="btn plain" data-move="1">⇧↓</button></span>`;
+          : `<span>líneas ${first + 1}–${first + seen.length} de ${total}</span><span><button class="btn plain" data-move="-1">▲</button> <button class="btn plain" data-move="1">▼</button></span>`;
       };
       win.addEventListener('scroll', update); update();
     }
@@ -386,7 +441,7 @@
   };
 
   // Clic en el árbol: qué estado del mockup muestra cada fila (no hay más que estos).
-  const GO = { [SPEC]: 'md', 'mods/nzt-files/hooks/register.tsx': 'code', 'Plan/state.json': 'json',
+  const GO = { [SPEC]: 'md', 'mods/nzt-files/hooks/register.tsx': 'lines', 'Plan/state.json': 'json',
     'node_modules': 'many', 'presentation/logo.png': 'bin', 'package-lock.json': 'big', 'presentation/old-logo.png': 'del',
     'secrets': 'err', 'specs': 'md', 'mods': 'code', 'Plan': 'json', 'presentation': 'bin' };
 
@@ -413,6 +468,7 @@
     const box = ev.target.closest('[role="checkbox"]');
     if (box) { go({ state: parse().state === 'mdsrc' ? 'md' : 'mdsrc' }); return; }
     if (ev.target.closest('[data-col]')) { go({ state: parse().state === 'size' ? 'start' : 'size' }); return; }
+    if (ev.target.closest('[data-changes]')) { go({ state: parse().state === 'changes' ? 'start' : 'changes' }); return; }
     const t = ev.target.closest('.tools .btn');
     if (t && /Ampliar|Árbol/.test(t.textContent)) { go({ state: parse().state === 'expand' ? 'md' : 'expand' }); return; }
     if (t && /Copiar/.test(t.textContent)) { go({ state: 'copied' }); return; }

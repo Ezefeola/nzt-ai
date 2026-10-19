@@ -10,7 +10,7 @@ para ver **qué lee y qué escribe Claude** mientras trabaja.
 ```
 ╭────────────────────────────────────────────────────────╮
 │  NZT  Archivos        ⑂ mods → origin/mods ↑2 · ● 9 · Σ │
-│ ⌕ Buscar (s)                    d:⊞ Desplegar p:⊟ Plegar │
+│ ⌕ Buscar (s)      g:± Cambios d:⊞ Desplegar p:⊟ Plegar │
 │ ▸ mods/                               19 oct   M:2     │
 │ ▸ Plan/                               19 oct   U:1 M:1 │
 │ ▾ specs/                              19 oct   M:2     │
@@ -50,13 +50,15 @@ Se abre solo al costado de la conversación cuando empieza la sesión, si hay lu
 |---|---|
 | `d` o **⊞ Desplegar** | abrir todas las carpetas, salvo las pesadas (`node_modules`, `bin`, `obj`, `dist`, `target`) |
 | `p` o **⊟ Plegar** | cerrar todas las carpetas |
+| `g` o **± Cambios** | dejar en el árbol solo lo cambiado desde el último commit; otra vez, el árbol entero |
 | Tab y Enter, o clic | ir a una fila; abrir o cerrar la carpeta, o mostrar el archivo |
 | doble clic, `o` o **Abrir ↗** | abrir el archivo con su app (un `.sln`, en Visual Studio) |
 | `s` | ir a la búsqueda |
 | `c` o **Copiar ruta** | copiar la ruta de la fila desde la carpeta del proyecto |
 | `a` o **Ampliar** | el archivo en todo el panel; **← Árbol** vuelve |
-| `m` o **☑ Markdown** | ver un Markdown dibujado o como fuente || RePág / AvPág, rueda | mover el archivo de a una página / de a una línea |
-| clic en la barra de scroll | llevar el archivo a esa altura |
+| `m` o **☑ Markdown** | ver un Markdown dibujado o como fuente |
+| RePág / AvPág, rueda | mover el archivo de a una página / de a una línea |
+| clic en la barra de scroll | llevar el archivo a esa altura; en el mapa de cambios, a ese cambio |
 | `Σ` | cambiar la columna entre tamaño y fecha o edad |
 | Escape | vaciar la búsqueda, salir de lo ampliado o cerrar |
 
@@ -75,6 +77,13 @@ hasta el archivo. Mencionar `@ruta` en un mensaje también lo deja a la vista.
 **A** nuevo agregado, **D** borrado; una carpeta dice cuántos tiene de cada uno (`U:1 M:2`, o
 un **●** si el panel es angosto). El encabezado dice la rama, la remota y `↑n` `↓n`. La fila de
 abajo dice la operación de git que corre Claude (`↻ haciendo push…`) y cómo terminó.
+**± Cambios** deja en el árbol solo los archivos cambiados, con sus carpetas abiertas.
+
+**Un archivo cambiado** contra el último commit se ve entero como diff, como en nzt-changes: lo
+agregado en **verde** y lo borrado en **rojo**, intercalado donde estaba. Al lado de la barra de
+scroll, un **mapa de cambios** marca a qué altura hay algo agregado (verde) o borrado (rojo,
+también si además se agregó); un clic ahí lleva al cambio. En un Markdown dibujado, los cambios se ven solo en
+el mapa.
 
 **El archivo** muestra su ruta, su marca, su tipo, su tamaño y sus líneas, y el contenido con
 número de línea y los colores que Claude Code le da a ese lenguaje con tu tema. Un `.cs` lo

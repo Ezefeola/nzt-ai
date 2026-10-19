@@ -1,6 +1,6 @@
-import type { Branch, Mark } from '../types'
+import type { BarMark, Branch, Entry, Listing, Mark } from '../types'
 
-import { folderOf } from './tree'
+import { ancestorsOf, folderOf, nameOf } from './tree'
 
 /**
  * The branch from the first entry `git status --porcelain=v1 -z --branch` gives:
@@ -49,6 +49,126 @@ export const linesOf = (out: string, prefix = ''): Record<string, [number, numbe
     lines[path.slice(prefix.length)] = [Number(found[1]), Number(found[2])]
   }
   return lines
+}
+
+/**
+ * One row of a file drawn as a diff against the last commit: its text, kept (` `), added (`+`)
+ * or removed (`-`), its number in the last commit and in the file now. A removed line takes the
+ * number of the line now after it; an added one, of the line of the commit after it.
+ */
+export type DiffLine = { op: ' ' | '+' | '-'; text: string; old: number; now: number }
+
+/**
+ * The whole file as a diff: the hunks of `git diff HEAD -U0`, with the lines between them taken
+ * from `lines`, the file now. A file cut short (`isWhole` false) ends at its last line, without
+ * what was removed after it.
+ */
+export const diffLinesOf = (diff: string, lines: string[], isWhole = true): DiffLine[] => {
+  const out: DiffLine[] = []
+  let old = 1
+  let now = 1
+  let inHunk = false
+  const keepUntil = (line: number) => {
+    while (now < line && now <= lines.length) out.push({ op: ' ', text: lines[now - 1]!, old: old++, now: now++ })
+  }
+  for (const raw of diff.split('\n')) {
+    const header = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(raw)
+    if (header !== null) {
+      const start = Number(header[1])
+      // A hunk that only removes names the line it went after.
+      keepUntil(header[2] === '0' ? start + 1 : start)
+      inHunk = true
+      continue
+    }
+    if (!inHunk) continue
+    const text = raw.slice(1).replace(/\r$/, '')
+    if (raw[0] === '-') out.push({ op: '-', text, old: old++, now })
+    else if (raw[0] === '+') out.push({ op: '+', text, old, now: now++ })
+    else if (raw[0] === ' ') out.push({ op: ' ', text, old: old++, now: now++ })
+  }
+  keepUntil(lines.length + 1)
+  return isWhole ? out : out.filter(line => line.now <= lines.length)
+}
+
+/** A file git sees as new: every one of its lines added. */
+export const allAddedOf = (lines: string[]): DiffLine[] => lines.map((text, at) => ({ op: '+', text, old: 1, now: at + 1 }))
+
+/** Whether a diff holds any change at all. */
+export const hasChange = (lines: DiffLine[]) => lines.some(line => line.op !== ' ')
+
+/**
+ * What a stretch of a diff changed, as the change map of the scroll bar colors it: only added,
+ * only removed, or both; and where its first change is in the stretch.
+ */
+export const changeOf = (lines: DiffLine[]): { kind: BarMark; at: number } | undefined => {
+  const at = lines.findIndex(line => line.op !== ' ')
+  if (at < 0) return undefined
+  const ops = new Set(lines.map(line => line.op))
+  return { kind: ops.has('+') && ops.has('-') ? 'change' : ops.has('+') ? 'add' : 'delete', at }
+}
+
+/** The rows a diff line takes in `Code` at `columns` cells, its text wrapping under the gutter of the widest number. */
+const diffRowsOf = (lines: DiffLine[], columns: number) => {
+  const widest = lines.reduce((max, line) => Math.max(max, line.old, line.now), 1)
+  const room = Math.max(8, columns - String(widest).length - 3)
+  return (line: DiffLine) => Math.max(1, Math.ceil(line.text.replace(/\t/g, '    ').length / room))
+}
+
+/** Lines of a diff back into the one hunk `Code` draws them from, its header counted again. */
+export const sourceOfDiff = (lines: DiffLine[]) => {
+  const first = lines[0]
+  if (first === undefined) return ''
+  const oldCount = lines.filter(line => line.op !== '+').length
+  const nowCount = lines.filter(line => line.op !== '-').length
+  // An empty side of a hunk names the line before it.
+  const oldStart = oldCount === 0 ? first.old - 1 : first.old
+  const nowStart = nowCount === 0 ? first.now - 1 : first.now
+  return [`@@ -${oldStart},${oldCount} +${nowStart},${nowCount} @@`, ...lines.map(line => `${line.op}${line.text}`)].join('\n')
+}
+
+/**
+ * The lines of a diff a window of `rows` rows shows from line `top`, clamped so the window never
+ * runs past the end, as textWindow does for a file.
+ */
+export const diffWindow = (lines: DiffLine[], top: number, rows: number, columns: number) => {
+  const size = diffRowsOf(lines, columns)
+  let last = lines.length
+  for (let used = 0; last > 0 && used + size(lines[last - 1]!) <= rows; last--) used += size(lines[last - 1]!)
+  const first = Math.max(0, Math.min(Number.isFinite(top) ? Math.floor(top) : 0, last))
+  let count = 0
+  for (let used = 0; first + count < lines.length && used + size(lines[first + count]!) <= rows; count++) {
+    used += size(lines[first + count]!)
+  }
+  return { first, count: Math.min(lines.length - first, Math.max(1, count)), total: lines.length, lastTop: last }
+}
+
+/**
+ * Only the changed files and the folders that hold them, all open, for ± Changes. Each entry
+ * keeps the size and date its folder's listing gave, when that folder was read; a deleted file
+ * is left to the tree, which puts it back struck through.
+ */
+export const changedTreeOf = (marks: Record<string, Mark>, known: Record<string, Listing>) => {
+  const listings: Record<string, Listing> = { '': { kind: 'ok', entries: [] } }
+  const open = new Set<string>()
+  const add = (folder: string, entry: Entry) => {
+    const listing = (listings[folder] ??= { kind: 'ok', entries: [] }) as { kind: 'ok'; entries: Entry[] }
+    if (!listing.entries.some(own => own.name === entry.name)) listing.entries.push(entry)
+  }
+  const fromDisk = (path: string, isDir: boolean): Entry => {
+    const listing = known[folderOf(path)]
+    const own = listing?.kind === 'ok' ? listing.entries.find(entry => entry.name === nameOf(path)) : undefined
+    return own ?? { name: nameOf(path), isDir, size: 0, mtimeMs: 0 }
+  }
+  for (const [path, mark] of Object.entries(marks)) {
+    for (const folder of ancestorsOf(path)) {
+      open.add(folder)
+      listings[folder] ??= { kind: 'ok', entries: [] }
+      // A folder gone with everything in it the tree puts back from the deletions.
+      if (Object.entries(marks).some(([held, own]) => own !== 'D' && held.startsWith(`${folder}/`))) add(folderOf(folder), fromDisk(folder, true))
+    }
+    if (mark !== 'D') add(folderOf(path), fromDisk(path, false))
+  }
+  return { listings, open: [...open] }
 }
 
 /** How many files of each mark every folder holds, at any depth. */

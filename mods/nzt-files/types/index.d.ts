@@ -24,13 +24,17 @@ export type Marks =
   | { kind: 'norepo' }
   | { kind: 'ok'; files: Record<string, Mark>; lines: Record<string, [number, number]>; branch?: Branch }
 
+/** What the change map of the scroll bar colors a stretch of the file with: added, removed, or both. */
+export type BarMark = 'add' | 'change' | 'delete'
+
 /**
  * The file the viewer shows. `lines` is how many lines the file has; `shown` how many the
- * viewer keeps; `size` its bytes.
+ * viewer keeps; `size` its bytes; `changes` what git said of the file when its diff against the
+ * last commit was read, null when it has none to show.
  */
 export type Opened =
   | { kind: 'loading' }
-  | { kind: 'text'; lines: number; shown: number; size: number }
+  | { kind: 'text'; lines: number; shown: number; size: number; changes: string | null }
   | { kind: 'binary'; size: number }
   | { kind: 'tooBig'; size: number }
   | { kind: 'deleted' }
@@ -42,7 +46,8 @@ export type Opened =
  * from the project's folder; `treeTop` the first tree row shown, null while the tree follows
  * the cursor; `viewTop` the first line of the file shown (in the drawn Markdown, its first
  * block); `expanded` the file over the whole pane; `markdown` whether a Markdown file is drawn;
- * `search` what is typed in the search; `sized` the Σ button's choice, null for the setting's.
+ * `search` what is typed in the search; `sized` the Σ button's choice, null for the setting's;
+ * `changesOnly` whether the tree shows only what changed since the last commit.
  */
 export type Explorer = {
   open: string[]
@@ -55,6 +60,7 @@ export type Explorer = {
   markdown: boolean
   search: string
   sized: boolean | null
+  changesOnly: boolean
 }
 
 /** What Claude is doing to a file: reading, writing or committing it; `isFading` once it ended well. */

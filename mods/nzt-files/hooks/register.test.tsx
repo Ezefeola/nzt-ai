@@ -18,6 +18,8 @@ type Disk = {
   files: Record<string, string>
   status?: string
   numstat?: string
+  /** What `git diff HEAD -U0` says of each file, by its path from the project folder. */
+  diff?: Record<string, string>
   isRepo?: boolean
   /** What the system says when asked to open a file; unset, it opens. */
   openError?: string
@@ -83,6 +85,7 @@ const fakeDisk = (on: On, disk: Disk) => {
     if (e.argv[0] !== 'git') return disk.openError === undefined ? run('') : run('', 1, disk.openError)
     if (disk.isRepo === false) return run('', 128, 'fatal: not a git repository')
     if (e.argv.includes('--show-prefix')) return run('\n')
+    if (e.argv.includes('-U0')) return run(disk.diff?.[e.argv[e.argv.length - 1]!] ?? '')
     if (e.argv.includes('--numstat')) return run(disk.numstat ?? '')
     if (e.argv[1] === 'show') return run(['README.md', ''].join('\0'))
     if (e.argv[1] === 'log') return run('Update the readme\n')
@@ -205,9 +208,9 @@ test('a file longer than the viewer has a scroll bar, and a click on its last ro
   const ui = await mount($)
   await ui.press({ key: 'n:src' })
   await ui.press({ key: 'n:src/main.ts' })
-  const bar = await ui.find({ type: 'Box', key: 'bar' })
-  expect(bar).toBeDefined()
-  const rows = (bar as { children: unknown[] }).children.length
+  const track = await ui.find({ type: 'Box', key: 'track' })
+  expect(track).toBeDefined()
+  const rows = (track as { children: unknown[] }).children.length
   await ui.press({ key: `bar:${rows - 1}` })
   expect(await ui.find({ type: 'Code', text: /export const v300 = 300/ })).toBeDefined()
 })
@@ -485,6 +488,112 @@ test('outside a repository the tree shows with no marks, and a line says when th
   expect(await ui.find({ type: 'Text', text: /sin git/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /después de git init/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: '●' })).toBeUndefined()
+})
+
+// Changed lines and ± Changes.
+
+
+test('a modified file is drawn whole as a diff, the changed line removed and added again', async ($, on) => {
+  const diff = { 'src/main.ts': ['@@ -1 +1 @@', '-export const a = 0', '+export const a = 1', '@@ -2,0 +3 @@', '+export const c = 3', ''].join('\n') }
+  const text = "export const a = 1\nexport const b = 'two'\nexport const c = 3\n"
+  fakeDisk(on, { ...DISK, diff, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: text } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -1,2 +1,3 @@', '-export const a = 0', '+export const a = 1', " export const b = 'two'", '+export const c = 3'].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a removed line shows between the lines it went between', async ($, on) => {
+  fakeDisk(on, { ...DISK, diff: { 'src/main.ts': '@@ -2 +1,0 @@\n-gone\n' } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -1,3 +1,2 @@', ' export const a = 1', '-gone', " export const b = 'two'"].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a file git does not follow yet is added whole', async ($, on) => {
+  fakeDisk(on, { ...DISK, status: ['## mods', '?? src/main.ts', ''].join('\0') })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -0,0 +1,2 @@', '+export const a = 1', "+export const b = 'two'"].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a file with no changes is drawn as code, with no change map beside the bar', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { startLine: 1 } })
+  expect(((await ui.find({ type: 'Code' })) as { props: { format?: string } }).props.format).toBeUndefined()
+  expect(await ui.find({ type: 'Box', key: 'track' })).toBeDefined()
+  expect(await ui.find({ type: 'Box', key: 'map' })).toBeUndefined()
+})
+
+test('the change map colors the stretch that holds a change, apart from the track, and a click there goes to it', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, diff: { 'src/main.ts': '@@ -249,0 +250 @@\n+export const v250 = 250\n' }, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const map = (await ui.find({ type: 'Box', key: 'map' })) as { children: { props?: { key?: string }; children?: { props?: { color?: string } }[] }[] }
+  const marked = map.children.filter(row => row.children?.[0]?.props?.color === 'green')
+  expect(marked.length).toBe(1)
+  const track = (await ui.find({ type: 'Box', key: 'track' })) as { children: { children?: { props?: { color?: string } }[] }[] }
+  expect(track.children.every(row => row.children?.[0]?.props?.color !== 'green')).toBe(true)
+  await ui.press({ key: marked[0]!.props!.key! })
+  expect(await ui.find({ type: 'Code', text: /^@@ -248,\d+ \+248,\d+ @@\n export const v248 = 248/ })).toBeDefined()
+})
+
+test('a drawn Markdown shows its changes on the change map only', async ($, on) => {
+  const long = Array.from({ length: 80 }, (_, i) => `Párrafo ${i + 1}.\n`).join('\n')
+  const status = ['## mods', ' M README.md', ''].join('\0')
+  fakeDisk(on, { ...DISK, status, diff: { 'README.md': '@@ -69 +69 @@\n-x\n+y\n' }, files: { ...DISK.files, [`${ROOT}/README.md`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Markdown' })).toBeDefined()
+  expect(await ui.find({ type: 'Code' })).toBeUndefined()
+  const map = (await ui.find({ type: 'Box', key: 'map' })) as { children: { children?: { props?: { color?: string } }[] }[] }
+  expect(map.children.some(row => row.children?.[0]?.props?.color === 'red')).toBe(true)
+})
+
+test('± Changes leaves only what changed, and pressed again brings the whole tree back as it was', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'changes' })
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await nameRow(ui, 'old.png')).toBeDefined()
+  expect(await nameRow(ui, 'README.md')).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'open-all' })).toBeUndefined()
+  await ui.press({ key: 'changes' })
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+  expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+})
+
+test('± Changes with nothing changed says so', async ($, on) => {
+  fakeDisk(on, { ...DISK, status: ['## mods', ''].join('\0'), numstat: '' })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'changes' })
+  expect(await ui.find({ type: 'Text', text: /Nada cambió desde el último commit$/ })).toBeDefined()
+})
+
+test('outside a repository there is no ± Changes', async ($, on) => {
+  fakeDisk(on, { ...DISK, isRepo: false })
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Button', key: 'changes' })).toBeUndefined()
 })
 
 test('with notices off the git init line is gone', { options: { notices: false } }, async ($, on) => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 
 import { foundOf, isShown, MAX_FOUND, shellReadOf, touchOf } from './activity'
-import { branchOf, countsOf, gitOpsOf, linesOf } from './git'
+import { allAddedOf, branchOf, changedTreeOf, changeOf, countsOf, diffLinesOf, diffWindow, gitOpsOf, linesOf, sourceOfDiff } from './git'
 import { TEXTS } from './i18n'
 import { blocksOf, blockWindow, hasHugeBlock, MARKDOWN_LIMIT } from './markdown'
 import { statesOf, tokensOf } from './csharp'
@@ -44,6 +44,47 @@ describe('linesOf', () => {
   test('a binary file is left out and a rename counts on its new path', async () => {
     expect(linesOf(z('-\t-\tlogo.png', '4\t1\t', 'old.ts', 'new.ts'))).toEqual({ 'new.ts': [4, 1] })
   })
+})
+
+describe('diffLinesOf', () => {
+  // notas.txt had 10 lines, a to j: line 3 changed, two added after line 6, the old line 9 removed.
+  const diff = ['diff --git a/notas.txt b/notas.txt', '@@ -3 +3 @@', '-c', '+C', '@@ -6,0 +7,2 @@', '+x', '+y', '@@ -9 +10,0 @@', '-i', ''].join('\n')
+  const lines = ['a', 'b', 'C', 'd', 'e', 'f', 'x', 'y', 'g', 'h', 'j']
+
+  test('the whole file, the removed lines between the others where they were', async () => {
+    const whole = diffLinesOf(diff, lines)
+    expect(whole.map(line => `${line.op}${line.text}`)).toEqual([' a', ' b', '-c', '+C', ' d', ' e', ' f', '+x', '+y', ' g', ' h', '-i', ' j'])
+    expect(whole[2]).toEqual({ op: '-', text: 'c', old: 3, now: 3 })
+    expect(whole[11]).toEqual({ op: '-', text: 'i', old: 9, now: 11 })
+    expect(whole[12]).toEqual({ op: ' ', text: 'j', old: 10, now: 11 })
+  })
+
+  test('a file cut short ends at its last line, and a new one is added whole', async () => {
+    expect(diffLinesOf(['@@ -2 +1,0 @@', '-b'].join('\n'), ['a'], false)).toEqual([{ op: ' ', text: 'a', old: 1, now: 1 }])
+    expect(allAddedOf(['a', 'b']).map(line => line.op)).toEqual(['+', '+'])
+  })
+
+  test('a window of the diff goes back to one hunk with its numbers counted again', async () => {
+    const shown = diffLinesOf(diff, lines).slice(7, 12)
+    expect(sourceOfDiff(shown)).toBe(['@@ -7,3 +7,4 @@', '+x', '+y', ' g', ' h', '-i'].join('\n'))
+    expect(sourceOfDiff(diffLinesOf(diff, lines).slice(7, 9))).toBe(['@@ -6,0 +7,2 @@', '+x', '+y'].join('\n'))
+    expect(diffWindow(diffLinesOf(diff, lines), 20, 5, 40)).toEqual({ first: 8, count: 5, total: 13, lastTop: 8 })
+  })
+
+  test('the change map colors a stretch by what changed in it and points at its first change', async () => {
+    const whole = diffLinesOf(diff, lines)
+    expect(changeOf(whole.slice(0, 5))).toEqual({ kind: 'change', at: 2 })
+    expect(changeOf(whole.slice(5, 9))).toEqual({ kind: 'add', at: 2 })
+    expect(changeOf(whole.slice(10, 12))).toEqual({ kind: 'delete', at: 1 })
+    expect(changeOf(whole.slice(12))).toBeUndefined()
+  })
+})
+
+test('± Changes keeps only the changed files under their open folders, the deleted ones struck through', async () => {
+  const marks = { 'src/a.ts': 'M', 'docs/x.md': 'U', 'old/gone.txt': 'D' } as const
+  const tree = changedTreeOf(marks, {})
+  const rows = rowsOf(tree.listings, tree.open, marks).map(row => (row.kind === 'entry' ? `${row.path}${row.isDeleted ? ' ✗' : ''}` : 'error'))
+  expect(rows).toEqual(['docs', 'docs/x.md', 'old', 'old/gone.txt ✗', 'src', 'src/a.ts'])
 })
 
 test('a folder counts the files of each mark it holds at any depth', async () => {

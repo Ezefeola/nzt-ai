@@ -13,7 +13,8 @@
 > vivo (286) antes de que el usuario la acepte. El usuario pidió que el panel pinte
 > lo que Claude lee y escribe, muestre los Markdown dibujados y sume las funciones acordadas el
 > 2026-10-19, sin ocupar contexto ("no quiero que ocupe contexto el mod que hagamos"). Marcas
-> `[add]`, `[modify]` y `[remove]` hasta cerrar el cambio.
+> `[add]`, `[modify]` y `[remove]` hasta cerrar el cambio. Sumado el 2026-10-19 (unidad 290): las
+> líneas cambiadas contra el último commit en el visor y en la barra, y **± Cambios**.
 
 ## Qué resuelve
 
@@ -39,6 +40,9 @@ commit, y debajo el archivo elegido para leer, sin salir de la conversación.
   fuente, y ampliar el archivo a todo el panel; buscar en el árbol; las líneas cambiadas, la
   rama y lo que Claude hace con git; la columna de fecha, edad o tamaño; abrir un archivo con
   su app; copiar su ruta; abrirse solo al empezar la sesión; los ajustes en `/config`. [add]
+- **Qué líneas cambiaron contra el último commit**, en el visor junto al número de línea y en
+  la barra de scroll, como Visual Studio, y un botón que deja en el árbol solo lo cambiado
+  (usuario 2026-10-19). [add]
 
 **Afuera**
 - **Editar, crear, renombrar, mover o borrar** archivos o carpetas. El usuario: "no es
@@ -52,6 +56,10 @@ commit, y debajo el archivo elegido para leer, sin salir de la conversación.
   adentro de los archivos sigue afuera.
 - **Buscar texto adentro de los archivos.** Para eso está Claude. [add]
 - **Mostrar los diffs.** Es lo que hace `nzt-changes`; este panel marca qué cambió, no cómo.
+  [modify] 0.2.0: el visor muestra el archivo cambiado contra el último commit entero, con lo
+  agregado y lo borrado en color, como `nzt-changes` (Q-14). Sigue afuera lo que hizo cada
+  turno de Claude: eso es de `nzt-changes`, que no cambia (usuario 2026-10-19). Tampoco salta de
+  un cambio al siguiente con una tecla: no se pidió.
 - **Pasarle a Claude lo que se está mirando.** El panel es para la persona; Claude no lee lo
   que el panel muestra. 0.2.0 lo confirma: pasarle a Claude, en cada mensaje, el archivo
   elegido ocupa contexto (usuario 2026-10-19). En su lugar, copiar la ruta y pegarla en el
@@ -113,6 +121,44 @@ líneas está (`líneas 41–64 de 312`). El árbol se recorre con la rueda cuan
 Cuando el archivo no entra en el visor, a su derecha hay una barra de scroll: una guía tenue y
 un tramo resaltado tan largo como la parte que se ve y a la altura donde está. Un clic en una
 fila de la barra lleva el archivo a esa altura. Si el archivo entra entero, no hay barra.
+[modify] 0.2.0: en un archivo con cambios (RN-files-cambios-lineas) la barra tiene **dos
+columnas** (Q-14). La de la izquierda, fina, es el mapa de cambios: cada fila representa un
+tramo proporcional del archivo y lleva el color de lo que cambió en él, **verde** si solo se
+agregó y **rojo** si se borró algo, aunque también se haya agregado; sin cambios, va vacía. La
+de la derecha es la de posición, la guía tenue con el tramo que se ve claro, y los colores
+nunca la tocan. Un clic en el mapa lleva el archivo a ese cambio; un clic en la de posición, a
+esa altura. Sin cambios, la barra es una sola columna, la de posición.
+*Origen: usuario 2026-10-19 ("en la barra de scroll"; en vivo, "con los colores se pierde un
+poco donde estamos": Q-14; lo borrado en rojo y no en azul, "que se vea rojo").*
+
+### RN-files-cambios-lineas · [add] · origin: usuario 2026-10-19 ("marcas tipo Visual Studio junto al número de línea", contra el último commit); en vivo, diff completo como `nzt-changes` (Q-14)
+Un archivo con cambios contra el último commit se ve **entero, como diff**: las líneas
+agregadas en **verde**, las borradas en **rojo**, intercaladas donde estaban, y las demás como
+siempre, con el mismo dibujo que `nzt-changes`. Una línea cambiada se ve como la vieja en rojo
+seguida de la nueva en verde. Cada línea lleva su número, el del archivo actual para lo que
+sigue y el del último commit para lo borrado. Un archivo nuevo (**U** o **A**) se ve entero en
+verde. Cuenta lo agregado al índice y lo que no, igual que **M** (RN-files-git). Mientras se
+ve así, el archivo toma los colores de Claude Code, no los propios de C# (RN-files-colores-cs;
+avisado al usuario, Q-14). El scroll recorre las filas del diff, contando las borradas.
+Ejemplo: `notas.txt` tenía 10 líneas en el último commit; se cambió la 3, se agregaron dos
+después de la 6 y se borró la 9 vieja. El visor muestra la 3 vieja en rojo y la nueva en
+verde, la 7 y la 8 nuevas en verde y la 9 vieja en rojo entre la 10 y la 11 nuevas.
+
+### RN-files-cambios-lineas-sin · [add] · origin: propuesta del agente
+Un archivo sin cambios, sin repositorio, binario o que git ignora se ve como siempre, sin
+diff. En un archivo cortado (RN-files-grande), el diff cubre solo las líneas que se ven. El
+Markdown dibujado no se ve como diff, porque un bloque no tiene líneas (RN-files-markdown-bloques):
+sus cambios se ven en el mapa de la barra, y destildar ☑ Markdown lo muestra como diff. Si git
+no puede compararlo, el visor muestra el archivo sin diff y el resto sigue igual
+(RN-files-error). Cuando el archivo cambia, el diff se recalcula con él (RN-files-vivo).
+
+### RN-files-solo-cambios · [add] · origin: usuario 2026-10-19 ("± Cambios (g) deja en el árbol solo lo cambiado"); la forma, propuesta del agente
+**± Cambios** (`g`), junto a Desplegar y Plegar, deja en el árbol solo los archivos cambiados
+contra el último commit (**U**, **A**, **M** y **D**) y las carpetas que los contienen, todas
+abiertas; el botón se ve encendido. Otro clic, o `g`, vuelve al árbol completo con las carpetas
+como estaban. La búsqueda busca dentro de lo que se ve. Si no hay nada cambiado, el árbol dice
+`Nada cambió desde el último commit`. Sin repositorio, el botón no aparece. Lo que cambia
+mientras está encendido entra o sale del árbol solo (RN-files-vivo).
 
 ### RN-files-binario · origin: propuesta del agente
 Si el archivo no es texto (una imagen, un `.dll`, un `.zip`), entonces el visor no muestra
@@ -174,11 +220,11 @@ entonces lo dice en su fila o en el visor, y el resto del panel sigue funcionand
 
 ### RN-files-teclas · [modify] · origin: propuesta del agente (lo que funcionó en `nzt-changes` 0.4.0); 0.2.0, propuesta del agente (Q-11)
 Las flechas recorren las filas del árbol; Enter abre o cierra la carpeta, o muestra el
-archivo en el visor. El archivo se mueve con Mayús+↑ y Mayús+↓ de a una línea y con RePág y
-AvPág de a una página. `s` va a la búsqueda, `d` despliega y `p` pliega todas las carpetas
-(RN-files-plegar-todo; reemplazan a `j` `k` `h` `l`, que el usuario sacó en la prueba en vivo), `c` copia la ruta, `a` amplía, `m` marca o
+archivo en el visor. El archivo se mueve con la rueda y los botones ▲ ▼ de a una línea y con
+RePág y AvPág de a una página (Q-12: Mayús+flechas no llega a un panel). `s` va a la búsqueda, `d` despliega y `p` pliega todas las carpetas
+(RN-files-plegar-todo; reemplazan a `j` `k` `h` `l`, que el usuario sacó en la prueba en vivo), `g` deja solo lo cambiado (RN-files-solo-cambios), `c` copia la ruta, `a` amplía, `m` marca o
 desmarca la casilla Markdown, `o` abre con la app. Escape, en este orden: vacía la búsqueda, sale de lo
-ampliado o cierra el panel.
+ampliado o cierra el panel. **Cerrar** no tiene tecla: se cierra con Escape o con el botón (Q-12).
 
 ### RN-files-acento · origin: mismo criterio que RN-cambios-acento de `nzt-changes` (usuario 2026-10-14)
 El panel sigue la estética de NZT: el acento y la etiqueta NZT de `nzt-changes`.
@@ -288,8 +334,9 @@ vista en el árbol (RN-files-ocultos) y se recorren abriéndolas.
 
 ### RN-files-copiar · [add] · origin: usuario 2026-10-19 (reemplaza pasarle la selección a Claude: "copiar la ruta y pegarla")
 **Copiar ruta** copia al portapapeles la ruta del archivo o carpeta de la fila desde la
-carpeta del proyecto; con Mayús, la ruta completa. Un aviso breve dice qué se copió, o que no
-se pudo. La ruta no entra en la conversación hasta que la persona la pega.
+carpeta del proyecto. Un aviso dice en la fila de git, durante 3 segundos, qué se copió, o que
+no se pudo. La ruta no entra en la conversación hasta que la persona la pega. *Q-12: la ruta
+completa con Mayús no se hace, porque un clic no dice si Mayús estaba apretada.*
 
 ### RN-files-mencion · [add] · origin: usuario 2026-10-19 (funciones acordadas)
 Cuando la persona manda un mensaje que nombra `@ruta` de un archivo del proyecto, el árbol
@@ -321,9 +368,9 @@ Si el tamaño de una carpeta no se puede calcular en 15 segundos o sin permiso, 
 `?` y el resto de la columna sigue.
 
 ### RN-files-iconos · [add] · origin: usuario 2026-10-19 (funciones acordadas)
-Cada fila lleva un ícono según el tipo de archivo o carpeta. El ajuste **Íconos** elige: los
-de Nerd Font si están instalados (por defecto, *auto*), siempre Nerd Font, o solo Unicode
-simple.
+Cada fila lleva un ícono según el tipo de archivo o carpeta. El ajuste **Íconos** elige: *auto*
+(por defecto), siempre Nerd Font, o solo Unicode simple. *Auto* dibuja Unicode simple, porque un
+mod no puede saber qué fuente usa la terminal (Q-12).
 
 ### RN-files-aviso-sin-git · [add] · origin: usuario 2026-10-19 (funciones acordadas)
 Fuera de un repositorio, una línea bajo el encabezado dice que las marcas de git aparecen
@@ -413,7 +460,9 @@ de 0.1.0. La tarea y la acción principal no cambian: elegir un archivo del árb
    (RN-files-rama), `● n` cambiados y **el botón `Σ`** (RN-files-columna). Sin repositorio,
    `sin git` y debajo **la línea de aviso** (RN-files-aviso-sin-git).
 2. **Buscar**: `⌕ Buscar (s)`; escribiendo, el texto y `×`; las coincidencias subrayadas en
-   amarillo en el árbol; sin coincidencias, `Nada con «zzz»` (RN-files-buscar, -buscar-nada).
+   amarillo en el árbol; sin coincidencias, `Nada con «zzz»` (RN-files-buscar, -buscar-nada). A
+   la derecha, `± Cambios` (encendido, en el acento; solo con repositorio), `⊞ Desplegar` y
+   `⊟ Plegar` (estos dos se van con ± Cambios encendido) (RN-files-plegar-todo, -solo-cambios).
 3. Árbol, 15 filas al costado y 7 sobre el prompt. Cada fila: sangría, `▸`/`▾`, nombre, **las
    líneas `+N -N`**, **la columna** (fecha, edad o tamaño; `…` calculando, `?` sin poder) y la
    marca; **una carpeta con cambios, sus conteos** `U:1 M:1`, y en angosto el `●`
@@ -426,11 +475,16 @@ de 0.1.0. La tarea y la acción principal no cambian: elegir un archivo del árb
 6. Contenido: código con número de línea, o **Markdown dibujado** que avanza de a bloque
    (`líneas 1–26 de 412 · de a bloque`); si un bloque es enorme, fuente con una línea que dice
    por qué (RN-files-markdown-bloques, -grande). **Ampliado**, el árbol y la búsqueda se van y
-   el botón dice `← Árbol`.
+   el botón dice `← Árbol`. Un archivo cambiado, en la fuente, **como diff entero**: agregado
+   en verde, borrado en rojo intercalado (Q-14). A la derecha, **la barra de scroll**: con
+   cambios, primero el mapa, `▌` verde si solo se agregó, rojo si se borró algo, o vacío; después la
+   de posición, `│` tenue y el tramo visto `┃` en el acento, que los colores no tocan
+   (RN-files-barra, -cambios-lineas).
 7. **La fila de git**: `↑ haciendo push…`, `● commit hecho · mensaje`, `✗ push falló`
    (RN-files-git-pie).
 8. `[ Cerrar ]`, siempre en la última fila. **Los avisos breves** (ruta copiada, sin app para
-   abrir) flotan sobre las dos últimas filas y no las mueven.
+   abrir) ocupan 3 segundos la fila de git, en cian; un panel no dibuja una capa encima de otra
+   (Q-12).
 
 **Angosto**: sin la columna ni `+N -N`; las carpetas, con `●` en lugar de los conteos; el resto
 como en 0.1.0. **Íconos**: el mockup dibuja el modo Unicode simple; los de Nerd Font se miran en
@@ -444,6 +498,12 @@ prompt × 320 y 800 px, ninguno con scroll horizontal; la tarjeta mide siempre 8
 de `-N` daba 4,15 y la columna tenue 3,68: se aclararon (5,88 y 5,73). Teclado: el orden de Tab
 sigue al de la tarjeta (Σ, búsqueda, filas, herramientas, contenido, Cerrar); revisado por el
 orden de los elementos, no recorrido con teclado.
+**Sumado en la unidad 287** (2026-10-19): los estados *Líneas cambiadas y barra* y *± Cambios
+encendido*, la fila de búsqueda con ± Cambios, Desplegar y Plegar, la barra de scroll en el visor y
+los avisos en la fila de git (Q-12). Mirado a 800 px con Chrome sin ventana; **a 320 px no se
+volvió a medir** (Chrome sin ventana no baja de ~500 px de ancho). En un panel angosto la fila de
+búsqueda no entra entera: se corta a la derecha, sin scroll horizontal; en vivo, a ver si el
+campo de búsqueda queda usable.
 
 ## Preguntas
 
@@ -509,6 +569,26 @@ orden de los elementos, no recorrido con teclado.
   ruta desde el proyecto; íconos en auto como Unicode; avisos en la fila de git; `j` `k` `h` `l`
   como botones; Cerrar sin tecla. El texto de esas reglas se alinea al cerrar (unidad 287). · 2026-10-19
 
+### Q-13 · ¿Confirmás las propuestas del agente de la unidad 290?
+- bloquea: que cuenten como acordadas RN-files-cambios-lineas (verde agregada, azul cambiada, rojo
+  donde se borró), -cambios-lineas-sin (en Markdown dibujado solo en la barra), los colores de
+  RN-files-barra y la forma de RN-files-solo-cambios (carpetas abiertas, `g`, búsqueda adentro)
+- no bloquea construir: se construye con las propuestas y se confirma al verlo en vivo (unidad 287)
+- respuesta: parcial, al verlo en vivo (2026-10-19, hallazgos H-09 a H-11). Las marcas de una
+  columna no alcanzan: reemplazadas por Q-14. La forma de RN-files-solo-cambios queda por
+  confirmar.
+
+### Q-14 · ¿Cómo se ve un archivo cambiado y la barra con cambios? (hallazgos H-09 a H-11)
+- bloquea: RN-files-cambios-lineas, -cambios-lineas-sin y RN-files-barra
+- respuesta (usuario, 2026-10-19):
+  - **Diff completo**: el archivo modificado se ve entero, con las líneas agregadas en verde y
+    las borradas en rojo intercaladas donde estaban, como en nzt-changes; las marcas de una
+    columna se van. Avisado: mientras se ve así, los colores propios de C# no aplican.
+  - **Barra en dos columnas**: una fina con los colores de los cambios y, al lado, la de
+    posición con el tramo visible claro, como el mapa de cambios de VS Code.
+  - Se veía raro: la raya lejos del número, tramos largos pintados en la barra que no
+    coinciden con lo que se ve, y una línea gris de más a la derecha de la barra.
+
 ## Sin determinar
 - [remove]: resuelto por Q-10 en 0.2.0 (app de Windows o comando propio).
   **Abrir en el editor que corresponde al proyecto** (Q-03, después de esta corrida): no solo
@@ -566,6 +646,19 @@ orden de los elementos, no recorrido con teclado.
       recorren el árbol solo si el motor las manda al panel con el árbol entero a la vista: a
       probar en vivo.
     - **`c` ya no cierra** (RN-files-teclas); Cerrar queda sin tecla, con Escape y el botón.
+- **Cambios por línea, resuelto al construir** (unidad 291): [add]
+  - Qué líneas cambiaron sale de `git diff HEAD -U0` del archivo elegido, leído al elegirlo y de
+    nuevo cuando cambia su marca o sus `+N -N` (un commit o un `git add` sin tocar el texto). Un
+    archivo **U** es todo agregado sin preguntarle a git; uno **A** sin ningún commit, también.
+  - [modify] Unidad 293 (Q-14): el diff entero se arma con las partes de `-U0` y, entre ellas,
+    las líneas del archivo como está (`diffLinesOf`); se queda en el módulo, no en el estado de la
+    sesión. Lo dibuja `Code` con `format: 'diff'` (el mismo de `nzt-changes`), de a ventana: cada
+    ventana vuelve a ser una sola parte con su encabezado recontado (`sourceOfDiff`), porque una
+    parte cortada a la mitad no se lee. Lo que ocupa cada línea partida se calcula como en
+    `nzt-changes` (número más ancho más 3 columnas); si el motor partiera distinto, la ventana
+    quedaría corta o larga: **a ver en vivo**. Las marcas de una columna de la 291 se sacaron.
+  - Con **± Cambios** encendido, el clic en una carpeta no la cierra (están todas abiertas) y
+    Desplegar y Plegar no se muestran: las carpetas del árbol entero quedan como estaban.
 - **Color del código** (prueba en vivo, 2026-10-19): el usuario lo vio con poco color. Los colores
   los pone el resaltador de Claude Code con el tema elegido; el mod solo le pasa la ruta, y los
   tipos dicen que el color en pantalla es del motor, nunca del mod (`CodeProps`, 2.1.303). El
@@ -580,16 +673,21 @@ orden de los elementos, no recorrido con teclado.
 
 ## Tests
 
-`claude plugin test mods/nzt-files`: **106 tests** en 0.2.0 (2026-10-19), todos pasan: 20 de la
-lógica del árbol (`tree.test.ts`), 35 de la lógica nueva (con los colores de C#) (`logic.test.ts`: rama, líneas,
-conteos, operaciones de git, qué hace cada herramienta, comandos que solo leen, bloques de
-Markdown, búsqueda, rutas, edad y ajustes) y 51 del panel dibujado (con la barra de scroll) (`register.test.tsx`: lo de
-0.1.0, contexto cero, actividad y su fundido, seguir, git, Markdown, ampliar, búsqueda, teclas,
-copiar, abrir con la app, `@ruta`, columna, íconos y abrir al empezar). También pasan
-`claude plugin validate` y `tsc` con los tipos de 2.1.303.
+`claude plugin test mods/nzt-files`: **120 tests** en 0.2.0 (2026-10-19, unidad 293), todos pasan:
+20 de la lógica del árbol (`tree.test.ts`), 40 de la lógica nueva (con los colores de C# y las
+líneas cambiadas) (`logic.test.ts`: rama, líneas, conteos, operaciones de git, qué hace cada
+herramienta, comandos que solo leen, bloques de Markdown, búsqueda, rutas, edad, ajustes, el
+archivo entero como diff, su ventana, el mapa de cambios y el árbol de ± Cambios) y 60 del panel
+dibujado (con la barra de scroll) (`register.test.tsx`: lo de 0.1.0, contexto cero, actividad y
+su fundido, seguir, git, Markdown, ampliar, búsqueda, teclas, copiar, abrir con la app, `@ruta`,
+columna, íconos, abrir al empezar, el archivo cambiado como diff, el mapa de cambios aparte de la
+barra y ± Cambios). También pasan
+`claude plugin validate` y `tsc --noEmit` con los tipos de 2.1.303 (los de la copia en
+`~/.claude/dev-mods`, que no están en el repositorio).
 **No cubierto hasta QA** (el kit no lo alcanza): que el módulo cargue en una sesión; Escape
 (el kit no levanta un cierre de la persona); las flechas del teclado; el doble clic real; el
-portapapeles y abrir con la app de verdad; los colores y los íconos en una terminal; `/context`
+portapapeles y abrir con la app de verdad; los colores y los íconos en una terminal; cómo dibuja
+el motor el diff y si la ventana del diff llena el visor cuando parte una línea larga; `/context`
 igual con el panel abierto y cerrado; los 50 ms; los subagentes.
 **Prueba en vivo 2026-10-19** (unidad 286, `testing/2026-10-19-en-vivo.md`): pasaron que el
 módulo cargue, `/context` igual con y sin el mod, los mismos resultados de herramienta y el

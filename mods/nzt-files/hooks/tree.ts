@@ -232,14 +232,19 @@ export const thumbOf = (rows: number, first: number, count: number, total: numbe
 /** The top a click on row `row` of a track of `rows` rows scrolls to. */
 export const topAtRow = (row: number, rows: number, lastTop: number) => Math.round((lastTop * row) / Math.max(1, rows - 1))
 
+/** How many rows a line of a file of `total` lines wraps to at `columns` cells, under its number. */
+const lineRowsOf = (total: number, columns: number) => {
+  const room = Math.max(8, columns - String(total).length - 1)
+  return (line: string) => Math.max(1, Math.ceil(line.replace(/\t/g, '    ').length / room))
+}
+
 /**
  * The lines a window of `rows` rows shows from line `top` at `columns` cells, a long line
  * taking as many rows as it wraps to under the gutter of line numbers; clamped so the window
  * never runs past the end.
  */
 export const textWindow = (lines: string[], top: number, rows: number, columns: number) => {
-  const room = Math.max(8, columns - String(lines.length).length - 1)
-  const size = (line: string) => Math.max(1, Math.ceil(line.replace(/\t/g, '    ').length / room))
+  const size = lineRowsOf(lines.length, columns)
   let last = lines.length
   for (let used = 0; last > 0 && used + size(lines[last - 1]!) <= rows; last--) used += size(lines[last - 1]!)
   const first = Math.max(0, Math.min(Number.isFinite(top) ? Math.floor(top) : 0, last))
