@@ -14,6 +14,36 @@ export const folderOf = (path: string) => path.slice(0, Math.max(0, path.lastInd
 export const nameOf = (path: string) => path.slice(path.lastIndexOf('/') + 1)
 export const join = (folder: string, name: string) => (folder === '' ? name : `${folder}/${name}`)
 
+/** The folders that hold `path`, outermost first: `a/b/c.ts` is held by `a` and `a/b`. */
+export const ancestorsOf = (path: string) => {
+  const folders: string[] = []
+  for (let folder = folderOf(path); folder !== ''; folder = folderOf(folder)) folders.unshift(folder)
+  return folders
+}
+
+/**
+ * `path`, absolute or relative to the project's folder `root`, as a path from that folder;
+ * undefined when it lies outside. On Windows the case does not tell paths apart, and Git
+ * Bash's `/c/...` is `C:/...`.
+ */
+export const relativeTo = (root: string, path: string): string | undefined => {
+  const isWindows = /^[A-Za-z]:/.test(root)
+  let clean = path.trim().replace(/\\/g, '/')
+  if (isWindows) clean = clean.replace(/^\/([A-Za-z])\//, (_, drive: string) => `${drive}:/`)
+  const isAbsolute = clean.startsWith('/') || /^[A-Za-z]:\//.test(clean)
+  const words: string[] = []
+  for (const word of (isAbsolute ? clean : `${root}/${clean}`).split('/')) {
+    if (word === '' || word === '.') continue
+    if (word === '..') words.pop()
+    else words.push(word)
+  }
+  const whole = (root.startsWith('/') ? '/' : '') + words.join('/')
+  const same = (a: string, b: string) => (isWindows ? a.toLowerCase() === b.toLowerCase() : a === b)
+  if (same(whole, root)) return ''
+  if (!same(whole.slice(0, root.length + 1), `${root}/`)) return undefined
+  return whole.slice(root.length + 1)
+}
+
 const markOf = (xy: string): Mark | undefined => {
   if (xy === '??') return 'U'
   const [x, y] = [xy[0], xy[1]]
@@ -39,7 +69,8 @@ export const marksOf = (out: string, prefix = ''): Record<string, Mark> => {
   }
   for (let i = 0; i < parts.length; i++) {
     const entry = parts[i] ?? ''
-    if (entry.length < 4) continue
+    // `--branch` puts the branch first, as `## main...origin/main`.
+    if (entry.length < 4 || entry.startsWith('## ')) continue
     const xy = entry.slice(0, 2)
     const isRename = xy[0] === 'R' || xy[0] === 'C'
     const from = isRename ? parts[++i] : undefined
@@ -85,7 +116,7 @@ export const withDeleted = (folder: string, entries: Entry[], marks: Record<stri
     const name = cut < 0 ? rest : rest.slice(0, cut)
     if (names.has(name)) continue
     names.add(name)
-    extra.push({ name, isDir: cut >= 0 })
+    extra.push({ name, isDir: cut >= 0, size: 0, mtimeMs: 0 })
   }
   return sortedOf([...entries, ...extra])
 }
@@ -101,6 +132,8 @@ export type Row =
       isOpen: boolean
       mark?: Mark
       isDeleted: boolean
+      size: number
+      mtimeMs: number
     }
   | { kind: 'error'; path: string; depth: number; message: string }
 
@@ -130,6 +163,8 @@ export const rowsOf = (listings: Record<string, Listing>, open: string[], marks:
         isOpen: opened,
         ...(mark === undefined ? {} : { mark }),
         isDeleted,
+        size: entry.size,
+        mtimeMs: entry.mtimeMs,
       })
       if (opened) walk(path, depth + 1)
     }

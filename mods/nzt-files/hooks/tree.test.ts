@@ -3,6 +3,8 @@ import { describe, expect, test } from 'claude-code/testing'
 import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, treeWindow, withDeleted } from './tree'
 
 const status = (...entries: string[]) => [...entries, ''].join('\0')
+const file = (name: string) => ({ name, isDir: false, size: 0, mtimeMs: 0 })
+const folder = (name: string) => ({ name, isDir: true, size: 0, mtimeMs: 0 })
 
 describe('marksOf', () => {
   test('reads each status as the mark VS Code shows', async () => {
@@ -26,29 +28,19 @@ test('a folder takes the strongest mark it holds at any depth', async () => {
 })
 
 test('the tree hides .git and lists folders first, each group by name without case', async () => {
-  const entries = [
-    { name: 'readme.md', isDir: false },
-    { name: '.git', isDir: true },
-    { name: 'src', isDir: true },
-    { name: 'App.ts', isDir: false },
-    { name: 'Docs', isDir: true },
-  ]
+  const entries = [file('readme.md'), folder('.git'), folder('src'), file('App.ts'), folder('Docs')]
   expect(sortedOf(entries).map(entry => entry.name)).toEqual(['Docs', 'src', 'App.ts', 'readme.md'])
 })
 
 test('what was deleted since the last commit is put back where it was', async () => {
-  const entries = withDeleted('', [{ name: 'src', isDir: true }], { 'old.png': 'D', 'gone/a.md': 'D', 'src/x.ts': 'D' })
-  expect(entries).toEqual([
-    { name: 'gone', isDir: true },
-    { name: 'src', isDir: true },
-    { name: 'old.png', isDir: false },
-  ])
+  const entries = withDeleted('', [folder('src')], { 'old.png': 'D', 'gone/a.md': 'D', 'src/x.ts': 'D' })
+  expect(entries).toEqual([folder('gone'), folder('src'), file('old.png')])
 })
 
 describe('rowsOf', () => {
   const listings = {
-    '': { kind: 'ok' as const, entries: [{ name: 'src', isDir: true }, { name: 'README.md', isDir: false }] },
-    src: { kind: 'ok' as const, entries: [{ name: 'main.ts', isDir: false }] },
+    '': { kind: 'ok' as const, entries: [folder('src'), file('README.md')] },
+    src: { kind: 'ok' as const, entries: [file('main.ts')] },
   }
 
   test('an open folder shows its entries one level deeper, with marks and dots', async () => {

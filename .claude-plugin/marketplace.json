@@ -18,7 +18,7 @@
     {
       "name": "nzt-files",
       "source": "./mods/nzt-files",
-      "description": "Browse the project like an editor's explorer: folders that open and close, git marks, and the chosen file beneath"
+      "description": "Browse the project like an editor's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file beneath"
     },
     {
       "name": "nzt-hub",

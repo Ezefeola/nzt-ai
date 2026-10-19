@@ -1,7 +1,7 @@
 {
   "name": "nzt-files",
-  "version": "0.1.1",
-  "description": "Browse the project like an editor's explorer: folders that open and close, git marks, and the chosen file beneath",
+  "version": "0.2.0",
+  "description": "Browse the project like an editor's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file beneath",
   "author": { "name": "Ezefeola" },
   "types": "./types/index.d.ts",
   "userConfig": {
@@ -11,6 +11,51 @@
       "description": "The language the pane speaks: es (español) or en (English)",
       "default": "es",
       "options": ["es", "en"]
+    },
+    "activity": {
+      "type": "string",
+      "title": "Claude's activity",
+      "description": "What the tree paints of Claude's work: read-write, write, read or none",
+      "default": "read-write",
+      "options": ["read-write", "write", "read", "none"]
+    },
+    "follow": {
+      "type": "boolean",
+      "title": "Follow Claude",
+      "description": "The tree opens the folders and moves to the file Claude reads, writes or commits",
+      "default": true
+    },
+    "openAtStart": {
+      "type": "boolean",
+      "title": "Open at start",
+      "description": "The pane opens beside the conversation when the session starts, when there is room",
+      "default": true
+    },
+    "column": {
+      "type": "string",
+      "title": "Column",
+      "description": "What each row shows at its right: date, age or size",
+      "default": "date",
+      "options": ["date", "age", "size"]
+    },
+    "openWith": {
+      "type": "string",
+      "title": "Open with",
+      "description": "A command to open files with instead of the system's app: {path} is the file, {dir} its folder (e.g. code -g {path})",
+      "default": ""
+    },
+    "icons": {
+      "type": "string",
+      "title": "Icons",
+      "description": "The rows' icons: auto, nerd (Nerd Font) or unicode",
+      "default": "auto",
+      "options": ["auto", "nerd", "unicode"]
+    },
+    "notices": {
+      "type": "boolean",
+      "title": "Notices",
+      "description": "The line that says git marks show after git init",
+      "default": true
     }
   }
 }

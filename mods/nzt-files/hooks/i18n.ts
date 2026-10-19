@@ -17,6 +17,32 @@ const thousands = (sep: string) => (n: number) => String(n).replace(/\B(?=(\d{3}
 const es = thousands('.')
 const en = thousands(',')
 
+const MINUTE = 60_000
+const HOUR = 60 * MINUTE
+const DAY = 24 * HOUR
+
+/** A day as the language writes it short, with the year only when it is not this one. */
+const dayIn = (months: readonly string[], order: 'day-month' | 'month-day') => (ms: number, now: number) => {
+  const when = new Date(ms)
+  const day = when.getDate()
+  const month = months[when.getMonth()]!
+  const year = when.getFullYear() === new Date(now).getFullYear() ? '' : ` ${when.getFullYear()}`
+  return (order === 'day-month' ? `${day} ${month}` : `${month} ${day}`) + year
+}
+
+/** How long ago, in its largest unit; past a week, the day. */
+const ageIn = (justNow: string, day: (ms: number, now: number) => string) => (ms: number, now: number) => {
+  const ago = Math.max(0, now - ms)
+  if (ago < MINUTE) return justNow
+  if (ago < HOUR) return `${Math.floor(ago / MINUTE)}m`
+  if (ago < DAY) return `${Math.floor(ago / HOUR)}h`
+  if (ago < 7 * DAY) return `${Math.floor(ago / DAY)}d`
+  return day(ms, now)
+}
+
+const dayEs = dayIn(['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'], 'day-month')
+const dayEn = dayIn(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], 'month-day')
+
 export const TEXTS = {
   es: {
     title: 'Archivos',
@@ -53,6 +79,26 @@ export const TEXTS = {
     folderUnreadable: (message: string) => `no se pudo leer: ${message}`,
     above: (n: number) => `↑ ${n} más`,
     below: (n: number) => `↓ ${n} más`,
+    search: 'Buscar (s)',
+    noMatch: (query: string) => `Nada con «${query}»`,
+    markdown: 'Markdown',
+    expand: 'Ampliar',
+    back: '← Árbol',
+    copy: 'Copiar ruta',
+    open: 'Abrir ↗',
+    copied: (path: string) => `Ruta copiada: ${path}`,
+    copyFailed: 'No se pudo copiar la ruta.',
+    openFailed: (reason: string) => `No se pudo abrir: ${reason}`,
+    noApp: 'no hay una app para este tipo de archivo',
+    markdownHuge: 'Se ve como fuente: un bloque es más grande de lo que Claude Code dibuja de una vez.',
+    blockLines: (from: number, to: number, total: number) => `líneas ${es(from)}–${es(to)} de ${es(total)} · de a bloque`,
+    gitRunning: (op: string) => `haciendo ${op}…`,
+    gitDone: (op: string) => `${op} hecho`,
+    gitFailed: (op: string) => `${op} falló`,
+    gitOps: { pr: 'pull request' } as Record<string, string>,
+    noGitHint: 'Las marcas de git aparecen después de git init.',
+    age: ageIn('ahora', dayEs),
+    day: dayEs,
   },
   en: {
     title: 'Files',
@@ -89,6 +135,26 @@ export const TEXTS = {
     folderUnreadable: (message: string) => `could not be read: ${message}`,
     above: (n: number) => `↑ ${n} more`,
     below: (n: number) => `↓ ${n} more`,
+    search: 'Search (s)',
+    noMatch: (query: string) => `Nothing with “${query}”`,
+    markdown: 'Markdown',
+    expand: 'Expand',
+    back: '← Tree',
+    copy: 'Copy path',
+    open: 'Open ↗',
+    copied: (path: string) => `Path copied: ${path}`,
+    copyFailed: 'The path could not be copied.',
+    openFailed: (reason: string) => `Could not open: ${reason}`,
+    noApp: 'no app is set for this kind of file',
+    markdownHuge: 'Shown as source: a block is larger than Claude Code draws at once.',
+    blockLines: (from: number, to: number, total: number) => `lines ${en(from)}–${en(to)} of ${en(total)} · by block`,
+    gitRunning: (op: string) => `running ${op}…`,
+    gitDone: (op: string) => `${op} done`,
+    gitFailed: (op: string) => `${op} failed`,
+    gitOps: { pr: 'pull request' } as Record<string, string>,
+    noGitHint: 'Git marks show after git init.',
+    age: ageIn('now', dayEn),
+    day: dayEn,
   },
 } as const
 
