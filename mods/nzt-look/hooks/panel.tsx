@@ -40,6 +40,7 @@ export type PanelHandlers = {
   words: (words: Prefs['words']) => void
   pick: (key: PaletteKey) => void
   paint: (value: string) => void
+  install: () => void
   close: () => void
 }
 
@@ -225,6 +226,12 @@ export const drawPanel = (elements: PanelElements, model: PanelModel, on: PanelH
 
       {section(Text, t.sectionClaude, palette)}
       <Text wrap="wrap">{t.claudeTheme}</Text>
+      <Button key="install" plain label={t.installThemes} onPress={on.install} />
+      {notice?.kind === 'installed' && <Text color={palette.ok} wrap="wrap">{`✓ ${t.installed(notice.folder)}`}</Text>}
+      {notice?.kind === 'installed' && notice.kept.length > 0 && (
+        <Text color={palette.warn} wrap="wrap">{`! ${t.kept(notice.kept.join(', '))}`}</Text>
+      )}
+      {notice?.kind === 'installFailed' && <Text color={palette.err} wrap="wrap">{`✗ ${t.installFailed(notice.reason)}`}</Text>}
       <Text color={palette.muted} wrap="wrap">{`\n${t.designHint}`}</Text>
       <Box marginTop={1}>
         <Button key="close" label={t.close} hotkey="c" onPress={on.close} />

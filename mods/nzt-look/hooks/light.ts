@@ -32,6 +32,13 @@ export const variantNamed = (value: unknown): Variant | null => {
   return name.includes('light') ? 'light' : name.includes('dark') ? 'dark' : null
 }
 
+/**
+ * Whether Claude Code's theme is NZT oscuro or claro: `custom:<file>` for one in the person's
+ * themes folder, `custom:<plugin>:<file>` for one a plugin brings.
+ */
+export const isNztClaudeTheme = (value: unknown): boolean =>
+  typeof value === 'string' && /^custom:(?:[^:]+:)?nzt-(?:dark|light)$/i.test(value.trim())
+
 /** `COLORFGBG` is `<fg>;<bg>` (sometimes `<fg>;<default>;<bg>`); background 7 or 15 is light. */
 export const colorfgbgLight = (value: string | undefined): boolean | null => {
   if (value === undefined) return null

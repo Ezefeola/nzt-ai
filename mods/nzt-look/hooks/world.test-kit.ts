@@ -6,11 +6,12 @@ export type On = Parameters<TestBody>[1]
 
 /**
  * What a session answers beneath the mod: a store and a clock in memory, a pane that places, a
- * clipboard that takes, the command registry, the debug log and the session's figures.
+ * clipboard that takes, the command registry, the debug log and the session's figures. A test
+ * that answers the store itself passes `null`.
  */
-export const world = (on: On, store: Record<string, unknown> = {}, now = Date.parse('2026-10-18T12:00:00Z')) => {
+export const world = (on: On, store: Record<string, unknown> | null = {}, now = Date.parse('2026-10-18T12:00:00Z')) => {
   const seen = { opens: 0, copies: [] as string[], toasts: [] as string[], clock: mock.clock(on, { now }) }
-  mock.store(on, store)
+  if (store !== null) mock.store(on, store)
   on('command.register', async (_, e) => ({ value: { command: (e as { name: string }).name } }) as never)
   on('ui.log', async () => ({ value: undefined }) as never)
   on('ui.open', async () => {

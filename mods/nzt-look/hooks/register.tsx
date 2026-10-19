@@ -35,8 +35,8 @@ import type { LiveProps } from './band-live'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { agentLineOf, CONFIRM_MS, crossingLineOf, effortOf, isAbove, isConfirming, levelOf, NO_USAGE, usageOf } from './kernel'
-import { colorfgbgLight, gnomeLight, macLight, variantNamed, variantOf, windowsLight } from './light'
-import { hexOf } from './palette'
+import { colorfgbgLight, gnomeLight, isNztClaudeTheme, macLight, variantNamed, variantOf, windowsLight } from './light'
+import { DEFAULT_THEME, hexOf } from './palette'
 import { drawPanel } from './panel'
 import {
   codeColorsOf,
@@ -55,7 +55,9 @@ import {
 
 const PANE = 'nzt-look'
 const COMMAND = 'nzt-look'
-const VERSION = '0.2.0'
+const VERSION = '0.5.0'
+// The mod's own files for Claude Code's /theme, copied as they are.
+const CLAUDE_THEME_FILES = ['nzt-dark.json', 'nzt-light.json']
 const DOCK_COLUMNS = 72
 const INLINE_ROWS = 30
 // A longer prompt keeps Claude Code's own drawing, which folds a big paste.
@@ -95,6 +97,10 @@ const SECOND_MS = 1000
 let isShowing = false
 let t: Texts = TEXTS.es
 let lang: 'es' | 'en' = 'es'
+// The session the store was last read for. /clear, /resume and /branch go on under another id
+// with $.state back at its initial values and no session.start, so the look would fall back to
+// the defaults while the store still holds the person's choice.
+let loadedFor: string | undefined
 
 const reasonOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
@@ -116,6 +122,25 @@ async function load($: EngineInterface) {
   await update($, prefsAtom, () => prefs)
   await update($, foldersAtom, () => folders)
   await update($, folderAtom, () => folder)
+}
+
+/**
+ * Reads the store again when the session's id changed. No await between the check and the mark,
+ * so a burst of rows loads once; a failed load lets the next row try again.
+ */
+async function reloadIfNewSession($: EngineInterface) {
+  const id = await $.session.id().catch(() => undefined)
+  if (id === undefined || id === loadedFor) return
+  loadedFor = id
+  try {
+    await load($)
+    await readThemeSetting($)
+    await refreshAppearance($)
+    await refreshModel($)
+  } catch (error) {
+    if (loadedFor === id) loadedFor = undefined
+    logDebug($, 'reload', error)
+  }
 }
 
 async function savePrefs($: EngineInterface, change: (prefs: Prefs) => Prefs) {
@@ -195,6 +220,48 @@ async function saveCustom($: EngineInterface, theme: CustomTheme) {
 
 async function say($: EngineInterface, notice: PanelNotice | null) {
   await update($, noticeAtom, () => notice)
+}
+
+/** NZT oscuro or claro picked in /theme brings the mod to `nzt` too, the drawing left on or off as it was. */
+async function followClaudeTheme($: EngineInterface, value: unknown) {
+  if (!isNztClaudeTheme(value)) return
+  const folder = await read($, folderAtom)
+  if (folder !== null && (await read($, foldersAtom))[folder] !== undefined) {
+    await saveFolders($, all => ({ ...all, [folder]: DEFAULT_THEME }))
+    return
+  }
+  await savePrefs($, prefs => ({ ...prefs, theme: DEFAULT_THEME }))
+}
+
+/** Where Claude Code keeps the person's own themes; null when nothing names a home. */
+async function claudeThemesFolder($: EngineInterface): Promise<string | null> {
+  const joined = (base: string, ...names: string[]) => [base, ...names].join(base.includes('\\') ? '\\' : '/')
+  const configured = await $.env.get('CLAUDE_CONFIG_DIR').catch(() => undefined)
+  if (configured) return joined(configured, 'themes')
+  const home = (await $.env.get('HOME').catch(() => undefined)) || (await $.env.get('USERPROFILE').catch(() => undefined))
+  return home ? joined(home, '.claude', 'themes') : null
+}
+
+/**
+ * Copies NZT oscuro and claro where /theme lists the person's themes. A file there already that
+ * differs is left alone: /theme edits that copy in place, and the person's changes win.
+ */
+async function installThemes($: EngineInterface) {
+  const folder = await claudeThemesFolder($)
+  if (folder === null) return say($, { kind: 'installFailed', reason: t.noHome })
+  try {
+    const kept: string[] = []
+    for (const file of CLAUDE_THEME_FILES) {
+      const text = await $.fs.read(`${$.plugin.root}/themes/${file}`)
+      const target = `${folder}${folder.includes('\\') ? '\\' : '/'}${file}`
+      const held = await $.fs.read(target).catch(() => null)
+      if (held === null) await $.fs.write(target, text as string)
+      else if (held !== text) kept.push(file)
+    }
+    await say($, { kind: 'installed', folder, kept })
+  } catch (error) {
+    await say($, { kind: 'installFailed', reason: reasonOf(error) })
+  }
 }
 
 async function pin($: EngineInterface) {
@@ -471,6 +538,7 @@ export const register: Register = (on, options) => {
       .register({ name: COMMAND, description: t.commandDescription, argumentHint: t.commandHint })
       .catch(error => logDebug($, 'command', error))
     await $.tool.register(DESIGN_SPEC).catch(error => logDebug($, 'design tool', error))
+    loadedFor = await $.session.id().catch(() => undefined)
     await load($).catch(error => logDebug($, 'load', error))
     await readThemeSetting($)
     await refreshAppearance($)
@@ -584,6 +652,18 @@ export const register: Register = (on, options) => {
     }
     return next(e)
   })
+
+  on('classic.SessionStart', { source: ['clear', 'resume', 'fork'] }, async ($, e, next) => {
+    await reloadIfNewSession($)
+    return next(e)
+  }).catch(($, e, next) => next(e))
+
+  // On a Team or Enterprise plan the built-in guard can hold classic.SessionStart back from a
+  // user's mod: the new session's first row catches the change instead.
+  on('session.append', async ($, e, next) => {
+    await reloadIfNewSession($)
+    return next(e)
+  }).catch(($, e, next) => next(e))
 
   // Typing cancels a clear waiting for its second press.
   on('prompt.change', async ($, e, next) => {
@@ -845,6 +925,7 @@ export const register: Register = (on, options) => {
     const set = await next(e)
     if (e.key === 'theme' && set.deny === undefined) {
       await update($, themeSettingAtom, () => (typeof set.value === 'string' ? set.value : null))
+      await followClaudeTheme($, set.value)
     }
     return set
   }).catch(($, e, next) => next(e))
@@ -894,6 +975,7 @@ export const register: Register = (on, options) => {
         words: words => toggle($, p => ({ ...p, words })),
         pick: (key: PaletteKey) => pickColor($, key),
         paint: (value: string) => paint($, value),
+        install: () => installThemes($),
         close: () => closePane($),
       },
     )

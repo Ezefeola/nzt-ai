@@ -101,6 +101,9 @@ export type PanelNotice =
   | { kind: 'invalid'; value: string }
   | { kind: 'pinned' }
   | { kind: 'unpinned' }
+  /** NZT oscuro and claro copied to Claude Code's themes folder; `kept`, files there already that differ. */
+  | { kind: 'installed'; folder: string; kept: string[] }
+  | { kind: 'installFailed'; reason: string }
 
 /** The panel's open repaint: which color is being changed. */
 export type Repaint = { key: PaletteKey } | null

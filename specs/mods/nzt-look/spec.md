@@ -89,6 +89,11 @@ siguen estando, como en `nzt-context`.
 Al instalarlo, el tema del mod es `nzt` en la variante que corresponde al tema de Claude Code. Se
 cambia con `/nzt-look <tema>` o en el panel, y la elección se recuerda entre sesiones.
 
+#### RN-skin-tras-clear · origin: usuario 2026-10-19 ("cuando limpio contexto se pierde el look elegido") · [add]
+Después de `/clear`, `/resume` o `/branch` el look sigue siendo el elegido: tema, variante, partes,
+banda, temas propios y el tema fijado a la carpeta. Claude Code sigue el proceso con otra sesión
+sin avisarle al mod, así que el mod vuelve a leer lo guardado cuando ve que la sesión cambió.
+
 #### RN-skin-variante · origin: alcance del usuario 2026-10-17 y su pedido de ese día
 Cada tema tiene variante oscura y clara, y la variante sigue al tema de Claude Code: con `auto`,
 sigue a la terminal o al sistema. Se puede forzar una de las dos con una opción del mod.
@@ -98,10 +103,16 @@ El tema `nzt` usa la paleta y los roles de `specs/nzt-brand.md`, y ese documento
 Los colores de error y aviso y la variante clara salen de sus preguntas Q-01 y Q-02 (cerradas en
 la 222). Qué rol toma cada color está en *Diseño · tema nzt*.
 
-#### RN-skin-tema-claude · origin: spike S-01, S-02 y S-04b (unidad 219)
-NZT oscuro y NZT claro aparecen en `/theme` de Claude Code con la paleta de `nzt`. El mod no los
-activa ni los apaga: el panel de opciones dice cómo elegirlos en `/theme`. Elegir un tema del mod no
-cambia el de Claude Code, y al revés solo cambia la variante (RN-skin-variante).
+#### RN-skin-tema-claude · origin: spike S-01, S-02 y S-04b (unidad 219); usuario 2026-10-19 (opción 1) · [modify]
+NZT oscuro y NZT claro llegan a `/theme` de Claude Code con la paleta de `nzt`. El mod no puede
+elegir el tema de Claude Code (observado con 2.1.303: la opción `theme` solo acepta sus 7 temas),
+así que el panel tiene un botón que copia los dos a la carpeta de temas de la persona
+(`~/.claude/themes/`, o la de `CLAUDE_CONFIG_DIR`), y ella elige uno en `/theme`. Un archivo que ya
+está ahí y es distinto no se pisa: el panel lo dice. Elegir NZT oscuro o claro en `/theme` pone el
+mod en `nzt` (en la carpeta fijada, si la hay), sin prender ni apagar el dibujo; elegir otro tema de
+Claude Code solo cambia la variante (RN-skin-variante). Elegir un tema del mod no cambia el de
+Claude Code. El borde del prompt y el spinner de Claude Code solo llevan la marca con NZT oscuro
+o claro elegido en `/theme`.
 
 #### RN-skin-no-cansa · origin: usuario 2026-10-18 ("que los colores no sean dañinos a la vista, no muy brillosos") · [add]
 Ninguna paleta oscura escribe texto más brillante que el texto de alto énfasis de Material, ni un
@@ -763,7 +774,8 @@ que `register.tsx` obtiene de `$.ui.resolve(e)` y les pasa.** Por eso se pueden 
 
 | Hook | Para qué | Reglas |
 |---|---|---|
-| `session.start`, `classic.SessionStart` (`clear`, `resume`) | leer `prefs`, `folders` y `custom`; resolver tema y variante; registrar `/nzt-look` y la herramienta de diseño | RN-skin-tema-por-defecto, -por-carpeta, -comando |
+| `session.start` | leer `prefs`, `folders` y `custom`; resolver tema y variante; registrar `/nzt-look` y la herramienta de diseño | RN-skin-tema-por-defecto, -por-carpeta, -comando |
+| `classic.SessionStart` (`clear`, `resume`, `fork`) y, de respaldo, `session.append` [modify] | si el id de la sesión cambió, leer todo de nuevo (flujo 1); el respaldo cubre los planes Team o Enterprise, donde una protección de Claude Code puede no pasarle `classic.SessionStart` a un mod de usuario | RN-skin-tras-clear |
 | `config.set` (`theme`) | recalcular la variante cuando cambia el tema de Claude Code | RN-skin-variante |
 | `command.run` (`nzt-look`) | abrir el panel, o `off`, `on`, `<tema>`, `copy`, `copy code` | RN-skin-apagado, -copiar |
 | `ui.render` `Pane` | el panel de opciones | sección *Panel de opciones* |
@@ -792,6 +804,9 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
       `auto`, de la terminal o del sistema (QT-03).
    4. La paleta es la del tema en esa variante (la propia, o la calculada si no la trae, QT-06),
       ajustada a 4,5:1 (QT-05). **Se calcula acá y no se guarda.**
+   5. Tras `/clear`, `/resume` o `/branch` no hay `session.start` y el estado de la sesión vuelve a
+      sus valores iniciales: el primer `classic.SessionStart` o la primera fila de la sesión nueva
+      repite 1.1 a 1.4 (RN-skin-tras-clear).
 2. **Dibujar una parte.** El hook toma la paleta resuelta y los datos del evento, y llama a la pieza
    que arma el árbol. Si la pieza dice que no puede, o lanza, el hook devuelve `next(e)`
    (RN-skin-cae-al-original).
@@ -1130,6 +1145,13 @@ de la 223; mientras tanto, los flujos van en lista.
 - respuesta: van como temas del plugin, en `mods/nzt-look/themes/`. El mod no escribe en
   `~/.claude/themes/`. Si en la 224 no aparecen instalados, esta pregunta se reabre con
   alternativas. · investigado
+- observado (2026-10-19, 2.1.303, `$.config.list` con el mod por `--plugin-dir` y con un tema en
+  `~/.claude/themes/`): la opción `theme` es `choice` con los 7 temas de Claude Code; ni los del
+  plugin ni los del usuario figuran, así que `$.config.set` no los elige (S-02). Un mod sí escribe
+  en `~/.claude/themes/` con `$.fs.write` (probado y borrado).
+- respuesta [modify]: el mod sigue trayendo `themes/`, y además el panel los copia a la carpeta de
+  temas de la persona con un botón (usuario 2026-10-19, opción 1 de tres: copiar, solo seguir
+  `/theme`, solo documentarlo). RN-skin-tema-claude. · decidido por el usuario
 
 ### QT-03 · ¿Cómo sabe el mod si el tema de Claude Code es claro u oscuro?
 - investigado: la referencia mira si el valor de la opción `theme` contiene `light` o `dark`

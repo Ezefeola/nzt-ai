@@ -1,6 +1,6 @@
 # nzt-look
 
-> Versión **0.4.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
+> Versión **0.5.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
 
 Cambia **cómo se ve una sesión de Claude Code**: un tema de colores, una banda sobre el prompt
 con lo que llevás gastado, y la conversación redibujada para leerla de un vistazo. Reemplaza a
@@ -53,8 +53,12 @@ una segunda pulsación** antes de limpiar: limpiar borra la conversación y no s
 entra en el ancho, se van primero los tokens, las cuentas regresivas, el costo, el effort, el modelo, el semanal, el de 5
 horas y el botón.
 
-**NZT oscuro y NZT claro** también están en `/theme`, para que el borde del prompt y el spinner
-de Claude Code lleven la marca: elegilos ahí una vez. El mod no puede cambiar ese tema por vos.
+**NZT oscuro y NZT claro** para `/theme`: el borde del prompt y el spinner los pinta el tema de
+Claude Code, y un mod no puede elegirlo por vos. En el panel, **copiar NZT oscuro y claro a /theme**
+los deja en `~/.claude/themes/` (un archivo que ya está y es distinto no se pisa); después elegí
+uno en `/theme`. Queda guardado en tu configuración, y elegirlo pone también el mod en `nzt`.
+
+El look elegido se mantiene después de `/clear`, `/resume` y `/branch`.
 
 ## Qué redibuja
 
