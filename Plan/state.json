@@ -41,7 +41,7 @@
           "id": 272,
           "do": "Cerrar nzt-look 0.5.0 aceptado por el usuario: barrer marcas de la spec, resultados en pruebas, catálogo",
           "status": "done",
-          "detail": "Spec: estado 'aceptada', marcas fuera salvo el [add] de la fila de skill (BUG-001); resultados en specs/testing/2026-10-18-nzt-look.md; catálogo de nzt-mods.md. Sin commit todavía"
+          "detail": "Spec: estado 'aceptada', marcas fuera salvo el [add] de la fila de skill (BUG-001); resultados en specs/testing/2026-10-18-nzt-look.md; catálogo de nzt-mods.md. Commit 101aa22 con push a origin/mods; el merge lo hace el usuario"
         }
       ]
     },
@@ -61,7 +61,7 @@
   "approved": true,
   "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-19: nzt-look aceptado y cerrado en 0.5.0; se retoma más adelante solo si hay que modificar algo. Pendiente fuera de la corrida: commit del cierre, release/tags y borrar copias de ~/.claude/dev-mods tras el merge",
+    "Usuario 2026-10-19: nzt-look aceptado y cerrado en 0.5.0; se retoma más adelante solo si hay que modificar algo. Pendiente fuera de la corrida: merge de mods (lo hace el usuario), release/tags y borrar copias de ~/.claude/dev-mods tras el merge",
     "Corrida anterior (nzt-look 0.1.0 a 0.4.0, retiro de nzt-context, unidades 214-268) commiteada en 8d48dc5 en la rama mods; el PR lo arma el usuario. Sus fases tenían nombres 'cambio: …', que no son fases de NZT: los cambios van como unidades dentro de las fases del kernel.",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ],
