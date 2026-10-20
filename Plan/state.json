@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-20T22:00:00Z",
+  "updated": "2026-10-20T23:30:00Z",
   "goal": "nzt-look 0.6.0 en main: el tema por defecto es 'default' (el dibujo de Claude Code, el mod no repinta la conversación) y TEMA tiene un botón 'default'",
   "phases": [
     {
@@ -29,22 +29,22 @@
     },
     {
       "name": "verify",
-      "status": "doing",
+      "status": "done",
       "units": [
-        { "id": 302, "do": "Prueba en vivo: instalación limpia arranca en default, chip default/nzt alterna el dibujo, fijado a carpeta", "status": "todo", "detail": "Necesita cargar mods/nzt-look de este repo (--plugin-dir o dev-mods): el instalado es 0.5.0. Lo guardado del usuario dice nzt: tiene que tocar default una vez" }
+        { "id": 302, "do": "Prueba en vivo: instalación limpia arranca en default, chip default/nzt alterna el dibujo, fijado a carpeta", "status": "dropped", "detail": "Usuario 2026-10-20 pidió commit, push a main y release directo; no se corrió por mí" }
       ]
     },
     {
       "name": "ship",
-      "status": "todo",
+      "status": "done",
       "units": [
-        { "id": 303, "do": "Commit en main y push (release solo si el usuario la pide)", "status": "todo", "detail": "" }
+        { "id": 303, "do": "Commit en main y push (release solo si el usuario la pide)", "status": "done", "detail": "8d1d9b0 nzt-look 0.6.0 + ea5aec3 bump 1.5.0 en main; tag v1.5.0, workflow release success, 13 assets; instalación no probada" }
       ]
     }
   ],
   "approved": true,
   "autonomy": { "units": [300, 301], "keep_stops": [] },
-  "waiting_on": "Usuario: probar 0.6.0 en vivo (302) o decir que pase directo al commit (303)",
+  "waiting_on": "Usuario: aceptar nzt-look 0.6.0 tras usarlo (actualizar el mod instalado) y decir con qué sigue",
   "notes": [
     "Hallazgo fuera de alcance 2026-10-20: variante auto lee AppsUseLightTheme de Windows (light.ts variantOf), que no es el fondo de la consola; eligió clara sobre consola oscura. Reportado, no arreglado",
     "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión",
