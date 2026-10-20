@@ -48,6 +48,7 @@ import {
   parseFolders,
   parsePrefs,
   rawPaletteOf,
+  redraws,
   themeFor,
   withCustom,
   wordsOf,
@@ -55,7 +56,7 @@ import {
 
 const PANE = 'nzt-look'
 const COMMAND = 'nzt-look'
-const VERSION = '0.5.0'
+const VERSION = '0.6.0'
 // The mod's own files for Claude Code's /theme, copied as they are.
 const CLAUDE_THEME_FILES = ['nzt-dark.json', 'nzt-light.json']
 const DOCK_COLUMNS = 72
@@ -315,7 +316,7 @@ async function paint($: EngineInterface, value: string) {
   await saveCustom($, theme)
   await setTheme($, own)
   await update($, repaintAtom, () => null)
-  await say($, { kind: 'saved', name: own, base: name.startsWith('mi-') ? name.slice(3) : name })
+  await say($, { kind: 'saved', name: own, base: own.slice(3) })
 }
 
 async function toggle($: EngineInterface, change: (prefs: Prefs) => Prefs) {
@@ -510,9 +511,16 @@ async function replyTree(
   return drawReply({ Box, Text, Button, Markdown }, segments, ctx)
 }
 
+/** The preferences the conversation is drawn by: under `default`, the drawing counts as off. */
+async function drawingPrefs($: EngineInterface): Promise<Prefs> {
+  const prefs = await read($, prefsAtom)
+  const name = themeFor(prefs, await read($, foldersAtom), await read($, folderAtom))
+  return { ...prefs, isDrawing: redraws(prefs, name) }
+}
+
 /** Whether the drawing of a part is on: the drawing at all, and that part. */
 async function draws($: EngineInterface, part: Part): Promise<boolean> {
-  const prefs = await read($, prefsAtom)
+  const prefs = await drawingPrefs($)
   return prefs.isDrawing && prefs.parts[part]
 }
 
@@ -787,7 +795,7 @@ export const register: Register = (on, options) => {
   // shell's and the edits' have cards of their own.
   on('ui.render', { component: 'ToolResult' }, async ($, e, next) => {
     const { tool } = e.props
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (isKept(tool) || !prefs.isDrawing) return next(e)
     const kind = kindOf(tool)
     if (kind === 'run') {
@@ -820,7 +828,7 @@ export const register: Register = (on, options) => {
   }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (!prefs.isDrawing || e.props.isSummary === true) return next(e)
     const text = prefs.parts.math ? withInlineMath(e.props.text) : e.props.text
     // Prose alone goes to Claude Code's markdown, with its inline formulas in Unicode.
@@ -849,7 +857,7 @@ export const register: Register = (on, options) => {
   // While diagrams are drawn, the agent knows which kinds; never in a run with no interface.
   on('prompt.compose', async ($, e, next) => {
     const composed = await next(e)
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (!prefs.isDrawing || !prefs.parts.diagrams || e.surfaces.length === 0) return composed
     return { ...composed, sections: [...composed.sections, { id: 'nzt-look-diagrams', text: DIAGRAM_HINT, scope: 'session' as const }] }
   }).catch(($, e, next) => next(e))
@@ -862,7 +870,7 @@ export const register: Register = (on, options) => {
   })
 
   on('ui.render', { component: 'Spinner' }, async ($, e, next) => {
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (!prefs.isDrawing || !prefs.parts.spinner || e.props.message !== null) return next(e)
     const { name, palette } = await look($)
     const startedAt = await read($, turnStartAtom)
@@ -886,7 +894,7 @@ export const register: Register = (on, options) => {
   }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (!prefs.isDrawing || !prefs.parts.spinner) return next(e)
     const { name, palette } = await look($)
     const turn = await read($, turnAtom)
@@ -899,7 +907,7 @@ export const register: Register = (on, options) => {
 
   // On the desktop the app's own prompt row stays: it carries copy, rewind and selection.
   on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     const isOwn = e.props.origin.kind === 'composer'
     if (!prefs.isDrawing || !prefs.parts.prompt || e.surface !== 'terminal' || !isOwn || e.props.text.length > MAX_PROMPT) return next(e)
     const { palette } = await look($)
@@ -908,7 +916,7 @@ export const register: Register = (on, options) => {
   }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'CommandOutput' }, async ($, e, next) => {
-    const prefs = await read($, prefsAtom)
+    const prefs = await drawingPrefs($)
     if (!prefs.isDrawing || !prefs.parts.commands || e.props.isErrored) return next(e)
     const segments = segmentsOf(e.props.text, { pairs: true })
     if (!segments.some(segment => segment.kind !== 'prose')) return next(e)

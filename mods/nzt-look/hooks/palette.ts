@@ -224,6 +224,10 @@ export const THEMES: readonly Theme[] = [
 
 export const DEFAULT_THEME = 'nzt'
 
+/** Not a palette: the conversation left as Claude Code draws it, and what the mod still draws in mono. */
+export const CLAUDE_DRAWING = 'default'
+export const NEUTRAL_THEME = 'mono'
+
 export const themeNamed = (name: string): Theme | undefined => THEMES.find(one => one.name === name)
 
 const HEX = /^#[0-9a-f]{6}$/

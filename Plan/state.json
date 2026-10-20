@@ -1,29 +1,17 @@
 {
   "version": 1,
-  "updated": "2026-10-20T19:00:00Z",
-  "goal": "nzt-state 0.7.0: una lista ordenada estilo checklist (✓ hecha, ▶ en curso o siguiente, ○ pendiente) en vez de EN CURSO/PENDIENTES/HECHAS, y lo que se espera de nosotros más lindo; arrastra el cierre pendiente de nzt-files 0.2.0",
+  "updated": "2026-10-20T22:00:00Z",
+  "goal": "nzt-look 0.6.0 en main: el tema por defecto es 'default' (el dibujo de Claude Code, el mod no repinta la conversación) y TEMA tiene un botón 'default'",
   "phases": [
     {
       "name": "discovery",
       "status": "done",
       "units": [
         {
-          "id": 294,
-          "do": "Spec nzt-state: lista ordenada de unidades (▶ = en curso, o primera pendiente de la fase en curso) que reemplaza EN CURSO/PENDIENTES/HECHAS; lo demás plegado; espera destacada",
+          "id": 300,
+          "do": "Spec nzt-look: RN-skin-tema-por-defecto pasa a 'default'; nueva regla del tema 'default' (conversación como la dibuja Claude Code, banda y panel con paleta neutra mono, chip primero en TEMA, fijable a carpeta)",
           "status": "done",
-          "detail": "RN-panel-lista, -lista-marcas, -lista-siguiente, -lista-detalle, -espera [add]; -unidad-en-su-fase, -varias-en-curso, -fases-plegables, -formatos-viejos [modify]; -secciones [remove]; Q-01 (forma de la espera), Q-02 (¿sigue la línea de fases?), Q-03 (propuestas) abiertas para el mockup"
-        }
-      ]
-    },
-    {
-      "name": "ux",
-      "status": "done",
-      "units": [
-        {
-          "id": 295,
-          "do": "Mockup HTML de nzt-state 0.7.0: la lista ordenada y propuestas para mostrar lo que espera de nosotros",
-          "status": "done",
-          "detail": "Aprobado por el usuario 2026-10-20: propuesta 1 (Q-04: Tu turno plegado que late, AHORA, ☰ Ver tareas), 'Tu turno' en vez de 'Te toca', línea de fases se queda (Q-02); spec con RN-panel-ahora, -tareas y -espera; mockup medido 40/40 sin scroll, AA"
+          "detail": "RN-skin-tema-por-defecto [modify], RN-skin-tema-default [add], QT-20 (respuesta del usuario: dibujo de Claude), Q-02 reabierta, panel región 3, flujo 1.2, encabezado 0.6.0"
         }
       ]
     },
@@ -32,61 +20,34 @@
       "status": "done",
       "units": [
         {
-          "id": 296,
-          "do": "Construir nzt-state 0.7.0 según spec y mockup, con tests; README del mod y fila del catálogo en specs/nzt-mods.md",
+          "id": 301,
+          "do": "Construir: 'default' en prefs/namesOf/paletas, compuertas de dibujo en register.tsx según el tema en vigor, chip en el panel, tests; plugin 0.6.0, README, fila del catálogo",
           "status": "done",
-          "detail": "register.tsx: Tu turno (pulse cada 4 cuadros solo mientras espera), AHORA, ☰ Ver tareas, grupos por fase; Button solo admite texto: el clic va sobre el texto de la unidad y de Tu turno; 38 tests, validate y tsc verdes; plugin 0.7.0, README, catálogo y spec al día; sin test: el latido"
+          "detail": "CLAUDE_DRAWING/NEUTRAL_THEME en palette.ts; redraws() y builtInOf en prefs.ts; drawingPrefs() en register.tsx; slugOf evita 'default'; repintar default guarda mi-mono; world.test-kit siembra nzt; 190 tests y validate verdes; tsc no corrido (npx sin tsc); dev-mods vacío, nada que sincronizar"
         }
       ]
     },
     {
       "name": "verify",
-      "status": "done",
+      "status": "doing",
       "units": [
-        {
-          "id": 297,
-          "do": "Prueba en vivo de nzt-state 0.7.0 (terminal y SVG, angosto y ancho, con y sin espera)",
-          "status": "done",
-          "detail": "testing/2026-10-20-en-vivo.md: V-01..V-03 passed, V-04..V-10 pending (el usuario dio 0.7.0 por terminada sin recorrerlos); H-01 carpeta de la sesión, H-02/H-03 brillo en onda, H-04 margen de ⏸: arreglados, 42 tests, copia de dev-mods sincronizada"
-        },
-        {
-          "id": 287,
-          "do": "Cerrar nzt-files 0.2.0 cuando el usuario lo acepte: marcas de la spec, resultados, catálogo",
-          "status": "done",
-          "detail": "Aceptada por el usuario 2026-10-20 ('te apruebo todo lo demás'), con V-06..V-11 sin correr (anotado en su testing); 61 marcas barridas, Q-13 cerrada, Sin determinar vacío, Historia 0.2.0 y catálogo al día"
-        },
-        {
-          "id": 298,
-          "do": "Cerrar nzt-state 0.7.0 cuando el usuario lo acepte",
-          "status": "done",
-          "detail": "Aceptada 2026-10-20 ('ya con esto estaria todo finalizado', 'te apruebo todo lo demás'); marcas barridas (secciones por estado quitadas, afirmado en RN-panel-lista), Historia 0.7.0 nueva, catálogo al día"
-        }
+        { "id": 302, "do": "Prueba en vivo: instalación limpia arranca en default, chip default/nzt alterna el dibujo, fijado a carpeta", "status": "todo", "detail": "Necesita cargar mods/nzt-look de este repo (--plugin-dir o dev-mods): el instalado es 0.5.0. Lo guardado del usuario dice nzt: tiene que tocar default una vez" }
       ]
     },
     {
       "name": "ship",
-      "status": "done",
+      "status": "todo",
       "units": [
-        {
-          "id": 289,
-          "do": "Commit y push del cierre de nzt-files a mods",
-          "status": "done",
-          "detail": "9ab97a7; la fila del catálogo viajó con el commit de nzt-state (mismo archivo)"
-        },
-        {
-          "id": 299,
-          "do": "Commit y push de nzt-state 0.7.0 a mods",
-          "status": "done",
-          "detail": "Commit de nzt-state 0.7.0 con este estado, pusheado junto con 9ab97a7 a origin/mods"
-        }
+        { "id": 303, "do": "Commit en main y push (release solo si el usuario la pide)", "status": "todo", "detail": "" }
       ]
     }
   ],
   "approved": true,
-  "waiting_on": "Usuario: decir con qué sigue (otro mod u otros ajustes)",
+  "autonomy": { "units": [300, 301], "keep_stops": [] },
+  "waiting_on": "Usuario: probar 0.6.0 en vivo (302) o decir que pase directo al commit (303)",
   "notes": [
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno (vale también para Clean View, que fue solo la idea visual). Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión, tool.call solo mira",
-    "Corrida cerrada 2026-10-20: nzt-files 0.2.0 y nzt-state 0.7.0 aceptadas; mods mergeada en main (#5) y release v1.4.0 publicada por el workflow (14 assets, latest = v1.4.0, descarga 200; instalación no probada). Falta que el usuario actualice sus mods instalados. Idea en pausa: mod nzt-sounds",
+    "Hallazgo fuera de alcance 2026-10-20: variante auto lee AppsUseLightTheme de Windows (light.ts variantOf), que no es el fondo de la consola; eligió clara sobre consola oscura. Reportado, no arreglado",
+    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }

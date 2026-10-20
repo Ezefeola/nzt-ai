@@ -12,13 +12,15 @@ const mountPane = ($: Engine, surface: 'terminal' | 'desktop' = 'terminal') =>
     props: { title: 'Aspecto', isFocused: true, bodyColumns: 68, placement: 'dock', scroll: { offset: 0, bodyRows: 80 }, view: {} },
   } as never)
 
-test('the pane lists the sixteen themes with the one in force marked, on both surfaces', async ($, on) => {
+test('the pane lists default first and the sixteen themes, with the one in force marked, on both surfaces', async ($, on) => {
   world(on)
   await start($)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await mountPane($, surface)
     const buttons = await ui.findAll({ type: 'Button' })
-    expect(buttons.filter(button => String(button.key).startsWith('theme:'))).toHaveLength(16)
+    const themes = buttons.filter(button => String(button.key).startsWith('theme:'))
+    expect(themes).toHaveLength(17)
+    expect(String(themes[0]!.key)).toBe('theme:default')
     expect(await ui.find({ type: 'Text', text: 'nzt ●' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /elegí uno en \/theme/ })).toBeDefined()
     await ui.unmount()

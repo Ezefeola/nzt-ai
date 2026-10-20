@@ -145,6 +145,17 @@ test('with the drawing off, a row is Claude Code’s own', async ($, on) => {
   expect(await ui.find({ type: 'Text', text: 'claude-code' })).toBeDefined()
 })
 
+test('under the default theme, a row is Claude Code’s own; pinned to another theme here, it is redrawn', async ($, on) => {
+  world(on, { prefs: { theme: 'default' }, folders: { '/repo': 'nzt' } })
+  await start($)
+  const pinned = await mountRow($, 'terminal', { tool_use_id: 'r3', tool: 'Read', input: { file_path: '/repo/a' }, output: {} })
+  expect(await pinned.find({ type: 'Text', text: 'claude-code' })).toBeUndefined()
+  await pinned.unmount()
+  expect(await $.command.run({ command: 'nzt-look', args: 'default', origin: { kind: 'composer' } } as never)).toEqual({ text: 'Tema: default.' })
+  const ui = await mountRow($, 'terminal', { tool_use_id: 'r4', tool: 'Read', input: { file_path: '/repo/a' }, output: {} })
+  expect(await ui.find({ type: 'Text', text: 'claude-code' })).toBeDefined()
+})
+
 test('reads in a run are one row that counts them, and ▸ unfolds them', async ($, on) => {
   world(on)
   await start($)

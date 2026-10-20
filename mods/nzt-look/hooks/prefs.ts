@@ -1,7 +1,7 @@
 import type { BandPart, CodeColors, CustomTheme, Palette, Part, Prefs, Variant } from '../types'
 import { legiblePalette } from './contrast'
 import { toLight } from './light'
-import { DEFAULT_THEME, paletteFrom, THEMES, themeNamed } from './palette'
+import { CLAUDE_DRAWING, DEFAULT_THEME, NEUTRAL_THEME, paletteFrom, THEMES, themeNamed } from './palette'
 import type { Theme, Words } from './palette'
 
 export const BAND_PARTS = ['context', 'fiveHour', 'week', 'cost', 'model', 'clear'] as const satisfies readonly BandPart[]
@@ -24,7 +24,7 @@ export const PARTS = [
 ] as const satisfies readonly Part[]
 
 export const DEFAULT_PREFS: Prefs = {
-  theme: DEFAULT_THEME,
+  theme: CLAUDE_DRAWING,
   variant: 'auto',
   isDrawing: true,
   band: { context: true, fiveHour: true, week: true, cost: true, model: true, clear: true },
@@ -82,17 +82,27 @@ export const parseFolders = (value: unknown, names: readonly string[]): Record<s
     Object.entries(record(value)).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && names.includes(entry[1])),
   )
 
-export const namesOf = (custom: readonly CustomTheme[]): string[] => [...THEMES.map(theme => theme.name), ...custom.map(theme => theme.name)]
+export const namesOf = (custom: readonly CustomTheme[]): string[] => [
+  CLAUDE_DRAWING,
+  ...THEMES.map(theme => theme.name),
+  ...custom.map(theme => theme.name),
+]
 
 /** The theme in force: the one pinned to this folder, else the one of always. */
 export const themeFor = (prefs: Prefs, folders: Record<string, string>, folder: string | null): string =>
   (folder === null ? undefined : folders[folder]) ?? prefs.theme
 
+/** Whether the mod redraws the conversation: the drawing on, and a theme other than `default`. */
+export const redraws = (prefs: Prefs, name: string): boolean => prefs.isDrawing && name !== CLAUDE_DRAWING
+
+/** The built-in theme a name paints with: `default` with the neutral one, a name the mod lacks with nzt. */
+const builtInOf = (name: string): Theme => themeNamed(name === CLAUDE_DRAWING ? NEUTRAL_THEME : name) ?? themeNamed(DEFAULT_THEME)!
+
 /** A theme's palette for a variant, as it was written: its own, or derived for light. */
 export const rawPaletteOf = (name: string, custom: readonly CustomTheme[], variant: Variant): Palette => {
   const own = custom.find(theme => theme.name === name)
   if (own !== undefined) return own[variant]
-  const builtIn: Theme = themeNamed(name) ?? themeNamed(DEFAULT_THEME)!
+  const builtIn = builtInOf(name)
   if (variant === 'dark') return builtIn.dark
   return builtIn.light ?? toLight(builtIn.dark)
 }
@@ -103,16 +113,19 @@ export const paletteOf = (name: string, custom: readonly CustomTheme[], variant:
 
 /** A built-in theme's own colors for code in a variant; a theme of the person's own has none. */
 export const codeColorsOf = (name: string, custom: readonly CustomTheme[], variant: Variant): CodeColors | null =>
-  custom.some(theme => theme.name === name) ? null : ((themeNamed(name) ?? themeNamed(DEFAULT_THEME)!).code?.[variant] ?? null)
+  custom.some(theme => theme.name === name) ? null : (builtInOf(name).code?.[variant] ?? null)
 
 /** The words a theme says; a theme of the person's own says those of the theme it came from. */
 export const wordsOf = (name: string, lang: 'es' | 'en'): Words => {
   const base = name.startsWith('mi-') ? name.slice(3) : name
-  return (themeNamed(base) ?? themeNamed(DEFAULT_THEME)!).words[lang]
+  return builtInOf(base).words[lang]
 }
 
-/** `mi-<tema>`: where a repaint of `name` is kept; a theme already the person's keeps its name. */
-export const ownNameOf = (name: string): string => (name.startsWith('mi-') ? name : `mi-${name}`)
+/** `mi-<tema>`: where a repaint of `name` is kept; a theme already the person's keeps its name, and `default` repaints mono. */
+export const ownNameOf = (name: string): string => {
+  if (name.startsWith('mi-')) return name
+  return `mi-${name === CLAUDE_DRAWING ? NEUTRAL_THEME : name}`
+}
 
 /** The custom themes with `theme` in place of the one of its name, or added last. */
 export const withCustom = (custom: readonly CustomTheme[], theme: CustomTheme): CustomTheme[] =>

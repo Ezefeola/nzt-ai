@@ -1,6 +1,6 @@
 import type { CustomTheme, PaletteKey } from '../types'
 import { toLight } from './light'
-import { KEYS, missingOf, paletteFrom, THEMES } from './palette'
+import { CLAUDE_DRAWING, KEYS, missingOf, paletteFrom, THEMES } from './palette'
 
 export const DESIGN_TOOL = 'design'
 
@@ -39,7 +39,7 @@ export const slugOf = (name: string): string => {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
       .slice(0, 32) || 'mi-tema'
-  return THEMES.some(theme => theme.name === slug) ? `mi-${slug}` : slug
+  return slug === CLAUDE_DRAWING || THEMES.some(theme => theme.name === slug) ? `mi-${slug}` : slug
 }
 
 /** The theme the agent designed, or the colors it lacks or wrote wrong. */

@@ -1,12 +1,37 @@
 import { expect, test } from 'claude-code/testing'
 
-import { DEFAULT_PREFS, namesOf, parseCustom, parseFolders, parsePrefs, themeFor } from './prefs'
+import { slugOf } from './design'
+import { DEFAULT_PREFS, namesOf, ownNameOf, paletteOf, parseCustom, parseFolders, parsePrefs, redraws, themeFor } from './prefs'
 
 const NAMES = namesOf([])
 
-test('a store with nothing in it reads as the defaults: nzt, every part on', async () => {
+test('a store with nothing in it reads as the defaults: default, every part on', async () => {
   expect(parsePrefs(undefined, NAMES)).toEqual(DEFAULT_PREFS)
-  expect(DEFAULT_PREFS.theme).toBe('nzt')
+  expect(DEFAULT_PREFS.theme).toBe('default')
+})
+
+test('a store that chose nzt keeps it', async () => {
+  expect(parsePrefs({ theme: 'nzt' }, NAMES).theme).toBe('nzt')
+})
+
+test('default comes first and leaves the conversation to Claude Code; any other theme redraws it', async () => {
+  expect(NAMES[0]).toBe('default')
+  expect(redraws(DEFAULT_PREFS, 'default')).toBe(false)
+  expect(redraws(DEFAULT_PREFS, 'nzt')).toBe(true)
+  expect(redraws({ ...DEFAULT_PREFS, isDrawing: false }, 'nzt')).toBe(false)
+})
+
+test('default paints what the mod still draws with mono, and a repaint of it is mi-mono', async () => {
+  for (const variant of ['dark', 'light'] as const) expect(paletteOf('default', [], variant)).toEqual(paletteOf('mono', [], variant))
+  expect(ownNameOf('default')).toBe('mi-mono')
+})
+
+test('a theme of the person own is never kept as default', async () => {
+  expect(slugOf('Default')).toBe('mi-default')
+})
+
+test('a folder can be pinned to default', async () => {
+  expect(parseFolders({ '/repo/a': 'default' }, NAMES)).toEqual({ '/repo/a': 'default' })
 })
 
 test('a broken store keeps what it can read and defaults the rest', async () => {
@@ -17,8 +42,8 @@ test('a broken store keeps what it can read and defaults the rest', async () => 
   expect(prefs.calm).toBe(false)
 })
 
-test('a theme the mod no longer has falls back to nzt', async () => {
-  expect(parsePrefs({ theme: 'mi-borrado' }, NAMES).theme).toBe('nzt')
+test('a theme the mod no longer has falls back to default', async () => {
+  expect(parsePrefs({ theme: 'mi-borrado' }, NAMES).theme).toBe('default')
 })
 
 test('a folder pinned to a theme uses it there and the usual one elsewhere', async () => {

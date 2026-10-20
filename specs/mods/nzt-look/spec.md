@@ -17,7 +17,8 @@
 > **0.4.0 (263 y 264):** la banda vuelve a una línea, con los rótulos a la izquierda de cada
 > medidor, sin la palabra del tramo y con naranja desde el 30 · **0.5.0 (269 y 270, 2026-10-19):**
 > el look sigue tras `/clear` (*"cuando limpio contexto se pierde el look elegido"*) y botón que
-> lleva NZT oscuro y claro a `/theme` ·
+> lleva NZT oscuro y claro a `/theme` · **0.6.0 (300 a 303, 2026-10-20):** tema `default`, el
+> dibujo de Claude Code, por defecto y primero en TEMA ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
@@ -85,9 +86,19 @@ siguen estando, como en `nzt-context`.
 
 ### Temas
 
-#### RN-skin-tema-por-defecto · origin: propuesta del agente (unidad 216)
-Al instalarlo, el tema del mod es `nzt` en la variante que corresponde al tema de Claude Code. Se
-cambia con `/nzt-look <tema>` o en el panel, y la elección se recuerda entre sesiones.
+#### RN-skin-tema-por-defecto · origin: propuesta del agente (unidad 216); usuario 2026-10-20 (QT-20) [modify]
+Al instalarlo, el tema del mod es `default`. Se cambia con `/nzt-look <tema>` o en el panel, y la
+elección se recuerda entre sesiones. Quien ya había elegido un tema lo conserva. *Origen del
+cambio: "por defecto no debe venir con el theme de nzt seleccionado, debe tener el theme por
+defecto de claude"; con `nzt` en variante `auto` su consola mostraba la clara y no se leía.*
+
+#### RN-skin-tema-default · origin: usuario 2026-10-20 (QT-20: dibujo de Claude) [add]
+`default` es el primer tema de TEMA. Con `default` en vigor, el mod no redibuja la conversación:
+filas de herramientas, tarjetas, tablas, código, diagramas, fórmulas, spinner y prompt quedan como
+los dibuja Claude Code con su `/theme`, igual que con `/nzt-look off`. La banda, la línea al agente
+y el panel siguen, pintados con la paleta de `mono`. Se fija a una carpeta como cualquier otro
+tema (RN-skin-por-carpeta), y elegir otro tema vuelve a redibujar. No se repinta: los colores del
+panel repintan `mono` y lo guardan como `mi-mono`. Ningún tema propio se puede llamar `default`.
 
 #### RN-skin-tras-clear · origin: usuario 2026-10-19 ("cuando limpio contexto se pierde el look elegido")
 Después de `/clear`, `/resume` o `/branch` el look sigue siendo el elegido: tema, variante, partes,
@@ -444,8 +455,8 @@ fija en el README.*
 1. Título `◐ Aspecto` (`◐ Look` en inglés) y versión.
 2. **Aviso**, solo si el dibujo está apagado (RN-skin-apagado: la banda y la línea al agente
    siguen). Sin aviso de `nzt-context`: se retiró sin él (M4, usuario 2026-10-17).
-3. **Tema**: los 16 temas más los propios, con teclas 1 a 9 y `●` en el elegido
-   (RN-skin-tema-por-defecto, RN-skin-repintar). Debajo, **variante** `auto · oscura · clara`
+3. **Tema**: `default` primero, después los 16 temas y los propios, con teclas 1 a 9 y `●` en el
+   elegido (RN-skin-tema-por-defecto, RN-skin-tema-default, RN-skin-repintar). Debajo, **variante** `auto · oscura · clara`
    (RN-skin-variante) y **esta carpeta**, con `fijar acá`, o `soltar` y `hacerlo el de siempre` si ya
    está fija (RN-skin-por-carpeta).
 4. **Vista previa**: un turno dibujado con el tema elegido (prompt, comando, edición, lecturas
@@ -798,7 +809,8 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
 1. **Arranque.**
    1. `session.start` lee `prefs`, `folders` y `custom` de `$.store`. Lo que no se puede leer toma
       el valor por defecto, y eso queda en el registro de depuración (RN-skin-no-interrumpe).
-   2. El tema es el de la carpeta si hay uno fijado ahí; si no, el de siempre; la primera vez, `nzt`.
+   2. El tema es el de la carpeta si hay uno fijado ahí; si no, el de siempre; la primera vez,
+      `default` (0.6.0; antes `nzt`).
    3. La variante es la forzada si la hay. Si no, sale del nombre del tema de Claude Code, y con
       `auto`, de la terminal o del sistema (QT-03).
    4. La paleta es la del tema en esa variante (la propia, o la calculada si no la trae, QT-06),
@@ -994,6 +1006,7 @@ Registro **append-only**. Origen de cada entrada: `usuario`, `agente, dentro del
 ### Q-02 · ¿El tema por defecto es `nzt`?
 - propuesta: sí (RN-skin-tema-por-defecto). La otra opción es `noir`, el de la referencia.
 - respuesta: sí, `nzt` · usuario 2026-10-17
+- reabierta 2026-10-20: el usuario pidió que venga con el dibujo de Claude Code; ver QT-20.
 
 ### Q-03 · ¿Confirmás las propuestas del agente de esta unidad?
 - RN-skin-una-linea (una sola línea al agente si `nzt-context` sigue instalado), RN-skin-comando
@@ -1292,6 +1305,13 @@ de la 223; mientras tanto, los flujos van en lista.
   llevan esos nombres (Dracula, Nord, Catppuccin…).
 - respuesta: se toman esos valores, que son datos y no código, y el README los atribuye a
   la referencia y a cada tema original. · agente, dentro del alcance
+
+### QT-20 · ¿Qué es el tema `default` (0.6.0)?
+- opciones: **dibujo de Claude** (el mod no redibuja la conversación, como `off`, y la banda y el
+  panel siguen con colores neutros) o **un tema `claude`** con la paleta de Claude Code, que el
+  mod sigue redibujando.
+- respuesta: dibujo de Claude · usuario 2026-10-20. La paleta neutra es la de `mono` · agente,
+  dentro del alcance.
 
 ## Notas técnicas (para la unidad 223)
 

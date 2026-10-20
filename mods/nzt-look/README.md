@@ -1,6 +1,6 @@
 # nzt-look
 
-> Versión **0.5.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
+> Versión **0.6.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
 
 Cambia **cómo se ve una sesión de Claude Code**: un tema de colores, una banda sobre el prompt
 con lo que llevás gastado, y la conversación redibujada para leerla de un vistazo. Reemplaza a
@@ -33,12 +33,15 @@ redibuja la conversación, usá uno de los dos: con los dos, dibuja el que Claud
 | Comando | Hace |
 |---|---|
 | `/nzt-look` | abre o cierra el panel de opciones |
-| `/nzt-look <tema>` | cambia el tema (`nzt`, `dracula`, `nord`, …) |
+| `/nzt-look <tema>` | cambia el tema (`default`, `nzt`, `dracula`, `nord`, …) |
 | `/nzt-look off` | devuelve el dibujo a Claude Code; la banda y la línea al agente siguen |
 | `/nzt-look on` | lo vuelve a prender |
 | `/nzt-look copy` | copia la última respuesta del agente (`copy code`: su último bloque de código) |
 
-**El panel** deja elegir el tema con una vista previa, la variante (`auto`, oscura, clara),
+**Arranca en `default`**: la conversación queda como la dibuja Claude Code con su `/theme`, y la
+banda y el panel van en grises (`mono`). Cualquier otro tema la redibuja.
+
+**El panel** deja elegir el tema con una vista previa (`default` primero), la variante (`auto`, oscura, clara),
 fijar un tema a la carpeta, prender y apagar cada parte de la banda y de la conversación, el
 modo calmo (sin movimiento), las **palabras** del spinner y del pie (`claude`, las de Claude Code,
 por defecto; `mod`, las del tema) y repintar un color: lo guarda como un tema tuyo, `mi-<tema>`, y el
