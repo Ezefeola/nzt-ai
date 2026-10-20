@@ -1,6 +1,6 @@
 # Instalador de NZT — .NET 10
 
-Versión 1.3.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
+Versión 1.4.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
 bloque en el archivo de instrucciones que el proveedor ya lee en toda sesión, y las 14
 skills, con sus referencias, aplanadas en su carpeta de skills de usuario. En Claude Code
 puede instalar además **los mods**, que sí son plugins (sección *Mods de Claude Code*). El
