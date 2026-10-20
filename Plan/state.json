@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-20T18:30:00Z",
+  "updated": "2026-10-20T19:00:00Z",
   "goal": "nzt-state 0.7.0: una lista ordenada estilo checklist (✓ hecha, ▶ en curso o siguiente, ○ pendiente) en vez de EN CURSO/PENDIENTES/HECHAS, y lo que se espera de nosotros más lindo; arrastra el cierre pendiente de nzt-files 0.2.0",
   "phases": [
     {
@@ -83,11 +83,10 @@
     }
   ],
   "approved": true,
-  "autonomy": { "units": [296, 297, 287, 298, 289, 299], "keep_stops": [] },
-  "waiting_on": null,
+  "waiting_on": "Usuario: decir con qué sigue (otro mod u otros ajustes); el trabajo continúa en la rama mods, y el merge y el release los decide después",
   "notes": [
     "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno (vale también para Clean View, que fue solo la idea visual). Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión, tool.call solo mira",
-    "Pendiente fuera de esta corrida: merge de mods (lo hace el usuario), release/tags, borrar copias de ~/.claude/dev-mods (d41a6bb1… nzt-files, 2f70bfcb… nzt-state); los instalados (nzt-files@nzt 0.1.1, nzt-state@nzt 0.4.0) cargan en vez de 0.2.0/0.7.0 hasta reinstalar. Idea en pausa: mod nzt-sounds (usuario 2026-10-20: 'primero otros')",
+    "Corrida cerrada 2026-10-20: nzt-files 0.2.0 y nzt-state 0.7.0 aceptadas, en origin/mods. Pendiente, cuando el usuario diga: merge de mods y release/tags; reinstalar (nzt-files@nzt 0.1.1 y nzt-state@nzt 0.4.0 cargan hasta entonces). ~/.claude/dev-mods vaciado. Idea en pausa: mod nzt-sounds",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }
