@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  Propuesta de color de NZT oscuro (2026-10-18, segunda vuelta). El usuario descartó la primera ("marca para
+  señalar, lectura para leer") y pidió mantener el tema actual (0.4.0) tal cual, con dos ajustes:
+  1) la barra del prompt vuelve al menta de la captura del 17/10 (#72f4cd), como el recuadro de nzt-look;
+  2) las pestañas y el recorrido de fases con el estilo de esa captura: la activa en pastilla llena, el resto
+     con su marca y un trazo debajo. Ningún otro color cambia. Imita la terminal; no es código del mod.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NZT oscuro · ajuste de prompt y pestañas</title>
+<style>
+  :root { --bg: #07100f; --page: #050b0a; --accent: #5ccaa9; --yellow: #e2d36e; --text: #d3dfdb; --muted: #7f9893; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font: 13px/20px ui-monospace, "Cascadia Mono", Consolas, monospace; padding: 16px; }
+  h1 { font: 600 16px system-ui, sans-serif; margin: 0 0 4px; color: #e6efec; }
+  p.lead { font: 13px/1.5 system-ui, sans-serif; color: #9fb3ae; margin: 0 0 16px; max-width: 900px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 16px; }
+  .col { background: var(--bg); border: 1px solid #1a2c2b; padding: 12px; min-width: 0; }
+  .col h2 { font: 600 13px system-ui, sans-serif; margin: 0 0 10px; color: #e6efec; }
+  .col h2 small { font-weight: 400; color: #9fb3ae; }
+  .panel { border-left: 1px solid var(--accent); padding: 4px 0 4px 10px; margin-bottom: 12px; }
+  .pill { background: var(--accent); color: #07100f; font-weight: 700; padding: 0 4px; }
+  .head { color: var(--accent); font-weight: 700; }
+  .ok { color: var(--accent); }
+  .muted { color: var(--muted); }
+  .box { border: 1px solid var(--yellow); padding: 4px 8px; margin: 8px 0; }
+  .box b { color: var(--yellow); }
+  .bar { height: 4px; background: #244146; margin: 4px 0; } .bar i { display: block; height: 100%; width: 30%; background: var(--accent); }
+  .band { white-space: nowrap; overflow: hidden; }
+  .tool { color: var(--accent); font-weight: 700; }
+  /* Pestañas del panel y recorrido de fases */
+  .tabs { display: flex; gap: 14px; margin: 2px 0 8px; white-space: nowrap; overflow: hidden; }
+  .tabs.new { gap: 4px; border-bottom: 1px solid #244146; }
+  .tabs.new span { padding: 0 10px; color: var(--muted); }
+  .tabs.new span.on { background: var(--accent); color: #07100f; font-weight: 700; }
+  .phases { margin: 6px 0; line-height: 24px; }
+  .phases.old { color: var(--muted); }
+  .phases.new .ph { display: inline-block; padding: 0 8px; margin-right: 2px; color: var(--muted); }
+  .phases.new .ph i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+  .phases.new .ph.on { background: var(--accent); color: #07100f; font-weight: 700; }
+  .phases.new .ar { color: #3d5a58; margin-right: 2px; }
+  /* Barra del prompt */
+  .prompt { margin-top: 6px; padding: 2px 0; border-top: 1px solid var(--pb); border-bottom: 1px solid var(--pb); }
+  .prompt .cur { color: var(--pb); }
+  table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin-top: 16px; font: 12.5px/1.5 system-ui, sans-serif; color: #c9d6d2; }
+  td, th { border-bottom: 1px solid #1a2c2b; padding: 4px 10px; text-align: left; }
+  th { color: #e6efec; }
+  .sw { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 4px; border: 1px solid #2b4a4f; }
+</style>
+</head>
+<body>
+<h1>NZT oscuro · barra del prompt y pestañas</h1>
+<p class="lead">Se queda el tema de hoy (0.4.0), sin tocar sus colores. Un solo ajuste, a la derecha: <b>la barra del prompt vuelve al menta de la captura del 17/10</b> (#72f4cd, solo el trazo fino de arriba y abajo y el cursor; lo que escribís sigue en el tono de lectura). El recorrido de fases ya tiene el estilo de la captura (pastilla llena para la activa, marca de color por fase) y es igual en las dos columnas. <b>Las pestañas</b> (Estado / Cambios / Archivos) <b>las dibuja Claude Code</b>: el mod solo les pone el título, así que se ven igual en las dos.</p>
+
+<div class="cols">
+  <div class="col" style="--pb:#5ccaa9">
+    <h2>Ahora <small>· 0.4.0, como está</small></h2>
+    <div class="tabs"><span class="head">Estado</span><span class="muted">Cambios</span><span class="muted">Archivos</span></div>
+    <div class="panel"><span class="pill">NZT</span> <span class="head">Estado</span><br>Plan <span class="ok">● aprobado</span>
+      <div class="phases new"><span class="ph on"><i style="background:#8f7bff"></i>● Análisis </span><span class="ar">→</span><span class="ph"><i style="background:#ff6fae"></i>○ UX</span><span class="ar">→</span><span class="ph"><i style="background:#5aa0ff"></i>○ Arquitectura</span><span class="ar">→</span><span class="ph"><i style="background:#ffb454"></i>○ Build</span><span class="ar">→</span><span class="ph"><i style="background:#3ed9c0"></i>○ Verificación</span></div>
+      <span class="head">EN CURSO</span><br>▸ 263 Spec y mockup de la banda<div class="box"><b>Esperando:</b> el usuario prueba la banda en una línea</div><div class="bar"><i></i></div></div>
+    <div><span class="tool">● Bash</span> <span class="muted">pnpm test</span></div>
+    <div class="band"><span style="color:var(--accent)">◇</span> Opus 5.5 <span class="muted">Contexto</span> <span style="color:var(--accent)">▰▰▱▱▱▱▱▱▱▱▱▱▱</span> 12%</div>
+    <div class="prompt"><span class="cur">›</span> <span class="muted">█</span></div>
+  </div>
+  <div class="col" style="--pb:#72f4cd">
+    <h2>Con el ajuste <small>· borde del prompt en menta</small></h2>
+    <div class="tabs"><span class="head">Estado</span><span class="muted">Cambios</span><span class="muted">Archivos</span></div>
+    <div class="panel"><span class="pill">NZT</span> <span class="head">Estado</span><br>Plan <span class="ok">● aprobado</span>
+      <div class="phases new"><span class="ph on"><i style="background:#8f7bff"></i>Análisis</span><span class="ar">→</span><span class="ph"><i style="background:#ff6fae"></i>UX</span><span class="ar">→</span><span class="ph"><i style="background:#5aa0ff"></i>Arquitectura</span><span class="ar">→</span><span class="ph"><i style="background:#ffb454"></i>Build</span><span class="ar">→</span><span class="ph"><i style="background:#3ed9c0"></i>Verificación</span></div>
+      <span class="head">EN CURSO</span><br>▸ 263 Spec y mockup de la banda<div class="box"><b>Esperando:</b> el usuario prueba la banda en una línea</div><div class="bar"><i></i></div></div>
+    <div><span class="tool">● Bash</span> <span class="muted">pnpm test</span></div>
+    <div class="band"><span style="color:var(--accent)">◇</span> Opus 5.5 <span class="muted">Contexto</span> <span style="color:var(--accent)">▰▰▱▱▱▱▱▱▱▱▱▱▱</span> 12%</div>
+    <div class="prompt"><span class="cur">›</span> <span class="muted">█</span></div>
+  </div>
+</div>
+
+<table>
+  <tr><th>Qué</th><th>Ahora</th><th>Con el ajuste</th></tr>
+  <tr><td>Trazo de la barra del prompt y cursor (<code>promptBorder</code>)</td><td><span class="sw" style="background:#5ccaa9"></span>#5ccaa9</td><td><span class="sw" style="background:#72f4cd"></span>#72f4cd (el de la captura)</td></tr>
+  <tr><td>Modo auto (<code>autoAccept</code>): el borde del prompt lo toma en lugar de <code>promptBorder</code> (sin verificar en la terminal)</td><td>preset de Claude Code</td><td><span class="sw" style="background:#72f4cd"></span>#72f4cd</td></tr>
+  <tr><td>Pestañas del panel</td><td colspan="2">las dibuja Claude Code; sin cambio posible desde el mod</td></tr>
+  <tr><td>Todo lo demás (texto, aviso, herramientas, fases, barras, banda)</td><td colspan="2">sin cambio</td></tr>
+</table>
+</body>
+</html>

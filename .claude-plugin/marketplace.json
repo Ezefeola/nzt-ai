@@ -1,17 +1,14 @@
 {
   "name": "nzt",
-  "owner": { "name": "Ezefeola" },
+  "owner": {
+    "name": "Ezefeola"
+  },
   "description": "NZT's optional mods for Claude Code (see specs/nzt-mods.md)",
   "plugins": [
     {
       "name": "nzt-state",
       "source": "./mods/nzt-state",
       "description": "Live pane with the NZT plan and state from Plan/state.json"
-    },
-    {
-      "name": "nzt-context",
-      "source": "./mods/nzt-context",
-      "description": "Context-used bar above the prompt with the NZT kernel's 20/30/40 marks"
     },
     {
       "name": "nzt-changes",
@@ -21,12 +18,22 @@
     {
       "name": "nzt-files",
       "source": "./mods/nzt-files",
-      "description": "Browse the project like an editor's explorer: folders that open and close, git marks, and the chosen file beneath"
+      "description": "Browse the project like an editor's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file beneath"
     },
     {
       "name": "nzt-hub",
       "source": "./mods/nzt-hub",
       "description": "One pane with every NZT mod: what each is for, its version, a button that opens it, and the install command for the missing ones"
+    },
+    {
+      "name": "nzt-questions",
+      "source": "./mods/nzt-questions",
+      "description": "Answer the questions the agent wrote in the chat one at a time, with options, and take the answers to the prompt in one message"
+    },
+    {
+      "name": "nzt-look",
+      "source": "./mods/nzt-look",
+      "description": "Themes (NZT and fifteen more, dark and light), a usage band with NZT's 20/30/40 context marks, and the conversation redrawn"
     }
   ]
 }

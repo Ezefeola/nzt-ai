@@ -342,7 +342,7 @@ public static class Program
         var catalog = ModCatalog.Load();
 
         if (methodSkipped && Manifest.Load(provider.Id, manifestDir) is not { Files.Count: > 0 })
-            Warn("nzt-state y nzt-context muestran lo que produce el método: sin él instalado no tienen qué mostrar.");
+            Warn("nzt-state muestra lo que produce el método: sin él instalado no tiene qué mostrar.");
 
         var result = ModInstaller.Install(Claude(), catalog, provider.Id, Version, dryRun, manifestDir);
 

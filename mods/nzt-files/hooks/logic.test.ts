@@ -1,0 +1,318 @@
+import { describe, expect, test } from 'claude-code/testing'
+
+import { foundOf, isShown, MAX_FOUND, shellReadOf, touchOf } from './activity'
+import { allAddedOf, branchOf, changedTreeOf, changeOf, countsOf, diffLinesOf, diffWindow, gitOpsOf, linesOf, sourceOfDiff } from './git'
+import { TEXTS } from './i18n'
+import { blocksOf, blockWindow, hasHugeBlock, MARKDOWN_LIMIT } from './markdown'
+import { statesOf, tokensOf } from './csharp'
+import { matchesOf, MAX_MATCHES, searchTreeOf } from './search'
+import { settingsOf } from './settings'
+import { marksOf, relativeTo, rowsOf } from './tree'
+
+const z = (...entries: string[]) => [...entries, ''].join('\0')
+
+describe('branchOf', () => {
+  test('reads the branch, the remote one and how far ahead and behind', async () => {
+    expect(branchOf(z('## main...origin/main [ahead 2, behind 1]'))).toEqual({
+      kind: 'branch',
+      name: 'main',
+      upstream: 'origin/main',
+      ahead: 2,
+      behind: 1,
+    })
+  })
+
+  test('a branch with no remote one is the branch alone', async () => {
+    expect(branchOf(z('## work'))).toEqual({ kind: 'branch', name: 'work', ahead: 0, behind: 0 })
+  })
+
+  test('a loose commit is told apart, and a repository with no commit names its branch', async () => {
+    expect(branchOf(z('## HEAD (no branch)'))).toBe('detached')
+    expect(branchOf(z('## No commits yet on main'))).toEqual({ kind: 'branch', name: 'main', ahead: 0, behind: 0 })
+  })
+
+  test('the branch entry is not read as a changed file', async () => {
+    expect(marksOf(z('## main...origin/main', ' M a.ts'))).toEqual({ 'a.ts': 'M' })
+  })
+})
+
+describe('linesOf', () => {
+  test('counts the lines each file gained and lost, from the project folder', async () => {
+    expect(linesOf(z('12\t3\tapp/a.ts', '1\t0\tother/b.ts'), 'app/')).toEqual({ 'a.ts': [12, 3] })
+  })
+
+  test('a binary file is left out and a rename counts on its new path', async () => {
+    expect(linesOf(z('-\t-\tlogo.png', '4\t1\t', 'old.ts', 'new.ts'))).toEqual({ 'new.ts': [4, 1] })
+  })
+})
+
+describe('diffLinesOf', () => {
+  // notas.txt had 10 lines, a to j: line 3 changed, two added after line 6, the old line 9 removed.
+  const diff = ['diff --git a/notas.txt b/notas.txt', '@@ -3 +3 @@', '-c', '+C', '@@ -6,0 +7,2 @@', '+x', '+y', '@@ -9 +10,0 @@', '-i', ''].join('\n')
+  const lines = ['a', 'b', 'C', 'd', 'e', 'f', 'x', 'y', 'g', 'h', 'j']
+
+  test('the whole file, the removed lines between the others where they were', async () => {
+    const whole = diffLinesOf(diff, lines)
+    expect(whole.map(line => `${line.op}${line.text}`)).toEqual([' a', ' b', '-c', '+C', ' d', ' e', ' f', '+x', '+y', ' g', ' h', '-i', ' j'])
+    expect(whole[2]).toEqual({ op: '-', text: 'c', old: 3, now: 3 })
+    expect(whole[11]).toEqual({ op: '-', text: 'i', old: 9, now: 11 })
+    expect(whole[12]).toEqual({ op: ' ', text: 'j', old: 10, now: 11 })
+  })
+
+  test('a file cut short ends at its last line, and a new one is added whole', async () => {
+    expect(diffLinesOf(['@@ -2 +1,0 @@', '-b'].join('\n'), ['a'], false)).toEqual([{ op: ' ', text: 'a', old: 1, now: 1 }])
+    expect(allAddedOf(['a', 'b']).map(line => line.op)).toEqual(['+', '+'])
+  })
+
+  test('a window of the diff goes back to one hunk with its numbers counted again', async () => {
+    const shown = diffLinesOf(diff, lines).slice(7, 12)
+    expect(sourceOfDiff(shown)).toBe(['@@ -7,3 +7,4 @@', '+x', '+y', ' g', ' h', '-i'].join('\n'))
+    expect(sourceOfDiff(diffLinesOf(diff, lines).slice(7, 9))).toBe(['@@ -6,0 +7,2 @@', '+x', '+y'].join('\n'))
+    expect(diffWindow(diffLinesOf(diff, lines), 20, 5, 40)).toEqual({ first: 8, count: 5, total: 13, lastTop: 8 })
+  })
+
+  test('the change map colors a stretch by what changed in it and points at its first change', async () => {
+    const whole = diffLinesOf(diff, lines)
+    expect(changeOf(whole.slice(0, 5))).toEqual({ kind: 'change', at: 2 })
+    expect(changeOf(whole.slice(5, 9))).toEqual({ kind: 'add', at: 2 })
+    expect(changeOf(whole.slice(10, 12))).toEqual({ kind: 'delete', at: 1 })
+    expect(changeOf(whole.slice(12))).toBeUndefined()
+  })
+})
+
+test('± Changes keeps only the changed files under their open folders, the deleted ones struck through', async () => {
+  const marks = { 'src/a.ts': 'M', 'docs/x.md': 'U', 'old/gone.txt': 'D' } as const
+  const tree = changedTreeOf(marks, {})
+  const rows = rowsOf(tree.listings, tree.open, marks).map(row => (row.kind === 'entry' ? `${row.path}${row.isDeleted ? ' ✗' : ''}` : 'error'))
+  expect(rows).toEqual(['docs', 'docs/x.md', 'old', 'old/gone.txt ✗', 'src', 'src/a.ts'])
+})
+
+test('a folder counts the files of each mark it holds at any depth', async () => {
+  expect(countsOf({ 'a/b/x.ts': 'M', 'a/y.ts': 'M', 'a/z.ts': 'U', 'c/w.ts': 'D' })).toEqual({
+    'a/b': { M: 1 },
+    a: { M: 2, U: 1 },
+    c: { D: 1 },
+  })
+})
+
+describe('gitOpsOf', () => {
+  test('names each git operation of a command once, in order', async () => {
+    expect(gitOpsOf('git add . && git commit -m "x" && git push')).toEqual(['commit', 'push'])
+  })
+
+  test('sees past git options and names a pull request', async () => {
+    expect(gitOpsOf('git -C repo checkout main; gh pr create --fill')).toEqual(['checkout', 'pr'])
+  })
+
+  test('a command that is not one of them is none', async () => {
+    expect(gitOpsOf('git status && npm test')).toEqual([])
+  })
+})
+
+describe('touchOf', () => {
+  test('a read, a write, a search and a shell command are told apart', async () => {
+    expect(touchOf('Read', { file_path: 'a.ts' })).toEqual({ kind: 'read', paths: ['a.ts'] })
+    expect(touchOf('NotebookEdit', { notebook_path: 'n.ipynb' })).toEqual({ kind: 'write', paths: ['n.ipynb'] })
+    expect(touchOf('Glob', { pattern: '*.ts' })).toEqual({ kind: 'search' })
+    expect(touchOf('PowerShell', { command: 'Get-Content a.ts' })).toEqual({ kind: 'shell', command: 'Get-Content a.ts' })
+  })
+
+  test('a tool the tree does not follow is none', async () => {
+    expect(touchOf('WebFetch', { url: 'https://example.com' })).toBeUndefined()
+  })
+})
+
+test(`a search paints at most ${MAX_FOUND} of the files it found`, async () => {
+  const names = Array.from({ length: MAX_FOUND + 5 }, (_, i) => `f${i}.ts`)
+  expect(foundOf({ filenames: names })).toHaveLength(MAX_FOUND)
+  expect(foundOf({ content: 'no names' })).toEqual([])
+})
+
+describe('shellReadOf', () => {
+  test('a command that only reads names its words, options left out', async () => {
+    expect(shellReadOf('cat README.md | head -n 5')).toEqual(['README.md', '5'])
+    expect(shellReadOf('Get-Content -Path src/a.ts | Select-Object -First 3')).toEqual(['src/a.ts', '3'])
+  })
+
+  test('a command that writes, moves elsewhere or is unknown is not followed', async () => {
+    expect(shellReadOf('cat a.ts > b.ts')).toBeUndefined()
+    expect(shellReadOf('cd src && cat a.ts')).toBeUndefined()
+    expect(shellReadOf('npm test')).toBeUndefined()
+  })
+
+  test('a redirection to nowhere still only reads', async () => {
+    expect(shellReadOf('grep -r foo src 2>/dev/null')).toEqual(['foo', 'src'])
+  })
+})
+
+test('the activity setting paints what it names, and the commit whenever something is painted', async () => {
+  expect(isShown('write', 'read')).toBe(false)
+  expect(isShown('write', 'commit')).toBe(true)
+  expect(isShown('none', 'commit')).toBe(false)
+  expect(isShown('read-write', 'read')).toBe(true)
+})
+
+describe('blocksOf', () => {
+  test('cuts headings, paragraphs, lists and tables apart, and keeps a fenced block whole', async () => {
+    const lines = ['# Title', 'intro', 'more', '', '- a', '- b', '', '```', 'code', '', 'more code', '```', '| a |', '| - |']
+    expect(blocksOf(lines).map(block => [block.from, block.to])).toEqual([
+      [0, 1],
+      [1, 3],
+      [4, 6],
+      [7, 12],
+      [12, 14],
+    ])
+  })
+
+  test('a front matter at the top is one YAML code block, not a rule and a heading', async () => {
+    const blocks = blocksOf(['---', 'update-when: a color changes', '---', '# Brand'])
+    expect(blocks.map(block => [block.from, block.to])).toEqual([
+      [0, 3],
+      [3, 4],
+    ])
+    expect(blocks[0]!.text).toBe('```yaml\nupdate-when: a color changes\n```')
+  })
+})
+
+describe('tokensOf (C#)', () => {
+  const kinds = (line: string) => tokensOf(line).tokens.filter(token => token.kind !== 'plain').map(token => [token.text, token.kind])
+
+  test('tells methods, types, members, variables and keywords apart as Visual Studio colors them', async () => {
+    expect(kinds('var owners = skills.Select(s => s.RepoPath).ToHashSet(StringComparer.Ordinal);')).toEqual([
+      ['var', 'keyword'],
+      ['owners', 'variable'],
+      ['skills', 'variable'],
+      ['Select', 'method'],
+      ['s', 'variable'],
+      ['s', 'variable'],
+      ['RepoPath', 'member'],
+      ['ToHashSet', 'method'],
+      ['StringComparer', 'type'],
+      ['Ordinal', 'member'],
+    ])
+  })
+
+  test('a type after new, control keywords, strings, numbers and comments', async () => {
+    expect(kinds('if (x) throw new InvalidOperationException($"a {b}", 42); // why')).toEqual([
+      ['if', 'control'],
+      ['x', 'variable'],
+      ['throw', 'control'],
+      ['new', 'keyword'],
+      ['InvalidOperationException', 'type'],
+      ['$"a {b}"', 'string'],
+      ['42', 'number'],
+      ['// why', 'comment'],
+    ])
+  })
+
+  test('an interface, a generic call and an escaped quote', async () => {
+    expect(kinds('IService svc = Get<IService>("a\\"b");')).toEqual([
+      ['IService', 'interface'],
+      ['svc', 'variable'],
+      ['Get', 'method'],
+      ['IService', 'interface'],
+      ['"a\\"b"', 'string'],
+    ])
+  })
+
+  test('a block comment and a verbatim string carry over to the next lines', async () => {
+    expect(statesOf(['/* one', 'two */ int a;', 'var s = @"x', 'y";', 'int b;'])).toEqual([
+      'code',
+      'comment',
+      'code',
+      'verbatim',
+      'code',
+    ])
+    expect(tokensOf('two */ int a;', 'comment').tokens[0]).toEqual({ text: 'two */', kind: 'comment' })
+  })
+})
+
+describe('blockWindow', () => {
+  const blocks = blocksOf(Array.from({ length: 20 }, (_, i) => [`## Part ${i}`, '', `text ${i}`, '']).flat())
+
+  test('shows whole blocks that fit, from the block asked', async () => {
+    expect(blockWindow(blocks, 4, 8, 40)).toMatchObject({ first: 4, count: 4 })
+  })
+
+  test('never runs past the end', async () => {
+    const window = blockWindow(blocks, 999, 8, 40)
+    expect(window.first + window.count).toBe(blocks.length)
+  })
+
+  test('a block taller than the window still shows, from its top', async () => {
+    const tall = blocksOf(Array.from({ length: 30 }, (_, i) => `- item ${i}`))
+    expect(blockWindow(tall, 0, 8, 40)).toMatchObject({ first: 0, count: 1 })
+  })
+})
+
+test('a block past what the engine draws at once is told apart', async () => {
+  expect(hasHugeBlock([{ from: 0, to: 1, text: 'x'.repeat(MARKDOWN_LIMIT + 1) }])).toBe(true)
+  expect(hasHugeBlock([{ from: 0, to: 1, text: 'x'.repeat(MARKDOWN_LIMIT) }])).toBe(false)
+})
+
+describe('search', () => {
+  const index = [
+    { path: 'src', isDir: true, size: 0, mtimeMs: 0 },
+    { path: 'src/Main.ts', isDir: false, size: 1, mtimeMs: 0 },
+    { path: 'docs/main.md', isDir: false, size: 1, mtimeMs: 0 },
+    { path: 'README.md', isDir: false, size: 1, mtimeMs: 0 },
+  ]
+
+  test('matches the path from the project folder without case', async () => {
+    expect(matchesOf(index, 'MAIN').map(item => item.path)).toEqual(['src/Main.ts', 'docs/main.md'])
+  })
+
+  test(`keeps at most ${MAX_MATCHES} matches`, async () => {
+    const many = Array.from({ length: MAX_MATCHES + 1 }, (_, i) => ({ path: `f${i}`, isDir: false, size: 0, mtimeMs: 0 }))
+    expect(matchesOf(many, 'f')).toHaveLength(MAX_MATCHES)
+  })
+
+  test('shows each match under the folders that hold it, those open', async () => {
+    const tree = searchTreeOf(matchesOf(index, 'main'), {})
+    const rows = rowsOf(tree.listings, tree.open, tree.marks)
+    expect(rows.map(row => (row.kind === 'entry' ? row.path : ''))).toEqual(['docs', 'docs/main.md', 'src', 'src/Main.ts'])
+  })
+})
+
+describe('relativeTo', () => {
+  test('takes an absolute path inside the project to a path from it, without case on Windows', async () => {
+    expect(relativeTo('C:/proj', 'c:\\Proj\\src\\a.ts')).toBe('src/a.ts')
+    expect(relativeTo('C:/proj', '/c/proj/src/a.ts')).toBe('src/a.ts')
+    expect(relativeTo('C:/proj', './src/../README.md')).toBe('README.md')
+  })
+
+  test('a path outside the project is none', async () => {
+    expect(relativeTo('C:/proj', 'D:/other/a.ts')).toBeUndefined()
+    expect(relativeTo('C:/proj', 'C:/project2/a.ts')).toBeUndefined()
+    expect(relativeTo('/home/me/proj', '../x.ts')).toBeUndefined()
+  })
+})
+
+describe('age and day', () => {
+  const now = new Date(2026, 9, 19, 12).getTime()
+
+  test('an age is in its largest unit, and past a week it is the day', async () => {
+    expect(TEXTS.es.age(now - 30_000, now)).toBe('ahora')
+    expect(TEXTS.es.age(now - 12 * 60_000, now)).toBe('12m')
+    expect(TEXTS.es.age(now - 3 * 3_600_000, now)).toBe('3h')
+    expect(TEXTS.es.age(now - 5 * 86_400_000, now)).toBe('5d')
+    expect(TEXTS.es.age(new Date(2026, 9, 9).getTime(), now)).toBe('9 oct')
+  })
+
+  test('a day of another year carries the year', async () => {
+    expect(TEXTS.es.day(new Date(2025, 9, 9).getTime(), now)).toBe('9 oct 2025')
+    expect(TEXTS.en.day(new Date(2025, 9, 9).getTime(), now)).toBe('Oct 9 2025')
+  })
+})
+
+test('settings take their defaults for what is missing or unknown', async () => {
+  expect(settingsOf({ activity: 'loud', follow: 'yes', openWith: '  code -g {path} ' })).toEqual({
+    activity: 'read-write',
+    follow: true,
+    openAtStart: true,
+    column: 'date',
+    openWith: 'code -g {path}',
+    icons: 'auto',
+    notices: true,
+  })
+})

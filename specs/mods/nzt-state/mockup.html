@@ -1,0 +1,343 @@
+<!doctype html>
+<!--
+  Mockup del panel de nzt-state 0.7.0: lo que está pasando ahora, a la vista y en vivo como en
+  Clean View (el cuadro Ahora); las tareas (la lista ordenada de unidades) ocultas detrás de un
+  botón; y «Tu turno», un desplegable que brilla mientras la corrida espera algo de nosotros.
+  Fuente: specs/mods/nzt-state/spec.md (RN-panel-ahora, -tareas, -lista, -lista-marcas,
+  -lista-siguiente, -lista-detalle, -espera, -fases-plegables, -secciones; Q-01..Q-04), unidad 295,
+  2026-10-20. Ronda 2: de 3 propuestas el usuario eligió la 1 y pidió «Tu turno» en vez de
+  «Te toca» (Q-04).
+  Los datos son los de Plan/state.json de este repo en esa fecha.
+  Imita el panel de Claude Code en una terminal oscura; no es código del mod.
+  Colores: los de fase y del personaje salen de mods/nzt-state/hooks/phases.ts y sprites.ts; el
+  resto son aproximaciones de la terminal /* provisional: la terminal y el tema ponen los reales */,
+  las mismas que specs/mods/nzt-files/mockup.html.
+  El brillo: en el mockup es una animación CSS; en la terminal sería alternar dos tonos con el
+  mismo reloj que anima al personaje (sin probar). Con ?quieto no se mueve nada.
+  Afuera del marco: el selector de estado y de línea de fases (Q-02).
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nzt-state 0.7.0 · mockup</title>
+<style>
+  :root {
+    /* provisional: aproximación de terminal oscura, igual que specs/mods/nzt-files/mockup.html */
+    --page: #111; --bg: #1a1a1a; --text: #e6e6e6; --dim: #8f8f8f; --border: #3a3a3a;
+    --claude: #d97757; --success: #6cc070; --warning: #e5c07b; --warning-soft: #9a8350; /* el punto bajo del brillo: 4,75 sobre el fondo, sigue en AA */ --inactive: #555;
+    --questions: #f48fb1; /* QUESTIONS_COLOR de register.tsx */
+    --row: 20px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text);
+         font: 14px/var(--row) ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; padding: 16px; }
+  .controls { max-width: 820px; margin: 0 auto 12px; display: flex; flex-direction: column; gap: 8px; }
+  .group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .group > span { color: var(--dim); font-size: 12px; line-height: 1.4; width: 100%; }
+  .group a { color: var(--text); border: 1px solid var(--border); padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; line-height: 1.4; }
+  .group a[aria-current] { background: var(--claude); color: #111; border-color: var(--claude); }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid #29b8db; outline-offset: 1px; }
+  .note { max-width: 820px; margin: 0 auto 12px; color: var(--dim); font-size: 12px; line-height: 1.5; }
+  .dock { width: 56ch; max-width: 100%; margin: 0 auto; background: var(--bg); padding: 8px 1ch 16px; border-left: 2px solid var(--border); }
+  .dock.narrow { width: 36ch; }
+  .line { min-height: var(--row); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .gap { height: var(--row); }
+  .dim { color: var(--dim); } .bold { font-weight: 700; }
+  .badge { background: var(--claude); color: #111; font-weight: 700; }
+  .title { color: var(--claude); font-weight: 700; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 1ch; min-height: var(--row); }
+  .top { display: flex; gap: 2ch; align-items: flex-start; }
+  .top.stack { flex-direction: column; align-items: stretch; }
+  .summary { flex: 1; min-width: 0; }
+  .kv { display: grid; grid-template-columns: 6ch 1fr; }
+  .crab { flex: none; display: flex; flex-direction: column; align-items: center; }
+  .crab .px { display: grid; grid-template-columns: repeat(20, 5px); grid-auto-rows: 5px; }
+  .crab .label { font-weight: 700; margin-top: 2px; }
+  .timeline { display: flex; flex-wrap: wrap; row-gap: var(--row); }
+  .timeline > span { display: inline-flex; align-items: center; white-space: pre; }
+  /* El sombrero en miniatura (RN-panel-mini-sombrero), aproximado como una placa de su color. */
+  .hat { display: inline-block; flex: none; align-self: center; width: 2ch; height: 10px; vertical-align: -1px; margin-right: 1ch; border-radius: 2px 2px 0 0; }
+  .bar { display: flex; height: var(--row); align-items: center; }
+  .bar i { display: block; height: 3px; }
+  .split { display: flex; justify-content: space-between; gap: 1ch; }
+  /* Botones del panel: Claude Code invierte el botón bajo el puntero */
+  .btn { all: unset; box-sizing: border-box; cursor: pointer; font-weight: 700; }
+  .btn:hover { background: #ddd; color: #111 !important; }
+  .btn.q { background: var(--questions); color: #111; padding: 0 1ch; }
+  .btn.full { display: flex; width: 100%; min-height: var(--row); }
+  /* La lista (RN-panel-lista) */
+  .phase { all: unset; box-sizing: border-box; display: flex; align-items: center; width: 100%; cursor: pointer; white-space: nowrap; min-height: var(--row); }
+  .phase:hover .ph-name { background: #ddd; color: #111 !important; }
+  .phase .ph-name { font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .phase .ph-count { flex: none; color: var(--dim); }
+  .unit { display: grid; grid-template-columns: 2ch 4ch 1fr; margin-left: 2ch; min-height: var(--row); }
+  .unit.flat { margin-left: 0; }
+  .unit .tx { overflow-wrap: anywhere; }
+  .unit.todo .tx { color: var(--dim); }
+  .unit.done .tx { color: #c8c8c8; }
+  /* El gris 'inactive' daba 2,33 sobre el fondo: la descartada va en el tenue (5,38) y tachada. */
+  .unit.dropped .tx { color: var(--dim); text-decoration: line-through; }
+  .unit.doing { cursor: pointer; }
+  .unit.doing .tx { font-weight: 700; }
+  .unit.next .tx { color: var(--text); }
+  .unit .tag { color: var(--dim); font-weight: 400; }
+  .detail { margin-left: 8ch; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: var(--row); }
+  .detail.open { white-space: normal; overflow-wrap: anywhere; }
+  .detail.flatd { margin-left: 6ch; }
+  .warn { color: var(--warning); }
+  .section { all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer; color: var(--claude); font-weight: 700; }
+  .section:hover { background: #ddd; color: #111; }
+  /* «Tu turno» (RN-panel-espera, Q-01): un desplegable que brilla mientras espera */
+  @keyframes glow-text { 0%, 100% { color: var(--warning); } 50% { color: var(--warning-soft); } }
+  .still * { animation: none !important; }
+  .tt { all: unset; box-sizing: border-box; display: flex; gap: 1ch; width: 100%; cursor: pointer; min-height: var(--row); }
+  .tt .h { flex: none; font-weight: 700; }
+  .tt .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tt .c { flex: none; color: var(--dim); }
+  .tt1 .h { animation: glow-text 1.6s ease-in-out infinite; }
+  .ttbody { padding-left: 2ch; }
+  .qrow { display: flex; justify-content: space-between; gap: 1ch; align-items: center; min-height: var(--row); }
+  .qrow .qt { color: var(--questions); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* «Ahora»: lo que está pasando, como el cuadro de Clean View */
+  .now { border: 1px solid var(--border); border-radius: 8px; padding: 0 1ch; }
+  .now .nh { display: flex; justify-content: space-between; gap: 1ch; }
+  .now .nh .l { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cur { display: grid; grid-template-columns: 2ch 1fr; }
+  .cur .tx { font-weight: 700; overflow-wrap: anywhere; }
+  .old { border: 1px dashed var(--border); padding: 0 1ch; }
+</style>
+</head>
+<body>
+<div class="controls" aria-label="Controles del mockup, afuera del panel">
+  <div class="group" id="states"><span>Estado del panel</span></div>
+  <div class="group" id="tl"><span>Q-02 · Línea de fases arriba</span></div>
+</div>
+<p class="note" id="note"></p>
+<main class="dock" id="dock" aria-label="Panel Estado de nzt-state"></main>
+
+<script>
+/* Fases: colores de mods/nzt-state/hooks/phases.ts */
+const PH = {
+  discovery: { label: 'Análisis', color: '#9B7BEA' }, ux: { label: 'UX', color: '#EC5FA6' },
+  build: { label: 'Build', color: '#F59E0B' }, verify: { label: 'Verificación', color: '#2BC4B0' },
+  ship: { label: 'Release', color: '#E5B53B' },
+}
+/* Personaje: paleta y sombreros de mods/nzt-state/hooks/sprites.ts */
+const PAL = { o:'#D77757', k:'#1A1A1A', v:'#9B7BEA', V:'#6D4FC9', y:'#F5C542', p:'#EC5FA6', a:'#F59E0B', w:'#F3F4F6', g:'#9CA3AF', t:'#2BC4B0', T:'#1A8F80', l:'#BFE8FF', M:'#D1D5DB', W:'#B7793E', h:'#6B7A90', Y:'#E5B53B' }
+const HATS = {
+  discovery: ['..............', '.VVVVVVVVVVVV.', '...vvvvvvvv.y.', '....vvvvvv..y.'],
+  ux: ['......p.......', '...pppppppp...', '..pppppppppppp', '...pppppppp...'],
+  build: ['...........g.g', '....aaaaaa.ggg', '...aawwwwaa.g.', '..aaaaaaaaaa.g'],
+  verify: ['ll....TT......', 'll..tttttt....', '..g.tTTTTt....', '...gtttttttt..'],
+  ship: ['....hhhhhh....', '....hhhhhh....', '....YYYYYY....', '..hhhhhhhhhh..'],
+}
+const frame = (ph, step) => {
+  const B = '..............'
+  const body = ['..oooooooooo..', '..okkooookko..', 'oooooooooooooo', '..oooooooooo..', step ? '..o.o....o.o..' : '...o.o..o.o...']
+  const top = step ? [...HATS[ph], B] : [B, ...HATS[ph]]
+  return [...top, ...body, B, B].map(r => '...' + r + '...')
+}
+const pixels = (ph, step) => frame(ph, step).map(r => [...r].map(c => `<i style="background:${PAL[c] ?? 'transparent'}"></i>`).join('')).join('')
+
+/* Unidades de esta corrida (Plan/state.json, 2026-10-20) */
+const RUN = [
+  { phase: 'discovery', units: [[294, 'Spec nzt-state: lista ordenada de unidades que reemplaza EN CURSO/PENDIENTES/HECHAS; espera destacada']] },
+  { phase: 'ux', units: [[295, 'Mockup HTML de nzt-state 0.7.0: la lista ordenada y propuestas para mostrar lo que espera de nosotros']] },
+  { phase: 'build', units: [[296, 'Construir nzt-state 0.7.0 según spec y mockup, con tests; README y catálogo']] },
+  { phase: 'verify', units: [[297, 'Prueba en vivo de nzt-state 0.7.0'], [287, 'Cerrar nzt-files 0.2.0 cuando el usuario lo acepte'], [298, 'Cerrar nzt-state 0.7.0 cuando el usuario lo acepte']] },
+  { phase: 'ship', units: [[289, 'Commit y push del cierre de nzt-files a mods'], [299, 'Commit y push de nzt-state 0.7.0 a mods']] },
+]
+/* El detalle de cada unidad, como lo trae el estado; una sin detalle no muestra el renglón. */
+const DETAILS = {
+  295: 'El usuario pidió que el mockup proponga cómo mejorar la espera (waiting_on y preguntas); aprobación del usuario antes de construir',
+  287: 'Arrastrada de la corrida anterior; espera al usuario: correr V-06..V-11 y re-ver H-01..H-11, confirmar el resto de Q-13 y aceptar; después barrer marcas, Historia 0.2.0 y catálogo',
+}
+const WAIT_SHORT = 'que mires el mockup y digas si va la línea de fases (Q-02)'
+const WAIT_LONG = 'Usuario: ver en vivo el diff entero y la barra en dos columnas (V-11, H-09..H-11), confirmar la forma de ± Cambios (resto de Q-13) y aceptar; cargado en vivo en ~/.claude/dev-mods/d41a6bb1 con nzt-files@nzt deshabilitado. Después: prueba en vivo V-06..V-11 y re-ver H-01..H-08'
+
+const STATES = {
+  'en-curso': { label: 'Unidad en curso', phase: 'verify', st: { 294: 'done', 295: 'done', 296: 'done', 297: 'done', 287: 'doing' }, note: 'Tu turno arriba de todo, plegado en un renglón cuyo título late. AHORA, como el cuadro de Clean View: la última hecha, la que está en curso y la que sigue, con «Unidad n de m». «☰ Ver tareas» abre la lista de todo el plan y «☰ Ocultar tareas» la cierra. Lo que pasa ahora, a la vista. Las tareas, ocultas: el botón las muestra y las vuelve a ocultar.' },
+  'espera': { label: 'Tu turno + preguntas', phase: 'ux', st: { 294: 'done', 295: 'doing' }, wait: WAIT_SHORT, q: 2, note: 'Tu turno brilla mientras el estado trae waiting_on o hay preguntas; un clic lo despliega y otro lo pliega (RN-panel-espera, Q-01).' },
+  'espera-larga': { label: 'Tu turno con texto largo', phase: 'verify', st: { 294: 'done', 295: 'done', 296: 'done', 297: 'done', 287: 'doing' }, wait: WAIT_LONG, note: 'El texto real de la corrida anterior: plegado entra en un renglón; desplegado se lee entero.' },
+  'preguntas': { label: 'Solo preguntas', phase: 'ux', st: { 294: 'done', 295: 'doing' }, q: 3, note: 'Sin waiting_on, Tu turno dice cuántas preguntas hay y también brilla.' },
+  'sigue': { label: 'Ninguna en curso (▷ sigue)', phase: 'ux', st: { 294: 'done' }, note: 'RN-panel-lista-siguiente: la 294 terminó y la 295 todavía no pasó a doing.' },
+  'descartada': { label: 'Con descartada', phase: 'verify', st: { 294: 'done', 295: 'done', 296: 'done', 297: 'done', 287: 'dropped', 298: 'doing' }, note: 'Una descartada queda en su lugar, tachada, y no cuenta en «n de m».' },
+  'varias': { label: 'Varias en curso (aviso)', phase: 'verify', st: { 294: 'done', 295: 'done', 296: 'done', 297: 'doing', 287: 'doing' }, note: 'RN-panel-varias-en-curso: las dos con ▶ y el aviso.' },
+  'completo': { label: 'Plan completo', phase: null, st: 'all-done', note: 'Con todo hecho no hay nada en curso: Ahora dice que el plan está completo.' },
+  'angosto': { label: 'Panel angosto', phase: 'ux', st: { 294: 'done', 295: 'doing' }, wait: WAIT_SHORT, q: 1, narrow: true, note: 'Menos de 40 columnas útiles: el personaje arriba, centrado, y lo demás igual.' },
+  'hoy': { label: 'Hoy (0.6.0), para comparar', phase: 'ux', st: { 294: 'done', 295: 'doing' }, wait: WAIT_SHORT, q: 2, old: true, note: 'Lo que reemplaza 0.7.0: EN CURSO, PENDIENTES y HECHAS separadas, el detalle entero, la espera en un recuadro y las preguntas sueltas debajo.' },
+}
+const TLS = { con: 'Con línea de fases', sin: 'Sin línea de fases' }
+
+const params = () => Object.fromEntries(new URLSearchParams(location.hash.slice(1)))
+const go = (k, v) => { const p = params(); p[k] = v; location.hash = new URLSearchParams(p).toString() }
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))
+const QUIET = /quieto/.test(location.search)
+/* Lo que la persona abre o cierra en el panel: dura lo que la sesión */
+let ui = { detail: false, wait: false, tasks: false, groups: {} }
+let tick = 0
+
+function statusOf(st, id) { return st === 'all-done' ? 'done' : (st[id] ?? 'todo') }
+
+function render() {
+  const p = params()
+  const key = STATES[p.state] ? p.state : 'en-curso'
+  const tl = TLS[p.fases] ? p.fases : 'con'
+  const s = STATES[key]
+  const reset = () => { ui = { detail: false, wait: false, tasks: false, groups: {} } }
+  for (const [id, map, cur, param] of [
+    ['states', Object.fromEntries(Object.entries(STATES).map(([k, v]) => [k, v.label])), key, 'state'],
+    ['tl', TLS, tl, 'fases'],
+  ]) {
+    const el = document.getElementById(id)
+    el.querySelectorAll('a').forEach(a => a.remove())
+    for (const [k, label] of Object.entries(map)) {
+      const a = document.createElement('a')
+      a.href = '#'; a.textContent = label
+      if (k === cur) a.setAttribute('aria-current', 'true')
+      a.onclick = ev => { ev.preventDefault(); reset(); go(param, k) }
+      el.appendChild(a)
+    }
+  }
+  document.getElementById('note').textContent = s.note
+  const dock = document.getElementById('dock')
+  dock.className = 'dock' + (s.narrow ? ' narrow' : '') + (QUIET ? ' still' : '')
+
+  const units = RUN.flatMap(g => g.units.map(([id, text]) => ({ id, text, phase: g.phase, status: statusOf(s.st, id) })))
+  const live = units.filter(u => u.status !== 'dropped')
+  const done = live.filter(u => u.status === 'done').length
+  const pct = Math.round(done / live.length * 100)
+  const doing = units.filter(u => u.status === 'doing')
+  const complete = s.st === 'all-done'
+  const cur = s.phase
+  const nextId = doing.length === 0 && cur ? units.find(u => u.phase === cur && u.status === 'todo')?.id : undefined
+  const phaseStatus = ph => {
+    const us = units.filter(u => u.phase === ph && u.status !== 'dropped')
+    if (us.length && us.every(u => u.status === 'done')) return 'done'
+    return ph === cur ? 'doing' : 'todo'
+  }
+  const crabPh = cur ?? 'ship'
+  const W = s.narrow ? 34 : 54
+
+  /* Piezas */
+  const markOf = u => {
+    const c = PH[u.phase].color
+    return u.status === 'done' ? `<span style="color:var(--success)">✓</span>`
+      : u.status === 'doing' ? `<span style="color:${c};font-weight:700">▶</span>`
+      : u.status === 'dropped' ? `<span style="color:var(--inactive)">✗</span>`
+      : u.id === nextId ? `<span style="color:${c}">▷</span>` : `<span class="dim">○</span>`
+  }
+  const row = (u, flat) => {
+    const isNext = u.id === nextId
+    const cls = `unit ${u.status}${isNext ? ' next' : ''}${flat ? ' flat' : ''}`
+    let r = `<div class="${cls}" data-origin="RN-panel-lista-marcas"${u.status === 'doing' ? ` data-detail="1" role="button" tabindex="0" aria-expanded="${ui.detail}"` : ''}><span>${markOf(u)}</span><span class="dim">${u.id}</span><span class="tx">${esc(u.text)}${isNext ? ' <span class="tag">· sigue</span>' : ''}</span></div>`
+    if (u.status === 'doing' && DETAILS[u.id]) r += `<div class="detail${ui.detail ? ' open' : ''}${flat ? ' flatd' : ''}" data-origin="RN-panel-lista-detalle">${esc(DETAILS[u.id])}</div>`
+    return r
+  }
+  const group = (g, forceOpen) => {
+    const c = PH[g.phase].color
+    const us = units.filter(u => u.phase === g.phase)
+    const lv = us.filter(u => u.status !== 'dropped')
+    const dn = lv.filter(u => u.status === 'done').length
+    const isOpen = forceOpen ?? (ui.groups[g.phase] ?? g.phase === cur)
+    const allDone = lv.length > 0 && dn === lv.length
+    let r = `<div class="gap"></div><button class="phase" data-phase="${g.phase}" aria-expanded="${isOpen}" data-origin="RN-panel-fases-plegables"><span class="hat" style="background:${c}"></span><span class="ph-name" style="color:${c}">${isOpen ? '▾' : '▸'} ${allDone ? '✓ ' : ''}${PH[g.phase].label}</span><span class="ph-count">${dn} de ${lv.length}</span></button>`
+    if (isOpen) r += us.map(u => row(u, false)).join('')
+    return r
+  }
+  const tasksToggle = (labelOn, labelOff, count) =>
+    `<div class="gap"></div><button class="btn full" id="tasks" aria-expanded="${ui.tasks}" style="color:var(--claude)">☰ ${ui.tasks ? labelOff : labelOn}<span class="dim" style="font-weight:400">&nbsp;· ${count}</span></button>`
+
+  /* Tu turno (RN-panel-espera): plegado, un renglón; desplegado, el texto entero y las preguntas */
+  const tuTurno = () => {
+    if (!s.wait && !s.q) return ''
+    const summary = s.wait ? s.wait : `${s.q} ${s.q === 1 ? 'pregunta' : 'preguntas'} para contestar`
+    const count = s.wait && s.q ? `? ${s.q}` : ''
+    const qrow = s.q ? `<div class="qrow"><span class="qt">? ${s.q} ${s.q === 1 ? 'pregunta' : 'preguntas'} para contestar</span><button class="btn q" data-origin="RN-panel-preguntas">Contestar ›</button></div>` : ''
+    const body = ui.wait ? `<div class="ttbody">${s.wait ? `<div class="line">${esc(s.wait)}</div>` : ''}${qrow}</div>` : ''
+    const arrow = ui.wait ? '▾' : '▸'
+    return `<div class="gap"></div><button class="tt tt1" id="tt" aria-expanded="${ui.wait}" data-origin="RN-panel-espera"><span class="h" style="color:var(--warning)">${arrow} ⏸ Tu turno</span><span class="t">${ui.wait ? '' : esc(summary)}</span><span class="c" style="color:var(--questions)">${ui.wait ? '' : count}</span></button>${body}`
+  }
+
+  /* Ahora: lo que está pasando, como el cuadro de Clean View (Q-04, propuesta 1) */
+  const ahora = () => {
+    if (complete) return `<div class="gap"></div><div class="now" style="border-color:var(--success)"><div class="line" style="color:var(--success);font-weight:700">✓ Plan completo: no hay unidades en curso ni pendientes.</div></div>`
+    const ordered = units
+    const focus = doing[0] ?? ordered.find(u => u.id === nextId)
+    const at = focus ? ordered.indexOf(focus) : -1
+    const c = focus ? PH[focus.phase].color : 'var(--border)'
+    const prev = at > 0 ? [...ordered.slice(0, at)].reverse().find(u => u.status === 'done') : undefined
+    const next = at >= 0 ? ordered.slice(at + 1).find(u => u.status === 'todo') : undefined
+    const n = focus ? live.indexOf(focus) + 1 : done
+    let r = `<div class="gap"></div><div class="now" style="border-color:${c}" data-origin="Ahora (Q-04)"><div class="nh"><span class="l" style="color:${c}">AHORA · ${focus ? PH[focus.phase].label : ''}</span><span class="dim">Unidad ${n} de ${live.length}</span></div>`
+    if (prev) r += row(prev, true)
+    for (const u of doing.length ? doing : focus ? [focus] : []) r += row(u, true)
+    if (next && next !== focus) r += row(next, true)
+    if (doing.length > 1) r += `<div class="line warn">⚠ ${doing.length} unidades en curso: el kernel permite una sola</div>`
+    return r + `</div>`
+  }
+
+  let h = ''
+  h += `<div class="gap"></div><div class="head"><span><span class="badge"> NZT </span> <span class="title">Estado</span></span>`
+  h += `</div>`
+
+  if (s.old) {
+    // 0.6.0, para comparar
+    h += `<div class="gap"></div><div class="top"><div class="summary"><div class="kv"><span class="dim">Plan</span><span style="color:var(--success)">● aprobado</span><span class="dim">Modo</span><span>acompañado</span></div></div><div class="crab"><div class="px" data-ph="${crabPh}">${pixels(crabPh, true)}</div><div class="label" style="color:${PH[crabPh].color}">${PH[crabPh].label}</div></div></div>`
+    h += `<div class="gap"></div><div style="border:1px solid var(--warning);border-radius:6px;padding:0 1ch"><div class="line warn">⏸ Esperando: ${esc(s.wait)}</div></div><div class="gap"></div><div class="qrow"><span class="qt">? 2 preguntas para contestar</span><button class="btn q">Contestar ›</button></div>`
+    h += `<div class="gap"></div><div class="old"><div class="line title">EN CURSO</div>`
+    doing.forEach(u => { h += `<div class="unit flat"><span style="color:var(--claude)">▶</span><span class="dim">${u.id}</span><span class="tx">${esc(u.text)}</span></div>${DETAILS[u.id] ? `<div class="detail open flatd">${esc(DETAILS[u.id])}</div>` : ''}` })
+    h += `<div class="gap"></div><div class="line title">▾ PENDIENTES · 6</div><div class="gap"></div><div class="line" style="margin-left:2ch"><b style="color:${PH.build.color}">▸ Build · 1</b></div><div class="gap"></div><div class="line" style="margin-left:2ch"><b style="color:${PH.verify.color}">▸ Verificación · 3</b></div><div class="gap"></div><div class="line" style="margin-left:2ch"><b style="color:${PH.ship.color}">▸ Release · 2</b></div>`
+    h += `<div class="gap"></div><div class="line title">▸ HECHAS · 1</div><div class="gap"></div><div class="line title">▸ NOTAS PARA RETOMAR · 3</div></div>`
+    return finish(dock, h, cur)
+  }
+
+  // Tu turno, arriba de todo, debajo del título
+  h += tuTurno()
+
+  // Personaje, y en la vista completa Plan, Modo y Objetivo (sin cambios en 0.7.0)
+  const crab = () => `<div class="crab"><div class="px" data-ph="${crabPh}" aria-label="Personaje de ${PH[crabPh].label}">${pixels(crabPh, true)}</div><div class="label" style="color:${PH[crabPh].color}">${PH[crabPh].label}</div></div>`
+  const summary = `<div class="summary"><div class="kv"><span class="dim">Plan</span><span style="color:var(--success)">● aprobado</span><span class="dim">Modo</span><span>acompañado<span class="dim"> · frena en cada unidad</span></span></div><div class="gap"></div><div class="line"><span class="dim">Objetivo </span><span class="bold">nzt-state 0.7.0: una lista ordenada estilo checklist y lo que se espera de nosotros más lindo</span></div></div>`
+  h += `<div class="gap"></div><div class="top${s.narrow ? ' stack' : ''}">${s.narrow ? crab() + summary : summary + crab()}</div>`
+
+  if (tl === 'con') {
+    h += `<div class="gap"></div><div class="timeline" data-origin="RN-panel-fases-tal-cual (Q-02)">` + RUN.map((g, i) => {
+      const ps = complete ? 'done' : phaseStatus(g.phase), c = PH[g.phase].color, L = PH[g.phase].label
+      const t = ps === 'done' ? `<span style="color:${c}">✓ ${L}</span>` : ps === 'doing' ? `<span style="background:${c};color:#111;font-weight:700"> ● ${L} </span>` : `<span style="color:${c};opacity:.6">○ ${L}</span>`
+      return `<span><span class="hat" style="background:${c}"></span>${t}${i < RUN.length - 1 ? '<span class="dim"> → </span>' : ''}</span>`
+    }).join('') + `</div>`
+  }
+  const filled = Math.round(pct / 100 * W)
+  const col = complete ? 'var(--success)' : 'var(--claude)'
+  h += `<div class="gap"></div><div class="split"><span><b>${done}</b><span class="dim"> de ${live.length} unidades hechas</span></span><b style="color:${col}">${pct}%</b></div>`
+  h += `<div class="bar"><i style="width:${filled}ch;background:${col}"></i><i style="width:${W - filled}ch;background:var(--inactive)"></i></div>`
+  h += `<div class="split" style="justify-content:flex-end"><span class="dim">actualizado recién</span></div>`
+
+  h += ahora()
+  h += tasksToggle('Ver tareas', 'Ocultar tareas', `${units.length}`)
+  if (ui.tasks) h += RUN.map(g => group(g)).join('')
+  h += `<div class="gap"></div><button class="section" data-origin="Notas para retomar">▸ NOTAS PARA RETOMAR · 3</button>`
+
+  finish(dock, h, cur)
+}
+
+function finish(dock, h, cur) {
+  dock.innerHTML = h
+  dock.querySelectorAll('.phase').forEach(b => b.onclick = () => { const ph = b.dataset.phase; ui.groups[ph] = !(ui.groups[ph] ?? ph === cur); render() })
+  dock.querySelectorAll('[data-detail]').forEach(b => { b.onclick = () => { ui.detail = !ui.detail; render() }; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click() } } })
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = () => { fn(); render() } }
+  on('tt', () => { ui.wait = !ui.wait })
+  on('tasks', () => { ui.tasks = !ui.tasks })
+}
+addEventListener('hashchange', render)
+render()
+// El personaje camina a unos 4 cuadros por segundo; solo se redibujan sus píxeles, para no perder el foco.
+if (!QUIET) setInterval(() => {
+  tick++
+  const px = document.querySelector('.crab .px')
+  if (px) px.innerHTML = pixels(px.dataset.ph, tick % 2 === 0)
+}, 250)
+</script>
+</body>
+</html>

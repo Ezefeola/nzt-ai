@@ -1,0 +1,17 @@
+{
+  "name": "nzt-look",
+  "version": "0.5.0",
+  "description": "Themes (NZT and fifteen more, dark and light), a usage band above the prompt with NZT's 20/30/40 context marks, and the conversation redrawn: tool rows, shell and diff cards, tables, code, math and Mermaid",
+  "author": { "name": "Ezefeola" },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "The language the band, the panel and the rows speak: es (español) or en (English)",
+      "default": "es",
+      "options": ["es", "en"]
+    }
+  }
+}

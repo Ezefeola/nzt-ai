@@ -68,6 +68,7 @@ Decisiones de diseño que no son opinión, salen de cómo funciona cada herramie
 | Compactación | re-adjunta cada skill invocada (primeros 5.000 tokens, 25.000 en total); un archivo leído no se re-adjunta | sin verificar |
 | Tamaño de SKILL.md | recomendado < 500 líneas | ídem |
 | Frontmatter portable | `name`, `description` (+ `license`, `compatibility`, `allowed-tools`) | `name`, `description` |
+| Tool de preguntas (D64) | `AskUserQuestion`: 1-4 preguntas, 2-4 opciones, siempre disponible (2.1.302, leído 2026-10-17) | `request_user_input`: solo en modo Plan o con el flag `default_mode_request_user_input`, en desarrollo y apagado (0.154.0, observado 2026-10-17) |
 
 Consecuencias directas:
 
@@ -1805,7 +1806,9 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     las confundiría. Dentro de una corrida, nada `done` o `dropped` se borra (regla de
     `nzt-plan`).
   - Un estado con `units` arriba (D61 o anterior) se convierte en su próxima escritura,
-    como un `phase` viejo: cada unidad va a la fase a la que pertenece.
+    como un `phase` viejo: cada unidad va a la fase a la que pertenece. **Desde D65 el
+    kernel ya no lo dice** (lo mismo para el `phase` de D61): el schema que muestra es el que
+    se escribe, y el panel sigue leyendo los formatos viejos (RN-mod-lee-formatos-viejos).
   - Opción descartada: un campo `phase` en cada unidad (más carga en el archivo y una
     fase que puede no estar en `phases`).
   - Pedido por el usuario el 2026-10-13 ("que cada unidad vaya dentro de su fase", y la
@@ -1834,6 +1837,108 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     (D23) y no se instala nunca.
   - Pedido por el usuario el 2026-10-13. Spec en la unidad 78; traer el mod y el catálogo,
     unidades 80 y 81; el instalador queda para otra corrida.
+- **D64.** **Una pregunta con opciones se hace con la tool de preguntas del host cuando la
+  sesión la ofrece, y si no, en una lista numerada con forma fija.** Lo que la forzó: el
+  agente tiraba las `Q-NN` y `QT-NN` en el chat como prosa, varias juntas, y el usuario
+  tenía que escribir un prompt para contestarlas una por una. Solo `stack-axes.md` pedía la
+  tool del host, y solo para los ejes del stack. Pedido del usuario el 2026-10-17: *"corregir
+  para que el agente pueda usar la tool de questions asi es transparente en cualquier
+  proveedor"*.
+  - **Dónde vive:** en el kernel, porque se pregunta en todas las fases (`Q-NN` en análisis,
+    UX y verificación, `QT-NN` en arquitectura, los ejes del stack). Cada adapter nombra la
+    tool de su host y sus límites; el kernel no nombra ninguna. `stack-axes.md` deja su
+    versión propia y remite al kernel, para que no haya dos reglas sobre lo mismo.
+  - **Con tool:** una pregunta por decisión, con su id al principio (`QT-03 · ¿…?`); las
+    opciones con su consecuencia en la descripción, la recomendada primero y marcada. Si la
+    tool toma pocas preguntas por vez, van varias llamadas seguidas, no una ronda por
+    respuesta. Lo que no entra en la tool —lo investigado, el contexto largo— queda en el
+    log y la pregunta lo cita.
+  - **Sin tool:** un solo bloque, una pregunta por número con su id y en negrita
+    (`**QT-03 · ¿…?**`), y debajo una viñeta por opción (`- **A · <opción>** — <consecuencia>`),
+    la recomendada primero y marcada *(recomendada)*. Es la misma forma que ya usan los logs
+    de preguntas. El mod `nzt-questions` la reconoce como un caso de su forma genérica (una
+    línea que termina en `?` y la lista debajo), sin depender de ella ni la regla de él.
+  - **La tool es cómo se pregunta, no dónde queda el registro.** La pregunta se escribe en
+    su log antes de preguntarla y la respuesta se anota al llegar, como hasta ahora; una
+    respuesta que llega por la tool se registra igual que una escrita en el chat.
+  - **Una pregunta abierta, sin opciones, va como texto**: la tool es para elegir entre
+    alternativas, no para todo lo que se pregunta.
+  - **Lo que se investigó (unidad 197, leído el 2026-10-17):**
+    - **Claude Code 2.1.302 · `AskUserQuestion`.** *documented*
+      ([tools reference](https://code.claude.com/docs/en/tools-reference)): preguntas de
+      opción múltiple, una fila **Other** y un campo de notas para texto libre, no pide
+      permiso y la pregunta queda abierta hasta que se contesta (salvo `askUserQuestionTimeout`).
+      *documented* (el esquema de la tool en los tipos que trae la 2.1.302): 1 a 4 preguntas
+      por llamada, 2 a 4 opciones por pregunta con `label` y `description`, `header` de hasta
+      12 caracteres, `multiSelect` y `preview` opcionales; **Other** lo agrega la tool.
+    - **Codex CLI 0.154.0 · `request_user_input`.** *documented* (código oficial,
+      [`openai/codex`](https://github.com/openai/codex) `main`,
+      `codex-rs/core/src/tools/handlers/request_user_input.rs` y
+      `codex-rs/protocol/src/request_user_input.rs`): bloquea al agente solo en modo Plan,
+      la usa solo el hilo principal (no un subagente), y cada pregunta lleva `id`, `header`,
+      `question`, `options` opcionales con `label` y `description`, `isOther` e `isSecret`.
+      *observed* (`codex features list` en esta máquina): el flag
+      `default_mode_request_user_input` está *under development* y apagado, así que en el
+      modo por defecto el agente no tiene la tool. *unverified*: el tope de 1 a 3 preguntas
+      por llamada (solo en un espejo del código y en artículos) y qué contesta la tool fuera
+      de Plan sin el flag. No hay página oficial de la doc de Codex que la describa.
+    - *inferred:* en Codex la regla cae casi siempre a la lista numerada, salvo en modo Plan o
+      con el flag. Por eso la forma fija sin tool importa tanto como la tool.
+  - **Fuera de alcance:** que el instalador active el flag de Codex. Escribiría la
+    configuración del usuario por una función que Codex marca en desarrollo, por el mismo
+    argumento de QT-03 B en `specs/nzt-mods.md`; el `README.md` lo explica. Propuesta del
+    agente, aceptada por el usuario el 2026-10-17.
+  - **Límite:** `CLAUDE.md` y `AGENTS.md` tenían 198 líneas (contado el 2026-10-17) y el tope
+    es 200 (C3). Lo resolvió el recorte de D65: bajaron a 189 y la regla entra entera en el
+    kernel, con su forma.
+  - Opción descartada: que el mod `nzt-questions` registre su propia tool de preguntas. En
+    Claude Code el agente tendría dos tools para lo mismo, y en Codex no existiría. Propuesta
+    del agente, aceptada por el usuario el 2026-10-17 (opción C').
+  - Spec en la unidad 198; el kernel, los adapters y `stack-axes.md`, en la unidad 206
+    (2026-10-17): sección *Questions* del kernel, una línea por adapter con la tool y sus
+    límites, y `stack-axes.md` remite a ella. `CLAUDE.md` y `AGENTS.md` quedaron en 200 líneas,
+    el tope de C3: la próxima regla del kernel necesita recortar antes.
+- **D65.** **El kernel dice cada regla una vez.** Lo que la forzó: D64 necesitaba lugar y
+  `CLAUDE.md` estaba en 198 de 200 líneas (C3). El usuario pidió revisar el kernel *"a ver si
+  tiene algo repetitivo o que este de mas, el funcionamiento debe ser tal cual no debemos
+  perder nada"* (2026-10-17). Se sacaron solo frases que repetían otra que queda:
+  - **La intro** enumeraba el loop que viene debajo; queda *"in the loop below"*.
+  - **Esperar la aprobación** estaba en el loop, en `approved` y en las hard rules; el loop
+    dice *"wait for approval"* y el candado sigue en `approved` y en la hard rule.
+  - **La sección *Entry point*** repetía la fila de `nzt` en Routing y el *"which phases you
+    are skipping and why"* del loop; la fila dice ahora *"classifying the request and picking
+    its phases"*.
+  - **"Specs are written one at a time"** repetía la hard rule *"Never write more than one spec
+    in a unit"*.
+  - **Decir el contexto al cerrar** estaba en el cierre de la unidad y al principio de
+    *Context*; queda en el cierre, con *"and whether clearing the session is worth it"*.
+  - **"Write `autonomy` when the user selects it, not when they approve the plan"** repetía
+    *"approving the plan does not select it"*.
+  - **"Write the file when a unit ends"** repetía el orden del cierre y la hard rule; queda
+    *"Never write the file while you are inside a unit"*.
+  - **La conversión de estados viejos** (`phase` de D61, `units` arriba de D62): era una nota
+    de un formato que cambió. El agente escribe el schema que el kernel le muestra, y un estado
+    viejo lo sigue leyendo el panel (RN-mod-lee-formatos-viejos). Lo pidió el usuario: *"no
+    deberia estar, no? es como una nota de un funcionamiento que cambio"*.
+  - **Se quedan** las justificaciones (*"a made up number is a recommendation resting on
+    nothing"* y las otras): ayudan a que la regla se cumpla. También *"Keep every line to one
+    line"*, que cubre `detail` y `notes`, no solo `do`.
+  - **Opción descartada: pasar el schema de `Plan/state.json` a una referencia** (propuesta del
+    usuario, 2026-10-17). El estado se escribe al cerrar cada unidad, también en trabajo chico
+    que no carga `nzt-plan`. Sin el schema delante, el agente escribiría el formato de memoria,
+    y si ese formato se corre, `nzt-state` y la retomada se rompen. Son 13 líneas, y es el
+    contrato que más se usa. Objetado por el agente; el usuario siguió sin pedirlo de nuevo
+    (*"ok perfecto entonces, con esto hecho"*, 2026-10-17), así que el schema queda en el kernel.
+  - **Opción descartada: que Claude Code lea `AGENTS.md` en lugar de `CLAUDE.md`** (pregunta del
+    usuario, 2026-10-17). *documented* ([memoria de Claude Code](https://code.claude.com/docs/en/memory),
+    leído el 2026-10-17): desde la 2.1.277 lee el `AGENTS.md` de la carpeta de trabajo y las de
+    arriba, y **solo si no hay un `CLAUDE.md` o `CLAUDE.local.md`** ahí; el `~/.claude/CLAUDE.md`
+    global carga siempre. NZT se instala para toda la máquina, así que en un `AGENTS.md` se
+    perdería en cualquier proyecto con su propio `CLAUDE.md`. Codex lee otra ruta
+    (`~/.codex/AGENTS.md`) y los adapters dicen cosas distintas, así que tampoco unifica nada; el
+    build ya arma los dos desde `core/kernel.md` (C3). Descartado por el usuario el 2026-10-17.
+  - **Resultado:** `core/kernel.md` de 185 a 176 líneas; `CLAUDE.md` y `AGENTS.md` de 198 a 189.
+    Unidad 212. La verificación con los evals de ruteo va en la 210.
 
 ## 13. Revisión contra Temper v3
 

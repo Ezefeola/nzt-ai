@@ -1,4 +1,4 @@
-import type { ModId } from './catalog'
+import type { Kind, ModId } from './catalog'
 
 /** The languages the pane speaks. */
 export type Lang = 'es' | 'en'
@@ -26,18 +26,20 @@ export const TEXTS = {
     copy: 'Copiar instalación',
     copyShort: 'Copiar',
     notInstalled: 'no instalado',
-    where: 'barra sobre el prompt',
     waiting: 'se abre al terminar el turno',
+    waitingShort: 'al terminar el turno',
     copied: '✓ Copiado · pegalo en el prompt y apretá Enter.',
     copyFailed: 'No se pudo copiar: esta terminal no deja. Seleccionalo:',
     openFailed: (message: string) => `No se pudo abrir: ${message}`,
     below: (n: number) => `↓ ${n} más`,
     close: 'Cerrar',
+    groups: { nzt: 'CON EL MÉTODO NZT', generic: 'PARA CUALQUIER PROYECTO' } satisfies Record<Kind, string>,
     mods: {
       'nzt-state': { title: 'Estado', desc: 'El plan y el estado de la corrida, leídos de Plan/state.json.' },
-      'nzt-context': { title: 'Contexto', desc: 'Cuánto contexto lleva la sesión, con las marcas 20/30/40.' },
       'nzt-changes': { title: 'Cambios', desc: 'Lo que Claude editó en el último turno o contra HEAD, un diff por vez.' },
       'nzt-files': { title: 'Archivos', desc: 'El proyecto como el explorador de VS Code, solo para leer.' },
+      'nzt-questions': { title: 'Preguntas', desc: 'Las preguntas del agente, de a una y con opciones, al prompt en un mensaje.' },
+      'nzt-look': { title: 'Aspecto', desc: 'Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.' },
     } satisfies Record<ModId, Mod>,
   },
   en: {
@@ -57,18 +59,20 @@ export const TEXTS = {
     copy: 'Copy install',
     copyShort: 'Copy',
     notInstalled: 'not installed',
-    where: 'bar above the prompt',
     waiting: 'opens when the turn ends',
+    waitingShort: 'when the turn ends',
     copied: '✓ Copied · paste it in the prompt and press Enter.',
     copyFailed: 'Could not copy: this terminal does not allow it. Select it:',
     openFailed: (message: string) => `Could not open: ${message}`,
     below: (n: number) => `↓ ${n} more`,
     close: 'Close',
+    groups: { nzt: 'WITH THE NZT METHOD', generic: 'FOR ANY PROJECT' } satisfies Record<Kind, string>,
     mods: {
       'nzt-state': { title: 'State', desc: "The run's plan and state, read from Plan/state.json." },
-      'nzt-context': { title: 'Context', desc: 'How much context the session has used, with the 20/30/40 marks.' },
       'nzt-changes': { title: 'Changes', desc: "What Claude edited in the last turn or against HEAD, one diff at a time." },
       'nzt-files': { title: 'Files', desc: "The project like VS Code's explorer, read only." },
+      'nzt-questions': { title: 'Questions', desc: "The agent's questions, one at a time with options, to the prompt in one message." },
+      'nzt-look': { title: 'Look', desc: "Themes, a usage band with NZT's 20/30/40 marks and a redrawn conversation." },
     } satisfies Record<ModId, Mod>,
   },
 } as const

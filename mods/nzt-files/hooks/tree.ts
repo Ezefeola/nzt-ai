@@ -14,6 +14,36 @@ export const folderOf = (path: string) => path.slice(0, Math.max(0, path.lastInd
 export const nameOf = (path: string) => path.slice(path.lastIndexOf('/') + 1)
 export const join = (folder: string, name: string) => (folder === '' ? name : `${folder}/${name}`)
 
+/** The folders that hold `path`, outermost first: `a/b/c.ts` is held by `a` and `a/b`. */
+export const ancestorsOf = (path: string) => {
+  const folders: string[] = []
+  for (let folder = folderOf(path); folder !== ''; folder = folderOf(folder)) folders.unshift(folder)
+  return folders
+}
+
+/**
+ * `path`, absolute or relative to the project's folder `root`, as a path from that folder;
+ * undefined when it lies outside. On Windows the case does not tell paths apart, and Git
+ * Bash's `/c/...` is `C:/...`.
+ */
+export const relativeTo = (root: string, path: string): string | undefined => {
+  const isWindows = /^[A-Za-z]:/.test(root)
+  let clean = path.trim().replace(/\\/g, '/')
+  if (isWindows) clean = clean.replace(/^\/([A-Za-z])\//, (_, drive: string) => `${drive}:/`)
+  const isAbsolute = clean.startsWith('/') || /^[A-Za-z]:\//.test(clean)
+  const words: string[] = []
+  for (const word of (isAbsolute ? clean : `${root}/${clean}`).split('/')) {
+    if (word === '' || word === '.') continue
+    if (word === '..') words.pop()
+    else words.push(word)
+  }
+  const whole = (root.startsWith('/') ? '/' : '') + words.join('/')
+  const same = (a: string, b: string) => (isWindows ? a.toLowerCase() === b.toLowerCase() : a === b)
+  if (same(whole, root)) return ''
+  if (!same(whole.slice(0, root.length + 1), `${root}/`)) return undefined
+  return whole.slice(root.length + 1)
+}
+
 const markOf = (xy: string): Mark | undefined => {
   if (xy === '??') return 'U'
   const [x, y] = [xy[0], xy[1]]
@@ -39,7 +69,8 @@ export const marksOf = (out: string, prefix = ''): Record<string, Mark> => {
   }
   for (let i = 0; i < parts.length; i++) {
     const entry = parts[i] ?? ''
-    if (entry.length < 4) continue
+    // `--branch` puts the branch first, as `## main...origin/main`.
+    if (entry.length < 4 || entry.startsWith('## ')) continue
     const xy = entry.slice(0, 2)
     const isRename = xy[0] === 'R' || xy[0] === 'C'
     const from = isRename ? parts[++i] : undefined
@@ -85,7 +116,7 @@ export const withDeleted = (folder: string, entries: Entry[], marks: Record<stri
     const name = cut < 0 ? rest : rest.slice(0, cut)
     if (names.has(name)) continue
     names.add(name)
-    extra.push({ name, isDir: cut >= 0 })
+    extra.push({ name, isDir: cut >= 0, size: 0, mtimeMs: 0 })
   }
   return sortedOf([...entries, ...extra])
 }
@@ -101,6 +132,8 @@ export type Row =
       isOpen: boolean
       mark?: Mark
       isDeleted: boolean
+      size: number
+      mtimeMs: number
     }
   | { kind: 'error'; path: string; depth: number; message: string }
 
@@ -130,6 +163,8 @@ export const rowsOf = (listings: Record<string, Listing>, open: string[], marks:
         isOpen: opened,
         ...(mark === undefined ? {} : { mark }),
         isDeleted,
+        size: entry.size,
+        mtimeMs: entry.mtimeMs,
       })
       if (opened) walk(path, depth + 1)
     }
@@ -157,6 +192,9 @@ export const treeWindow = (total: number, rows: number, top: number | null, chos
 /** Tab and the other control characters a `Text` refuses, made visible as spaces or `?`. */
 export const printable = (text: string) => text.replace(/\t/g, '  ').replace(/[\u0000-\u001f\u007f]/g, '?')
 
+/** Text of many lines the engine draws as written: tab and newline are its only control characters. */
+export const printableLines = (text: string) => text.replace(/\r/g, '').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '?')
+
 /** A text cut to `cells` cells, the cut marked with `…`. */
 export const fit = (text: string, cells: number) =>
   text.length <= cells ? text : `${text.slice(0, Math.max(0, cells - 1))}…`
@@ -182,13 +220,31 @@ export const contentOf = (text: string) => {
 }
 
 /**
+ * The scroll bar's thumb in a track of `rows` rows: as long as the part shown is of the whole
+ * (`count` of `total`), and as far down as `first` is of the last top, `lastTop`.
+ */
+export const thumbOf = (rows: number, first: number, count: number, total: number, lastTop: number) => {
+  const size = Math.max(1, Math.min(rows, Math.round((rows * count) / Math.max(1, total))))
+  const from = lastTop <= 0 ? 0 : Math.round(((rows - size) * Math.min(first, lastTop)) / lastTop)
+  return { from, size }
+}
+
+/** The top a click on row `row` of a track of `rows` rows scrolls to. */
+export const topAtRow = (row: number, rows: number, lastTop: number) => Math.round((lastTop * row) / Math.max(1, rows - 1))
+
+/** How many rows a line of a file of `total` lines wraps to at `columns` cells, under its number. */
+const lineRowsOf = (total: number, columns: number) => {
+  const room = Math.max(8, columns - String(total).length - 1)
+  return (line: string) => Math.max(1, Math.ceil(line.replace(/\t/g, '    ').length / room))
+}
+
+/**
  * The lines a window of `rows` rows shows from line `top` at `columns` cells, a long line
  * taking as many rows as it wraps to under the gutter of line numbers; clamped so the window
  * never runs past the end.
  */
 export const textWindow = (lines: string[], top: number, rows: number, columns: number) => {
-  const room = Math.max(8, columns - String(lines.length).length - 1)
-  const size = (line: string) => Math.max(1, Math.ceil(line.replace(/\t/g, '    ').length / room))
+  const size = lineRowsOf(lines.length, columns)
   let last = lines.length
   for (let used = 0; last > 0 && used + size(lines[last - 1]!) <= rows; last--) used += size(lines[last - 1]!)
   const first = Math.max(0, Math.min(Number.isFinite(top) ? Math.floor(top) : 0, last))

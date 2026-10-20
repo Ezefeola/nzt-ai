@@ -1,0 +1,32 @@
+{
+  "name": "NZT claro",
+  "base": "light",
+  "overrides": {
+    "claude": "#0b6b55",
+    "claudeShimmer": "#2a8f74",
+    "suggestion": "#0b6b55",
+    "permission": "#0b6b55",
+    "permissionShimmer": "#2a8f74",
+    "promptBorder": "#0b6b55",
+    "promptBorderShimmer": "#2a8f74",
+    "remember": "#0b6b55",
+    "success": "#0b6b55",
+    "text": "#07100f",
+    "inverseText": "#f4faf7",
+    "inactive": "#4d6662",
+    "subtle": "#556d68",
+    "warning": "#6b5d00",
+    "warningShimmer": "#8a7a10",
+    "error": "#b3263a",
+    "diffAdded": "#aecfc6",
+    "diffRemoved": "#fbb4bc",
+    "diffAddedWord": "#8bbaae",
+    "diffRemovedWord": "#fe9aa5",
+    "userMessageBackground": "#e3f1ec",
+    "userMessageBackgroundHover": "#d6ebe3",
+    "selectionBg": "#c4ebdd",
+    "composerSidebarBackground": "#f4faf7",
+    "rate_limit_fill": "#0b6b55",
+    "rate_limit_empty": "#c9ddd6"
+  }
+}

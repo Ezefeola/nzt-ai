@@ -1,0 +1,318 @@
+<!doctype html>
+<!--
+  Mockup de nzt-look 0.2.0: la conversación redibujada (filas de herramientas, diff, consola,
+  tablas, código, y el prompt, el spinner y el pie que las rodean).
+  Fuente: specs/mods/nzt-look/spec.md (RN-skin-partes, RN-skin-cae-al-original, RN-skin-calmo,
+  RN-skin-copiar, RN-skin-palabras, RN-skin-solo-dibujo, tabla "Qué se redibuja" y sección Diseño ·
+  conversación), unidad 221, 2026-10-17; textos de Claude Code (RN-skin-textos-claude, Q-10), unidad 245, 2026-10-18. Pedido del usuario: todo el alcance de la referencia (2026-10-17).
+  Referencia leída: el mod de referencia, hooks/rows.tsx (toolRow, groupRow, promptRow,
+  spinnerRow, footerRow, tableRows), hooks/shell-rows.tsx (tarjeta de consola en la terminal),
+  hooks/code-rows.tsx (bloque de código enmarcado) y hooks/skin.ts (glifos: ○ corriendo, ● bien,
+  ✕ falló, ◌ cortado, ◆ listo, ┃ riel, ─ rama, spinner braille), en
+  la copia local de la referencia.
+  Tonos de lectura de la oscura y colores del código (nzt-brand.md, Q-03), unidad 254, 2026-10-18.
+  Imita la terminal y la app de escritorio con el tema nzt oscuro; no es código del mod. Los datos
+  son de ejemplo. Colores: specs/nzt-brand.md (Estados y Derivados, fijados en la unidad 222), los
+  mismos de mockup-banda.html.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nzt-look 0.1.0 · conversación · mockup</title>
+<style>
+  :root {
+    --page: #050b0a; --row: 20px; --bg: #07100f;
+    /* Tonos de lectura de la oscura (nzt-brand.md, Q-03, unidad 253). */
+    --t-user: #5ccaa9; --t-fg: #d3dfdb; --t-sec: #244146;
+    --t-muted: #7f9893;   /* Tenue */
+    --t-surface: #0c1918; /* Superficie */
+    --t-zebra: #102221;   /* Cebra */
+    --t-err: #e8909a;     /* Error */
+    --t-warn: #e2d36e;    /* aviso = Contraste */
+    --t-ok: #5ccaa9; --t-read: #5ccaa9; --t-write: #e2d36e; --t-run: #d3dfdb; --t-search: #5ccaa9;
+    /* Colores del código (nzt-brand.md). */
+    --c-bg: #0a1514; --c-fg: #b9c7c3; --c-k: #62c4a8; --c-s: #d4c77a; --c-n: #e0a08f;
+    --c-c: #6f8a85; --c-f: #9fd4e0; --c-t: #c8b4e8; --c-p: #a9c4be;
+    /* Lo que Claude Code dibuja por su cuenta, para los estados que caen al original: gris neutro. */
+    --cc-fg: #d6d6d6; --cc-dim: #8a8a8a; --cc-accent: #d97757;
+    --sel: #4fc3f7;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--t-fg); font: 14px/var(--row) ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; padding: 16px; }
+  .states { max-width: 980px; margin: 0 auto 12px; display: flex; flex-wrap: wrap; gap: 6px; font-family: system-ui, sans-serif; }
+  .states span { color: #9fb3ae; width: 100%; font-size: 12px; line-height: 1.4; margin-top: 4px; }
+  .states a { color: #e6efec; border: 1px solid #2b4a4f; padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; line-height: 1.4; }
+  .states a[aria-current] { background: var(--t-user); color: var(--t-sec); border-color: var(--t-user); font-weight: 700; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+  .frame { margin: 0 auto; max-width: 100%; background: var(--bg); padding: 8px 1ch; border: 1px solid #1a2c2b; overflow: hidden; }
+  .note { max-width: 980px; margin: 12px auto 0; color: #9fb3ae; font: 12px/1.5 system-ui, sans-serif; }
+  .note b, .note code { color: #e6efec; }
+  .prop { text-decoration: underline dotted #9fb3ae; text-underline-offset: 3px; }
+
+  .row { display: flex; gap: 0 2ch; white-space: nowrap; min-height: var(--row); min-width: 0; align-items: baseline; }
+  .row > .main { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .row > .meta { flex: none; }
+  .dim { color: var(--t-muted); } .b { font-weight: 700; }
+  .rail { color: var(--t-user); height: var(--row); }
+  .ok { color: var(--t-ok); } .err { color: var(--t-err); } .warn { color: var(--t-warn); }
+  .k-read { color: var(--t-read); } .k-write { color: var(--t-write); } .k-run { color: var(--t-run); } .k-search { color: var(--t-search); }
+  .box { border: 1px solid var(--t-muted); border-radius: 8px; padding: 0 1ch; position: relative; margin: 4px 0; }
+  /* La salida y el código conservan sus espacios; lo que no entra se corta en el borde. */
+  .box > div, .desk .card .body > div { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+  .box.code { padding-top: 6px; }
+  .box > .label { position: absolute; top: -11px; left: 1ch; background: var(--bg); padding: 0 .5ch; color: var(--t-muted); line-height: 20px; }
+  .box > .ctl { position: absolute; bottom: -11px; right: 1ch; background: var(--bg); padding: 0 .5ch; line-height: 20px; }
+  .ctl button, .fold { all: unset; cursor: pointer; color: var(--t-muted); }
+  .ctl button:hover, .fold:hover { color: var(--t-fg); }
+  .prompt-box { display: inline-block; max-width: 100%; border: 1px solid var(--t-muted); border-radius: 8px; padding: 0 1ch; margin: 8px 0; white-space: normal; }
+  .reply { white-space: normal; margin: 6px 0; }
+  .grid { display: grid; gap: 0 2ch; justify-content: start; }
+  .grid .h { color: var(--t-user); font-weight: 700; background: var(--t-surface); }
+  .grid .z { background: var(--t-zebra); }
+  .tok-k { color: var(--c-k); } .tok-s { color: var(--c-s); } .tok-n { color: var(--c-n); } .tok-c { color: var(--c-c); font-style: italic; }
+  .tok-f { color: var(--c-f); } .tok-t { color: var(--c-t); } .tok-p { color: var(--c-p); }
+  .box.code, .desk .card.code .body { background: var(--c-bg); color: var(--c-fg); }
+  @keyframes spin { to { content: ''; } }
+  .shimmer span { transition: color .1s; }
+
+  /* Escritorio. */
+  .desk { font: 14px/1.5 system-ui, sans-serif; }
+  .desk .trow { display: flex; align-items: center; gap: 8px; min-height: 26px; white-space: nowrap; }
+  .desk .trow .main { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .desk .ico { width: 16px; height: 16px; flex: none; }
+  .desk .card { border: 1px solid #1f3a3c; border-radius: 10px; background: var(--t-surface); margin: 8px 0; overflow: hidden; }
+  .desk .card .head { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #1f3a3c; color: var(--t-muted); font-size: 12.5px; }
+  .desk .card .body { padding: 6px 12px; font: 13px/1.55 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; overflow-x: auto; }
+  .desk .ln { color: var(--t-muted); display: inline-block; width: 3ch; text-align: right; margin-right: 1.5ch; user-select: none; }
+  .desk .add, .box .add { background: rgba(114, 244, 205, .16); } .desk .del, .box .del { background: rgba(255, 143, 156, .18); }
+  .box .ln { color: var(--t-muted); }
+  .grid.wrap > span { white-space: normal; }
+  .desk table { border-collapse: collapse; font-size: 13px; }
+  .desk th { text-align: left; color: var(--t-user); padding: 4px 12px; border-bottom: 1px solid var(--t-muted); }
+  .desk td { padding: 4px 12px; } .desk tr.z td { background: var(--t-zebra); }
+  .desk .bubble { display: inline-block; border: 1px solid #1f3a3c; border-radius: 12px; padding: 6px 12px; margin: 8px 0; background: var(--t-surface); }
+  .desk button.copy { all: unset; cursor: pointer; color: var(--t-muted); font-size: 12px; }
+  /* Lo de Claude Code, cuando una parte cae al original. */
+  .cc { color: var(--cc-fg); } .cc .dim { color: var(--cc-dim); } .cc-mark { color: var(--cc-accent); }
+</style>
+</head>
+<body>
+
+<nav class="states" aria-label="Estados del mockup (fuera del diseño)">
+  <span>Superficie:</span>
+  <a href="#" data-k="surf" data-v="term">Terminal</a>
+  <a href="#" data-k="surf" data-v="desk">App de escritorio</a>
+  <span>Estado del turno:</span>
+  <a href="#" data-k="state" data-v="done">Turno terminado</a>
+  <a href="#" data-k="state" data-v="running">Claude trabajando</a>
+  <a href="#" data-k="state" data-v="failed">Un comando falló</a>
+  <a href="#" data-k="state" data-v="interrupted">Turno cortado</a>
+  <a href="#" data-k="state" data-v="long">Salida y código largos (plegados)</a>
+  <a href="#" data-k="state" data-v="open">Plegado abierto</a>
+  <a href="#" data-k="state" data-v="empty">Comando sin salida</a>
+  <a href="#" data-k="state" data-v="fallback">Cae al dibujo de Claude Code</a>
+  <a href="#" data-k="state" data-v="wide">Tabla más ancha que la terminal</a>
+  <a href="#" data-k="state" data-v="partoff">Tablas apagadas</a>
+  <a href="#" data-k="state" data-v="quiet">Solo lectura plegada</a>
+  <a href="#" data-k="state" data-v="calm">Modo calmo</a>
+  <a href="#" data-k="state" data-v="off">Dibujo apagado (/nzt-look off)</a>
+  <a href="#" data-k="state" data-v="narrow">Angosta (60 columnas)</a>
+  <span>No aplican: <i>vacío</i> (sin turno no hay nada que redibujar), <i>sin permiso</i> (el pedido de permiso queda en el dibujo de Claude Code, alcance Afuera), <i>cargando</i> (es <i>Claude trabajando</i>).</span>
+</nav>
+
+<main id="stage"></main>
+<div class="note" id="note"></div>
+
+<script>
+  // Solo dibuja los estados del mockup a partir de datos fijos; no hay lógica del mod.
+  const P = '<span class="prop" title="propuesta del agente">';
+  const END = '</span>';
+  // Lo que pone Claude Code y el mockup no puede saber: se marca pendiente (Q-10), no se inventa.
+  const CC = '<span class="prop" title="lo pone Claude Code; sin ver todavía (Q-10)">[palabra de Claude]</span>';
+  // Las cifras del spinner como las muestra Claude Code (RN-skin-spinner-cifras); la forma exacta se mira en vivo (L-20).
+  const FIG = '<span class="prop" title="forma de Claude Code; se mira en vivo (L-20)">(12s · 300 tokens · high)</span>';
+  // El pie es la línea de Claude Code tal cual (RN-skin-pie-claude).
+  const CCLINE = '<span class="prop" title="la línea de Claude Code tal cual (Q-11)">[línea de Claude]</span>';
+
+  // El turno de ejemplo: el mismo de la vista previa del panel (mockup-banda.html).
+  const PROMPT = 'sumá límite de pedidos a la API del hub';
+  const TEST_OUT = ['✓ hub › rate limit › acepta 60 pedidos por minuto', '✓ hub › rate limit › rechaza el 61 con 429', '✓ hub › rate limit › la ventana se renueva', '', 'Tests: 12 passed, 12 total', 'Time:  2.1 s'];
+  const TEST_FAIL = ['✓ hub › rate limit › acepta 60 pedidos por minuto', '✕ hub › rate limit › rechaza el 61 con 429'];
+  const TEST_ERR = ['Expected status 429, received 200', '  at server.test.ts:41:18', 'Tests: 1 failed, 11 passed, 12 total'];
+  const LONG_OUT = Array.from({ length: 31 }, (_, i) => `✓ hub › caso ${String(i + 1).padStart(2, '0')}`);
+  const CODE = [
+    ['<span class="tok-k">import</span> { <span class="tok-t">Router</span> } <span class="tok-k">from</span> <span class="tok-s">\'express\'</span>'],
+    ['<span class="tok-k">const</span> limiter = <span class="tok-f">rateLimit</span>({'],
+    ['  <span class="tok-p">windowMs</span>: <span class="tok-n">60_000</span>,'],
+    ['  <span class="tok-p">max</span>: <span class="tok-n">60</span>, <span class="tok-c">// pedidos por ventana</span>'],
+    ['  <span class="tok-p">message</span>: <span class="tok-s">\'Demasiados pedidos\'</span>,'],
+    ['})'],
+    ['<span class="tok-k">export function</span> <span class="tok-f">mount</span>(app: <span class="tok-t">Router</span>): <span class="tok-t">void</span> {'],
+    ['  app.<span class="tok-f">use</span>(<span class="tok-s">\'/api\'</span>, limiter)'],
+    ['}'],
+  ];
+  const LONG_CODE = Array.from({ length: 38 }, (_, i) => [`<span class="tok-k">export const</span> ruta${i + 1} = <span class="tok-s">'/r/${i + 1}'</span>`]);
+  const TABLE = [['Ruta', 'Límite', 'Ventana'], ['/chat', '60', '1 min'], ['/upload', '10', '1 min'], ['/search', '120', '1 min']];
+  const DIFF = [[40, ' ', "app.use(express.json())"], [41, '+', "app.use('/api', limiter)"], [42, ' ', "app.get('/health', health)"], [57, '-', "// TODO: límite de pedidos"], [57, '+', "export { limiter }"]];
+  // El diff resaltado como código (RN-skin-diff-legible): palabras clave, cadenas y comentarios del lenguaje.
+  const hl = s => s.replace(/</g, '&lt;').replace(/('[^']*')/g, '<span class="tok-s">$1</span>').replace(/^(\/\/.*)$/, '<span class="tok-c">$1</span>').replace(/\b(export|const)\b/g, '<span class="tok-k">$1</span>').replace(/\.(\w+)\(/g, '.<span class="tok-f">$1</span>(');
+  const WIDE = [['Unidad', 'Qué produce', 'Por qué'], ['243', 'Quito toda mención de la referencia: specs, mockups, README del mod, comentarios del código y el estado', 'Lo pediste; los orígenes se reescriben'], ['244', 'Spec con una regla nueva: el mod cambia el estilo, no los textos de Claude Code', 'Que el pedido quede como regla']];
+
+  // ── Terminal ─────────────────────────────────────────────────────────────
+  // Una fila de herramienta: nodo con su glifo de estado, rama del riel, nombre, objetivo y, a la derecha, los datos.
+  const node = st => st === 'run' ? '<span class="dim">○</span>' : st === 'err' ? '<span class="err">✕</span>' : st === 'cut' ? '<span class="warn">◌</span>' : '<span class="ok">●</span>';
+  const tRow = (st, kind, label, target, meta = '', rail = true, tClass = 'dim') =>
+    `${rail ? '<div class="rail">┃</div>' : ''}<div class="row"><span class="main">${node(st)}<span class="dim">${rail ? '─' : ''} </span><span class="k-${kind}">${label}</span><span class="${tClass}">  ${target}</span></span>${meta ? `<span class="meta">${meta}</span>` : ''}</div>`;
+  const shellCard = (cmd, lines, { err = [], status = '<span class="ok">✓</span>', fold = 0, tail = [], open = false, empty = false } = {}) =>
+    `<div class="box"><div class="row"><span class="main"><span class="k-run">$ </span><span class="b">${cmd}</span></span><span class="meta">${status}</span></div>${empty ? `<div class="dim">${P}sin salida${END}</div>` : ''}${lines.map(l => `<div>${l === '' ? '&nbsp;' : colorize(l)}</div>`).join('')}${fold ? `<div><button class="fold" data-go="open">▾ ${fold} más</button></div>` : ''}${tail.map(l => `<div>${colorize(l)}</div>`).join('')}${err.length ? `${lines.length ? '<div class="dim">stderr</div>' : ''}${err.map(l => `<div class="err">${l}</div>`).join('')}` : ''}${open ? '<div><button class="fold" data-go="long">▴ menos</button></div>' : ''}<span class="ctl"><button aria-label="Copiar la salida">${P}Copiar${END}</button></span></div>`;
+  // Palabras de error, aviso y éxito, rutas y números en color (tabla "Qué se redibuja", Consola).
+  const colorize = l => l.replace(/^✓/, '<span class="ok">✓</span>').replace(/^✕/, '<span class="err">✕</span>').replace(/(\d+ passed)/, '<span class="ok">$1</span>').replace(/(\d+ failed)/, '<span class="err">$1</span>').replace(/(\d+(\.\d+)? s)$/, '<span class="warn">$1</span>');
+  const codeBox = (lang, lines, fold = 0) => `<div class="box code" style="margin-top:14px"><span class="label">${lang}</span>${lines.map(l => `<div>${l[0]}</div>`).join('')}${fold ? `<div><button class="fold" data-go="open">▾ ${fold} más</button></div>` : ''}<span class="ctl"><button aria-label="Copiar el código">${P}Copiar${END}</button></span></div>`;
+  const tableGrid = (rows, wrap = false) => `<div class="grid${wrap ? ' wrap' : ''}" style="grid-template-columns:${wrap ? '5ch minmax(6ch,3fr) minmax(6ch,2fr)' : `repeat(${rows[0].length},auto)`};margin:6px 0">${rows.map((r, i) => r.map(c => `<span class="${i === 0 ? 'h' : i % 2 === 0 ? 'z' : ''}">&nbsp;${c}&nbsp;</span>`).join('')).join('')}</div>`;
+  const promptT = () => `<div class="prompt-box">${PROMPT}</div>`;
+  const spinnerT = calm => calm ? `<div class="row" style="white-space:normal"><span class="dim">⠋ ${CC}… ${FIG}</span></div>` : `<div class="row shimmer" id="shimmer" style="white-space:normal"><span class="k-run" id="frame">⠋</span> <span id="word">${CC}</span><span class="dim">… ${FIG}</span></div>`;
+  const footerT = () => `<div class="row" style="margin-top:6px;white-space:normal"><span class="dim">${CCLINE}  ·  ${P}6 herramientas${END}  ·  <span class="ok">+18</span> <span class="err">−3</span></span></div>`;
+  const replyT = () => `<div class="reply"><span title="la viñeta de Claude Code (RN-skin-vineta)">●</span> Listo: el hub limita a 60 pedidos por minuto por ruta, y el 61 recibe un 429. Los límites quedaron así:</div>`;
+
+  // La edición como tarjeta de diff también en la terminal (RN-skin-diff-legible).
+  const tDiff = () => `<div class="box"><div class="row"><span class="main" style="color:var(--t-warn)">apps/hub/src/server.ts</span><span class="meta"><span class="ok">+18</span> <span class="err">−3</span></span></div>${DIFF.map(([n, s, x]) => `<div class="${s === '+' ? 'add' : s === '-' ? 'del' : ''}"><span class="ln">${String(n).padStart(3)}</span> <span class="${s === '+' ? 'ok' : s === '-' ? 'err' : 'dim'}">${s}</span> ${hl(x)}</div>`).join('')}</div>`;
+
+  function terminal(state) {
+    const calm = state === 'calm', quiet = state === 'quiet' || calm;
+    const out = [promptT()];
+    // Lecturas y búsquedas: una fila agrupada; en solo lectura plegada, nada (un fallo dejaría su línea).
+    if (!quiet) out.push(tRow('ok', 'read', `Read <span class="dim">2</span><span class="dim"> · </span><span class="k-search">Grep</span>`, '<span class="dim">1  ▸</span>'));
+    if (state === 'running') {
+      out.push(tRow('ok', 'write', `Edit`, 'apps/hub/src/server.ts', '<span class="ok">+18</span> <span class="err">−3</span>  <span class="dim">0.4s</span>', true, 'warn'));
+      out.push(tDiff());
+      out.push(tRow('run', 'run', `Bash`, 'pnpm test --filter hub', '<span class="dim">⠙ 1.2s</span>'));
+      out.push(spinnerT(false));
+      return out.join('');
+    }
+    out.push(tRow('ok', 'write', `Edit`, 'apps/hub/src/server.ts', '<span class="ok">+18</span> <span class="err">−3</span>  <span class="dim">0.4s</span>', true, 'warn'));
+    if (!calm && state !== 'fallback') out.push(tDiff());
+    if (state === 'failed') {
+      out.push(tRow('err', 'run', `Bash`, 'pnpm test --filter hub', '<span class="dim">2.3s</span>', true, 'err'));
+      out.push(shellCard('pnpm test --filter hub', TEST_FAIL, { err: TEST_ERR, status: '<span class="err">✗ exit 1</span>' }));
+      out.push('<div class="reply">El test del 429 falla: el límite no se aplica a <span style="color:var(--t-warn)">/api/chat</span>. Lo reviso.</div>');
+      out.push(footerT());
+      return out.join('');
+    }
+    if (state === 'interrupted') {
+      out.push(tRow('cut', 'run', `Bash`, 'pnpm test --filter hub', `<span class="warn">Interrupted</span>`));
+      out.push(`<div class="row"><span class="warn">◌ ${P}Cortado en 9s${END}</span></div>`);
+      return out.join('');
+    }
+    out.push(tRow('ok', 'run', `Bash`, 'pnpm test --filter hub', '<span class="dim">2.1s</span>'));
+    if (state === 'calm') { out.push(replyT(), tableGrid(TABLE), footerT()); return out.join(''); }
+    if (state === 'fallback') {
+      out.push(`<div class="cc"><div><span class="cc-mark">⏺</span> Bash(pnpm test --filter hub)</div>${TEST_OUT.slice(0, 3).map(l => `<div class="dim">  ⎿  ${l}</div>`).join('')}<div class="dim">     … +3 lines (ctrl+o to expand)</div></div>`);
+      out.push(replyT(), tableGrid(TABLE));
+      out.push(`<div class="cc" style="margin:6px 0"><div class="dim">\`\`\`zig</div><div>const limit: u32 = 60;</div><div class="dim">\`\`\`</div></div>`);
+      out.push(footerT());
+      return out.join('');
+    }
+    const long = state === 'long', open = state === 'open';
+    out.push(long ? shellCard('pnpm test --filter hub', LONG_OUT.slice(0, 8), { fold: LONG_OUT.length - 12, tail: LONG_OUT.slice(-4) }) :
+      open ? shellCard('pnpm test --filter hub', LONG_OUT, { open: true }) :
+      state === 'empty' ? shellCard('pnpm lint --fix', [], { empty: true }) : shellCard('pnpm test --filter hub', TEST_OUT));
+    out.push(replyT());
+    out.push(state === 'wide' ? tableGrid(WIDE, true) : state === 'partoff' ? `<div class="cc" style="margin:6px 0">${['| Ruta    | Límite | Ventana |', '|---------|--------|---------|', '| /chat   | 60     | 1 min   |', '| /upload | 10     | 1 min   |', '| /search | 120    | 1 min   |'].map(l => `<div>${l}</div>`).join('')}</div>` : tableGrid(TABLE));
+    out.push(long ? codeBox('ts', LONG_CODE.slice(0, 24), LONG_CODE.length - 24) : open ? codeBox('ts', LONG_CODE) : codeBox('ts', CODE));
+    out.push(footerT());
+    return out.join('');
+  }
+
+  // ── Escritorio ──────────────────────────────────────────────────────────
+  const ICON = {
+    read: '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h5l1 1h6v9H2z" fill="none" stroke="var(--t-read)" stroke-width="1.4"/></svg>',
+    write: '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13l1-3 7-7 2 2-7 7z" fill="none" stroke="var(--t-write)" stroke-width="1.4"/></svg>',
+    run: '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4l4 4-4 4M8 12h5" fill="none" stroke="var(--t-run)" stroke-width="1.4"/></svg>',
+    err: '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--t-err)" stroke-width="1.8"/></svg>',
+    spin: '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--t-muted)" stroke-opacity=".3" stroke-width="2"/><path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="var(--t-user)" stroke-width="2"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="1s" repeatCount="indefinite"/></path></svg>',
+  };
+  const dRow = (ico, label, kind, target, meta = '', tColor = 'var(--t-muted)', expander = true) =>
+    `<div class="trow">${ico}<span class="main"><b style="color:var(--t-${kind})">${label}</b>  <span style="color:${tColor}">${target}</span>${meta ? `   <span>${meta}</span>` : ''}</span>${expander ? '<span style="color:var(--t-muted)">▸</span>' : ''}</div>`;
+  const dShell = (cmd, lines, { err = [], status = '<span class="ok">✓ exit 0</span>', fold = 0 } = {}) =>
+    `<div class="card"><div class="head"><span><span class="k-run">$</span> <b style="color:var(--t-fg)">${cmd}</b></span><span>${status}  <button class="copy">${P}Copiar${END}</button></span></div><div class="body">${lines.map(l => `<div>${l === '' ? '&nbsp;' : colorize(l)}</div>`).join('')}${fold ? `<div><button class="fold" data-go="open">▾ ${fold} más</button></div>` : ''}${err.length ? `<div style="color:var(--t-muted);margin-top:4px">stderr</div>${err.map(l => `<div class="err">${l}</div>`).join('')}` : ''}</div></div>`;
+  const dDiff = () => `<div class="card"><div class="head"><span style="color:var(--t-warn)">apps/hub/src/server.ts</span><span><span class="ok">+18</span> <span class="err">−3</span></span></div><div class="body">${DIFF.map(([n, s, t]) => `<div class="${s === '+' ? 'add' : s === '-' ? 'del' : ''}"><span class="ln">${n}</span><span class="${s === '+' ? 'ok' : s === '-' ? 'err' : 'dim'}">${s}</span> ${t.replace(/</g, '&lt;')}</div>`).join('')}</div></div>`;
+  const dTable = (rows = TABLE) => `<div class="card"><div class="head"><span>${P}Tabla${END} · ${rows.length - 1} filas</span><button class="copy">${P}Copiar${END}</button></div><div class="body" style="font-family:system-ui,sans-serif;white-space:normal"><table><tr>${rows[0].map(h => `<th>${h}</th>`).join('')}</tr>${rows.slice(1).map((r, i) => `<tr class="${i % 2 ? 'z' : ''}">${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</table></div></div>`;
+  const dCode = (lines, fold = 0) => `<div class="card code"><div class="head"><span>ts</span><button class="copy">${P}Copiar${END}</button></div><div class="body">${lines.map((l, i) => `<div><span class="ln">${i + 1}</span>${l[0]}</div>`).join('')}${fold ? `<div><button class="fold" data-go="open">▾ ${fold} más</button></div>` : ''}</div></div>`;
+  function desktop(state) {
+    const calm = state === 'calm', quiet = state === 'quiet' || calm;
+    const out = [`<div class="bubble">${PROMPT}</div>`];
+    if (!quiet) out.push(dRow(ICON.read, `Read 2 · Grep 1`, 'read', ''));
+    const edit = dRow(ICON.write, `Edit`, 'write', 'apps/hub/src/server.ts', '<span class="ok">+18</span> <span class="err">−3</span>  <span class="dim">0.4s</span>', 'var(--t-warn)');
+    if (state === 'running') { out.push(edit, dRow(ICON.spin, `Bash`, 'run', 'pnpm test --filter hub', '<span class="dim">1.2s</span>'), `<div class="trow">${ICON.spin}<span class="dim">${CC}…</span></div>`); return out.join(''); }
+    out.push(edit);
+    if (!calm && state !== 'fallback') out.push(dDiff());
+    if (state === 'failed') { out.push(dRow(ICON.err, `Bash`, 'run', 'pnpm test --filter hub', '<span class="dim">2.3s</span>', 'var(--t-err)', false), dShell('pnpm test --filter hub', TEST_FAIL, { err: TEST_ERR, status: '<span class="err">✗ exit 1</span>' })); return out.join(''); }
+    if (state === 'interrupted') { out.push(dRow(ICON.run, `Bash`, 'run', 'pnpm test --filter hub', `<span class="warn">Interrupted</span>`)); return out.join(''); }
+    out.push(dRow(ICON.run, `Bash`, 'run', 'pnpm test --filter hub', '<span class="dim">2.1s</span>'));
+    if (state === 'fallback') out.push(`<div class="cc" style="font:13px ui-monospace,monospace;margin:6px 0"><span class="cc-mark">⏺</span> Bash(pnpm test --filter hub) <span class="dim">— ${P}como lo dibuja Claude Code${END}</span></div>`);
+    else if (!calm) out.push(state === 'long' ? dShell('pnpm test --filter hub', LONG_OUT.slice(0, 8), { fold: LONG_OUT.length - 8 }) : state === 'open' ? dShell('pnpm test --filter hub', LONG_OUT) : state === 'empty' ? dShell('pnpm lint --fix', [`${P}sin salida${END}`]) : dShell('pnpm test --filter hub', TEST_OUT));
+    out.push(`<div class="reply" style="font:14px/1.5 system-ui,sans-serif">Listo: el hub limita a 60 pedidos por minuto por ruta, y el 61 recibe un 429.</div>`);
+    out.push(state === 'partoff' ? `<div class="cc" style="font:13px/1.5 system-ui,sans-serif;margin:6px 0">${P}La tabla, como la dibuja Claude Code${END}</div>` : dTable(state === 'wide' ? WIDE : TABLE));
+    out.push(state === 'long' ? dCode(LONG_CODE.slice(0, 24), LONG_CODE.length - 24) : state === 'open' ? dCode(LONG_CODE) : dCode(CODE));
+    return out.join('');
+  }
+
+  const NOTES = {
+    base: `<p><b>Cómo se lee</b> (Q-05 vale también acá: tal cual la referencia). En la terminal, cada herramienta del turno es un nodo en un riel <code>┃</code> del color del acento. El glifo dice el estado por la forma, no solo por el color: <code>○</code> corriendo, <code>●</code> bien, <code>✕</code> falló, <code>◌</code> cortado. Después vienen el nombre, el objetivo y, a la derecha, las líneas cambiadas y el tiempo. Un archivo editado en el turno va en <i>aviso</i> y uno creado, en <i>bien</i>. Las lecturas y búsquedas seguidas se juntan en una fila con <code>▸</code>, que las abre. Desde 0.3.0, tocar la fila en cualquier parte de su texto la abre y la cierra igual que <code>▸</code> (RN-skin-plegar-tocando).</p>
+      <p>La consola es una tarjeta con el comando, <code>✓</code> o <code>✗ exit N</code>, la salida en color y stderr aparte, en error. Las tablas son una grilla con encabezado y filas alternadas, y el código va enmarcado con el lenguaje en el marco. Cada tarjeta tiene <b>Copiar</b> en el borde (RN-skin-copiar). Los bloques largos se pliegan: consola en 8 + 4 líneas, código pasadas 24 y tablas pasadas 14, con <code>▾ N más</code> / <code>▴ menos</code>.</p>
+      <p>En el escritorio, cada fila lleva un ícono por tipo y <code>▸</code> abre la entrada y la respuesta. La edición es una tarjeta de diff con líneas numeradas, y la consola, la tabla y el código son tarjetas. El prompt del usuario queda como lo dibuja la app, con copiar y rebobinar.</p>
+      <p><b>Los textos son los de Claude Code</b> (RN-skin-textos-claude, Q-10): cada fila lleva el nombre de la herramienta como Claude Code se lo da al mod (<code>Bash</code>, <code>Read</code>, <code>Edit</code>, <code>Grep</code>), el grupo de lecturas cuenta con esos nombres, y una llamada cortada dice <code>Interrupted</code>. El spinner tiene el estilo del mod con la palabra y las cifras de Claude Code (tiempo, tokens, effort: RN-skin-spinner-cifras); el pie es la línea de Claude Code tal cual, más lo que suma el mod (RN-skin-pie-claude). El mockup no conoce esos textos y los marca pendientes. La respuesta empieza con la viñeta <code>●</code> (RN-skin-vineta). Las filas llevan el nombre en el color de su tipo y el objetivo en tenue (RN-skin-filas-legibles), y la edición es una tarjeta de diff resaltada también en la terminal (RN-skin-diff-legible). Lo que suma el mod (<i>6 herramientas</i>, <i>Copiar</i>, <i>▾ N más</i>) sigue en español. Subrayado en punteado: lo pendiente o propuesto.</p>`,
+    failed: '<p><b>Un comando falló:</b> el nodo pasa a <code>✕</code> y el objetivo a error, y la tarjeta se ve entera, sin plegar, con stderr aparte. Un fallo se abre solo (tabla <i>Qué se redibuja</i>).</p>',
+    fallback: '<p><b>Cae al dibujo de Claude Code</b> (RN-skin-cae-al-original): un lenguaje que el resaltado no conoce (acá <code>zig</code>), un bloque que no se puede redibujar fielmente o una parte que falla se ven exactamente como los dibuja Claude Code, en gris neutro en el mockup. Nunca se pierde contenido. En este estado la consola también cae, para mostrar las dos.</p>',
+    wide: '<p><b>Tabla más ancha que la terminal</b> (RN-skin-tabla-ancha): las columnas se achican y el texto baja de línea dentro de su celda; la grilla sigue siendo la del mod. Solo si una columna quedara con menos de 6 de ancho queda el dibujo de Claude Code.</p>',
+    partoff: '<p><b>Una parte apagada</b> (RN-skin-partes): con <i>tablas</i> apagada, la tabla se ve como la dibuja Claude Code y el resto sigue redibujado.</p>',
+    quiet: '<p><b>Solo lectura plegada</b> (apagada por defecto): las lecturas y búsquedas no tienen fila. Si una falla, queda su línea de error.</p>',
+    calm: '<p><b>Modo calmo</b> (RN-skin-calmo): nada se mueve, cada herramienta va en una línea y la salida de solo lectura se pliega. Un fallo se sigue viendo entero. Al apagarlo vuelve lo que la persona tenía.</p>',
+    off: '<p><b>Dibujo apagado</b> (RN-skin-apagado): toda la conversación se ve como la dibuja Claude Code, pero la banda de uso y la línea al agente siguen (ver <code>mockup-banda.html</code>).</p>',
+    narrow: '<p><b>Angosta</b> (60 columnas): el objetivo de cada fila se corta con <code>…</code> antes que los datos de la derecha. Las tarjetas toman el ancho que hay, y una tabla que no entra baja el texto de sus celdas de línea (RN-skin-tabla-ancha).</p>',
+    running: '<p><b>Claude trabajando:</b> la herramienta en curso lleva <code>○</code> y su spinner. Abajo, la palabra del spinner con una banda de luz que la recorre (RN-skin-palabras) y el tiempo.</p>',
+    interrupted: '<p><b>Turno cortado:</b> la herramienta que corría queda en <code>◌</code>, en aviso, y el pie lo dice.</p>',
+    long: '<p><b>Plegado:</b> la consola muestra las primeras 8 líneas y las últimas 4, y el código las primeras 24, cada uno con <code>▾ N más</code>. Los números son los de la referencia y se ajustan en vivo.</p>',
+    empty: '<p><b>Sin salida:</b> la tarjeta lo dice, en vez de quedar vacía (como <code>no output</code> en la referencia).</p>',
+  };
+
+  const STATES = ['done', 'running', 'failed', 'interrupted', 'long', 'open', 'empty', 'fallback', 'wide', 'partoff', 'quiet', 'calm', 'off', 'narrow'];
+  const parse = () => { const h = new URLSearchParams(location.hash.slice(1)); return { state: STATES.includes(h.get('state')) ? h.get('state') : 'done', surf: h.get('surf') === 'desk' ? 'desk' : 'term' }; };
+  const go = patch => { const s = { ...parse(), ...patch }; location.hash = `state=${s.state}&surf=${s.surf}`; };
+  let ticker = null;
+  function show() {
+    const { state, surf } = parse();
+    const stage = document.getElementById('stage');
+    const width = surf === 'desk' ? '820px' : state === 'narrow' ? '62ch' : '100ch';
+    let body;
+    if (state === 'off') {
+      body = `<div class="cc">${surf === 'desk' ? '' : `<div><span class="cc-mark">&gt;</span> ${PROMPT}</div>`}<div><span class="cc-mark">⏺</span> Read(apps/hub/src/server.ts)</div><div class="dim">  ⎿  Read 64 lines</div><div><span class="cc-mark">⏺</span> Update(apps/hub/src/server.ts)</div><div class="dim">  ⎿  Updated with 18 additions and 3 removals</div><div><span class="cc-mark">⏺</span> Bash(pnpm test --filter hub)</div><div class="dim">  ⎿  Tests: 12 passed, 12 total</div></div>`;
+    } else {
+      body = surf === 'desk' ? `<div class="desk">${desktop(state === 'narrow' ? 'done' : state)}</div>` : terminal(state === 'narrow' ? 'done' : state);
+    }
+    stage.innerHTML = `<div class="frame" style="width:${width}">${body}</div>`;
+    document.getElementById('note').innerHTML = NOTES.base + (NOTES[state] ?? '');
+    document.querySelectorAll('.states a').forEach(a => a.toggleAttribute('aria-current', a.dataset.k === 'state' ? a.dataset.v === state : a.dataset.v === surf));
+    // El spinner: el cuadro braille gira y una banda de luz recorre la palabra (spinnerRow de la referencia).
+    clearInterval(ticker);
+    const word = document.getElementById('word');
+    if (word && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'], letters = [...word.children];
+      let f = 0;
+      ticker = setInterval(() => {
+        f++; document.getElementById('frame').textContent = frames[f % frames.length];
+        const head = (f % (letters.length + 8)) - 4;
+        letters.forEach((l, i) => { const d = Math.abs(i - head); l.style.color = d === 0 ? 'var(--t-fg)' : d === 1 ? 'var(--t-user)' : 'var(--t-muted)'; });
+      }, 120);
+    }
+  }
+  document.addEventListener('click', ev => {
+    const a = ev.target.closest('.states a');
+    if (a) { ev.preventDefault(); go({ [a.dataset.k]: a.dataset.v }); return; }
+    const f = ev.target.closest('[data-go]'); if (f) go({ state: f.dataset.go });
+  });
+  addEventListener('hashchange', show); show();
+</script>
+</body>
+</html>

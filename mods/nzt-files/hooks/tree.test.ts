@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, treeWindow, withDeleted } from './tree'
+import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, thumbOf, topAtRow, treeWindow, withDeleted } from './tree'
 
 const status = (...entries: string[]) => [...entries, ''].join('\0')
+const file = (name: string) => ({ name, isDir: false, size: 0, mtimeMs: 0 })
+const folder = (name: string) => ({ name, isDir: true, size: 0, mtimeMs: 0 })
 
 describe('marksOf', () => {
   test('reads each status as the mark VS Code shows', async () => {
@@ -26,29 +28,19 @@ test('a folder takes the strongest mark it holds at any depth', async () => {
 })
 
 test('the tree hides .git and lists folders first, each group by name without case', async () => {
-  const entries = [
-    { name: 'readme.md', isDir: false },
-    { name: '.git', isDir: true },
-    { name: 'src', isDir: true },
-    { name: 'App.ts', isDir: false },
-    { name: 'Docs', isDir: true },
-  ]
+  const entries = [file('readme.md'), folder('.git'), folder('src'), file('App.ts'), folder('Docs')]
   expect(sortedOf(entries).map(entry => entry.name)).toEqual(['Docs', 'src', 'App.ts', 'readme.md'])
 })
 
 test('what was deleted since the last commit is put back where it was', async () => {
-  const entries = withDeleted('', [{ name: 'src', isDir: true }], { 'old.png': 'D', 'gone/a.md': 'D', 'src/x.ts': 'D' })
-  expect(entries).toEqual([
-    { name: 'gone', isDir: true },
-    { name: 'src', isDir: true },
-    { name: 'old.png', isDir: false },
-  ])
+  const entries = withDeleted('', [folder('src')], { 'old.png': 'D', 'gone/a.md': 'D', 'src/x.ts': 'D' })
+  expect(entries).toEqual([folder('gone'), folder('src'), file('old.png')])
 })
 
 describe('rowsOf', () => {
   const listings = {
-    '': { kind: 'ok' as const, entries: [{ name: 'src', isDir: true }, { name: 'README.md', isDir: false }] },
-    src: { kind: 'ok' as const, entries: [{ name: 'main.ts', isDir: false }] },
+    '': { kind: 'ok' as const, entries: [folder('src'), file('README.md')] },
+    src: { kind: 'ok' as const, entries: [file('main.ts')] },
   }
 
   test('an open folder shows its entries one level deeper, with marks and dots', async () => {
@@ -105,6 +97,20 @@ describe('contentOf', () => {
   })
 })
 
+describe('thumbOf and topAtRow', () => {
+  test('the thumb is as long as the part shown and moves from the top to the bottom of the track', async () => {
+    expect(thumbOf(10, 0, 20, 100, 80)).toEqual({ from: 0, size: 2 })
+    expect(thumbOf(10, 40, 20, 100, 80)).toEqual({ from: 4, size: 2 })
+    expect(thumbOf(10, 80, 20, 100, 80)).toEqual({ from: 8, size: 2 })
+    expect(thumbOf(10, 0, 1, 5000, 4999)).toMatchObject({ size: 1 })
+  })
+
+  test('a click on the first row goes to the top and on the last to the end', async () => {
+    expect(topAtRow(0, 10, 80)).toBe(0)
+    expect(topAtRow(9, 10, 80)).toBe(80)
+  })
+})
+
 describe('textWindow', () => {
   const lines = Array.from({ length: 50 }, (_, i) => `line ${i + 1}`)
 
@@ -119,5 +125,4 @@ describe('textWindow', () => {
   test('a long line takes the rows it wraps to', async () => {
     const wide = ['x'.repeat(100), 'short', 'short']
     expect(textWindow(wide, 0, 3, 40)).toMatchObject({ first: 0, count: 1 })
-  })
-})
+  })})

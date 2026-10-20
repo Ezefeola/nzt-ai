@@ -1,17 +1,28 @@
-import { expect, test } from 'claude-code/testing'
+import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
 type Engine = Parameters<TestBody>[0]
 type On = Parameters<TestBody>[1]
 
 const ROOT = 'C:/proj'
+// 2026-10-19 12:00 UTC; the files below were last changed an hour before.
+const NOW = 1_792_411_200_000
+const AN_HOUR_AGO = NOW - 3_600_000
+const VIOLET = '#c084fc'
+const ORANGE = '#fb923c'
+const GREEN = '#4ade80'
 
 /** A project on disk: each folder's entries and each file's text; a folder not listed cannot be read. */
 type Disk = {
   folders: Record<string, { name: string; kind: 'file' | 'dir' }[]>
   files: Record<string, string>
   status?: string
+  numstat?: string
+  /** What `git diff HEAD -U0` says of each file, by its path from the project folder. */
+  diff?: Record<string, string>
   isRepo?: boolean
+  /** What the system says when asked to open a file; unset, it opens. */
+  openError?: string
 }
 
 const run = (stdout: string, exitCode = 0, stderr = '') => ({
@@ -33,22 +44,36 @@ const DISK: Disk = {
     [`${ROOT}/src/main.ts`]: "export const a = 1\nexport const b = 'two'\n",
     [`${ROOT}/logo.bin`]: 'PNG\0\0data',
   },
-  status: [' M src/main.ts', ' D old.png', ''].join('\0'),
+  status: ['## mods...origin/mods [ahead 2]', ' M src/main.ts', ' D old.png', ''].join('\0'),
+  numstat: ['12\t3\tsrc/main.ts', ''].join('\0'),
 }
 
 const at = (path: unknown) => String(path).replace(/\\/g, '/')
 
+/** The world beneath the pane: the disk, git, the clock, the panes and the clipboard. Returns what it saw. */
 const fakeDisk = (on: On, disk: Disk) => {
+  const seen = { argv: [] as string[][], copied: [] as string[], opened: [] as string[], closed: [] as string[] }
+  const clock = mock.clock(on, { now: NOW })
   on('session.root', async () => ({ value: ROOT }) as never)
+  on('command.register', async () => ({ value: undefined }) as never)
   on('fs.list', async (_, e) => {
     const entries = disk.folders[at(e.path)]
     if (entries === undefined) return { deny: 'EACCES: permission denied' } as never
-    return { value: entries.map(entry => ({ ...entry, size: 1, mtimeMs: 1, isLink: false })) }
+    return {
+      value: entries.map(entry => ({
+        ...entry,
+        size: disk.files[`${at(e.path)}/${entry.name}`]?.length ?? 0,
+        mtimeMs: entry.kind === 'file' ? AN_HOUR_AGO : 0,
+        isLink: false,
+      })),
+    }
   })
   on('fs.stat', async (_, e) => {
-    const text = disk.files[at(e.path)]
+    const path = at(e.path)
+    if (disk.folders[path] !== undefined) return { value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: false } }
+    const text = disk.files[path]
     if (text === undefined) return { deny: 'ENOENT' } as never
-    return { value: { kind: 'file', size: text.length, mtimeMs: 1, isLink: false } }
+    return { value: { kind: 'file', size: text.length, mtimeMs: AN_HOUR_AGO, isLink: false } }
   })
   on('fs.read', async (_, e) => {
     const text = disk.files[at(e.path)]
@@ -56,12 +81,30 @@ const fakeDisk = (on: On, disk: Disk) => {
     return { value: text }
   })
   on('process.run', async (_, e) => {
+    seen.argv.push([...e.argv])
+    if (e.argv[0] !== 'git') return disk.openError === undefined ? run('') : run('', 1, disk.openError)
     if (disk.isRepo === false) return run('', 128, 'fatal: not a git repository')
     if (e.argv.includes('--show-prefix')) return run('\n')
+    if (e.argv.includes('-U0')) return run(disk.diff?.[e.argv[e.argv.length - 1]!] ?? '')
+    if (e.argv.includes('--numstat')) return run(disk.numstat ?? '')
+    if (e.argv[1] === 'show') return run(['README.md', ''].join('\0'))
+    if (e.argv[1] === 'log') return run('Update the readme\n')
     return run(disk.status ?? '')
   })
-  on('ui.open', async () => ({ value: { isPlaced: true } }))
-  on('ui.close', async () => ({ value: undefined }) as never)
+  on('ui.open', async (_, e) => {
+    seen.opened.push(e.id)
+    return { value: { isPlaced: true } }
+  })
+  on('ui.close', async (_, e) => {
+    seen.closed.push(e.id)
+    return { value: undefined } as never
+  })
+  on('ui.focus', async () => ({ value: {} }) as never)
+  on('ui.copy', async (_, e) => {
+    seen.copied.push(e.text)
+    return { value: { isCopied: true } } as never
+  })
+  return { clock, seen }
 }
 
 const openPane = ($: Engine) =>
@@ -72,33 +115,50 @@ const openPane = ($: Engine) =>
     presentation: { isFullscreen: true, columns: 160 },
   })
 
-const mount = ($: Engine, bodyRows = 40) =>
+const mount = ($: Engine, bodyRows = 40, bodyColumns = 60) =>
   $.ui.mount({
     plugin: 'nzt-files',
     surface: 'terminal',
     component: 'Pane',
     requestId: 'nzt-files',
-    viewport: { columns: 64, rows: bodyRows + 4 },
+    viewport: { columns: bodyColumns + 4, rows: bodyRows + 4 },
     props: {
       title: 'Archivos',
       isFocused: true,
-      bodyColumns: 60,
+      bodyColumns,
       placement: 'dock',
       scroll: { offset: 0, bodyRows },
       view: {},
     },
   })
 
-test('the pane opens on the project: folders first, .git hidden, marks and dots of git', async ($, on) => {
+/** A tool call that waits for `release` before the tool answers, to look at the pane while it runs. */
+const heldTool = (on: On, answer: Record<string, unknown> = { result: 'ok' }) => {
+  let release = () => {}
+  const held = new Promise<void>(resolve => {
+    release = resolve
+  })
+  on('tool.call', async () => {
+    await held
+    return answer as never
+  })
+  return () => release()
+}
+
+const nameRow = (ui: Awaited<ReturnType<typeof mount>>, name: string) =>
+  ui.find({ type: 'Text', text: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}$`) })
+
+// The pane as it was.
+
+test('the pane opens on the project: folders first, .git hidden, marks and counts of git', async ($, on) => {
   fakeDisk(on, DISK)
-  expect(await openPane($)).toEqual({ text: 'Explorador abierto.' })
+  expect(await openPane($)).toEqual({})
   const ui = await mount($)
-  expect(await ui.find({ type: 'Text', text: 'src/' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '.git/' })).toBeUndefined()
-  expect(await ui.find({ type: 'Text', text: '●' })).toBeDefined()
+  expect(await nameRow(ui, 'src/')).toBeDefined()
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+  expect(await nameRow(ui, '.git/')).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'M:1' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Elegí un archivo del árbol\.$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: / 2 cambiados$/ })).toBeDefined()
 })
 
 test('the card keeps a blank row under the pane tabs and still fills the body', async ($, on) => {
@@ -106,6 +166,7 @@ test('the card keeps a blank row under the pane tabs and still fills the body', 
   await openPane($)
   const ui = await mount($)
   expect(await ui.drawn()).toMatchObject({ props: { marginTop: 1, height: 39 } })
+  expect(await ui.find({ type: 'Box', key: 'body' })).toMatchObject({ props: { marginTop: 1 } })
 })
 
 test('a folder opens with a click and its file shows beneath, numbered, with its detail', async ($, on) => {
@@ -113,15 +174,54 @@ test('a folder opens with a click and its file shows beneath, numbered, with its
   await openPane($)
   const ui = await mount($)
   await ui.press({ key: 'n:src' })
-  expect(await ui.find({ type: 'Text', text: 'main.ts' })).toBeDefined()
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
   await ui.press({ key: 'n:src/main.ts' })
   expect(await ui.find({ type: 'Text', text: 'src/main.ts' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'M modificado' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /TypeScript · \d+ B · 2 líneas/ })).toBeDefined()
   expect(await ui.find({ type: 'Code', text: "export const a = 1\nexport const b = 'two'" })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '2 líneas' })).toBeDefined()
   await ui.press({ key: 'n:src' })
-  expect(await ui.find({ type: 'Text', text: /^main\.ts$/ })).toBeUndefined()
+  expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+})
+
+test('a C# file is colored by the pane, methods and types too, with its line numbers', async ($, on) => {
+  const disk = {
+    ...DISK,
+    folders: { ...DISK.folders, [ROOT]: [...DISK.folders[ROOT]!, { name: 'App.cs', kind: 'file' as const }] },
+    files: { ...DISK.files, [`${ROOT}/App.cs`]: 'var list = items.ToList();\r\nreturn new Catalog(list);\r\n' },
+  }
+  fakeDisk(on, disk)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:App.cs' })
+  expect(await ui.find({ type: 'Code' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^ToList$/ })).toMatchObject({ props: { color: '#DCDCAA' } })
+  expect(await ui.find({ type: 'Text', text: /^Catalog$/ })).toMatchObject({ props: { color: '#4EC9B0' } })
+  expect(await ui.find({ type: 'Text', text: /^return$/ })).toMatchObject({ props: { color: '#D8A0DF' } })
+  expect(await ui.find({ type: 'Text', text: /^2 $/ })).toBeDefined()
+})
+
+test('a file longer than the viewer has a scroll bar, and a click on its last row goes to the end', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const track = await ui.find({ type: 'Box', key: 'track' })
+  expect(track).toBeDefined()
+  const rows = (track as { children: unknown[] }).children.length
+  await ui.press({ key: `bar:${rows - 1}` })
+  expect(await ui.find({ type: 'Code', text: /export const v300 = 300/ })).toBeDefined()
+})
+
+test('a file that fits has no scroll bar', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  expect(await ui.find({ type: 'Box', key: 'bar' })).toBeUndefined()
 })
 
 test('a binary file shows what it is, not its bytes', async ($, on) => {
@@ -137,19 +237,10 @@ test('a file deleted since the last commit stays in its place, struck through, a
   fakeDisk(on, DISK)
   await openPane($)
   const ui = await mount($)
-  expect(await ui.find({ type: 'Text', text: 'old.png', strikethrough: true } as never)).toBeDefined()
+  expect((await nameRow(ui, 'old.png'))?.props).toMatchObject({ strikethrough: true })
   await ui.press({ key: 'n:old.png' })
   expect(await ui.find({ type: 'Text', text: /Se borró desde el último commit/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /\/nzt-changes/ })).toBeDefined()
-})
-
-test('outside a repository the tree shows with no marks and no error', async ($, on) => {
-  fakeDisk(on, { ...DISK, isRepo: false })
-  await openPane($)
-  const ui = await mount($)
-  expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /sin git/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '●' })).toBeUndefined()
 })
 
 test('a folder that cannot be read says so in its place and the rest keeps working', async ($, on) => {
@@ -159,23 +250,603 @@ test('a folder that cannot be read says so in its place and the rest keeps worki
   await ui.press({ key: 'n:secrets' })
   expect(await ui.find({ type: 'Text', text: /⚠ no se pudo leer: .*EACCES/ })).toBeDefined()
   await ui.press({ key: 'n:README.md' })
-  expect(await ui.find({ type: 'Code', text: '# Proj' })).toBeDefined()
+  expect(await ui.find({ type: 'Markdown', text: '# Proj' })).toBeDefined()
 })
 
 test('a file taller than its window scrolls and says which lines show', async ($, on) => {
   const long = Array.from({ length: 60 }, (_, i) => `line ${i + 1}`).join('\n')
-  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/README.md`]: long } })
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
   await openPane($)
   const ui = await mount($)
-  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
   expect(await ui.find({ type: 'Text', text: /^líneas 1–\d+ de 60$/ })).toBeDefined()
-  await ui.press({ key: 'down' })
+  await ui.press({ key: 'view-down' })
   expect(await ui.find({ type: 'Text', text: /^líneas 2–\d+ de 60$/ })).toBeDefined()
 })
 
-test('the command closes the pane when it is open', async ($, on) => {
+// Context zero: the pane adds nothing to what Claude reads.
+
+test('the command opens and closes the pane beside the conversation without printing a line', async ($, on) => {
   fakeDisk(on, DISK)
+  expect(await openPane($)).toEqual({})
+  await mount($)
+  expect(await openPane($)).toEqual({})
+})
+
+test('the command prints one line only when the pane cannot go beside the conversation', async ($, on) => {
+  fakeDisk(on, DISK)
+  const opened = await $.command.run({
+    command: 'nzt-files',
+    args: '',
+    origin: { kind: 'composer' },
+    presentation: { isFullscreen: false, columns: 160 },
+  })
+  expect(opened.text).toMatch(/sobre el prompt/)
+})
+
+test('a tool call reaches the tool as it came and its result comes back untouched', async ($, on) => {
+  fakeDisk(on, DISK)
+  const seen: unknown[] = []
+  on('tool.call', async (_, e) => {
+    seen.push(e)
+    return { result: 'the file' } as never
+  })
   await openPane($)
   await mount($)
-  expect(await openPane($)).toEqual({ text: 'Explorador cerrado.' })
+  const ran = await $.tool.call({ tool: 'Read', file_path: `${ROOT}/README.md` } as never)
+  expect(ran).toEqual({ result: 'the file' })
+  expect(seen[0]).toMatchObject({ tool: 'Read', file_path: `${ROOT}/README.md` })
+  expect((seen[0] as Record<string, unknown>).context).toBeUndefined()
+})
+
+test('a tool whose result the pane cannot follow still gets it back untouched', async ($, on) => {
+  fakeDisk(on, DISK)
+  on('tool.call', async () => ({ result: { filenames: 'not a list' } }) as never)
+  await openPane($)
+  await mount($)
+  expect(await $.tool.call({ tool: 'Grep', pattern: 'x' } as never)).toEqual({ result: { filenames: 'not a list' } })
+})
+
+test('a message naming @path reaches Claude as typed, with nothing added', async ($, on) => {
+  fakeDisk(on, DISK)
+  const seen: { text: string; context?: readonly string[] }[] = []
+  on('prompt.submit', async (_, e) => {
+    seen.push({ text: e.text, ...(e.context === undefined ? {} : { context: e.context }) })
+    return { text: e.text }
+  })
+  await openPane($)
+  await mount($)
+  await $.prompt.submit({ text: 'look at @src/main.ts please' } as never)
+  expect(seen).toEqual([{ text: 'look at @src/main.ts please' }])
+})
+
+// Claude's activity.
+
+test('a file Claude reads is violet while the tool runs and goes out a few seconds after it ends', async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Read', file_path: `${ROOT}/README.md` } as never)
+  await clock.settle()
+  expect((await nameRow(ui, 'README.md'))?.props).toMatchObject({ color: VIOLET, bold: true })
+  release()
+  await call
+  expect((await nameRow(ui, 'README.md'))?.props).toMatchObject({ color: VIOLET, dimColor: true })
+  await clock.advance(3000)
+  expect((await nameRow(ui, 'README.md'))?.props.color).toBeUndefined()
+})
+
+test('a file Claude writes is orange, and the tree opens its folders to show it', async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Edit', file_path: `${ROOT}/src/main.ts`, old_string: 'a', new_string: 'b' } as never)
+  await clock.settle()
+  expect((await nameRow(ui, 'main.ts'))?.props).toMatchObject({ color: ORANGE })
+  release()
+  await call
+})
+
+test('without following, a closed folder takes the color of the file Claude writes inside it', { options: { follow: false } }, async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Write', file_path: `${ROOT}/src/main.ts`, content: 'x' } as never)
+  await clock.settle()
+  expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+  expect((await nameRow(ui, 'src/'))?.props).toMatchObject({ color: ORANGE })
+  release()
+  await call
+})
+
+test('a tool that fails or is refused takes its color away at once', async ($, on) => {
+  fakeDisk(on, DISK)
+  on('tool.call', async () => ({ deny: 'the person said no' }) as never)
+  await openPane($)
+  const ui = await mount($)
+  await $.tool.call({ tool: 'Read', file_path: `${ROOT}/README.md` } as never)
+  expect((await nameRow(ui, 'README.md'))?.props.color).toBeUndefined()
+})
+
+test('a shell command that only reads paints the project files it names', async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Bash', command: 'cat README.md | head -n 5' } as never)
+  await clock.settle()
+  expect((await nameRow(ui, 'README.md'))?.props).toMatchObject({ color: VIOLET })
+  release()
+  await call
+})
+
+test('a search paints the files it found', async ($, on) => {
+  fakeDisk(on, DISK)
+  on('tool.call', async () => ({ result: { filenames: [`${ROOT}/README.md`], numFiles: 1 } }) as never)
+  await openPane($)
+  const ui = await mount($)
+  await $.tool.call({ tool: 'Grep', pattern: 'Proj' } as never)
+  expect((await nameRow(ui, 'README.md'))?.props).toMatchObject({ color: VIOLET })
+})
+
+test('what Claude reads outside the project paints nothing', async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Read', file_path: 'D:/elsewhere/README.md' } as never)
+  await clock.settle()
+  expect((await nameRow(ui, 'README.md'))?.props.color).toBeUndefined()
+  release()
+  await call
+})
+
+test('with the activity setting on writing only, what Claude reads is not painted', { options: { activity: 'write' } }, async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  const release = heldTool(on)
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Read', file_path: `${ROOT}/README.md` } as never)
+  await clock.settle()
+  expect((await nameRow(ui, 'README.md'))?.props.color).toBeUndefined()
+  release()
+  await call
+})
+
+// The git line.
+
+test('a commit Claude makes paints its files green and the last row says it is done', async ($, on) => {
+  fakeDisk(on, DISK)
+  on('tool.call', async () => ({ result: { stdout: '', stderr: '' } }) as never)
+  await openPane($)
+  const ui = await mount($)
+  await $.tool.call({ tool: 'Bash', command: 'git commit -m "Update the readme"' } as never)
+  expect((await nameRow(ui, 'README.md'))?.props).toMatchObject({ color: GREEN })
+  expect(await ui.find({ type: 'Text', text: '● commit hecho' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: ' · Update the readme' })).toBeDefined()
+})
+
+test('a git operation says it is running, then that it failed, and the row goes after 45 seconds', async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  let release = () => {}
+  const held = new Promise<void>(resolve => {
+    release = resolve
+  })
+  on('tool.call', async () => {
+    await held
+    return { isError: true, result: 'rejected', text: 'rejected' } as never
+  })
+  await openPane($)
+  const ui = await mount($)
+  const call = $.tool.call({ tool: 'Bash', command: 'git push' } as never)
+  await clock.settle()
+  expect(await ui.find({ type: 'Text', text: '↻ haciendo push…' })).toBeDefined()
+  release()
+  await call
+  expect(await ui.find({ type: 'Text', text: '✗ push falló' })).toBeDefined()
+  await clock.advance(45_000)
+  expect(await ui.find({ type: 'Text', text: '✗ push falló' })).toBeUndefined()
+})
+
+test('the heading says the branch, the remote one and how far ahead it is', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: /⑂ mods → origin\/mods/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: ' ↑2' })).toBeDefined()
+})
+
+test('a modified file shows the lines it gained and lost', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  expect(await ui.find({ type: 'Text', text: '+12' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '-3' })).toBeDefined()
+})
+
+test('a narrow pane shows only the letters, and a dot on the folder in place of its counts', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($, 40, 40)
+  await ui.press({ key: 'n:src' })
+  expect(await ui.find({ type: 'Text', text: '+12' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'M:1' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: '●' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'M' })).toBeDefined()
+})
+
+test('outside a repository the tree shows with no marks, and a line says when they show', async ($, on) => {
+  fakeDisk(on, { ...DISK, isRepo: false })
+  await openPane($)
+  const ui = await mount($)
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /sin git/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /después de git init/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '●' })).toBeUndefined()
+})
+
+// Changed lines and ± Changes.
+
+
+test('a modified file is drawn whole as a diff, the changed line removed and added again', async ($, on) => {
+  const diff = { 'src/main.ts': ['@@ -1 +1 @@', '-export const a = 0', '+export const a = 1', '@@ -2,0 +3 @@', '+export const c = 3', ''].join('\n') }
+  const text = "export const a = 1\nexport const b = 'two'\nexport const c = 3\n"
+  fakeDisk(on, { ...DISK, diff, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: text } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -1,2 +1,3 @@', '-export const a = 0', '+export const a = 1', " export const b = 'two'", '+export const c = 3'].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a removed line shows between the lines it went between', async ($, on) => {
+  fakeDisk(on, { ...DISK, diff: { 'src/main.ts': '@@ -2 +1,0 @@\n-gone\n' } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -1,3 +1,2 @@', ' export const a = 1', '-gone', " export const b = 'two'"].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a file git does not follow yet is added whole', async ($, on) => {
+  fakeDisk(on, { ...DISK, status: ['## mods', '?? src/main.ts', ''].join('\0') })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const source = ['@@ -0,0 +1,2 @@', '+export const a = 1', "+export const b = 'two'"].join('\n')
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { format: 'diff', source } })
+})
+
+test('a file with no changes is drawn as code, with no change map beside the bar', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  expect(await ui.find({ type: 'Code' })).toMatchObject({ props: { startLine: 1 } })
+  expect(((await ui.find({ type: 'Code' })) as { props: { format?: string } }).props.format).toBeUndefined()
+  expect(await ui.find({ type: 'Box', key: 'track' })).toBeDefined()
+  expect(await ui.find({ type: 'Box', key: 'map' })).toBeUndefined()
+})
+
+test('the change map colors the stretch that holds a change, apart from the track, and a click there goes to it', async ($, on) => {
+  const long = Array.from({ length: 300 }, (_, i) => `export const v${i + 1} = ${i + 1}`).join('\n')
+  fakeDisk(on, { ...DISK, diff: { 'src/main.ts': '@@ -249,0 +250 @@\n+export const v250 = 250\n' }, files: { ...DISK.files, [`${ROOT}/src/main.ts`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  const map = (await ui.find({ type: 'Box', key: 'map' })) as { children: { props?: { key?: string }; children?: { props?: { color?: string } }[] }[] }
+  const marked = map.children.filter(row => row.children?.[0]?.props?.color === 'green')
+  expect(marked.length).toBe(1)
+  const track = (await ui.find({ type: 'Box', key: 'track' })) as { children: { children?: { props?: { color?: string } }[] }[] }
+  expect(track.children.every(row => row.children?.[0]?.props?.color !== 'green')).toBe(true)
+  await ui.press({ key: marked[0]!.props!.key! })
+  expect(await ui.find({ type: 'Code', text: /^@@ -248,\d+ \+248,\d+ @@\n export const v248 = 248/ })).toBeDefined()
+})
+
+test('a drawn Markdown shows its changes on the change map only', async ($, on) => {
+  const long = Array.from({ length: 80 }, (_, i) => `Párrafo ${i + 1}.\n`).join('\n')
+  const status = ['## mods', ' M README.md', ''].join('\0')
+  fakeDisk(on, { ...DISK, status, diff: { 'README.md': '@@ -69 +69 @@\n-x\n+y\n' }, files: { ...DISK.files, [`${ROOT}/README.md`]: long } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Markdown' })).toBeDefined()
+  expect(await ui.find({ type: 'Code' })).toBeUndefined()
+  const map = (await ui.find({ type: 'Box', key: 'map' })) as { children: { children?: { props?: { color?: string } }[] }[] }
+  expect(map.children.some(row => row.children?.[0]?.props?.color === 'red')).toBe(true)
+})
+
+test('± Changes leaves only what changed, and pressed again brings the whole tree back as it was', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'changes' })
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await nameRow(ui, 'old.png')).toBeDefined()
+  expect(await nameRow(ui, 'README.md')).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'open-all' })).toBeUndefined()
+  await ui.press({ key: 'changes' })
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+  expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+})
+
+test('± Changes with nothing changed says so', async ($, on) => {
+  fakeDisk(on, { ...DISK, status: ['## mods', ''].join('\0'), numstat: '' })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'changes' })
+  expect(await ui.find({ type: 'Text', text: /Nada cambió desde el último commit$/ })).toBeDefined()
+})
+
+test('outside a repository there is no ± Changes', async ($, on) => {
+  fakeDisk(on, { ...DISK, isRepo: false })
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Button', key: 'changes' })).toBeUndefined()
+})
+
+test('with notices off the git init line is gone', { options: { notices: false } }, async ($, on) => {
+  fakeDisk(on, { ...DISK, isRepo: false })
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: /después de git init/ })).toBeUndefined()
+})
+
+// Markdown.
+
+test('a drawn Markdown keeps its line breaks, from a file saved with Windows line endings too', async ($, on) => {
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/README.md`]: '# Proj\r\n\r\n> state: written\r\n\r\n- one\r\n- two\r\n' } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Markdown', text: '# Proj\n\n> state: written\n\n- one\n- two' })).toBeDefined()
+})
+
+const LONG_MD = Array.from({ length: 30 }, (_, i) => `## Part ${i + 1}\n\nText of part ${i + 1}.`).join('\n\n')
+
+test('a Markdown file is drawn, with its box checked, and unchecking it shows the source', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Markdown', text: '# Proj' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'markdown', text: '☑ Markdown' })).toBeDefined()
+  await ui.press({ key: 'markdown' })
+  expect(await ui.find({ type: 'Code', text: '# Proj' })).toBeDefined()
+  expect(await ui.find({ type: 'Button', key: 'markdown', text: '☐ Markdown' })).toBeDefined()
+})
+
+test('drawn Markdown moves a whole block at a time and says which lines show', async ($, on) => {
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/README.md`]: LONG_MD } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Text', text: /^líneas 1–\d+ de 119 · de a bloque$/ })).toBeDefined()
+  await ui.press({ key: 'view-down' })
+  expect(await ui.find({ type: 'Text', text: /^líneas 3–\d+ de 119 · de a bloque$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Markdown' }))?.text.startsWith('Text of part 1.')).toBe(true)
+})
+
+test('a Markdown block larger than the engine draws at once shows the file as source and says why', async ($, on) => {
+  // One table past the engine's 100,000 characters, within the 5,000 lines the viewer keeps.
+  const huge = `| a |\n${`| ${'x'.repeat(30)} |\n`.repeat(3_000)}`
+  fakeDisk(on, { ...DISK, files: { ...DISK.files, [`${ROOT}/README.md`]: huge } })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  expect(await ui.find({ type: 'Text', text: /Se ve como fuente/ })).toBeDefined()
+  expect(await ui.find({ type: 'Markdown' })).toBeUndefined()
+})
+
+test('the file expands over the whole pane, and ← Árbol brings the tree back as it was', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'expand' })
+  expect(await nameRow(ui, 'src/')).toBeUndefined()
+  expect(await ui.find({ type: 'Button', key: 'expand', text: '← Árbol' })).toBeDefined()
+  await ui.press({ key: 'expand' })
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await ui.find({ type: 'Markdown', text: '# Proj' })).toBeDefined()
+})
+
+// Search, keys, copy, open.
+
+test('the search shows the matches under their folders, closed ones too, and Enter chooses the first', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.input({ key: 'search', text: 'MAIN', kind: 'change' })
+  expect(await nameRow(ui, 'src/')).toBeDefined()
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await nameRow(ui, 'README.md')).toBeUndefined()
+  await ui.input({ key: 'search', text: 'MAIN', kind: 'submit' })
+  expect(await ui.find({ type: 'Code', text: /export const a = 1/ })).toBeDefined()
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+})
+
+test('a search with no match says so and stays open; emptying it brings the tree back', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.input({ key: 'search', text: 'zzz', kind: 'change' })
+  expect(await ui.find({ type: 'Text', text: /Nada con «zzz»/ })).toBeDefined()
+  expect(await ui.find({ type: 'Input', key: 'search' })).toBeDefined()
+  await ui.press({ key: 'clear' })
+  expect(await nameRow(ui, 'README.md')).toBeDefined()
+})
+
+test('the search does not walk into heavy folders', async ($, on) => {
+  const disk = {
+    ...DISK,
+    folders: {
+      ...DISK.folders,
+      [ROOT]: [...DISK.folders[ROOT]!, { name: 'node_modules', kind: 'dir' as const }],
+      [`${ROOT}/node_modules`]: [{ name: 'main-lib.js', kind: 'file' as const }],
+    },
+  }
+  fakeDisk(on, disk)
+  await openPane($)
+  const ui = await mount($)
+  await ui.input({ key: 'search', text: 'main', kind: 'change' })
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await nameRow(ui, 'main-lib.js')).toBeUndefined()
+})
+
+test('Unfold opens every folder but the heavy ones, reading them; Fold closes them all', async ($, on) => {
+  const disk = {
+    ...DISK,
+    folders: {
+      ...DISK.folders,
+      [ROOT]: [...DISK.folders[ROOT]!, { name: 'node_modules', kind: 'dir' as const }],
+      [`${ROOT}/src`]: [{ name: 'main.ts', kind: 'file' as const }, { name: 'lib', kind: 'dir' as const }],
+      [`${ROOT}/src/lib`]: [{ name: 'deep.ts', kind: 'file' as const }],
+      [`${ROOT}/node_modules`]: [{ name: 'pkg', kind: 'dir' as const }],
+    },
+  }
+  fakeDisk(on, disk)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Button', key: 'up' })).toBeUndefined()
+  await ui.press({ key: 'open-all' })
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+  expect(await nameRow(ui, 'deep.ts')).toBeDefined()
+  expect(await nameRow(ui, 'node_modules/')).toBeDefined()
+  expect(await nameRow(ui, 'pkg/')).toBeUndefined()
+  await ui.press({ key: 'close-all' })
+  expect(await nameRow(ui, 'main.ts')).toBeUndefined()
+  expect(await nameRow(ui, 'src/')).toBeDefined()
+})
+
+test('copy path puts the row path from the project folder on the clipboard and says so', async ($, on) => {
+  const { seen } = fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:src' })
+  await ui.press({ key: 'n:src/main.ts' })
+  await ui.press({ key: 'copy' })
+  expect(seen.copied).toEqual(['src/main.ts'])
+  expect(await ui.find({ type: 'Text', text: 'Ruta copiada: src/main.ts' })).toBeDefined()
+})
+
+test('open with the app hands the file to Windows, and a double click does the same', async ($, on) => {
+  const { seen, clock } = fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'open' })
+  const opened = seen.argv.filter(argv => argv[0] === 'powershell.exe')
+  expect(opened).toHaveLength(1)
+  expect(opened[0]!.at(-1)).toBe("Start-Process -FilePath 'C:\\proj\\README.md'")
+  await clock.advance(1000)
+  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'n:README.md' })
+  expect(seen.argv.filter(argv => argv[0] === 'powershell.exe')).toHaveLength(2)
+})
+
+test('the open with setting runs its command with the file put in', { options: { openWith: 'code -g {path}' } }, async ($, on) => {
+  const { seen } = fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'open' })
+  const opened = seen.argv.find(argv => argv[0] === 'powershell.exe')
+  expect(opened!.at(-1)).toBe("Start-Process -FilePath 'code' -ArgumentList @('-g','C:\\proj\\README.md')")
+})
+
+test('a file that cannot be opened says why and the pane stays as it was', async ($, on) => {
+  fakeDisk(on, { ...DISK, openError: 'No application is associated with the specified file' })
+  await openPane($)
+  const ui = await mount($)
+  await ui.press({ key: 'n:README.md' })
+  await ui.press({ key: 'open' })
+  expect(await ui.find({ type: 'Text', text: /No se pudo abrir: No application/ })).toBeDefined()
+  expect(await ui.find({ type: 'Markdown', text: '# Proj' })).toBeDefined()
+})
+
+test('a message naming @path opens its folders and highlights it', async ($, on) => {
+  fakeDisk(on, DISK)
+  on('prompt.submit', async (_, e) => ({ text: e.text }))
+  await openPane($)
+  const ui = await mount($)
+  await $.prompt.submit({ text: 'look at @src/main.ts' } as never)
+  expect(await nameRow(ui, 'main.ts')).toBeDefined()
+})
+
+// The column, the icons and opening at the start.
+
+test('the column shows each file date, and Σ changes it to sizes', async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: '19 oct' })).toBeDefined()
+  await ui.press({ key: 'sum' })
+  expect(await ui.find({ type: 'Text', text: '7 B' })).toBeDefined()
+})
+
+test('the age column says how long ago', { options: { column: 'age' } }, async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: '1h' })).toBeDefined()
+})
+
+test('in sizes a folder shows what everything inside it takes', { options: { column: 'size' } }, async ($, on) => {
+  const { clock } = fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  await clock.settle()
+  const size = DISK.files[`${ROOT}/src/main.ts`]!.length
+  expect(await ui.find({ type: 'Text', text: `${size} B` })).toBeDefined()
+})
+
+test('with Nerd Font icons a folder row carries its folder icon', { options: { icons: 'nerd' } }, async ($, on) => {
+  fakeDisk(on, DISK)
+  await openPane($)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: '▸ \u{f07b} ' })).toBeDefined()
+})
+
+test('the pane opens by itself when the session starts', async ($, on) => {
+  const { seen } = fakeDisk(on, DISK)
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: ROOT, surface: 'terminal', isInteractive: true })
+  expect(seen.opened).toEqual(['nzt-files'])
+})
+
+test('opened at the start and seated above the prompt, the pane closes again', async ($, on) => {
+  const { seen } = fakeDisk(on, DISK)
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: ROOT, surface: 'terminal', isInteractive: true })
+  await $.ui.mount({
+    plugin: 'nzt-files',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: 'nzt-files',
+    viewport: { columns: 64, rows: 28 },
+    props: { title: 'Archivos', isFocused: false, bodyColumns: 60, placement: 'inline', scroll: { offset: 0, bodyRows: 24 }, view: {} },
+  })
+  expect(seen.opened).toEqual(['nzt-files'])
+  expect(seen.closed).toEqual(['nzt-files'])
+})
+
+test('with open at start off the pane waits for the command', { options: { openAtStart: false } }, async ($, on) => {
+  const { seen } = fakeDisk(on, DISK)
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: ROOT, surface: 'terminal', isInteractive: true })
+  expect(seen.opened).toEqual([])
 })

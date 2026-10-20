@@ -1,11 +1,17 @@
 # Mod · nzt-state — panel del plan y el estado
 
-> Estado: **construido**, versión 0.4.0, en `mods/nzt-state/` (B-01 a B-04 e idioma en las
+> Estado: **aceptado y cerrado**, versión 0.7.0; 0.6.0 (aviso de fase que NZT no conoce,
+> unidad 271), aceptado con ella. En `mods/nzt-state/` (B-01 a B-04 e idioma en las
 > unidades 84 a 88; fases plegables y personajes en 91 a 95; aviso de varias fases en curso
-> en la 164; Plan y Modo al lado del personaje en la 166) · Depende de: `specs/nzt-mods.md`,
+> en la 164; Plan y Modo al lado del personaje en la 166; aviso de preguntas abiertas,
+> RN-panel-preguntas y -preguntas-espera, aprobado en la 202, construido en la 209 y aceptado
+> por el usuario tras probarlo en vivo el 2026-10-17, unidad 210) · Depende de: `specs/nzt-mods.md`,
 > `specs/nzt-core.md` sección 7 (formato de `Plan/state.json`), D61 y D62.
 > Escrita el 2026-10-13 leyendo el código; los hallazgos R-01 a R-08 los resolvió el usuario
 > el 2026-10-14 (sección **Hallazgos resueltos**).
+> **0.7.0 aceptado y cerrado** (usuario 2026-10-20, unidad 298; spec 294, mockup 295, build
+> 296, prueba en vivo 297): Tu turno, AHORA y las tareas a pedido. 0.6.0, aceptado con ella.
+> Cómo llegó hasta acá, en **Historia** al final.
 
 ## Qué resuelve
 
@@ -23,29 +29,34 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 - Si el plan está aprobado, el modo (acompañado o autónomo, y en autónomo la tanda con su
   avance y las paradas que se mantienen), la línea de fases, el objetivo, el porcentaje de
   avance, hace cuánto se actualizó y lo que se está esperando.
-- La unidad en curso con su detalle. Las pendientes agrupadas por fase, y las hechas, las
-  descartadas y las notas (**Notas para retomar**, lo que una sesión nueva necesita para seguir) en secciones que se pliegan.
-- El comando `/nzt-state`, que abre el panel.
+- **AHORA**: la última hecha, la que está en curso y la que sigue, en vivo (RN-panel-ahora).- **Las tareas, ocultas detrás de un botón** (RN-panel-tareas): una sola lista de unidades, en el orden del plan y agrupada por fase, que se marca
+  como un checklist: hechas, la que está en curso (o la que sigue) y pendientes
+  (RN-panel-lista). Las notas (**Notas para retomar**, lo que una sesión nueva necesita para
+  seguir) en una sección que se pliega.- **Tu turno**: lo que se espera de nosotros, arriba de todo, plegado y latiendo (RN-panel-espera).- El comando `/nzt-state`, que abre el panel.
 - La lectura de los tres formatos del estado: el actual (D62), el de D61 y el anterior con
   `phase`.
 - Los avisos de un estado que rompe el formato del kernel: un estado inválido, más de una
   unidad en curso, más de una fase en curso, una tanda que nombra unidades que no existen.
 - Español e inglés.
-- Las fases plegables dentro de cada sección, y la identidad de cada fase: su color, su
+- Las fases plegables dentro de la lista, y la identidad de cada fase: su color, su
   personaje animado y su sombrero en miniatura.
-
 **Afuera**
 - **Editar o corregir el estado desde el panel.** El panel solo lee
   (`RN-mod-lee-no-escribe` de `specs/nzt-mods.md`); avisa lo que está mal y no lo arregla.
 - **Codex.** Un mod es solo de Claude Code (D63).
 - **Otros artefactos**, como specs, historias o el glosario. El panel lee únicamente
-  `Plan/state.json`.
+  `Plan/state.json`. Las preguntas abiertas no las busca en los documentos: toma la
+  cuenta que da `nzt-questions` (RN-panel-preguntas), que es el mod que las lee.
 - **Historial de corridas.** Una corrida nueva reescribe el estado (D62), y el panel
   muestra solo la corrida actual.
 - **Buscar el estado en carpetas de más arriba.** El usuario decidió que lea solo la
   carpeta de la sesión (R-08).
 - **Otros idiomas** fuera de español e inglés.
-- **Elegir o dibujar personajes propios** desde la configuración, y apagar la animación.
+- **Los pasos de Claude dentro de una unidad** (su lista de tareas, como la muestra Clean
+  View). Haría falta que el kernel le pida a Claude armarla y marcarla; el usuario decidió no
+  sumar ese cambio de funcionalidad (2026-10-20): la lista es de unidades.- **Que el agente escriba el estado más seguido.** La lista se marca con lo que el estado ya
+  trae: mientras el agente hace una unidad sin haberla pasado a `doing`, la lista la muestra
+  como la que sigue (RN-panel-lista-siguiente).- **Elegir o dibujar personajes propios** desde la configuración, y apagar la animación.
   No se pidió.
 - **Personajes de otros mods.** Los de `savvy-progress` dicen venir de DockCrab, cuya
   licencia no se encontró: no se copian (decisión del usuario, 2026-10-14).
@@ -54,7 +65,8 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 
 ### RN-panel-solo-lee · origin: D63
 El panel no escribe ningún archivo del proyecto. Lo único que guarda es su propio estado de
-sesión: qué secciones están abiertas.
+sesión: qué grupos y secciones están abiertos, y si el detalle de la unidad en curso está
+desplegado.
 
 ### RN-panel-abre-con-estado · origin: reverse (R-01)
 Al empezar la sesión, el panel se abre solo si el proyecto tiene `Plan/state.json`. En un
@@ -72,12 +84,77 @@ el motivo, y la sesión sigue funcionando.
 Si el estado trae `phases`, la línea de fases muestra esas fases y no otras, en el orden
 del archivo y cada una con su estado. Una fase `dropped` aparece tachada.
 
-### RN-panel-unidad-en-su-fase · origin: D62 (unidad 76)
-Las unidades se leen dentro de su fase (`phases[].units`), y las pendientes se muestran
-agrupadas bajo el nombre de su fase, en el orden del plan.
+### RN-panel-fase-desconocida · origin: usuario 2026-10-19 ("eso no es una fase, no? las fases son análisis, ux, build, etc")Si `phases` trae un nombre que no es ninguna fase de NZT (ni en ninguna de sus grafías), la
+línea de fases lo muestra igual, tal como viene (RN-panel-fases-tal-cual), y debajo avisa cuáles
+no son fases y cuáles son: *⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las
+fases son Análisis, Arquitectura, UX, Build, Verificación, Release*. Se encontró con el estado de
+este repo: el agente había escrito cada cambio como una fase.
 
-### RN-panel-formatos-viejos · origin: D61 y D62 (unidades 71 y 76)
-Un estado de D61, con `units` arriba, se muestra con las pendientes sin agrupar. Un estado
+### RN-panel-unidad-en-su-fase · origin: D62 (unidad 76)Las unidades se leen dentro de su fase (`phases[].units`), y la lista las muestra bajo el
+nombre de su fase, en el orden del plan: las fases en el orden del archivo y, dentro de cada
+una, las unidades en el orden en que el archivo las trae, sea cual sea su estado.
+
+### RN-panel-ahora · origin: usuario 2026-10-20, Q-04 (propuesta 1: "me gusta el 1 asi que vamos con el 1")Debajo del avance, un cuadro **AHORA** con el borde y el título en el color de la fase de la
+unidad en curso muestra lo que está pasando, como Clean View: la **última unidad hecha**, la
+**que está en curso** (o la que sigue, RN-panel-lista-siguiente) con su detalle
+(RN-panel-lista-detalle), y la **próxima pendiente**, en el orden del plan y con las marcas de
+RN-panel-lista-marcas. Arriba a la derecha dice **Unidad n de m** (sin contar descartadas).
+Con la 287 en curso, la 297 hecha y la 298 pendiente: `AHORA · Verificación`, `Unidad 5 de 8`,
+`✓ 297`, `▶ 287`, `○ 298`. Si falta la anterior o la siguiente, se muestra lo que hay. Con
+varias en curso, todas, con el aviso de RN-panel-varias-en-curso. Con el plan completo, el
+cuadro dice *✓ Plan completo: no hay unidades en curso ni pendientes.* **La unidad en curso
+brilla leve**, marca y texto, en el color de su fase, con la misma onda que Tu turno pero menos
+profunda (usuario en la prueba en vivo, H-02: *"en la tarea que se esta haciendo en el momento,
+debe tener un efecto digamos de brillo leve"*). Solo ella: ▷ sigue no brilla.
+
+### RN-panel-tareas · origin: usuario 2026-10-20 ("no siempre vamos a querer ver las tareas … quizas un boton para activar la vista y desactivarla"), Q-04Debajo de AHORA, el botón **☰ Ver tareas · n** (n, el total de unidades) muestra la lista de
+todo el plan (RN-panel-lista), y entonces dice **☰ Ocultar tareas** y la vuelve a ocultar. Al
+abrir el panel, las tareas están ocultas. Lo que la persona elige dura lo que la sesión.
+
+### RN-panel-lista · origin: usuario 2026-10-20 ("me gustaria una lista asi ordenada como clean view")Con las tareas a la vista (RN-panel-tareas), las unidades se muestran en **una sola lista**,
+cada una una vez, en el lugar que le toca en el plan, y su marca dice cómo está
+(RN-panel-lista-marcas). El panel no agrupa las unidades por estado: con 2 hechas, 1 en curso,
+2 pendientes y 1 descartada, cada una de las 6 aparece una sola vez en la lista (AHORA repite, a
+propósito, las que muestra). La lista se lee de arriba hacia
+abajo como un checklist: lo hecho arriba, la que está en curso en el medio y lo que falta
+abajo, porque así las ordena el plan. Ejemplo, con la fase Verificación en curso:
+
+```
+Verificación · 1 de 3
+✓ 297  Prueba en vivo de nzt-state 0.7.0
+▶ 287  Cerrar nzt-files 0.2.0 cuando el usuario lo acepte
+○ 298  Cerrar nzt-state 0.7.0 cuando el usuario lo acepte
+```
+
+### RN-panel-lista-marcas · origin: usuario 2026-10-20; los glifos, propuesta del agente (Q-03)Cada unidad lleva delante una marca, la misma en la terminal y en el escritorio:
+**✓ hecha** · **▶ en curso**, resaltada en el color de su fase · **○ pendiente**, atenuada ·
+**✗ descartada**, atenuada y tachada. Una unidad con un status que el kernel no define
+lleva la marca de RN-panel-status-invalido.
+
+### RN-panel-lista-siguiente · origin: usuario 2026-10-20 (el agente explicó que el estado se escribe al terminar cada unidad); la forma, propuesta del agente (Q-03)Si ninguna unidad está en curso, la primera pendiente de la fase en curso lleva **▷** y la
+palabra **sigue** ("next"), atenuada, en vez de ○: es la que el agente está haciendo o va a
+hacer. Con el estado de esta corrida al aprobarse el plan (ninguna en curso, fase Análisis en
+curso, 294 primera pendiente), la 294 se muestra como `▷ 294 … sigue`. Si no hay fase en
+curso, o la fase en curso no tiene pendientes, ninguna lleva ▷.
+
+### RN-panel-lista-detalle · origin: propuesta del agente, por "nzt-state se siente como que tiene muchisima informacion" (Q-03)El detalle de la unidad en curso va debajo de ella en **un solo renglón**, cortado con «…» si
+no entra. Un clic en la unidad lo despliega entero y otro lo vuelve a un renglón; dura lo que
+la sesión. Las demás unidades no muestran su detalle.
+
+### RN-panel-espera · origin: usuario 2026-10-20 ("cuando esta esperando algo de nosotros se ve siempre en pantalla, en nzt-state estaria bueno que eso se vea mas lindo"); la forma, Q-01 y Q-04; el nombre, usuario ("en vez de que diga 'Te toca' que diga 'Tu turno'")Mientras el estado trae `waiting_on` o `nzt-questions` tiene preguntas pendientes, el panel
+muestra **Tu turno** ("Your turn") en el primer renglón debajo del título, arriba de todo lo
+demás. **Plegado**, es un solo renglón: `▸ ⏸ Tu turno`, el texto de `waiting_on` cortado con «…»
+y, si además hay preguntas, `? n` al final; sin `waiting_on`, el texto es *n preguntas para
+contestar*. **Mientras está a la vista, el título brilla suave**: va de un amarillo apagado al
+amarillo entero y vuelve, en una onda de unos 2 segundos, sin saltos (usuario en la prueba en
+vivo, H-03: *"es como que se prende y apaga de forma brusca … que este en un amarillo apagado y
+se vaya iluminando y desiluminando"*). Un clic lo **despliega** (`▾`): el texto entero
+tal como viene, y debajo el aviso de preguntas con Contestar (RN-panel-preguntas); otro clic lo
+pliega. Arranca plegado y lo elegido dura lo que la sesión. Sin `waiting_on` y sin preguntas,
+no aparece ni deja lugar vacío.
+
+### RN-panel-formatos-viejos · origin: D61 y D62 (unidades 71 y 76)Un estado de D61, con `units` arriba, se muestra como una lista sin grupos, en el orden del
+archivo y con las mismas marcas (RN-panel-lista-marcas). Un estado
 anterior, con un solo `phase`, muestra las seis fases de NZT: las anteriores a la actual
 como hechas, la actual en curso y las demás pendientes. Si ese plan está completo, todas
 aparecen hechas.
@@ -87,9 +164,8 @@ Si una unidad o una fase tiene un `status` que no es `todo`, `doing`, `done` ni 
 se muestra marcada como inválida, con el valor que trae. No cuenta como pendiente, ni como
 hecha, ni en el porcentaje, y el panel avisa cuántas hay.
 
-### RN-panel-varias-en-curso · origin: reverse (R-03)
-Si hay más de una unidad `doing`, el panel las muestra todas en **En curso** y avisa que el
-kernel permite una sola.
+### RN-panel-varias-en-curso · origin: reverse (R-03)Si hay más de una unidad `doing`, la lista las marca todas con ▶, cada una en su lugar, y el
+panel avisa que el kernel permite una sola. Ninguna lleva ▷ (RN-panel-lista-siguiente).
 
 ### RN-panel-objetivo · origin: usuario 2026-10-15
 El objetivo de la corrida va debajo de Plan y Modo, en su misma columna (al lado del
@@ -117,9 +193,10 @@ Un id de `autonomy.units` sin unidad en el estado no cuenta para el avance de la
 tanda se da por terminada cuando terminan las unidades que existen, y el panel avisa qué
 ids no existen.
 
-### RN-panel-carpeta-sesion · origin: reverse (R-08)
-El panel lee `Plan/state.json` de la carpeta donde se abrió la sesión. Abierta en una
-subcarpeta del proyecto, dice que no hay estado.
+### RN-panel-carpeta-sesion · origin: reverse (R-08); el cd del agente, usuario 2026-10-20 (H-01)El panel lee `Plan/state.json` de la carpeta donde se abrió la sesión. Abierta en una
+subcarpeta del proyecto, dice que no hay estado. **Que el agente se mueva a otra carpeta
+durante la sesión no cambia cuál lee**: con la sesión abierta en la raíz y el agente en
+`specs/mods`, el panel sigue mostrando el estado de la raíz.
 
 ### RN-panel-idioma · origin: usuario 2026-10-14 (R-06)
 El panel habla en español o en inglés: textos, nombres de fase, tiempos ("hace 2 h" /
@@ -135,15 +212,25 @@ adivinarlo del texto del estado puede fallar con un objetivo corto o mezclado. `
 defecto porque es lo que el panel hace hoy. **Se reabre** si el motor empieza a exponer el
 idioma, o si el usuario prefiere que se adivine del estado.
 
-### RN-panel-fases-plegables · origin: usuario 2026-10-14
-Dentro de **Pendientes**, **Hechas** y **Descartadas**, las unidades se agrupan por fase y
-cada grupo se pliega y despliega con un clic, aparte de la sección. Al abrir el panel solo
-está desplegado el grupo de la fase en curso; los demás, plegados. Lo que la persona abre
-o cierra dura lo que la sesión. Antes de cada grupo queda una línea en blanco, también
-antes del primero, para que no se lea pegado al título de la sección ni a la fase anterior.
-Las unidades de un grupo van con sangría bajo su encabezado, para que se lean como de esa
-fase y no de la sección. Un estado sin fases (anterior a D62) no tiene grupos: la
-sección muestra la lista como antes.
+### RN-panel-preguntas · origin: usuario 2026-10-17 ("me gusta lo de que nzt-state avise lo de las preguntas"); la forma, propuesta del agente
+Si `nzt-questions` está instalado y tiene preguntas pendientes, el panel muestra, debajo de lo
+que se está esperando, **`? n preguntas para contestar`** con un botón **Contestar ›** que abre
+`nzt-questions`, igual que si la persona escribiera su comando. Las ya llevadas al prompt no
+cuentan. Sin preguntas pendientes, o sin `nzt-questions` instalado, no muestra nada: el panel no
+le pide a nadie que instale otro mod.
+
+### RN-panel-preguntas-espera · origin: mismo criterio que RN-hub-espera de `nzt-hub`
+Si Claude está trabajando en un turno cuando se aprieta Contestar, el aviso dice que
+`nzt-questions` se abre al terminar el turno, y se abre entonces.
+
+### RN-panel-fases-plegables · origin: usuario 2026-10-14; en la lista, usuario 2026-10-20En la lista, cada fase es un grupo con su encabezado: el sombrero en miniatura, el nombre en
+su color y cuántas unidades lleva hechas de cuántas, sin contar las descartadas (`Build · 1
+de 3`; una fase con todo hecho, `✓ Análisis · 1 de 1`). Cada grupo se pliega y despliega con un
+clic. Al abrir el panel solo está desplegado el grupo de la fase en curso; los demás,
+plegados a su encabezado. Lo que la persona abre o cierra dura lo que la sesión. Antes de
+cada grupo queda una línea en blanco, para que una fase no se lea pegada a la anterior. Las
+unidades van con sangría bajo su encabezado. Un estado sin fases (anterior a D62) no tiene
+grupos (RN-panel-formatos-viejos).
 
 ### RN-panel-identidad-fase · origin: usuario 2026-10-14
 Cada fase de NZT tiene un color, un personaje y un sombrero, los mismos en la terminal y en
@@ -240,22 +327,131 @@ Leídos del código el 2026-10-13 y resueltos por el usuario el 2026-10-14.
 | R-07 | Un id de tanda inexistente impedía "tanda terminada" | Bug B-04 |
 | R-08 | Lee solo la carpeta de la sesión | Regla: RN-panel-carpeta-sesion |
 
+## Diseño 0.7.0 (unidad 295)
+Mockup: [`mockup.html`](mockup.html), que se abre desde el disco. Arriba, afuera del marco, se
+elige el estado y si va la línea de fases (Q-02); cada combinación se puede enlazar
+(`#state=espera&fases=sin`). Salió de dos rondas con el usuario (2026-10-20): en la primera,
+la lista con todas las fases a la vista y tres formas de la espera; en la segunda, tres
+propuestas, de las que eligió la 1 (Q-04).
+
+- **Tarea:** ver qué está pasando ahora y si la corrida nos espera. No hay acción principal: el
+  panel informa. Se aprieta Tu turno (desplegar), Contestar, Ver tareas, una fase (plegar) y la
+  unidad en curso (detalle).
+- **Orden de lectura, de arriba hacia abajo:** título · **Tu turno**, plegado (RN-panel-espera) ·
+  Plan, Modo y Objetivo con el personaje (sin cambios) · línea de fases (Q-02) · avance ·
+  **AHORA** (RN-panel-ahora) · **☰ Ver tareas** (RN-panel-tareas) y, abiertas, la lista por fase
+  (RN-panel-lista) · Notas para retomar, plegada.
+- **Estados dibujados:** unidad en curso · Tu turno con preguntas · Tu turno con texto largo ·
+  solo preguntas · ninguna en curso (▷ sigue) · con descartada · varias en curso · plan
+  completo · panel angosto · y **Hoy (0.6.0)** para comparar. Sin estado y archivo roto no
+  cambian: no se dibujan. Un estado sin fases (D61) muestra AHORA igual y la lista sin grupos.
+- **Angosto** (menos de 40 columnas útiles): el personaje arriba, centrado; Tu turno, AHORA y la
+  lista, iguales a todo el ancho.
+- **El brillo:** en el mockup, una animación CSS de 1,6 s; en la terminal, alternar dos tonos
+  con el reloj que ya anima al personaje (sin probar). Con `?quieto` el mockup no se mueve.
+- **Medido** en el mockup (Edge sin ventana, 2026-10-20): 10 estados × con y sin línea de fases,
+  a 320 y 800 px, con Tu turno, las tareas y el detalle desplegados: ningún scroll horizontal
+  (40 de 40). **Contraste** sobre el fondo de la terminal: texto 13,9 · tenue 5,4 · amarillo de
+  Tu turno 10,1 y 4,75 en el punto bajo del brillo · preguntas 7,8 · Contestar 8,5 · colores de
+  fase entre 5,3 (Análisis) y 9,1, todos AA. El gris de las descartadas daba 2,3: va en el
+  tenue, tachada.
+- **Sin probar:** el orden de foco con teclado en el panel real; en el mockup, la unidad en
+  curso se despliega con Enter.
+
+## Preguntas
+
+### Q-01 · ¿Cómo se ve lo que se espera de nosotros? (RN-panel-espera)
+- bloquea: la forma de RN-panel-espera y el build (296)
+- se responde: sobre las propuestas del mockup, unidad 295
+- respuesta (usuario 2026-10-20, ronda 1 del mockup): *"el Te Toca deberia ser quizas un
+  desplegable que brille mientras este esperando algo de nosotros"*. Se llama **Te toca**, va
+  plegado en un renglón, se despliega con un clic y brilla mientras hay `waiting_on` o
+  preguntas. La forma exacta del brillo sale de Q-04.
+
+### Q-02 · Con la lista agrupada por fase, ¿sigue la línea de fases de arriba?
+- por qué: la lista ya muestra cada fase con su sombrero, su color y su avance; la línea de
+  fases repite eso arriba, y el usuario dijo que el panel tiene "muchisima informacion"
+- opciones: dejarla como está · sacarla y que el encabezado de cada grupo diga si la fase está
+  hecha, en curso o pendiente · dejarla solo en el modo angosto
+- bloquea: el build (296); el mockup muestra la opción con y sin línea
+- respuesta (usuario 2026-10-20, *"perfecta tu propuesta"*): **queda como está**. Con las tareas
+  ocultas (RN-panel-tareas), es lo único que muestra todo el plan de un vistazo.
+
+### Q-03 · ¿Confirmás las propuestas del agente de la unidad 294?
+- las propuestas: los glifos de RN-panel-lista-marcas; ▷ con «sigue» de
+  RN-panel-lista-siguiente; el detalle en un renglón que se despliega de RN-panel-lista-detalle;
+  las descartadas dentro de la lista, tachadas
+- no bloquea construir: se confirman al ver el mockup (295)
+- respuesta (usuario 2026-10-20): *"me gustan las propuestas hechas"*. Confirmadas.
+
+### Q-04 · ¿Cómo se ve lo que está pasando y cómo se muestran las tareas? (ronda 2 del mockup)
+- origen: usuario 2026-10-20, *"no quiero todas las fases tiradas ahi con sus unidades porque no
+  siempre vamos a querer ver las tareas … quizas un boton para activar la vista y desactivarla …
+  la idea es que sea como clean view ese panel osea en tiempo real … dame en el mock 3 propuestas"*
+- propuestas, en el mockup (selector Q-04):
+  1. **Ahora + «Ver tareas»**: Te toca, un renglón arriba de todo cuyo título late; un cuadro
+     **Ahora** con la última hecha, la que está en curso y la que sigue, y «Unidad n de m»; el
+     botón «☰ Ver tareas» abre la lista de todo el plan y «☰ Ocultar tareas» la cierra.
+  2. **Checklist de la fase en curso**: Te toca, una banda amarilla que late; un cuadro con todas
+     las unidades de la fase en curso, «Paso n de m» y su %; «☰ Todo el plan» suma las demás fases,
+     plegadas.
+  3. **Vista simple / completa**: un botón arriba a la derecha cambia todo el panel; **Simple**
+     deja el personaje chico, el objetivo con el %, Te toca (un recuadro cuyo borde late) y
+     Ahora; **Completa** suma Plan, Modo, la línea de fases, el avance, las tareas y las notas.
+- en las tres, las tareas arrancan ocultas, y lo abierto o cerrado dura lo que la sesión
+  (propuesta del agente)
+- respuesta (usuario 2026-10-20): *"me gusta el 1 asi que vamos con el 1, y en vez de que diga
+  'Te toca' que diga 'Tu turno'"*. Queda en RN-panel-ahora, RN-panel-tareas y RN-panel-espera.
+  Las propuestas 2 y 3 se sacaron del mockup.
+
 ## Sin determinar
 
 - **Escritorio:** los tests montan el panel en `desktop`, pero no lo vi dibujado en la app.
   Tampoco está probado si la animación CSS del SVG corre dibujado como imagen o necesita
   `isInteractive`; los tipos del motor solo lo afirman de la animación SMIL.
 - **Terminal de 256 colores:** no se probó cómo se ve el personaje.
+- **Cómo sabe `nzt-state` cuántas preguntas tiene `nzt-questions`** (RN-panel-preguntas, unidad
+  202): el motor deja que un mod lea el estado de sesión de otro que declara como dependencia,
+  pero no está verificado si declararlo obliga a tener instalado `nzt-questions`, lo que
+  rompería *sin `nzt-questions` instalado, no muestra nada*. Se decide en el diseño técnico de
+  `nzt-questions` (unidad 205). **Probado en la unidad 209:** `nzt-state` no declara la
+  dependencia y declara en su propio contrato la única clave que lee (`nzt-questions.pending`).
+  `claude plugin validate` lo acepta y avisa que la clave de otro plugin no la puede comprobar.
+  En el test, sin `nzt-questions`, la lectura se rechaza, el panel la toma como cero y no muestra
+  nada. **Verificado en vivo en la unidad 210** (usuario, 2026-10-17): con los dos mods cargados
+  el aviso aparece, Contestar abre `nzt-questions` y no hay quejas por los dos contratos.
 
 ## Tests
 
 `hooks/register.test.ts` corre con `claude plugin test mods/nzt-state`. Cubre la línea de
 fases en los tres formatos, la lectura del estado, el JSON roto, el panel con la unidad en
-curso, las pendientes por fase, las secciones que se pliegan (en terminal y en escritorio)
-y la tanda autónoma con sus paradas; la apertura con y sin estado (B-01), el status
+curso, AHORA con la última hecha, la que está en curso y la que sigue (y nada más), el
+detalle que se despliega, ▷ sigue sin unidad en curso, el plan completo, Tu turno primero,
+plegado y que se despliega, y su ausencia sin espera; las tareas ocultas que Ver tareas
+muestra, sin las secciones de antes, con la descartada tachada (en terminal y en escritorio)
+y la tanda autónoma con sus paradas y su lista sin grupos; la apertura con y sin estado (B-01), el status
 inválido (B-02), varias unidades en curso (B-03), varias fases en curso y una sola sin
-aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
+aviso, una fase que NZT no conoce con su aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
 se pliegan, los cuadros y sombreros de cada personaje, las celdas, el personaje y los mini
 sombreros en la terminal, y el SVG en el escritorio; Plan y Modo al lado del personaje
 desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el objetivo con su
-etiqueta, arriba de las fases. 28 tests.
+etiqueta, arriba de las fases; el aviso de preguntas pendientes en Tu turno con Contestar, y su
+ausencia sin `nzt-questions` o sin preguntas; la onda del brillo (sube y baja sin saltos, entera
+arriba y mezclada con gris abajo) y Tu turno y la unidad en curso dibujados en su brillo; el
+estado leído de la carpeta en que empezó la sesión. 42 tests. **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
+pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueba en vivo
+([testing/2026-10-20-en-vivo.md](testing/2026-10-20-en-vivo.md), V-03).
+
+## Historia
+
+Una entrada por ciclo de cambio cerrado, la más nueva arriba. Empieza en 0.7.0: lo anterior está
+en el encabezado y en **Hallazgos resueltos**.
+
+### 2026-10-20 · Tu turno, AHORA y las tareas a pedido — 0.7.0
+Type:     modify
+Change:   lo que espera de la persona va primero, plegado y brillando suave; lo que está pasando se ve en un cuadro AHORA (la última hecha, la que está en curso brillando y la que sigue); todas las unidades, como un checklist por fase, solo cuando se piden.
+Reason:   el usuario, al ver Clean View: "nzt-state se siente como que tiene muchisima informacion ademas el 'EN CURSO' no se ve bien y no me permite seguir bien con que esta"; "me gustaria una lista asi ordenada"; "no quiero todas las fases tiradas ahi".
+Before:   secciones En curso, Pendientes, Hechas y Descartadas, el detalle entero de la unidad en curso, la espera en un recuadro y las preguntas sueltas debajo; el panel leía el estado de la carpeta donde estuviera el agente.
+Now:      Tu turno, AHORA y Ver tareas; el detalle en un renglón que se despliega; el estado, siempre de la carpeta donde empezó la sesión.
+Impact:   RN-panel-ahora, -tareas, -lista, -lista-marcas, -lista-siguiente, -lista-detalle, -espera nuevas · RN-panel-unidad-en-su-fase, -varias-en-curso, -fases-plegables, -formatos-viejos, -carpeta-sesion cambiadas · las secciones por estado, quitadas
+Decision: propuesta 1 de tres (Q-04), "Tu turno" en vez de "Te toca", la línea de fases se queda (Q-02), los pasos de Claude afuera (usuario 2026-10-20). Aceptada con V-04..V-10 de la prueba en vivo sin recorrer uno por uno.

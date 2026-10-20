@@ -1,13 +1,27 @@
-/** The NZT mods the pane lists, in the catalog's order; each one's glyph and color. */
+/**
+ * The NZT mods the pane lists, in the catalog's order; each one's type, glyph and color. A mod
+ * of type `nzt` needs an artifact of the method; a `generic` one works in any project.
+ */
 export const CATALOG = [
   // 'claude' is a theme key: NZT's accent, so it follows the theme.
-  { id: 'nzt-state', icon: '◆', color: 'claude', hasPane: true },
-  { id: 'nzt-context', icon: '◔', color: '#82aaff', hasPane: false },
-  { id: 'nzt-changes', icon: '±', color: '#c792ea', hasPane: true },
-  { id: 'nzt-files', icon: '▤', color: '#6cc070', hasPane: true },
+  { id: 'nzt-state', kind: 'nzt', icon: '◆', color: 'claude' },
+  { id: 'nzt-changes', kind: 'generic', icon: '±', color: '#c792ea' },
+  { id: 'nzt-files', kind: 'generic', icon: '▤', color: '#6cc070' },
+  { id: 'nzt-questions', kind: 'generic', icon: '?', color: '#f48fb1' },
+  { id: 'nzt-look', kind: 'generic', icon: '◐', color: '#82aaff' },
 ] as const
 
 export type ModId = (typeof CATALOG)[number]['id']
+export type Kind = (typeof CATALOG)[number]['kind']
+
+/** The groups the pane shows, in order: the mods of the method first, then the generic ones. */
+export const GROUPS: readonly Kind[] = ['nzt', 'generic']
+
+/** The catalog's ids by group, each group in the catalog's order; a group with no mods left out. */
+export const groupsOf = <T extends { id: string }>(mods: readonly T[]) =>
+  GROUPS.map(kind => ({ kind, mods: mods.filter(mod => CATALOG.find(entry => entry.id === mod.id)?.kind === kind) })).filter(
+    group => group.mods.length > 0,
+  )
 
 export const MARKETPLACE = 'Ezefeola/nzt-ai'
 
@@ -16,7 +30,7 @@ export const installCommand = (id: string) => `/plugin install ${id} --marketpla
 
 /**
  * Whether the session has a mod: it registered its command, or its options show in /config
- * (every NZT mod has a language option, and a band like nzt-context has no command).
+ * (every NZT mod has a language option, so a mod whose command failed to load still counts).
  */
 export const isInstalled = (
   id: string,

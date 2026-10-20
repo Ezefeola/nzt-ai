@@ -61,13 +61,10 @@ table.
 An axis is a tradeoff, so it is **asked in every mode**, with a recommendation — never decided
 alone, and never asked before the technology that decides which router's axes apply.
 
-- **Use the host's multiple-choice question tool when this session offers one**, one question
-  per axis, its options the values of the table, the recommended one first and its cost in the
-  description. **When there is no such tool, a bulleted list**: the axis, then one bullet per
-  value with its cost, the recommended one first and marked.
+- **Asked the way the kernel's *Questions* says**: one question per axis with its `QT-NN`, its
+  options the values of the table, each value's cost as its consequence.
 - **Group them into one round**, ordered by what depends on them: the technology first, then the
-  generic axes, then the router's. A tool that takes a few questions at a time gets several
-  calls in a row, not a round per answer.
+  generic axes, then the router's.
 - **Each answer is written as it arrives**: the `QT-NN` in `Docs/Architecture/architecture-decisions.md`
   with where it came from, and the value in the stack's axis table. An answer outside the
   options is a gap (above), never a new value.
@@ -84,8 +81,8 @@ table offers — and that is the user's decision, as `stack.md` says.
 
 - [ ] Every value was copied from a build table, spelled exactly as there.
 - [ ] The generic axes were answered, plus the router's own axes when the technology has one.
-- [ ] Each axis was asked with its options, its cost and a recommendation, through the host's
-      question tool or a bulleted list, in one round.
+- [ ] Each axis was asked with its options, its cost and a recommendation, as the kernel's
+      *Questions* says, in one round.
 - [ ] Every answer has its `QT-NN` and its row; a concept outside the tables is an open gap,
       not an invented value.
 - [ ] An existing component's axes came from its code, and only what the code cannot settle

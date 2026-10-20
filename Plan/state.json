@@ -1,13 +1,92 @@
 {
   "version": 1,
-  "updated": "2026-10-17T09:00:00Z",
-  "goal": null,
-  "phases": [],
-  "approved": false,
-  "autonomy": {},
-  "waiting_on": null,
+  "updated": "2026-10-20T19:00:00Z",
+  "goal": "nzt-state 0.7.0: una lista ordenada estilo checklist (✓ hecha, ▶ en curso o siguiente, ○ pendiente) en vez de EN CURSO/PENDIENTES/HECHAS, y lo que se espera de nosotros más lindo; arrastra el cierre pendiente de nzt-files 0.2.0",
+  "phases": [
+    {
+      "name": "discovery",
+      "status": "done",
+      "units": [
+        {
+          "id": 294,
+          "do": "Spec nzt-state: lista ordenada de unidades (▶ = en curso, o primera pendiente de la fase en curso) que reemplaza EN CURSO/PENDIENTES/HECHAS; lo demás plegado; espera destacada",
+          "status": "done",
+          "detail": "RN-panel-lista, -lista-marcas, -lista-siguiente, -lista-detalle, -espera [add]; -unidad-en-su-fase, -varias-en-curso, -fases-plegables, -formatos-viejos [modify]; -secciones [remove]; Q-01 (forma de la espera), Q-02 (¿sigue la línea de fases?), Q-03 (propuestas) abiertas para el mockup"
+        }
+      ]
+    },
+    {
+      "name": "ux",
+      "status": "done",
+      "units": [
+        {
+          "id": 295,
+          "do": "Mockup HTML de nzt-state 0.7.0: la lista ordenada y propuestas para mostrar lo que espera de nosotros",
+          "status": "done",
+          "detail": "Aprobado por el usuario 2026-10-20: propuesta 1 (Q-04: Tu turno plegado que late, AHORA, ☰ Ver tareas), 'Tu turno' en vez de 'Te toca', línea de fases se queda (Q-02); spec con RN-panel-ahora, -tareas y -espera; mockup medido 40/40 sin scroll, AA"
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        {
+          "id": 296,
+          "do": "Construir nzt-state 0.7.0 según spec y mockup, con tests; README del mod y fila del catálogo en specs/nzt-mods.md",
+          "status": "done",
+          "detail": "register.tsx: Tu turno (pulse cada 4 cuadros solo mientras espera), AHORA, ☰ Ver tareas, grupos por fase; Button solo admite texto: el clic va sobre el texto de la unidad y de Tu turno; 38 tests, validate y tsc verdes; plugin 0.7.0, README, catálogo y spec al día; sin test: el latido"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "status": "done",
+      "units": [
+        {
+          "id": 297,
+          "do": "Prueba en vivo de nzt-state 0.7.0 (terminal y SVG, angosto y ancho, con y sin espera)",
+          "status": "done",
+          "detail": "testing/2026-10-20-en-vivo.md: V-01..V-03 passed, V-04..V-10 pending (el usuario dio 0.7.0 por terminada sin recorrerlos); H-01 carpeta de la sesión, H-02/H-03 brillo en onda, H-04 margen de ⏸: arreglados, 42 tests, copia de dev-mods sincronizada"
+        },
+        {
+          "id": 287,
+          "do": "Cerrar nzt-files 0.2.0 cuando el usuario lo acepte: marcas de la spec, resultados, catálogo",
+          "status": "done",
+          "detail": "Aceptada por el usuario 2026-10-20 ('te apruebo todo lo demás'), con V-06..V-11 sin correr (anotado en su testing); 61 marcas barridas, Q-13 cerrada, Sin determinar vacío, Historia 0.2.0 y catálogo al día"
+        },
+        {
+          "id": 298,
+          "do": "Cerrar nzt-state 0.7.0 cuando el usuario lo acepte",
+          "status": "done",
+          "detail": "Aceptada 2026-10-20 ('ya con esto estaria todo finalizado', 'te apruebo todo lo demás'); marcas barridas (secciones por estado quitadas, afirmado en RN-panel-lista), Historia 0.7.0 nueva, catálogo al día"
+        }
+      ]
+    },
+    {
+      "name": "ship",
+      "status": "done",
+      "units": [
+        {
+          "id": 289,
+          "do": "Commit y push del cierre de nzt-files a mods",
+          "status": "done",
+          "detail": "9ab97a7; la fila del catálogo viajó con el commit de nzt-state (mismo archivo)"
+        },
+        {
+          "id": 299,
+          "do": "Commit y push de nzt-state 0.7.0 a mods",
+          "status": "done",
+          "detail": "Commit de nzt-state 0.7.0 con este estado, pusheado junto con 9ab97a7 a origin/mods"
+        }
+      ]
+    }
+  ],
+  "approved": true,
+  "waiting_on": "Usuario: decir con qué sigue (otro mod u otros ajustes); el trabajo continúa en la rama mods, y el merge y el release los decide después",
   "notes": [
-    "Sin corrida en curso. La anterior (mods en el instalador, unidades 180-196) terminó el 2026-10-17 con NZT v1.3.0 publicada; el usuario probó lo que faltaba (.sh, Copiar, desinstalación completa). Su historia está en git y en specs/.",
-    "La próxima corrida numera sus unidades desde 197."
+    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno (vale también para Clean View, que fue solo la idea visual). Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión, tool.call solo mira",
+    "Corrida cerrada 2026-10-20: nzt-files 0.2.0 y nzt-state 0.7.0 aceptadas, en origin/mods. Pendiente, cuando el usuario diga: merge de mods y release/tags; reinstalar (nzt-files@nzt 0.1.1 y nzt-state@nzt 0.4.0 cargan hasta entonces). ~/.claude/dev-mods vaciado. Idea en pausa: mod nzt-sounds",
+    "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }

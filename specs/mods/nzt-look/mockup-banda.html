@@ -1,0 +1,431 @@
+<!doctype html>
+<!--
+  Mockup de nzt-look 0.1.0: la banda de uso sobre el prompt y el panel de opciones (/nzt-look).
+  Fuente: specs/mods/nzt-look/spec.md (reglas RN-skin-* y sección Diseño · banda y panel), unidad 220,
+  2026-10-17. Q-05 de la spec: la banda va "tal cual" la de la referencia (usuario 2026-10-17,
+  después de probarlo instalado): medidores de bloques en la terminal, anillos en la app de escritorio,
+  y el botón de la banda (acá /clear, no compactar: usuario 2026-10-17). Lo que suma NZT: las marcas 20/30/40 del kernel sobre el contexto, el color
+  por tramo, el costo, y las opciones de la banda y de la línea al agente en el panel.
+  Cambio 0.2.0 (unidad 241, 2026-10-18): el modelo de la sesión y su effort (RN-skin-modelo).
+  Cambio 0.3.0 (unidad 256, 2026-10-18): dos filas, rótulos arriba y medidores abajo, modelo primero.
+  Cambio 0.4.0 (unidad 263, 2026-10-18): de nuevo una línea, cada rótulo a la izquierda de su medidor,
+  sin la palabra del tramo y con naranja desde el 30 (RN-skin-banda-rotulos).
+  Referencia leída: el mod de referencia, hooks/rows.tsx (usageBand, meterView),
+  hooks/svg-usage.ts (anillos, cuenta regresiva, colores de los límites) y hooks/settings.tsx (panel:
+  fila de temas, vista previa de un turno, partes, colores y "Or ask Claude"), en
+  la copia local de la referencia. Las paletas de los 15 temas son las de sus
+  hooks/themes/*.ts; cinco no traen variante clara (dracula, gruvbox, mono, night-owl, nord): la referencia
+  la deriva (skin.ts, "without one, light.ts derives it").
+  Imita la terminal y la app de escritorio; no es código del mod. Las cifras son de ejemplo.
+  Colores del tema nzt: specs/nzt-brand.md (Estados y Derivados, fijados en la unidad 222). La
+  variante clara de nzt está en ese documento y este mockup no la dibuja.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nzt-look 0.1.0 · banda y panel · mockup</title>
+<style>
+  :root {
+    /* Tema nzt, variante oscura: specs/nzt-brand.md, con los tonos de lectura (Q-03, unidad 254). */
+    --page: #050b0a; --row: 20px;
+    --t-user: #5ccaa9; --t-fg: #d3dfdb; --t-sec: #244146;
+    --t-muted: #7f9893;   /* Tenue */
+    --t-surface: #0c1918; /* Superficie */
+    --t-zebra: #102221;   /* Cebra */
+    --t-err: #e8909a;     /* Error */
+    --t-warn: #e2d36e;    /* aviso = Contraste */
+    --t-orange: #e5b284;  /* desde el 30: mitad de aviso y error del tema (cambio 0.4.0, propuesta) */
+    --t-ok: #5ccaa9; --t-read: #5ccaa9; --t-write: #e2d36e; --t-run: #d3dfdb;
+    --bg: #07100f; --border: #2b4a4f;
+    --sel: #4fc3f7; /* foco del mockup, fuera del diseño */
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--t-fg);
+         font: 14px/var(--row) ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; padding: 16px; }
+  .states { max-width: 980px; margin: 0 auto 12px; display: flex; flex-wrap: wrap; gap: 6px; font-family: system-ui, sans-serif; }
+  .states span { color: #9fb3ae; width: 100%; font-size: 12px; line-height: 1.4; margin-top: 4px; }
+  .states a { color: #e6efec; border: 1px solid #2b4a4f; padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 12px; line-height: 1.4; }
+  .states a[aria-current] { background: var(--t-user); color: var(--t-sec); border-color: var(--t-user); font-weight: 700; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+  .frame { max-width: 100%; margin: 0 auto; background: var(--bg); padding: 8px 1ch; border: 1px solid #1a2c2b; overflow: hidden; }
+  .note { max-width: 980px; margin: 12px auto 0; color: #9fb3ae; font: 12px/1.5 system-ui, sans-serif; }
+  .note b { color: #e6efec; } .note code { color: #e6efec; }
+  .prop { text-decoration: underline dotted #9fb3ae; text-underline-offset: 3px; }
+
+  /* Una fila de la terminal. */
+  .row { display: flex; align-items: center; gap: 0 2ch; white-space: nowrap; min-height: var(--row); min-width: 0; }
+  .row > * { flex: none; }
+  .dim { color: var(--t-muted); } .b { font-weight: 700; } .it { font-style: italic; }
+  .ghost-line { color: var(--t-muted); }
+  .prompt { border: 1px solid var(--t-muted); border-radius: 8px; padding: 0 1ch; margin-top: 4px; }
+  .prompt .cur { color: var(--t-user); }
+  .survey { border: 1px solid var(--t-user); border-radius: 8px; padding: 0 1ch; margin-top: 4px; }
+
+  /* La banda: dos filas, el rótulo de cada parte arriba y su medidor abajo (cambio 0.3.0). */
+  /* Una línea: el rótulo de cada parte a su izquierda (cambio 0.4.0). */
+  .band { display: flex; align-items: center; gap: 0 2ch; white-space: nowrap; height: var(--row); overflow: hidden; }
+  .seg { display: inline-flex; align-items: center; flex: none; }
+  .lab { color: var(--t-muted); margin-right: 1ch; }
+  .meter { display: inline-flex; gap: 0 1ch; }
+  .cells { letter-spacing: 0; }
+  .c-low { color: var(--t-user); } .c-warn { color: var(--t-warn); } .c-high { color: var(--t-orange); } .c-crit { color: var(--t-err); font-weight: 700; }
+  .rail { color: var(--t-muted); opacity: .45; }
+  .pill { background: var(--t-err); color: var(--bg); font-weight: 700; padding: 0 1ch; }
+  .btn-dim { all: unset; cursor: pointer; color: var(--t-muted); }
+  .btn-main { all: unset; cursor: pointer; background: var(--t-user); color: var(--t-sec); font-weight: 700; padding: 0 1ch; }
+  .spacer { flex: 1 1 auto; }
+  /* Destello del turno: un tramo claro recorre el relleno (RN-skin-banda-refresco). */
+  @keyframes glint { 0%, 100% { filter: none; } 50% { filter: brightness(1.6); } }
+  .glint .lit { animation: glint 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .15; } }
+  .blink { animation: blink .5s steps(2) 3; }
+  @keyframes beat { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+  .beat { animation: beat 1s ease-in-out infinite; }
+  .calm * { animation: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+  /* App de escritorio: anillos (svg-usage.ts de la referencia). */
+  .desk { font: 12.5px/1.4 system-ui, sans-serif; display: flex; align-items: center; gap: 0 24px; flex-wrap: nowrap; overflow: hidden; height: 34px; }
+  .desk .ring { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .desk .pct { font-weight: 600; }
+  .desk button { all: unset; cursor: pointer; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+  .desk .bmain { background: var(--t-user); color: var(--t-sec); }
+  .desk .bdim { color: var(--t-muted); border: 1px solid var(--border); }
+  .deskbox { border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; margin-top: 6px; color: var(--t-muted); font: 13px system-ui, sans-serif; }
+
+  /* El panel de opciones. */
+  .dock { width: 72ch; max-width: 100%; margin: 0 auto; background: var(--bg); padding: 8px; border-left: 2px solid var(--border); }
+  .card { border: 1px solid var(--t-user); border-radius: 10px; padding: 0 1ch; height: calc(var(--rows) * var(--row) + 2px);
+          display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+  .card > * { flex: none; }
+  .scroll { flex: 1 1 0; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+  .sec { color: var(--t-muted); font-weight: 700; letter-spacing: .05em; height: var(--row); margin-top: var(--row); }
+  .wrap { display: flex; flex-wrap: wrap; gap: 0 2ch; }
+  .chip { all: unset; cursor: pointer; white-space: nowrap; }
+  .chip.off { color: var(--t-muted); }
+  .chip.on { color: var(--t-fg); font-weight: 700; }
+  .chip .hk { color: var(--t-muted); font-weight: 400; }
+  .chip:hover { background: var(--t-sec); }
+  .warnbox { color: var(--t-warn); }
+  .errline { color: var(--t-err); }
+  .okline { color: var(--t-ok); }
+  .preview { border: 1px solid var(--t-muted); border-radius: 8px; padding: 0 1ch; margin-top: 4px; }
+  .tbl { display: grid; grid-template-columns: auto auto auto; gap: 0 2ch; justify-content: start; margin: 4px 0; }
+  .tbl .h { color: var(--t-user); font-weight: 700; border-bottom: 1px solid var(--t-muted); }
+  .tbl .z { background: var(--t-zebra); }
+  .sw { display: inline-block; width: 2ch; height: 1em; vertical-align: -2px; }
+  .slot { all: unset; cursor: pointer; white-space: nowrap; }
+  .slot.cur { font-weight: 700; color: var(--t-fg); text-decoration: underline; }
+  .slot:not(.cur) { color: var(--t-muted); }
+  .field { display: flex; gap: 0 1ch; align-items: center; flex-wrap: wrap; }
+  .field input { font: inherit; background: var(--t-surface); color: var(--t-fg); border: 1px solid var(--t-muted); width: 10ch; padding: 0 .5ch; }
+  .buttons { display: flex; gap: 0 2ch; height: var(--row); margin-top: 4px; }
+  .btn { all: unset; font-weight: 700; cursor: pointer; }
+  .mobile { font: 15px/1.5 system-ui, sans-serif; color: var(--t-fg); padding: 16px; border: 1px solid var(--border); border-radius: 12px; max-width: 380px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<nav class="states" aria-label="Estados del mockup (fuera del diseño)">
+  <span>Superficie:</span>
+  <a href="#" data-k="surf" data-v="term">Terminal</a>
+  <a href="#" data-k="surf" data-v="desk">App de escritorio</a>
+  <span>Banda de uso (sobre el prompt):</span>
+  <a href="#" data-k="state" data-v="b-low">12% · bajo la marca 20</a>
+  <a href="#" data-k="state" data-v="b-warn">24% · desde el 20</a>
+  <a href="#" data-k="state" data-v="b-high">34% · desde el 30</a>
+  <a href="#" data-k="state" data-v="b-crit">46% · pasado el 40</a>
+  <a href="#" data-k="state" data-v="b-confirm">Confirmar /clear</a>
+  <a href="#" data-k="state" data-v="b-turn">Claude trabajando</a>
+  <a href="#" data-k="state" data-v="b-cross">Cruza la marca 30</a>
+  <a href="#" data-k="state" data-v="b-limits">Límites casi llenos</a>
+  <a href="#" data-k="state" data-v="b-none">Sin lectura todavía</a>
+  <a href="#" data-k="state" data-v="b-nolimits">Cuenta sin límites</a>
+  <a href="#" data-k="state" data-v="b-noeffort">Modelo sin effort</a>
+  <a href="#" data-k="state" data-v="b-parts">Partes apagadas</a>
+  <a href="#" data-k="state" data-v="b-alloff">Todas apagadas</a>
+  <a href="#" data-k="state" data-v="b-narrow">Angosta</a>
+  <a href="#" data-k="state" data-v="b-survey">Encuesta sobre el prompt</a>
+  <a href="#" data-k="state" data-v="b-calm">Modo calmo</a>
+  <span>Panel de opciones (/nzt-look; los temas y las partes también se clickean):</span>
+  <a href="#" data-k="state" data-v="p-main">Panel</a>
+  <a href="#" data-k="state" data-v="p-paint">Repintar un color</a>
+  <a href="#" data-k="state" data-v="p-badhex">Color inválido</a>
+  <a href="#" data-k="state" data-v="p-saved">Guardado como propio</a>
+  <a href="#" data-k="state" data-v="p-pinned">Fijado a esta carpeta</a>
+  <a href="#" data-k="state" data-v="p-off">Dibujo apagado</a>
+  <a href="#" data-k="state" data-v="p-narrow">Panel angosto</a>
+  <a href="#" data-k="state" data-v="p-mobile">Celular</a>
+  <span>No aplican: <i>vacío</i> en el panel (siempre hay 16 temas), <i>sin permiso</i> (no lee nada protegido). <i>Cargando</i> en la banda es <i>Sin lectura todavía</i>. Un fallo de la banda se ve como <i>Sin lectura todavía</i> (RN-skin-no-interrumpe). Después de /clear la sesión no tiene cifras: se ve como <i>Sin lectura todavía</i>.</span>
+</nav>
+
+<main id="stage"></main>
+<div class="note" id="note"></div>
+
+<script>
+  // Solo dibuja los estados del mockup a partir de datos fijos; no hay lógica del mod.
+
+  // Paletas: user, fg, muted, surface, zebra, ok, err, warn, read, write, run. Las 15 de la referencia
+  // (hooks/themes/*.ts); light null = la referencia la deriva. nzt: specs/nzt-brand.md.
+  const SLOTS = ['user', 'fg', 'muted', 'surface', 'zebra', 'ok', 'err', 'warn', 'read', 'write', 'run'];
+  const RAW = {
+    nzt: ['NZT', '#5ccaa9,#d3dfdb,#7f9893,#0c1918,#102221,#5ccaa9,#e8909a,#e2d36e,#5ccaa9,#e2d36e,#d3dfdb', null],
+    noir: ['Noir', '#e2e2e2,#e2e2e2,#8c8c8c,#151515,#1c1c1c,#e2e2e2,#f87171,#a3a3a3,#e2e2e2,#e2e2e2,#e2e2e2', '#111111,#151515,#6b6b6b,#ffffff,#f2f2f2,#151515,#c42b2b,#6b6b6b,#111111,#111111,#111111'],
+    'tokyo-night': ['Tokyo Night', '#7aa2f7,#c0caf5,#737aa2,#1f2335,#1d2030,#9ece6a,#f7768e,#e0af68,#7dcfff,#fb9f68,#e0af68', '#2e7de9,#3760bf,#848cb5,#d0d5e3,#dfe2eb,#587539,#f52a65,#8c6c3e,#007197,#b15c00,#8c6c3e'],
+    dracula: ['Dracula', '#bd93f9,#f8f8f2,#6272a4,#2b2d3a,#2a2c37,#5cee81,#f36161,#f1fa8c,#8be9fd,#ffb86c,#f1fa8c', null],
+    catppuccin: ['Catppuccin Mocha', '#cba6f7,#cdd6f4,#7f849c,#252536,#232334,#a6e3a1,#f38ba8,#f9e2af,#89dceb,#fab387,#f9e2af', '#8839ef,#4c4f69,#8c8fa1,#e6e9ef,#eceef3,#40a02b,#d20f39,#df8e1d,#04a5e5,#fe640b,#df8e1d'],
+    'rose-pine': ['Rosé Pine', '#c4a7e7,#e0def4,#6e6a86,#26233a,#1f1d2e,#9ccfd8,#eb6f92,#f6c177,#9ccfd8,#ebbcba,#f6c177', '#907aa9,#575279,#9893a5,#f2e9e1,#fffaf3,#56949f,#b4637a,#ea9d34,#56949f,#d7827e,#ea9d34'],
+    nord: ['Nord', '#88c0d0,#e5e9f0,#7b88a1,#3b4252,#353b49,#a3be8c,#bf616a,#ebcb8b,#8fbcbb,#d08770,#ebcb8b', null],
+    gruvbox: ['Gruvbox', '#deb24b,#ebdbb2,#928374,#32302f,#2f2c2a,#b8bb26,#e15d4e,#d48443,#83a598,#d48443,#b8bb26', null],
+    kanagawa: ['Kanagawa', '#7e9cd8,#dcd7ba,#727169,#2a2a37,#232330,#98bb6c,#e46876,#e6c384,#7fb4ca,#fca169,#e6c384', '#4d699b,#545464,#8a8980,#e7dba0,#ede5b4,#6f894e,#c84053,#836f4a,#4e8ca2,#cc6d00,#836f4a'],
+    everforest: ['Everforest', '#a7c080,#d3c6aa,#859289,#3d484d,#343f44,#a7c080,#e67e80,#dbbc7f,#7fbbb3,#e69875,#dbbc7f', '#8da101,#5c6a72,#939f91,#efebd4,#f4f0d9,#8da101,#f85552,#dfa000,#3a94c5,#f57d26,#dfa000'],
+    'one-dark': ['One Dark', '#61afef,#abb2bf,#5c6370,#2c313a,#262a31,#98c379,#e06c75,#e5c07b,#56b6c2,#d19a66,#e5c07b', '#4078f2,#383a42,#a0a1a7,#f0f0f1,#f5f5f6,#50a14f,#e45649,#c18401,#0184bc,#986801,#c18401'],
+    solarized: ['Solarized', '#3489c4,#93a1a1,#586e75,#073642,#04313c,#839603,#cf3f3c,#a48011,#2aa198,#ba5227,#a48011', '#268bd2,#586e75,#93a1a1,#eee8d5,#f5efdc,#859900,#dc322f,#b58900,#2aa198,#cb4b16,#b58900'],
+    'night-owl': ['Night Owl', '#82aaff,#d6deeb,#637777,#0b2942,#071d33,#addb67,#e95956,#ecc48d,#7fdbca,#f78c6c,#ecc48d', null],
+    ayu: ['Ayu', '#e6b450,#bfbdb6,#626a73,#131721,#0f131a,#aad94c,#f07178,#f3b360,#95e6cb,#e99356,#f3b360', '#ffaa33,#5c6166,#8a9199,#f3f4f5,#f8f9fa,#86b300,#e65050,#f2ae49,#4cbf99,#fa8d3e,#f2ae49'],
+    github: ['GitHub', '#62a7f5,#e1e9f1,#7d8590,#161b22,#11161d,#3fb950,#ea5e57,#c39431,#79c0ff,#f4a762,#c39431', '#0969da,#1f2328,#656d76,#f6f8fa,#fafbfc,#1a7f37,#cf222e,#9a6700,#0969da,#bc4c00,#9a6700'],
+    mono: ['Monochrome', '#e0e0e0,#e0e0e0,#7a7a7a,#262626,#222222,#e0e0e0,#f7f7f7,#bdbdbd,#9e9e9e,#e0e0e0,#bdbdbd', null],
+  };
+  const pal = s => Object.fromEntries(s.split(',').map((h, i) => [SLOTS[i], h]));
+  const THEMES = Object.entries(RAW).map(([id, [label, dark, light]]) => ({ id, label, dark: pal(dark), light: light && pal(light) }));
+  // Los nombres de los colores, en la lengua del panel (propuesta del agente).
+  const SLOT_ES = { user: 'acento', fg: 'texto', muted: 'tenue', surface: 'superficie', zebra: 'cebra', ok: 'bien', err: 'error', warn: 'aviso', read: 'leer', write: 'escribir', run: 'correr' };
+
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const P = '<span class="prop" title="propuesta del agente">';
+
+  // ── Banda ────────────────────────────────────────────────────────────────
+  // Tramo del kernel por porcentaje (RN-skin-marcas-kernel).
+  const tramo = p => p >= 40 ? 'crit' : p >= 30 ? 'high' : p >= 20 ? 'warn' : 'low';
+  // Palabra del tramo, para que el estado no se diga solo con color (specs/nzt-brand.md, Accesibilidad).
+  const WORD = { low: '', warn: 'mejor limpiar', high: 'limpiá pronto', crit: 'limpiá ya' };
+  // Contexto: 10 celdas de 10%, como los 8 bloques de la referencia, y las marcas 20/30/40 entre ellas
+  // (después de la celda 2, 3 y 4). Con 20 celdas la banda entera no entraba en 120 columnas (medido).
+  function contextCells(p, { blink = null } = {}) {
+    const n = 10, step = 100 / n, filled = Math.round(p / step), t = tramo(p);
+    let out = '';
+    for (let i = 0; i < n; i++) {
+      const at = Math.round(i * step);
+      // Cada marca es una celda del mismo tamaño, siempre en el color de su tramo: ▰ alcanzada, ▱ no
+      // (usuario 2026-10-17: "del mismo tamaño que las demás pero con su color respectivo").
+      if (at === 20 || at === 30 || at === 40) {
+        const on = p >= at, mt = tramo(at);
+        out += `<span class="mark c-${mt}${blink === at ? ' blink' : ''}">${on ? '▰' : '▱'}</span>`;
+      }
+      out += i < filled ? `<span class="c-${t} lit">▰</span>` : '<span class="rail">▱</span>';
+    }
+    return `<span class="cells">${out}</span>`;
+  }
+  // Lo que se saca cuando no entra, en orden: primero los tokens del contexto, después las partes de
+  // RN-skin-banda-ancho, el rótulo "contexto" y, última, la palabra del tramo (propuesta, como
+  // RN-ctx-ancho de nzt-context). Sin la palabra, el estado se sigue leyendo sin color en el
+  // porcentaje y en las marcas alcanzadas (▰) o no (▱).
+  // Cambio 0.2.0 (unidad 241): effort y modelo se van después del costo (RN-skin-banda-ancho).
+  // Cambio 0.3.0 (unidad 256): el rótulo "Contexto" ya no ocupa la fila del medidor; lo último que se
+  // va es la palabra del tramo, que vive en la fila de rótulos.
+  // Cambio 0.4.0 (unidad 263): una línea, sin la palabra del tramo; los rótulos se van al final.
+  // En una línea no entra todo a 120 columnas (hacen falta unas 145): las cuentas regresivas se van
+  // antes que el costo, para que el modelo quede (propuesta del agente).
+  const DROPS = ['tok', 'cd', 'cost', 'effort', 'model', 'd7', 'h5', 'clear', 'label'];
+  // Rótulos sobre cada parte (usuario 2026-10-18: "arriba de cada barra diga que es cada una").
+  // "Límite 5h" y no "Límite D": el de 5 horas no es diario (RN-skin-limites).
+  // Cambio 0.4.0 (usuario 2026-10-18): una sola línea, cada rótulo a la izquierda de su medidor; el
+  // modelo sin rótulo ("se entiende").
+  const LAB = { ctx: 'Contexto', h5: 'Límite 5h', d7: 'Límite semanal', cost: 'Costo' };
+  let showLab = true;
+  const seg = (lab, val) => `<span class="seg">${lab && showLab ? `<span class="lab">${lab}</span> ` : ''}${val}</span>`;
+  // Modelo y effort de la sesión (RN-skin-modelo): el nombre corto, el effort tenue; sin effort, solo el modelo.
+  const MODEL = { name: 'Opus 5.5', effort: 'high' };
+  // Límites: 8 bloques como la referencia; aviso desde el 80%, error desde el 95% (svg-usage.ts, meterColor).
+  const limitColor = p => p >= 95 ? 'c-high' : p >= 80 ? 'c-warn' : 'c-low';
+  const limitCells = p => { const f = Math.round(p / 12.5); return `<span class="${limitColor(p)}">${'▰'.repeat(f)}</span><span class="rail">${'▱'.repeat(8 - f)}</span>`; };
+
+  const BAND = {
+    'b-low':    { ctx: 12, tok: '24k/200k', h5: [18, '3h40'], d7: [9, '5d2h'], cost: '$0.42' },
+    'b-warn':   { ctx: 24, tok: '48k/200k', h5: [33, '2h55'], d7: [11, '5d1h'], cost: '$0.97' },
+    'b-high':   { ctx: 34, tok: '68k/200k', h5: [41, '2h15'], d7: [12, '4d3h'], cost: '$1.84' },
+    'b-crit':   { ctx: 46, tok: '92k/200k', h5: [57, '1h30'], d7: [14, '4d2h'], cost: '$3.10' },
+    'b-confirm': { ctx: 34, tok: '68k/200k', h5: [41, '2h15'], d7: [12, '4d3h'], cost: '$1.84', confirm: true },
+    'b-turn':   { ctx: 34, tok: '68k/200k', h5: [41, '2h15'], d7: [12, '4d3h'], cost: '$1.84', working: true },
+    'b-cross':  { ctx: 31, tok: '62k/200k', h5: [40, '2h16'], d7: [12, '4d3h'], cost: '$1.71', blink: 30 },
+    'b-limits': { ctx: 16, tok: '32k/200k', h5: [86, '0h40'], d7: [97, '0d9h'], cost: '$0.61' },
+    'b-none':   { none: true },
+    'b-nolimits': { ctx: 24, tok: '48k/200k', cost: '$0.97' },
+    'b-noeffort': { ctx: 12, tok: '24k/200k', h5: [18, '3h40'], d7: [9, '5d2h'], cost: '$0.42', noEffort: true },
+    'b-parts':  { ctx: 24, tok: '48k/200k', cost: '$0.97', only: ['ctx', 'cost'] },
+    'b-alloff': { off: true },
+    'b-narrow': { ctx: 34, tok: '68k/200k', h5: [41, '2h15'], d7: [12, '4d3h'], cost: '$1.84' },
+    'b-survey': { survey: true },
+    'b-calm':   { ctx: 34, tok: '68k/200k', h5: [41, '2h15'], d7: [12, '4d3h'], cost: '$1.84', calm: true },
+  };
+  function bandTerm(id, level) {
+    const b = BAND[id], gone = new Set(DROPS.slice(0, level)), has = k => (!b.only || b.only.includes(k)) && !gone.has(k);
+    if (b.off) return '';
+    // El modelo va primero (usuario 2026-10-18) y no es una cifra de uso: también va sin lectura (RN-skin-modelo).
+    showLab = !gone.has('label');
+    const model = has('model') ? seg('', `<span style="color:var(--t-user)">◇</span> ${MODEL.name}${!b.noEffort && has('effort') ? `<span class="dim"> · ${MODEL.effort}</span>` : ''}`) : '';
+    if (b.none) return `<div class="band">${model}${seg(LAB.ctx, `${contextCells(0).replace(/c-low lit/g, 'rail')} <span class="dim it">${gone.has('label') ? 'sin lectura' : 'sin lectura todavía'}</span>`)}</div>`;
+    const t = tramo(b.ctx);
+    const pct = t === 'crit' ? `<span class="pill${b.calm ? '' : ' beat'}">${b.ctx}%</span>` : `<span class="c-${t} ${t === 'low' ? '' : 'b'}">${b.ctx}%</span>`;
+    const ctx = seg(LAB.ctx, `<span class="meter${b.working ? ' glint' : ''}">${contextCells(b.ctx, { blink: b.blink })} ${pct}${gone.has('tok') ? '' : `<span class="dim">${b.tok}</span>`}</span>`);
+    const lim = k => seg(LAB[k], `<span class="meter">${limitCells(b[k][0])} <span><span class="b">${b[k][0]}%</span>${gone.has('cd') ? '' : ` <span class="dim">· ${b[k][1]}</span>`}</span></span>`);
+    const out = [];
+    if (model) out.push(model);
+    out.push(ctx);
+    if (b.h5 && has('h5')) out.push(lim('h5'));
+    if (b.d7 && has('d7')) out.push(lim('d7'));
+    if (has('cost')) out.push(seg(LAB.cost, `<span class="dim">${b.cost}</span>`));
+    out.push('<span class="spacer"></span>');
+    // El botón corre /clear (RN-skin-limpiar); no está mientras Claude trabaja. La primera pulsación
+    // pide confirmación (RN-skin-limpiar-confirma, Q-07).
+    if (has('clear') && !b.working) out.push(b.confirm
+      ? `<span class="c-high b">${P}0 otra vez: limpiar</span></span><span class="dim">Esc cancela</span>`
+      : b.ctx >= 20 ? `<button class="btn-main" aria-label="Limpiar la sesión, /clear (tecla 0)">0: /clear</button>` : `<button class="btn-dim" aria-label="Limpiar la sesión, /clear (tecla 0)">0: /clear</button>`);
+    return `<div class="band${b.calm ? ' calm' : ''}">${out.join('')}</div>`;
+  }
+  // Escritorio: un anillo por cifra; el del contexto con tres marcas en 20, 30 y 40.
+  const COLOR = { low: 'var(--t-user)', warn: 'var(--t-warn)', high: 'var(--t-orange)', crit: 'var(--t-err)' };
+  function ring(p, color, marks = false) {
+    const r = 9, c = 2 * Math.PI * r, fill = (c * p) / 100;
+    const ticks = marks ? [20, 30, 40].map(at => { const a = (at / 100) * 2 * Math.PI - Math.PI / 2, on = p >= at;
+      return `<line x1="${13 + Math.cos(a) * 6}" y1="${13 + Math.sin(a) * 6}" x2="${13 + Math.cos(a) * 12.5}" y2="${13 + Math.sin(a) * 12.5}" stroke="${on ? COLOR[tramo(at)] : 'var(--t-muted)'}" stroke-width="${on ? 2 : 1.2}"/>`; }).join('') : '';
+    return `<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="${r}" fill="none" stroke="var(--t-muted)" stroke-opacity=".25" stroke-width="3"/><circle cx="13" cy="13" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${fill} ${c}" transform="rotate(-90 13 13)"/>${ticks}</svg>`;
+  }
+  function bandDesk(id, level) {
+    const b = BAND[id], gone = new Set(DROPS.slice(0, level));
+    if (b.off) return '';
+    const has = k => (!b.only || b.only.includes(k)) && !gone.has(k);
+    showLab = !gone.has('label');
+    const model = has('model') ? seg('', `<span style="line-height:26px"><span style="color:var(--t-user)">◇</span> ${MODEL.name}${!b.noEffort && has('effort') ? `<span style="color:var(--t-muted)"> · ${MODEL.effort}</span>` : ''}</span>`) : '';
+    if (b.none) return `<div class="desk">${model}${seg(LAB.ctx, `<span class="ring">${ring(0, 'var(--t-muted)', true)}<span style="color:var(--t-muted);font-style:italic">sin lectura todavía</span></span>`)}</div>`;
+    const t = tramo(b.ctx);
+    const lc = p => p >= 95 ? 'var(--t-err)' : p >= 80 ? 'var(--t-warn)' : 'var(--t-user)';
+    const out = [];
+    if (model) out.push(model);
+    out.push(seg(LAB.ctx, `<span class="ring${b.working ? ' glint' : ''}">${ring(b.ctx, COLOR[t], true)}<span><span class="pct${t === 'crit' && !b.calm ? ' beat' : ''}" style="color:${t === 'low' ? 'var(--t-fg)' : COLOR[t]}">${b.ctx}%</span>${gone.has('tok') ? '' : ` <span style="color:var(--t-muted)">${b.tok}</span>`}</span></span>`));
+    const lim = k => seg(LAB[k], `<span class="ring">${ring(b[k][0], lc(b[k][0]))}<span><span class="pct">${b[k][0]}%</span>${gone.has('cd') ? '' : ` <span style="color:var(--t-muted)">· ${b[k][1]}</span>`}</span></span>`);
+    if (b.h5 && has('h5')) out.push(lim('h5'));
+    if (b.d7 && has('d7')) out.push(lim('d7'));
+    if (has('cost')) out.push(seg(LAB.cost, `<span style="color:var(--t-muted);line-height:26px">${b.cost}</span>`));
+    out.push('<span class="spacer"></span>');
+    if (has('clear') && !b.working) out.push(b.confirm
+      ? `<span style="color:var(--t-err);font-weight:600">${P}Apretá otra vez para limpiar</span></span><button class="bdim">Cancelar</button>`
+      : b.ctx >= 20 ? '<button class="bmain">/clear</button>' : '<button class="bdim">/clear</button>');
+    return `<div class="desk${b.calm ? ' calm' : ''}">${out.join('')}</div>`;
+  }
+  // La terminal entera mide 120 columnas (o 60 en "Angosta"), y nunca más que la página.
+  function bandStage(id, surf, level) {
+    const b = BAND[id];
+    const width = surf === 'desk' ? (id === 'b-narrow' ? '420px' : '980px') : (id === 'b-narrow' ? '62ch' : '122ch');
+    if (surf === 'desk') {
+      const above = b.survey ? '<div class="deskbox">¿Cómo viene la sesión? 1 Bien · 2 Regular · 3 Mal · 0 Cerrar</div>' : bandDesk(id, level);
+      return `<div class="frame" style="width:${width};font-family:system-ui,sans-serif"><div style="color:var(--t-muted);font-size:13px">● Listo. Cambié el límite de la API del hub y los tests pasan.</div>${above}<div class="deskbox">Escribí un mensaje…</div></div>`;
+    }
+    const above = b.survey ? '<div class="survey">● ¿Cómo viene la sesión? <span class="dim">1 Bien · 2 Regular · 3 Mal · 0 Cerrar</span></div>' : bandTerm(id, level);
+    return `<div class="frame" style="width:${width}"><div class="ghost-line">● Listo. Cambié el límite de la API del hub y los tests pasan.</div><div class="ghost-line">&nbsp;</div>${above}<div class="prompt"><span class="cur">›</span> <span class="dim">█</span></div><div class="row dim">&nbsp;? para atajos</div></div>`;
+  }
+
+  // ── Panel ────────────────────────────────────────────────────────────────
+  const BAND_PARTS = [['contexto', 1], ['5h', 1], ['semanal', 1], ['costo', 1], ['modelo', 1], ['limpiar', 1], ['línea al agente', 1]];
+  const LOOK_PARTS = [['herramientas', 1], ['diffs', 1], ['consola', 1], ['solo lectura plegada', 0], ['tablas', 1], ['código', 1], ['diagramas', 1], ['fórmulas', 1], ['avisos y tareas', 1], ['salida de comandos', 1], ['spinner', 1], ['enlaces', 1], ['contorno del prompt', 1], ['plegar', 1], ['desplegar lecturas', 0], ['copiar', 1], ['calmo', 0]];
+  const state = { theme: 'nzt', variant: 'auto', toggles: {} };
+  const isOn = (name, def) => state.toggles[name] ?? !!def;
+  const chips = list => list.map(([n, d]) => `<button class="chip ${isOn(n, d) ? 'on' : 'off'}" data-toggle="${n}" aria-pressed="${isOn(n, d)}">${n} ${isOn(n, d) ? '●' : '○'}</button>`).join('');
+
+  function preview(p) {
+    const s = `color:${p.fg}`;
+    return `<div class="preview" style="background:${p.surface};border-color:${p.muted};${s}">
+      <div class="row"><span style="color:${p.user}">›</span><span>sumá límite de pedidos a la API del hub</span></div>
+      <div class="row"><span style="color:${p.run}">▶</span><span style="color:${p.fg}">pnpm test --filter hub</span><span style="color:${p.muted}">2.1s</span><span style="color:${p.ok}">✓</span></div>
+      <div class="row"><span style="color:${p.write}">✎</span><span>apps/hub/src/server.ts</span><span style="color:${p.ok}">+18</span><span style="color:${p.err}">−3</span><span style="color:${p.muted}">0.4s</span></div>
+      <div class="row"><span style="color:${p.read}">◇</span><span style="color:${p.muted}">Leer 2 · Buscar 1 ▸</span></div>
+      <div class="tbl"><span class="h" style="color:${p.user};border-color:${p.muted}">Ruta</span><span class="h" style="color:${p.user};border-color:${p.muted}">Límite</span><span class="h" style="color:${p.user};border-color:${p.muted}">Ventana</span>
+        <span>/chat</span><span>60</span><span>1 min</span>
+        <span style="background:${p.zebra}">/upload</span><span style="background:${p.zebra}">10</span><span style="background:${p.zebra}">1 min</span>
+        <span>/search</span><span>120</span><span>1 min</span></div>
+      <div class="row" style="color:${p.muted}">✻ Listo · 41s · 6 herramientas · +18 −3</div>
+      <div class="row" style="border-top:1px dashed ${p.muted}"><span><span style="color:${p.user}">◇</span> Opus 5.5</span><span><span style="color:${p.muted}">Contexto</span> <span style="color:${p.err}">▰▰<span style="color:${p.warn}">▰</span>▰▰<span style="opacity:.4">▱</span>▱<span style="opacity:.4">▱▱▱▱▱▱</span></span> <span style="font-weight:700">34%</span></span><span><span style="color:${p.muted}">Límite 5h</span> <span style="color:${p.user}">▰▰▰<span style="opacity:.4">▱▱▱▱▱</span></span> 41%</span></div>
+    </div>`;
+  }
+  function panel(id) {
+    const t = THEMES.find(x => x.id === state.theme) ?? THEMES[0];
+    const custom = id === 'p-saved' ? [{ id: 'mi-nzt', label: 'mi-nzt' }] : [];
+    const p = state.variant === 'clara' ? (t.light ?? null) : t.dark;
+    const themeChips = [...THEMES, ...custom].map((x, i) => `<button class="chip ${x.id === state.theme ? 'on' : 'off'}" data-theme="${x.id}" aria-pressed="${x.id === state.theme}">${i < 9 ? `<span class="hk">${i + 1}</span> ` : ''}${x.id}${x.id === state.theme ? ' ●' : ''}</button>`).join('');
+    const variant = ['auto', 'oscura', 'clara'].map(v => `<button class="chip ${v === state.variant ? 'on' : 'off'}" data-variant="${v}">${v}${v === state.variant ? ' ●' : ''}</button>`).join('');
+    const editing = id === 'p-paint' || id === 'p-badhex' ? 'user' : null;
+    const slots = SLOTS.map(sl => `<button class="slot ${sl === editing ? 'cur' : ''}" data-slot="${sl}"><span class="sw" style="background:${(t.dark)[sl]}"></span> ${SLOT_ES[sl]}</button>`).join('');
+    const rows = id === 'p-narrow' ? 40 : 40;
+    const body = [];
+    if (id === 'p-off') body.push(`<div class="warnbox">▲ ${P}El dibujo está apagado: la conversación se ve como la dibuja Claude Code. La banda y la línea al agente siguen.</span></div><div class="dim">${P}Volvé a prenderlo eligiendo un tema.</span></div>`);
+    body.push(`<div class="sec">TEMA</div><div class="wrap">${themeChips}</div>`);
+    body.push(`<div class="wrap"><span class="dim">variante</span>${variant}</div>`);
+    body.push(id === 'p-pinned'
+      ? `<div class="wrap"><span class="dim">esta carpeta</span><span>${P}fijado: <b>${state.theme}</b></span></span><button class="chip off">soltar</button><button class="chip off">${P}hacerlo el de siempre</span></button></div>`
+      : `<div class="wrap"><span class="dim">esta carpeta</span><span class="dim">${P}usa el de siempre</span></span><button class="chip off">fijar acá</button></div>`);
+    body.push(`<div class="sec">VISTA PREVIA</div>${p ? preview(p) : `<div class="preview dim">[variante clara de ${t.id} · derivada al construir, unidad 223: la referencia la calcula]</div>`}`);
+    body.push(`<div class="sec">BANDA</div><div class="wrap">${chips(BAND_PARTS)}</div>`);
+    body.push(`<div class="sec">CONVERSACIÓN</div><div class="wrap">${chips(LOOK_PARTS)}<button class="chip off" data-toggle="palabras">palabras tema</button></div>`);
+    body.push(`<div class="sec">COLORES</div><div class="wrap">${slots}</div>`);
+    if (editing) body.push(`<div class="field"><span class="dim">${SLOT_ES[editing]}</span><span>${t.dark[editing]} →</span><input aria-label="Nuevo color para ${SLOT_ES[editing]}" placeholder="#rrggbb" value="${id === 'p-badhex' ? '#72f4z' : ''}"><button class="chip on">pintar</button></div>`);
+    if (id === 'p-badhex') body.push(`<div class="errline">✗ ${P}#72f4z no es un color: escribilo como #rrggbb.</span></div>`);
+    if (id === 'p-saved') body.push(`<div class="okline">✓ ${P}Guardado como mi-nzt; nzt queda como estaba.</span></div>`);
+    if (!editing && id !== 'p-saved') body.push(`<div class="dim">${P}Elegí un color para repintarlo.</span></div>`);
+    body.push(`<div class="sec">TEMA DE CLAUDE CODE</div><div>${P}NZT oscuro y NZT claro están en</span> <b>/theme</b>${P}: elegilos ahí para que el prompt y el spinner de Claude Code también lleven la marca.</span></div>`);
+    body.push(`<div class="dim" style="margin-top:var(--row)">${P}O pedile a Claude: <span style="color:var(--t-fg)">"un tema que se sienta como un atardecer"</span>. Esc cierra.</span></div>`);
+    const width = id === 'p-narrow' ? '42ch' : '72ch';
+    return `<div class="dock" style="width:${width}"><section class="card" style="--rows:${rows}"><div class="row"><span class="b" style="color:var(--t-user)">◐ Aspecto</span><span class="dim">nzt-look 0.1.0</span></div><div class="scroll">${body.join('')}</div><div class="buttons"><button class="btn">[ Cerrar ]</button></div></section></div>`;
+  }
+
+  const NOTES = {
+    band: `<p><b>Banda</b> (Q-05: tal cual la referencia). Terminal: medidores de bloques. El del contexto tiene 10 celdas de 10% y las marcas 20, 30 y 40 entre ellas. Cada marca es una celda más, del mismo tamaño, siempre en el color de su tramo: <code>▰</code> si se alcanzó y <code>▱</code> si no (RN-skin-marcas-kernel). Los límites tienen 8 bloques, como la referencia, que los pinta de aviso desde el 80% y de error desde el 95%. Escritorio: un anillo por cifra, y el del contexto con tres rayas en 20, 30 y 40. La terminal no dibuja anillos: Claude Code dibuja ahí el elemento Svg como nada.</p>
+      <p><b>0: /clear</b> limpia la sesión (RN-skin-limpiar). Bajo el 20% va tenue y desde el 20% es el botón principal. Primero pide confirmación (<i>Confirmar /clear</i>, Q-07). El contexto suma la palabra de su tramo, para que el estado no se diga solo con color. Las palabras subrayadas en punteado son propuesta del agente (Q-06 y Q-07 de la spec). La tecla <b>0</b> con el prompt vacío aprieta el botón, como en la referencia, porque la terminal no siempre manda clicks. Mientras Claude trabaja, el botón no está.</p>
+      <p><b>Modelo</b> (cambio 0.2.0, RN-skin-modelo): <code>◇ Opus 5.5 · high</code>, el modelo de la sesión y su effort tenue. El effort llega con el primer pedido al modelo: antes, y en un modelo sin effort, solo el modelo (<i>Modelo sin effort</i>). El modelo no es una cifra de uso, así que también se ve sin lectura. Lugar, glifo y colores son propuesta del agente.</p>
+      <p><b>Una línea</b> (cambio 0.4.0, usuario 2026-10-18: <i>"debe ir todo en una sola linea y quedar legible"</i>): el modelo sin rótulo, y <i>Contexto</i>, <i>Límite 5h</i>, <i>Límite semanal</i> y <i>Costo</i> a la izquierda de su medidor. Sin la palabra del tramo: el color (amarillo desde el 20, naranja desde el 30, rojo desde el 40), el <code>%</code> y las marcas lo dicen. El naranja es la mitad entre el aviso y el error del tema (propuesta). La cuenta regresiva va después del porcentaje de cada límite.</p>
+      <p>Por ancho se sacan, en este orden: los tokens del contexto, las cuentas regresivas, costo, effort, modelo, semanal, 5 h y el botón (RN-skin-banda-ancho), y si ni así entra, los rótulos. Cada rótulo se va con su parte. Lo que queda siempre son las celdas, las marcas y el porcentaje. Medido: a 120 columnas entra todo bajo el 20%, y desde el 20% se van solo los tokens. <i>Angosta</i> muestra la banda a 60 columnas; a 320 px (unas 34 columnas) quedan las celdas, las marcas y el porcentaje.</p>`,
+    panel: `<p><b>Panel</b> (<code>/nzt-look</code>, al costado como los otros paneles de NZT; propuesta). El orden es el de la referencia: tema, vista previa, partes y colores. NZT le suma la variante, la carpeta, las partes de la banda con la línea al agente, y cómo elegir el tema en <code>/theme</code>. <b>No hay una acción principal:</b> cada elección se aplica al tocarla, y la vista previa la muestra en el momento. Los temas 1 a 9 tienen tecla, como en la referencia.</p>
+      <p>Lo subrayado en punteado son textos propuestos (Q-06). Los nombres de los colores en español también son propuesta. La lista no entra en 40 filas: se recorre con su propio scroll y Cerrar queda fijo abajo.</p>`,
+  };
+
+  const STATES = [...Object.keys(BAND), 'p-main', 'p-paint', 'p-badhex', 'p-saved', 'p-pinned', 'p-off', 'p-narrow', 'p-mobile'];
+  const parse = () => { const h = new URLSearchParams(location.hash.slice(1));
+    return { state: STATES.includes(h.get('state')) ? h.get('state') : 'b-high', surf: h.get('surf') === 'desk' ? 'desk' : 'term' }; };
+  const go = patch => { const s = { ...parse(), ...patch }; location.hash = `state=${s.state}&surf=${s.surf}`; };
+  function show() {
+    const { state: id, surf } = parse();
+    const stage = document.getElementById('stage');
+    if (id.startsWith('b-')) {
+      // Como el mod, que sabe sus columnas: saca partes hasta que la banda entra (RN-skin-banda-ancho).
+      document.getElementById('note').innerHTML = NOTES.band; // antes de medir: su alto puede sumar una barra de scroll
+      let level = 0;
+      for (; level <= DROPS.length; level++) {
+        stage.innerHTML = bandStage(id, surf, level);
+        const band = stage.querySelector('.band, .desk');
+        if (!band || band.scrollWidth <= band.clientWidth + 1) break;
+      }
+      stage.dataset.dropped = DROPS.slice(0, level).join(' ');
+      stage.innerHTML = bandStage(id, surf, Math.min(level, DROPS.length)) + (BAND[id].off ? '<p class="note">Con las seis partes apagadas la banda no se dibuja: el prompt queda como en Claude Code (RN-skin-banda-partes).</p>' : '') + (BAND[id].survey ? '<p class="note">Mientras Claude Code muestra una encuesta sobre el prompt, la banda no se dibuja (RN-skin-cede-la-banda).</p>' : '');
+      document.getElementById('note').innerHTML = NOTES.band;
+    } else if (id === 'p-mobile') {
+      stage.innerHTML = `<div class="mobile">${P}Las opciones de Aspecto se cambian desde la terminal o la app de escritorio.</span></div>`;
+      document.getElementById('note').innerHTML = '<p>En el celular el panel no tiene campos de entrada; dice dónde se usa (alcance, <i>Afuera</i>).</p>';
+    } else {
+      if (id === 'p-off') state.toggles = {};
+      stage.innerHTML = panel(id);
+      document.getElementById('note').innerHTML = NOTES.panel;
+    }
+    document.querySelectorAll('.states a').forEach(a => a.toggleAttribute('aria-current', a.dataset.k === 'state' ? a.dataset.v === id : a.dataset.v === surf));
+  }
+  document.addEventListener('click', ev => {
+    const a = ev.target.closest('.states a');
+    if (a) { ev.preventDefault(); go({ [a.dataset.k]: a.dataset.v }); return; }
+    const th = ev.target.closest('[data-theme]'); if (th) { state.theme = th.dataset.theme; show(); return; }
+    const v = ev.target.closest('[data-variant]'); if (v) { state.variant = v.dataset.variant; show(); return; }
+    const tg = ev.target.closest('[data-toggle]'); if (tg) { const n = tg.dataset.toggle, d = [...BAND_PARTS, ...LOOK_PARTS].find(x => x[0] === n)?.[1]; state.toggles[n] = !isOn(n, d); show(); return; }
+    const sl = ev.target.closest('[data-slot]'); if (sl) go({ state: 'p-paint' });
+  });
+  addEventListener('hashchange', show); show();
+</script>
+</body>
+</html>
