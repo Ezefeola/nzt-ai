@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
+import { GLOW_STEPS, glowOf, levelOf } from './glow'
 import { parseState } from './parse'
 import { idOf, PHASES, timelineOf } from './phases'
 import {
@@ -143,30 +144,28 @@ test('the pane draws the unit in progress and what comes next', async ($, on) =>
     expect(await ui.find({ type: 'Text', text: /○ Verificación/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Arquitectura/ })).toBeUndefined()
 
-    // Done and dropped units stay folded until pressed, and inside the section each phase
-    // that is not in progress is folded too.
-    expect(await ui.find({ type: 'Text', text: /Write the parser/ })).toBeUndefined()
-    await ui.press({ key: 'toggle-done' })
-    expect(await ui.find({ type: 'Text', text: /▸ Análisis · 1/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Write the parser/ })).toBeUndefined()
-    await ui.press({ key: 'toggle-done-analysis' })
+    // AHORA: the last done, the one in progress and the next pending, with where it stands.
+    expect(await ui.find({ type: 'Text', text: /^AHORA · Build$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^Unidad 2 de 3$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Write the parser/ })).toBeDefined()
-    await ui.press({ key: 'toggle-done-analysis' })
-    await ui.press({ key: 'toggle-done' })
-    expect(await ui.find({ type: 'Text', text: /DESCARTADAS/ })).toBeDefined()
-
-    // Pending is grouped under its phase, folded while that phase is not in progress.
-    expect(await ui.find({ type: 'Text', text: /▸ Verificación · 1/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Write the tests/ })).toBeUndefined()
-    await ui.press({ key: 'toggle-todo-verify' })
     expect(await ui.find({ type: 'Text', text: /Write the tests/ })).toBeDefined()
 
-    // The section folds as a whole too.
-    await ui.press({ key: 'toggle-todo' })
-    expect(await ui.find({ type: 'Text', text: /Write the tests/ })).toBeUndefined()
-    await ui.press({ key: 'toggle-todo' })
-    expect(await ui.find({ type: 'Text', text: /Write the tests/ })).toBeDefined()
-    await ui.press({ key: 'toggle-todo-verify' })
+    // The sections of before are gone; the tasks start hidden behind their button.
+    expect(await ui.find({ type: 'Text', text: /EN CURSO|PENDIENTES|HECHAS|DESCARTADAS/ })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /Old idea/ })).toBeUndefined()
+    await ui.press({ key: 'toggle-tasks' })
+    expect(await ui.find({ type: 'Text', text: /☰ Ocultar tareas/ })).toBeDefined()
+
+    // Each phase a group; only the one in progress open, a finished one with its check.
+    expect(await ui.find({ type: 'Text', text: /^▾ Build +0 de 1$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^▸ ✓ Análisis +1 de 1$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^▸ Verificación +0 de 1$/ })).toBeDefined()
+    await ui.press({ key: 'toggle-group-analysis' })
+    const dropped = await ui.find({ type: 'Text', text: /Old idea/ })
+    expect(dropped?.props).toMatchObject({ strikethrough: true })
+    await ui.press({ key: 'toggle-group-analysis' })
+    await ui.press({ key: 'toggle-tasks' })
+    expect(await ui.find({ type: 'Text', text: /Old idea/ })).toBeUndefined()
 
     // No batch selected reads as accompanied, labelled.
     expect(await ui.find({ type: 'Text', text: /frena en cada unidad/ })).toBeDefined()
@@ -264,8 +263,8 @@ test('a status the kernel does not define is shown as invalid and counts nowhere
   expect(await ui.find({ type: 'Text', text: /1 con status inválido/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /status "in-progress"/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^50%$/ })).toBeDefined()
-  // The typo is not pending: the only pending row is unit 3.
-  expect(await ui.find({ type: 'Text', text: /PENDIENTES · 1/ })).toBeDefined()
+  // The typo counts nowhere: two units count, and unit 3 is the one that follows.
+  expect(await ui.find({ type: 'Text', text: /^Unidad 2 de 2$/ })).toBeDefined()
   await ui.unmount()
 })
 
@@ -358,31 +357,150 @@ test('with language en the pane speaks English and keeps the state as written', 
   expect(await ui.find({ type: 'Text', text: /of 3 units done/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /2 h ago/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /✓ Analysis/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /IN PROGRESS/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /▸ Verify · 1/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^NOW · Build$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Unit 2 of 3$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /☰ Show tasks/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /aprobado|EN CURSO|Análisis/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /aprobado|AHORA|Análisis|Ver tareas/ })).toBeUndefined()
   await ui.unmount()
 })
 
-test('the pending group of the phase in progress starts open, the others folded', async ($, on) => {
+test('in the tasks, the group of the phase in progress starts open and the others folded', async ($, on) => {
   const ui = await mountPane($, on, {
     goal: 'Groups',
     phases: [
       { name: 'build', status: 'doing', units: [
         { id: 1, do: 'Build now', status: 'doing' },
         { id: 2, do: 'Build next', status: 'todo' },
+        { id: 4, do: 'Build last', status: 'todo' },
       ] },
       { name: 'verify', status: 'todo', units: [{ id: 3, do: 'Verify later', status: 'todo' }] },
     ],
     approved: true,
   })
-  expect(await ui.find({ type: 'Text', text: /▾ Build · 1/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /Build next/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /▸ Verificación · 1/ })).toBeDefined()
+  await ui.press({ key: 'toggle-tasks' })
+  expect(await ui.find({ type: 'Text', text: /Build last/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Verify later/ })).toBeUndefined()
-  await ui.press({ key: 'toggle-todo-build' })
-  expect(await ui.find({ type: 'Text', text: /Build next/ })).toBeUndefined()
+  await ui.press({ key: 'toggle-group-build' })
+  expect(await ui.find({ type: 'Text', text: /Build last/ })).toBeUndefined()
+  await ui.press({ key: 'toggle-group-verify' })
+  expect(await ui.find({ type: 'Text', text: /Verify later/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('AHORA shows only the last done, the one in progress and the next pending', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'Window',
+    phases: [
+      { name: 'verify', status: 'doing', units: [
+        { id: 295, do: 'Old done', status: 'done' },
+        { id: 297, do: 'Last done', status: 'done' },
+        { id: 287, do: 'In progress now', status: 'doing', detail: 'a detail long enough to be folded' },
+        { id: 298, do: 'Next one', status: 'todo' },
+        { id: 299, do: 'Later one', status: 'todo' },
+      ] },
+    ],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /^AHORA · Verificación$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Unidad 3 de 5$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Last done/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /In progress now/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Next one/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Old done|Later one/ })).toBeUndefined()
+
+  // The detail sits in one row until the unit is pressed, and goes back to one row.
+  const folded = await ui.find({ type: 'Text', text: /a detail long enough/ })
+  expect(folded?.props).toMatchObject({ wrap: 'truncate-end' })
+  await ui.press({ key: 'detail-287' })
+  expect((await ui.find({ type: 'Text', text: /a detail long enough/ }))?.props).toMatchObject({ wrap: 'wrap' })
+  await ui.press({ key: 'detail-287' })
+  expect((await ui.find({ type: 'Text', text: /a detail long enough/ }))?.props).toMatchObject({ wrap: 'truncate-end' })
+  await ui.unmount()
+})
+
+test('with no unit in progress, the first pending of the phase in progress is the one that follows', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'Between units',
+    phases: [
+      { name: 'discovery', status: 'done', units: [{ id: 294, do: 'Spec', status: 'done' }] },
+      { name: 'ux', status: 'doing', units: [{ id: 295, do: 'Mockup', status: 'todo' }] },
+      { name: 'build', status: 'todo', units: [{ id: 296, do: 'Build it', status: 'todo' }] },
+    ],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: '▷' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: / · sigue$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^AHORA · UX$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Unidad 2 de 3$/ })).toBeDefined()
+  expect((await ui.findAll({ type: 'Text', text: '▷' })).length).toBe(1)
+  // Only one follows: in the tasks the mockup is marked again, and the build unit keeps ○.
+  await ui.press({ key: 'toggle-tasks' })
+  await ui.press({ key: 'toggle-group-build' })
+  expect((await ui.findAll({ type: 'Text', text: '▷' })).length).toBe(2)
+  await ui.unmount()
+})
+
+test('with the plan complete, AHORA says so', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'Done',
+    phases: [{ name: 'ship', status: 'done', units: [{ id: 1, do: 'Release', status: 'done' }] }],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /Plan completo/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^AHORA/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('while the run waits on the person, Tu turno sits first, folded to one row, and unfolds', async ($, on) => {
+  const ui = await mountPane($, on, {
+    ...JSON.parse(STATE),
+    waiting_on: 'que mires el mockup y elijas la forma de la espera',
+  })
+  const texts = (await ui.findAll({ type: 'Text' })).map(found => found.text)
+  const turn = texts.findIndex(text => /⏸ {2}Tu turno/.test(text))
+  expect(turn).toBeGreaterThan(-1)
+  expect(turn).toBeLessThan(texts.findIndex(text => /^Plan$/.test(text)))
+  // The pause sign keeps a margin from the word: it draws wide in some terminals.
+  expect(await ui.find({ type: 'Text', text: /^▸ ⏸ {2}Tu turno$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Text', text: /que mires el mockup/ }))?.props).toMatchObject({ wrap: 'truncate-end' })
+  await ui.press({ key: 'toggle-turn' })
+  expect(await ui.find({ type: 'Text', text: /^▾ ⏸ {2}Tu turno$/ })).toBeDefined()
+  expect((await ui.find({ type: 'Text', text: /que mires el mockup/ }))?.props).toMatchObject({ wrap: 'wrap' })
+  await ui.unmount()
+})
+
+describe('glow', () => {
+  test('rises from dim to full and falls back along a wave, without jumps', async () => {
+    expect(levelOf(0)).toBe(0)
+    expect(levelOf(GLOW_STEPS / 2)).toBe(1)
+    expect(levelOf(GLOW_STEPS)).toBe(0)
+    for (let step = 0; step < GLOW_STEPS; step++) {
+      expect(Math.abs(levelOf(step + 1) - levelOf(step))).toBeLessThanOrEqual(0.35)
+    }
+  })
+
+  test('is the color itself at full, and mixed toward gray by its depth at the dimmest', async () => {
+    expect(glowOf('#F5C542', GLOW_STEPS / 2, 0.6)).toBe('#f5c542')
+    expect(glowOf('#F5C542', 0, 0.6)).toBe('#af9c67')
+    expect(glowOf('#F5C542', 0, 0)).toBe('#f5c542')
+  })
+})
+
+test('Tu turno and the unit in progress are drawn in their glow, not in a fixed tone', async ($, on) => {
+  const ui = await mountPane($, on, { ...JSON.parse(STATE), waiting_on: 'que lo mires' })
+  // The glow has not stepped yet: both sit at the dim end of the wave.
+  const turn = await ui.find({ type: 'Text', text: /^▸ ⏸ {2}Tu turno$/ })
+  expect(turn?.props?.color).toBe(glowOf('#F5C542', 0, 0.6))
+  const doing = await ui.find({ type: 'Text', text: /^Draw the pane$/ })
+  expect(doing?.props?.color).toBe(glowOf(PHASES.find(p => p.id === 'build')!.color, 0, 0.35))
+  await ui.unmount()
+})
+
+test('a run that waits on nobody draws no Tu turno', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE))
+  expect(await ui.find({ type: 'Text', text: /Tu turno/ })).toBeUndefined()
+  expect(await ui.find({ key: 'toggle-turn' })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -553,6 +671,22 @@ test('a project with Plan/state.json opens the pane when the session starts', as
   expect(await startSession($, on, true)).toEqual(['nzt-state'])
 })
 
+test('the state is read from the folder the session started in, wherever the agent moves', async ($, on) => {
+  const asked: string[] = []
+  on('session.start', async (_, e) => ({ cwd: e.cwd }))
+  on('command.register', async (_, e) => ({ value: { command: e.name } }))
+  on('clock.every', async () => ({ value: undefined }))
+  on('fs.stat', async (_, e) => {
+    asked.push(e.path)
+    return { value: { kind: 'file', size: STATE.length, mtimeMs: 5, isLink: false } }
+  })
+  on('fs.read', async () => ({ value: STATE }))
+  on('ui.open', async () => ({ value: { isPlaced: true } }))
+  await $.session.start({ cwd: 'C:\\project\\', surface: 'terminal', isInteractive: true })
+  // The engine hands the path on in the platform's separators.
+  expect(asked[0]?.replace(/\\/g, '/')).toBe('C:/project/Plan/state.json')
+})
+
 test('a project without Plan/state.json starts with the pane closed', async ($, on) => {
   expect(await startSession($, on, false)).toEqual([])
 })
@@ -603,6 +737,12 @@ test('an autonomous batch reads as a range with its progress and kept stops', as
   })
   expect(await ui.find({ type: 'Text', text: /⚡ autónomo/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /69–72 sin frenar · 2 de 4 hechas · frena en 71/ })).toBeDefined()
+  // Units with no phase of their own: AHORA without one, and the tasks as one list with no groups.
+  expect(await ui.find({ type: 'Text', text: /^AHORA$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Unidad 3 de 4$/ })).toBeDefined()
+  await ui.press({ key: 'toggle-tasks' })
+  expect(await ui.find({ type: 'Text', text: /^A$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^[▾▸] / })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -652,6 +792,11 @@ const mountState = async ($: Parameters<TestBody>[0]) => {
 test('with questions pending in nzt-questions, the pane says how many and Contestar opens it', async ($, on) => {
   const ran = questionsSession(on, 3)
   const ui = await mountState($)
+  // Folded, Tu turno says how many; unfolded, the notice and Contestar.
+  expect(await ui.find({ type: 'Text', text: /⏸ {2}Tu turno/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '3 preguntas para contestar' })).toBeDefined()
+  expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
+  await ui.press({ key: 'toggle-turn' })
   expect(await ui.find({ type: 'Text', text: '? 3 preguntas para contestar' })).toBeDefined()
   await ui.press({ key: 'answer-questions' })
   expect(ran).toEqual(['nzt-questions'])
@@ -660,7 +805,7 @@ test('with questions pending in nzt-questions, the pane says how many and Contes
 test('without nzt-questions, or with nothing pending, the pane says nothing about questions', async ($, on) => {
   questionsSession(on)
   const ui = await mountState($)
-  expect(await ui.find({ type: 'Text', text: /para contestar/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /para contestar|Tu turno/ })).toBeUndefined()
   expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
 })

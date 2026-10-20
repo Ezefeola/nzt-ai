@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.6.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.7.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -8,6 +8,8 @@ leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
 ```
 
  NZT  Estado
+▸ ⏸ Tu turno  que mires el mockup y elijas…   ? 2
+
 Plan  ● aprobado                         ▄▄████████▄▄
 Modo  ⚡ autónomo · 80–82 sin            ██ ▀▀  ▀▀ ██
       frenar · 1 de 3 hechas             ████████████
@@ -20,12 +22,15 @@ mod en mods/ y el catálogo.
 3 de 5 unidades hechas                         60%
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                                  actualizado recién
-EN CURSO
-▶ 81  Docs: README del mod + sección Mods
-▾ PENDIENTES · 1
-Verificación
-○ 82  Verificar: tests, build y links
-▸ HECHAS · 3
+╭────────────────────────────────────────────────╮
+│ AHORA · Build                    Unidad 4 de 5 │
+│ ✓ 80  Mod en mods/                             │
+│ ▶ 81  Docs: README del mod + sección Mods      │
+│       falta la sección Mods del README…        │
+│ ○ 82  Verificar: tests, build y links          │
+╰────────────────────────────────────────────────╯
+☰ Ver tareas · 5
+▸ NOTAS PARA RETOMAR · 2
 ```
 
 **Es opcional.** NZT funciona completo sin el panel: el estado vive en `Plan/state.json`
@@ -38,11 +43,17 @@ igual. Funciona solo en Claude Code, porque Codex no tiene mods.
 ```
 
 Abre el panel si lo cerraste; en un proyecto con `Plan/state.json` ya se abre solo al
-empezar la sesión. **Un clic** en el título de una sección (Pendientes, Hechas,
-Descartadas, Notas para retomar) o en el de una fase dentro de ella la pliega o la despliega.
+empezar la sesión. **Un clic** despliega o pliega **Tu turno**, el detalle de la unidad en
+curso (clic en su texto), las tareas (**☰ Ver tareas** / **☰ Ocultar tareas**), cada fase
+dentro de ellas y las notas.
 
 De arriba hacia abajo muestra:
 
+- **⏸ Tu turno**, primero de todo, mientras la corrida espera algo de vos: lo que dice
+  `waiting_on` y, si tenés [`nzt-questions`](../nzt-questions/README.md) con preguntas sin
+  contestar, cuántas son. Va plegado en un renglón y su título late mientras espera; un clic
+  lo despliega con el texto entero y **Contestar ›**, que abre `nzt-questions` (si Claude
+  está trabajando, se abre al terminar el turno). Si no se espera nada, no aparece.
 - Arriba a la derecha, el personaje de la fase en curso, animado, con el nombre de la fase
   debajo. A su izquierda: si el plan está aprobado, en qué modo corre (acompañado, o
   autónomo con la tanda, cuántas unidades lleva hechas y en cuáles frena igual) y el
@@ -50,12 +61,14 @@ De arriba hacia abajo muestra:
   entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
 - La línea de fases de la corrida con su estado, el porcentaje de avance
   (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.
-- La unidad en curso con su detalle y lo que se está esperando. Si tenés
-  [`nzt-questions`](../nzt-questions/README.md) con preguntas sin contestar, debajo dice
-  `? n preguntas para contestar` y **Contestar ›** lo abre; si Claude está trabajando, se abre
-  al terminar el turno. Sin `nzt-questions`, o sin preguntas, no dice nada.
-- Las pendientes, las hechas y las descartadas, agrupadas por fase, y las **notas para retomar**: lo que una sesión nueva necesita saber después de `/clear`. Al abrir el
-  panel solo está desplegada la fase en curso.
+- **AHORA**, en el color de la fase: la última unidad hecha, la que está en curso con su
+  detalle en un renglón, y la próxima pendiente, con "Unidad n de m". Si ninguna figura en
+  curso (el agente escribe el estado al terminar cada unidad), la que sigue lleva **▷ · sigue**.
+- **☰ Ver tareas**: todas las unidades del plan, cada una una vez y en su lugar, como un
+  checklist (✓ hecha, ▶ en curso, ▷ la que sigue, ○ pendiente, ✗ descartada y tachada),
+  agrupadas por fase con "hechas de cuántas". Arrancan ocultas; al mostrarlas, solo la fase
+  en curso está desplegada.
+- Las **notas para retomar**: lo que una sesión nueva necesita saber después de `/clear`.
 
 Avisa cuando el estado rompe el formato del kernel: una unidad con un status que no existe,
 más de una unidad en curso, más de una fase en curso, o una tanda que nombra unidades que no están. No lo corrige.

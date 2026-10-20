@@ -1,59 +1,17 @@
 {
   "version": 1,
-  "updated": "2026-10-19T20:30:00Z",
-  "goal": "nzt-files 0.2.0: actividad de Claude, Markdown y las funciones acordadas el 2026-10-19, sin ocupar contexto: el mod solo mira, nunca le agrega nada a Claude",
+  "updated": "2026-10-20T18:30:00Z",
+  "goal": "nzt-state 0.7.0: una lista ordenada estilo checklist (✓ hecha, ▶ en curso o siguiente, ○ pendiente) en vez de EN CURSO/PENDIENTES/HECHAS, y lo que se espera de nosotros más lindo; arrastra el cierre pendiente de nzt-files 0.2.0",
   "phases": [
     {
       "name": "discovery",
       "status": "done",
       "units": [
         {
-          "id": 273,
-          "do": "Spec nzt-files: alcance nuevo (qué entra y qué no) y reglas de contexto cero; ronda de preguntas",
+          "id": 294,
+          "do": "Spec nzt-state: lista ordenada de unidades (▶ = en curso, o primera pendiente de la fase en curso) que reemplaza EN CURSO/PENDIENTES/HECHAS; lo demás plegado; espera destacada",
           "status": "done",
-          "detail": "Q-07 a Q-10 respondidas; alcance [add]/[modify]/[remove]; RN-files-contexto-cero, -solo-mira, -comando-callado; 2 RNF (misma cifra en /context, 50 ms)"
-        },
-        {
-          "id": 274,
-          "do": "Spec nzt-files: actividad de Claude (leer violeta, escribir naranja, commit verde, fundido, carpeta cerrada) y seguir a Claude",
-          "status": "done",
-          "detail": "RN-files-actividad, -fundido, -que, -fuera, -carpeta, -seguir, -actividad-ajuste [add]; sin verificar: si los subagentes disparan el evento (va a la prueba en vivo)"
-        },
-        {
-          "id": 275,
-          "do": "Spec nzt-files: visor con botón fuente/Markdown por secciones, reconciliado con RN-files-dividido",
-          "status": "done",
-          "detail": "RN-files-dividido [modify]; RN-files-markdown (casilla ☑ Markdown marcada por defecto, Q-11), -markdown-bloques (de a bloque), -markdown-grande, -ampliar [add]; propuestas 273-278 confirmadas en Q-11"
-        },
-        {
-          "id": 276,
-          "do": "Spec nzt-files: búsqueda en el árbol, teclas h/j/k/l, copiar ruta, @ruta revela, abrir con la app",
-          "status": "done",
-          "detail": "RN-files-teclas [modify] (j/k pasan al árbol, c copia y ya no cierra); RN-files-buscar, -buscar-nada, -buscar-pesadas, -copiar, -mencion, -abrir-app (doble clic/o, no Enter: propuesta), -abrir-falla [add]"
-        },
-        {
-          "id": 277,
-          "do": "Spec nzt-files: git ampliado (+N -N, conteos por carpeta, rama y ahead/behind, operaciones git al pie)",
-          "status": "done",
-          "detail": "RN-files-git [modify] (conteos en carpetas); RN-files-lineas, -rama, -git-pie, -git-pie-dura [add]"
-        },
-        {
-          "id": 278,
-          "do": "Spec nzt-files: columna fecha/edad/tamaño, abrir al inicio, ajustes en /config, íconos; diseño técnico sin herramientas Unix",
-          "status": "done",
-          "detail": "RN-files-ubicacion [modify]; RN-files-columna, -tamaño-carpeta, -tamaño-falla, -iconos, -aviso-sin-git, -ajustes [add]; notas técnicas 0.2.0 (subagentes, Markdown, Windows sin Unix, CC 2.1.287, aviso MIT)"
-        },
-        {
-          "id": 290,
-          "do": "Spec nzt-files: cambios de git en el visor (marcas tipo Visual Studio junto al número de línea), en la barra de scroll y botón ± Cambios",
-          "status": "done",
-          "detail": "RN-files-cambios-lineas, -cambios-lineas-sin, -solo-cambios [add]; RN-files-barra, -teclas (g) y Afuera de diffs [modify]; Q-13 abierta (propuestas, se confirman en 287)"
-        },
-        {
-          "id": 292,
-          "do": "Spec nzt-files: archivo modificado como diff completo con color (como nzt-changes) y barra en dos columnas (Q-14, H-09..H-11)",
-          "status": "done",
-          "detail": "RN-files-cambios-lineas y -cambios-lineas-sin reescritas (diff entero, borrado intercalado, U/A en verde, sin colores C# en diff), RN-files-barra [modify] (mapa + posición), Afuera de diffs y Diseño 0.2.0 al día; notas técnicas y mockup quedan para 293"
+          "detail": "RN-panel-lista, -lista-marcas, -lista-siguiente, -lista-detalle, -espera [add]; -unidad-en-su-fase, -varias-en-curso, -fases-plegables, -formatos-viejos [modify]; -secciones [remove]; Q-01 (forma de la espera), Q-02 (¿sigue la línea de fases?), Q-03 (propuestas) abiertas para el mockup"
         }
       ]
     },
@@ -62,10 +20,10 @@
       "status": "done",
       "units": [
         {
-          "id": 279,
-          "do": "Mockup de nzt-files con los estados nuevos (actividad, Markdown, búsqueda, git, columna)",
+          "id": 295,
+          "do": "Mockup HTML de nzt-state 0.7.0: la lista ordenada y propuestas para mostrar lo que espera de nosotros",
           "status": "done",
-          "detail": "mockup.html 0.2.0 (25 estados) y 'Diseño 0.2.0' en la spec; medido: sin scroll horizontal a 320/800, alto fijo, contraste AA (rojo y tenue sobre fila elegida aclarados). Aprobado por el usuario 2026-10-19 ('esta perfecto')"
+          "detail": "Aprobado por el usuario 2026-10-20: propuesta 1 (Q-04: Tu turno plegado que late, AHORA, ☰ Ver tareas), 'Tu turno' en vez de 'Te toca', línea de fases se queda (Q-02); spec con RN-panel-ahora, -tareas y -espera; mockup medido 40/40 sin scroll, AA"
         }
       ]
     },
@@ -74,98 +32,62 @@
       "status": "done",
       "units": [
         {
-          "id": 280,
-          "do": "Base: reglas de contexto cero con test que las guarda; estructura de módulos para lo nuevo",
+          "id": 296,
+          "do": "Construir nzt-state 0.7.0 según spec y mockup, con tests; README del mod y fila del catálogo en specs/nzt-mods.md",
           "status": "done",
-          "detail": "settings.ts, contrato de estado ampliado, tool.call devuelve el mismo resultado, prompt.submit next primero, /nzt-files sin línea al costado; 3 tests lo guardan"
-        },
-        {
-          "id": 281,
-          "do": "Actividad de Claude y seguir a Claude, con tests",
-          "status": "done",
-          "detail": "activity.ts (Read/Write/Edit/Grep/Glob/Bash/PowerShell), fundido 3 s, carpeta cerrada, seguir sin bloquear la herramienta; escritura por shell por git status+numstat antes/después"
-        },
-        {
-          "id": 282,
-          "do": "Visor fuente/Markdown por secciones, con tests",
-          "status": "done",
-          "detail": "markdown.ts (bloques, ventana de a bloque, bloque > 100.000 a fuente), casilla ☑ Markdown (m), Ampliar/← Árbol (a)"
-        },
-        {
-          "id": 283,
-          "do": "Búsqueda, teclas, copiar ruta, @ruta y abrir con la app, con tests",
-          "status": "done",
-          "detail": "search.ts (sin carpetas pesadas, 60), j/k/h/l como botones ↑↓←→, copiar con $.ui.copy, Start-Process en Windows y Abrir con; Mayús+flechas y copiar con Mayús no posibles (notas técnicas)"
-        },
-        {
-          "id": 284,
-          "do": "Git ampliado en árbol, encabezado y pie, con tests",
-          "status": "done",
-          "detail": "git.ts: rama/remota/↑↓ con status --branch, +N -N con diff HEAD --numstat, conteos U:A:M:D por carpeta (● en angosto), fila de operación con 45 s"
-        },
-        {
-          "id": 285,
-          "do": "Columna, ajustes, abrir al inicio e íconos; versión, README y catálogo",
-          "status": "done",
-          "detail": "0.2.0; userConfig de 8 campos; fecha/edad/tamaño y Σ; abrir al inicio solo al costado; íconos Nerd/Unicode; README, marketplace, README raíz y nzt-mods.md al día. 95 tests, validate y tsc verdes"
-        },
-        {
-          "id": 291,
-          "do": "Cambios de git en el visor, en la barra de scroll y botón ± Cambios, con tests",
-          "status": "done",
-          "detail": "git.ts: lineChangesOf (diff HEAD -U0), gutterOf, changeIn, changedTreeOf; margen a la izquierda del número (C#: a la derecha), barra coloreada con salto, ± Cambios (g). 120 tests, validate y tsc --noEmit verdes; README al día"
-        },
-        {
-          "id": 293,
-          "do": "Construir la 292: archivo modificado con Code format=diff por ventana, barra en dos columnas, con tests; sincronizar la copia de dev-mods",
-          "status": "done",
-          "detail": "git.ts: diffLinesOf/allAddedOf/changeOf/sourceOfDiff/diffWindow (sacados gutterOf, changeIn, lineChangesOf); Opened.changes pasa a string|null; barra = mapa + track (mapa: verde agregado, rojo si se borró algo; el azul se sacó a pedido del usuario en vivo); README, mockup, notas técnicas y V-11 al día. 120 tests, validate y tsc verdes; copia de dev-mods sincronizada"
+          "detail": "register.tsx: Tu turno (pulse cada 4 cuadros solo mientras espera), AHORA, ☰ Ver tareas, grupos por fase; Button solo admite texto: el clic va sobre el texto de la unidad y de Tu turno; 38 tests, validate y tsc verdes; plugin 0.7.0, README, catálogo y spec al día; sin test: el latido"
         }
       ]
     },
     {
       "name": "verify",
-      "status": "doing",
+      "status": "done",
       "units": [
         {
-          "id": 286,
-          "do": "Pruebas en vivo de nzt-files nuevo, incluida /context con panel abierto y cerrado (debe dar igual)",
+          "id": 297,
+          "do": "Prueba en vivo de nzt-state 0.7.0 (terminal y SVG, angosto y ancho, con y sin espera)",
           "status": "done",
-          "detail": "testing/2026-10-19-en-vivo.md: V-01..V-05 passed (carga, /context igual, mismos resultados, +10 ms, subagentes); V-06..V-10 blocked: necesitan el panel a la vista, los corre el usuario con la lista del archivo"
+          "detail": "testing/2026-10-20-en-vivo.md: V-01..V-03 passed, V-04..V-10 pending (el usuario dio 0.7.0 por terminada sin recorrerlos); H-01 carpeta de la sesión, H-02/H-03 brillo en onda, H-04 margen de ⏸: arreglados, 42 tests, copia de dev-mods sincronizada"
         },
         {
           "id": 287,
-          "do": "Cerrar nzt-files cuando el usuario lo acepte: marcas de la spec, resultados, catálogo",
-          "status": "doing",
-          "detail": "Hecho sin usuario (2026-10-19): RN-files-teclas, -copiar, -iconos y Diseño 0.2.0 alineados con Q-12; mockup con ± Cambios, Desplegar/Plegar, marcas por línea, barra y avisos en la fila de git; V-11 sumada a testing/2026-10-19-en-vivo.md. Falta: el usuario corre V-06..V-11 y re-ve H-01..H-08, responde Q-13 y acepta; después el cierre (barrer marcas, Historia 0.2.0, catálogo). Trabajo de 290/291/287 sin commitear. Hallazgos H-01..H-08 de la prueba en vivo arreglados y commiteados (lista en testing/2026-10-19-en-vivo.md); tras 291: re-ver en vivo (cargar con plugin-authoring: copiar mods/nzt-files a ~/.claude/dev-mods/<sesión>/ y aceptar la recarga), V-06..V-10 y aceptación. Incluye alinear RN-files-teclas, -copiar, -iconos y avisos del Diseño 0.2.0 con Q-12; el mockup no muestra Desplegar/Plegar ni la barra"
+          "do": "Cerrar nzt-files 0.2.0 cuando el usuario lo acepte: marcas de la spec, resultados, catálogo",
+          "status": "done",
+          "detail": "Aceptada por el usuario 2026-10-20 ('te apruebo todo lo demás'), con V-06..V-11 sin correr (anotado en su testing); 61 marcas barridas, Q-13 cerrada, Sin determinar vacío, Historia 0.2.0 y catálogo al día"
+        },
+        {
+          "id": 298,
+          "do": "Cerrar nzt-state 0.7.0 cuando el usuario lo acepte",
+          "status": "done",
+          "detail": "Aceptada 2026-10-20 ('ya con esto estaria todo finalizado', 'te apruebo todo lo demás'); marcas barridas (secciones por estado quitadas, afirmado en RN-panel-lista), Historia 0.7.0 nueva, catálogo al día"
         }
       ]
     },
     {
       "name": "ship",
-      "status": "todo",
+      "status": "done",
       "units": [
-        {
-          "id": 288,
-          "do": "Commit y push a la rama mods",
-          "status": "done",
-          "detail": "Adelantada a pedido del usuario ('hacé todas'): 0.2.0 commiteada y pusheada a mods antes del cierre, como se hizo con nzt-look"
-        },
         {
           "id": 289,
           "do": "Commit y push del cierre de nzt-files a mods",
-          "status": "todo",
-          "detail": null
+          "status": "done",
+          "detail": "9ab97a7; la fila del catálogo viajó con el commit de nzt-state (mismo archivo)"
+        },
+        {
+          "id": 299,
+          "do": "Commit y push de nzt-state 0.7.0 a mods",
+          "status": "done",
+          "detail": "Commit de nzt-state 0.7.0 con este estado, pusheado junto con 9ab97a7 a origin/mods"
         }
       ]
     }
   ],
   "approved": true,
-  "autonomy": { "units": [292, 293, 287, 289], "keep_stops": [287] },
-  "waiting_on": "290-293 commiteadas y pusheadas a mods (6e8c48e, 2026-10-19, a pedido del usuario, antes del cierre); el usuario ya vio el diff y el mapa en vivo y los aprobó ('perfecto'). Falta: usuario: ver en vivo el diff entero y la barra en dos columnas (V-11, H-09..H-11), confirmar la forma de ± Cambios (resto de Q-13) y aceptar; cargado en vivo en ~/.claude/dev-mods/d41a6bb1-4330-44f9-a8e1-3f59e3cd8e82 con nzt-files@nzt deshabilitado por el usuario. Después: prueba en vivo V-06..V-11 y re-ver H-01..H-08 (lista en specs/mods/nzt-files/testing/2026-10-19-en-vivo.md), Q-13 y aceptación de nzt-files 0.2.0",
+  "autonomy": { "units": [296, 297, 287, 298, 289, 299], "keep_stops": [] },
+  "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno. Contexto cero: nada en prompt.submit ni al iniciar sesión, tool.call solo mira; la selección se reemplaza por copiar ruta y @ruta",
-    "Pendiente fuera de esta corrida: merge de mods (lo hace el usuario), release/tags, borrar copias de ~/.claude/dev-mods; la 0.1.1 instalada (nzt-files@nzt) carga en vez de la 0.2.0 hasta reinstalar",
+    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno (vale también para Clean View, que fue solo la idea visual). Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión, tool.call solo mira",
+    "Pendiente fuera de esta corrida: merge de mods (lo hace el usuario), release/tags, borrar copias de ~/.claude/dev-mods (d41a6bb1… nzt-files, 2f70bfcb… nzt-state); los instalados (nzt-files@nzt 0.1.1, nzt-state@nzt 0.4.0) cargan en vez de 0.2.0/0.7.0 hasta reinstalar. Idea en pausa: mod nzt-sounds (usuario 2026-10-20: 'primero otros')",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }

@@ -38,13 +38,14 @@ export type Snapshot =
     }
 
 /**
- * Which folded sections of the pane the person opened. `groups` holds the phase groups the
- * person toggled, keyed `<section>:<phase>`; one never toggled follows the phase in progress.
+ * What the person unfolded in the pane: Tu turno, the detail of the unit in progress, the
+ * tasks and the notes. `groups` holds the phase groups the person toggled, keyed by phase;
+ * one never toggled follows the phase in progress.
  */
 export type Expanded = {
-  todo: boolean
-  done: boolean
-  dropped: boolean
+  turn: boolean
+  detail: boolean
+  tasks: boolean
   notes: boolean
   groups?: Record<string, boolean>
 }
@@ -57,7 +58,8 @@ export type Answering = { kind: 'idle' } | { kind: 'waiting' } | { kind: 'failed
 
 declare module 'claude-code' {
   interface PluginState {
-    'nzt-state': { snapshot: Snapshot; expanded: Expanded; answering: Answering }
+    /** `glow` is the step of the soft glow of Tu turno and the unit in progress, while either shows. */
+    'nzt-state': { snapshot: Snapshot; expanded: Expanded; answering: Answering; glow: number }
     /**
      * The one value read of nzt-questions, as its own contract declares it. Not a dependency,
      * so the pane works without it installed, and its contract is not laid here.
