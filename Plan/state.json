@@ -83,10 +83,10 @@
     }
   ],
   "approved": true,
-  "waiting_on": "Usuario: decir con qué sigue (otro mod u otros ajustes); el trabajo continúa en la rama mods, y el merge y el release los decide después",
+  "waiting_on": "Usuario: decir con qué sigue (otro mod u otros ajustes)",
   "notes": [
     "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; el código se escribe desde cero, sin copiar código ajeno (vale también para Clean View, que fue solo la idea visual). Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión, tool.call solo mira",
-    "Corrida cerrada 2026-10-20: nzt-files 0.2.0 y nzt-state 0.7.0 aceptadas, en origin/mods. Pendiente, cuando el usuario diga: merge de mods y release/tags; reinstalar (nzt-files@nzt 0.1.1 y nzt-state@nzt 0.4.0 cargan hasta entonces). ~/.claude/dev-mods vaciado. Idea en pausa: mod nzt-sounds",
+    "Corrida cerrada 2026-10-20: nzt-files 0.2.0 y nzt-state 0.7.0 aceptadas; mods mergeada en main (#5) y release v1.4.0 publicada por el workflow (14 assets, latest = v1.4.0, descarga 200; instalación no probada). Falta que el usuario actualice sus mods instalados. Idea en pausa: mod nzt-sounds",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }
