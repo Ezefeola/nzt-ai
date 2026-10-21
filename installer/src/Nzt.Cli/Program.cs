@@ -4,6 +4,7 @@ using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
 using Nzt.Cli.Mods;
 using Nzt.Cli.Providers;
+using Nzt.Cli.State;
 using Spectre.Console;
 
 namespace Nzt.Cli;
@@ -12,6 +13,9 @@ public static class Program
 {
     private static readonly string Version =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
+
+    // Dónde queda nzt-ai. Con `--bin-dir` no se toca el PATH: lo usan las comprobaciones.
+    private static string? _binDir;
 
     public static int Main(string[] args)
     {
@@ -31,6 +35,7 @@ public static class Program
         var command = args.FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
         var dryRun = args.Contains("--dry-run");
         var manifestDir = ValueOf(args, "--manifest-dir");
+        _binDir = ValueOf(args, "--bin-dir");
 
         var modsValue = ValueOf(args, "--mods");
         var mods = modsValue is null ? null : ModsChoiceFor(modsValue);
@@ -46,6 +51,9 @@ public static class Program
             "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.All),
             "status" => Status(manifestDir),
             "lint" or "verify" => Lint(detailed: false),
+            "state" => SubcommandOf(args) == "check"
+                ? State(Directory.GetCurrentDirectory())
+                : Fail("Falta el subcomando: nzt-ai state check."),
             "help" or "--help" or "-h" => Help(),
             _ => Fail($"Comando desconocido: {command}")
         };
@@ -58,11 +66,12 @@ public static class Program
         Console.WriteLine($"""
             NZT installer {Version}
 
-              nzt                                    menú interactivo
-              nzt install --provider <id> [--mods all|none|only] [--dry-run]
-              nzt uninstall --provider <id> [--mods all|none|only] [--dry-run]
-              nzt status
-              nzt lint | verify
+              nzt-ai                                    menú interactivo
+              nzt-ai install --provider <id> [--mods all|none|only] [--dry-run]
+              nzt-ai uninstall --provider <id> [--mods all|none|only] [--dry-run]
+              nzt-ai status
+              nzt-ai lint | verify
+              nzt-ai state check                        revisa Plan/state.json de esta carpeta
 
             Proveedores: claude-code, codex, all
             Mods (solo Claude Code): all = el método y los mods, none = solo el método,
@@ -95,7 +104,7 @@ public static class Program
         // vez de girar sobre un prompt que nadie puede contestar.
         if (Console.IsInputRedirected)
         {
-            Console.WriteLine("  El menú necesita una terminal. Sin ella están los comandos: nzt help.");
+            Console.WriteLine("  El menú necesita una terminal. Sin ella están los comandos: nzt-ai help.");
             return 0;
         }
 
@@ -296,6 +305,8 @@ public static class Program
             Console.WriteLine();
         }
 
+        ReportCli(CliCommand.Install(CliCommand.RunningSingleFile(), dryRun, _binDir), dryRun);
+
         if (!installsMethod) return failed ? 1 : 0;
 
         Console.WriteLine($"{report.SkillCount} skills · ~{report.ListingChars} chars de listado"
@@ -323,6 +334,7 @@ public static class Program
 
         Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
+        Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
         Summary(result.Outcomes);
 
         foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
@@ -429,7 +441,44 @@ public static class Program
             Console.WriteLine();
         }
 
+        // nzt-ai se va cuando no queda nada instalado por el CLI (QT-26). La simulación no
+        // borra manifiestos, así que ahí solo se dice la regla.
+        if (dryRun)
+            Console.WriteLine($"{CliCommand.Name}  se saca si después no queda ningún proveedor ni mod instalado por este CLI.");
+        else if (Provider.All.All(p => Manifest.Load(p.Id, manifestDir) is null))
+            ReportCli(CliCommand.Uninstall(dryRun, _binDir), dryRun);
+
         return failed ? 1 : 0;
+    }
+
+    private static void ReportCli(CliOutcome outcome, bool dryRun)
+    {
+        var line = outcome.Action switch
+        {
+            CliAction.Installed => dryRun ? $"se instala en {outcome.Target}" : $"instalado en {outcome.Target}",
+            CliAction.Updated => dryRun ? $"se actualiza en {outcome.Target}" : $"actualizado en {outcome.Target}",
+            CliAction.Unchanged => $"al día, {outcome.Target}",
+            CliAction.Removed => dryRun ? $"se saca de {outcome.Target}" : "desinstalado",
+            CliAction.NotSingleFile => "no se instala: corre desde el repo, no es el binario del release",
+            CliAction.Failed => $"falló: {outcome.Detail}",
+            _ => "no estaba instalado"
+        };
+
+        if (outcome.Action == CliAction.Failed) Error($"{CliCommand.Name}  {line}");
+        else Console.WriteLine($"{CliCommand.Name}  {line}");
+
+        if (outcome.PathChanged)
+            Console.WriteLine(outcome.Action == CliAction.Removed
+                ? "  Su carpeta sale del PATH del usuario."
+                : "  Su carpeta entra al PATH del usuario: una terminal nueva ya lo encuentra.");
+
+        if (outcome.PathLine is { } pathLine)
+        {
+            Warn($"la carpeta de {CliCommand.Name} no está en el PATH. Agregá esta línea al perfil de tu shell:");
+            Console.WriteLine($"    {pathLine}");
+        }
+
+        Console.WriteLine();
     }
 
     private static void UninstallMethod(Provider provider, bool dryRun, string? manifestDir)
@@ -528,6 +577,7 @@ public static class Program
         Console.WriteLine($"  instalado      {manifest.InstalledAt:yyyy-MM-dd HH:mm}");
         Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
+        Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
         Console.WriteLine($"  archivos       {manifest.Files.Count}"
             + (edited > 0 ? $", {edited} editado(s) localmente" : "")
             + (missing > 0 ? $", {missing} faltante(s)" : ""));
@@ -569,7 +619,36 @@ public static class Program
         return report.Ok ? 0 : 1;
     }
 
+    /// <summary>
+    /// `state check`: lo corre el agente después de escribir el estado, así que la
+    /// salida es corta —una línea si está bien— y el código de salida es lo que importa.
+    /// </summary>
+    private static int State(string projectDirectory)
+    {
+        var report = StateCheck.Run(projectDirectory);
+
+        if (!report.Found)
+        {
+            Console.WriteLine($"No hay {StateCheck.RelativePath} en esta carpeta: nada que revisar.");
+            return 0;
+        }
+
+        if (report.Ok)
+        {
+            Console.WriteLine($"{StateCheck.RelativePath}: cumple el contrato del kernel.");
+            return 0;
+        }
+
+        Console.WriteLine($"{StateCheck.RelativePath}: {report.Problems.Count} problema(s)");
+        foreach (var problem in report.Problems)
+            Console.WriteLine($"  {problem}");
+        return 1;
+    }
+
     // ── Auxiliares ─────────────────────────────────────────────────────────────
+
+    private static string? SubcommandOf(string[] args) =>
+        args.Where(a => !a.StartsWith('-')).Skip(1).FirstOrDefault()?.ToLowerInvariant();
 
     private static IReadOnlyList<Provider> ProvidersFrom(string[] args)
     {

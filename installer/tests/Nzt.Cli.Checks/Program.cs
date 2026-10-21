@@ -3,6 +3,7 @@ using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
 using Nzt.Cli.Mods;
 using Nzt.Cli.Providers;
+using Nzt.Cli.State;
 
 namespace Nzt.Cli.Checks;
 
@@ -27,6 +28,9 @@ public static class Program
         InstallsReferencesInsideTheirSkill();
         RemovesOrphanReferencesAndEmptyFolders();
         EmbedsEveryReferenceOfTheRepo();
+        InstallsEachProviderItsOwnAgent();
+        UninstallRemovesTheAgentButNotTheFolder();
+        EmbedsTheAgentsOfTheRepo();
         RefusesWhenASkillFileIsNotOurs();
         RefusesWhenMarkersExistWithoutAManifest();
         DryRunWritesNothing();
@@ -54,6 +58,16 @@ public static class Program
         ModsUninstallDryRunChangesNothing();
         UninstallingTheModsKeepsTheMethod();
         StatusSaysWhoInstalledEachMod();
+        LeavesTheCliInstalledAndUpdatesIt();
+        CliDryRunWritesNothing();
+        CliFromTheRepoIsNotInstalled();
+        UninstallRemovesTheCli();
+        StateCheckAcceptsAValidState();
+        StateCheckWithoutAFileIsNotAnError();
+        StateCheckCatchesEveryBrokenInvariant();
+        StateCheckAcceptsEachDelegationModeAndItsAbsence();
+        StateCheckReportsBrokenJson();
+        StateCheckAcceptsTheRepoState();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -220,6 +234,64 @@ public static class Program
 
         Check($"embebe las {onDisk} referencias del repo", onDisk > 0 && embedded == onDisk);
     }
+
+    private static void InstallsEachProviderItsOwnAgent() => InTemp(home =>
+    {
+        var (claude, catalog, manifests) = Setup(home);
+        catalog = WithAgents(catalog);
+        var codex = Provider.Codex(home, Path.Combine(home, ".codex"));
+
+        Installer.Install(claude, catalog, "0.1.0", manifestDirectory: manifests);
+        Installer.Install(codex, catalog, "0.1.0", manifestDirectory: manifests);
+
+        Check("Claude Code recibe el agente en Markdown",
+            File.Exists(Path.Combine(home, ".claude", "agents", "nzt-explorer.md")));
+        Check("Claude Code no recibe el de Codex",
+            !File.Exists(Path.Combine(home, ".claude", "agents", "nzt-explorer.toml")));
+        Check("Codex recibe el agente en TOML",
+            File.Exists(Path.Combine(home, ".codex", "agents", "nzt-explorer.toml")));
+        Check("Codex no recibe el de Claude Code",
+            !File.Exists(Path.Combine(home, ".codex", "agents", "nzt-explorer.md")));
+        Check("el agente queda en el manifiesto de su proveedor",
+            Manifest.Load(claude.Id, manifests)!.HashOf(Path.Combine(claude.AgentsDirectory, "nzt-explorer.md")) is not null);
+    });
+
+    private static void UninstallRemovesTheAgentButNotTheFolder() => InTemp(home =>
+    {
+        var (provider, catalog, manifests) = Setup(home);
+        catalog = WithAgents(catalog);
+        var mine = Path.Combine(provider.AgentsDirectory, "mi-agente.md");
+        Directory.CreateDirectory(provider.AgentsDirectory);
+        File.WriteAllText(mine, "un agente del usuario\n");
+
+        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        Installer.Uninstall(provider, manifestDirectory: manifests);
+
+        Check("desinstalar saca el agente",
+            !File.Exists(Path.Combine(provider.AgentsDirectory, "nzt-explorer.md")));
+        Check("desinstalar deja los agentes del usuario", File.Exists(mine));
+    });
+
+    /// <summary>
+    /// Un agente del repo que no viaja embebido no se instala, y `nzt-delegate`
+    /// mandaría a delegar en algo que no existe.
+    /// </summary>
+    private static void EmbedsTheAgentsOfTheRepo()
+    {
+        var root = RepoRoot();
+        if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
+
+        var onDisk = Directory.EnumerateFiles(Path.Combine(root, "agents"))
+            .Select(Path.GetFileName).Order(StringComparer.Ordinal).ToList();
+        var embedded = ContentCatalog.Load().Agents.Select(a => a.FileName).ToList();
+
+        Check($"embebe los {onDisk.Count} agentes del repo", onDisk.Count > 0 && embedded.SequenceEqual(onDisk));
+    }
+
+    private static ContentCatalog WithAgents(ContentCatalog catalog) =>
+        ContentCatalog.From(catalog.Kernel, catalog.Adapters.ToDictionary(), catalog.Skills,
+            [new AgentFile("nzt-explorer.md", "---\nname: nzt-explorer\n---\n"),
+             new AgentFile("nzt-explorer.toml", "name = \"nzt_explorer\"\n")]);
 
     private static ContentCatalog WithReferences(ContentCatalog catalog, string skillName, params string[] files) =>
         ContentCatalog.From(catalog.Kernel, catalog.Adapters.ToDictionary(),
@@ -684,6 +756,145 @@ public static class Program
 
     private static SkillFile Skill(string name, string text) =>
         new(name, name.Replace('-', '/'), text);
+
+    // ── nzt-ai ─────────────────────────────────────────────────────────────────
+    // Siempre con una carpeta explícita: así CliCommand no toca el PATH real.
+
+    private static void LeavesTheCliInstalledAndUpdatesIt() => InTemp(home =>
+    {
+        var source = Path.Combine(home, "nzt-release");
+        File.WriteAllText(source, "binario 1");
+        var bin = Path.Combine(home, "bin");
+
+        var first = CliCommand.Install(source, dryRun: false, bin);
+        Check("instala nzt-ai", first.Action == CliAction.Installed && File.Exists(CliCommand.PathFor(bin)));
+        Check("con una carpeta explícita no toca el PATH", !first.PathChanged && first.PathLine is null);
+
+        Check("reinstalar el mismo binario no cambia nada",
+            CliCommand.Install(source, dryRun: false, bin).Action == CliAction.Unchanged);
+
+        File.WriteAllText(source, "binario 2");
+        var updated = CliCommand.Install(source, dryRun: false, bin);
+        Check("reinstalar otra versión la reemplaza",
+            updated.Action == CliAction.Updated && File.ReadAllText(CliCommand.PathFor(bin)) == "binario 2");
+    });
+
+    private static void CliDryRunWritesNothing() => InTemp(home =>
+    {
+        var source = Path.Combine(home, "nzt-release");
+        File.WriteAllText(source, "binario");
+        var bin = Path.Combine(home, "bin");
+
+        var result = CliCommand.Install(source, dryRun: true, bin);
+        Check("la simulación dice que instalaría nzt-ai", result.Action == CliAction.Installed);
+        Check("la simulación no copia nzt-ai", !File.Exists(CliCommand.PathFor(bin)));
+    });
+
+    private static void CliFromTheRepoIsNotInstalled() => InTemp(home =>
+    {
+        var bin = Path.Combine(home, "bin");
+        Check("sin binario de un solo archivo no instala nzt-ai",
+            CliCommand.Install(null, dryRun: false, bin).Action == CliAction.NotSingleFile
+            && !File.Exists(CliCommand.PathFor(bin)));
+        Check("las comprobaciones corren desde el repo, no como binario único",
+            CliCommand.RunningSingleFile() is null);
+    });
+
+    private static void UninstallRemovesTheCli() => InTemp(home =>
+    {
+        var source = Path.Combine(home, "nzt-release");
+        File.WriteAllText(source, "binario");
+        var bin = Path.Combine(home, "bin");
+        CliCommand.Install(source, dryRun: false, bin);
+
+        Check("la simulación de desinstalar no borra nzt-ai",
+            CliCommand.Uninstall(dryRun: true, bin).Action == CliAction.Removed && File.Exists(CliCommand.PathFor(bin)));
+        Check("desinstalar saca nzt-ai",
+            CliCommand.Uninstall(dryRun: false, bin).Action == CliAction.Removed && !File.Exists(CliCommand.PathFor(bin)));
+        Check("sin nzt-ai instalado no hay nada que sacar",
+            CliCommand.Uninstall(dryRun: false, bin).Action == CliAction.NotInstalled);
+    });
+
+    // ── state check ────────────────────────────────────────────────────────────
+
+    private static StateReport CheckState(string home, string json)
+    {
+        Directory.CreateDirectory(Path.Combine(home, "Plan"));
+        File.WriteAllText(Path.Combine(home, StateCheck.RelativePath), json);
+        return StateCheck.Run(home);
+    }
+
+    private static void StateCheckAcceptsAValidState() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "version": 1, "approved": true,
+              "phases": [
+                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                { "name": "build", "status": "doing", "units": [
+                  { "id": 2, "status": "doing" }, { "id": 3, "status": "todo" }] },
+                { "name": "verify", "status": "todo", "units": [] }],
+              "autonomy": { "units": [2, 3], "keep_stops": [3] } }
+            """);
+        Check("un estado que cumple el contrato no tiene problemas", report.Found && report.Ok);
+    });
+
+    private static void StateCheckWithoutAFileIsNotAnError() => InTemp(home =>
+    {
+        var report = StateCheck.Run(home);
+        Check("sin Plan/state.json no hay nada que revisar", !report.Found && report.Ok);
+    });
+
+    private static void StateCheckCatchesEveryBrokenInvariant() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "approved": "yes",
+              "phases": [
+                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "todo" }] },
+                { "name": "build", "status": "doing", "units": [
+                  { "id": 2, "status": "doing" }, { "id": 2, "status": "running" }] },
+                { "name": "verify", "status": "doing", "units": [{ "id": 4, "status": "doing" }] },
+                { "name": "ship", "status": "todo", "units": [{ "id": 5, "status": "doing" }] },
+                { "name": "discusion", "status": "todo", "units": [] }],
+              "autonomy": { "units": [9] }, "delegation": "always" }
+            """);
+
+        bool Says(string text) => report.Problems.Any(p => p.Contains(text));
+        Check("approved que no es booleano", Says("approved tiene que ser true o false"));
+        Check("un id repetido", Says("el id 2 se repite"));
+        Check("un status que el kernel no define", Says("'running'"));
+        Check("más de una fase en doing", Says("hay 2 fases en doing"));
+        Check("más de una unidad en doing", Says("hay 3 unidades en doing"));
+        Check("una unidad en doing fuera de la fase en doing", Says("la unidad 5 está en doing, pero su fase 'ship'"));
+        Check("una fase done con unidades pendientes", Says("la fase 'analysis' está done con la unidad 1 en todo"));
+        Check("autonomy que nombra una unidad que no existe", Says("autonomy.units nombra la unidad 9"));
+        Check("una fase que no es de NZT", Says("la fase 'discusion' no es una fase de NZT"));
+        Check("las fases de NZT no se marcan", !Says("la fase 'build' no es una fase"));
+        Check("un modo de delegación que no existe", Says("delegation es 'always'"));
+    });
+
+    private static void StateCheckAcceptsEachDelegationModeAndItsAbsence() => InTemp(home =>
+    {
+        const string plan = """{ "approved": true, "phases": [] """;
+        Check("sin delegation el estado cumple", CheckState(home, plan + "}").Ok);
+        foreach (var mode in new[] { "auto", "ask", "off" })
+            Check($"delegation {mode} cumple", CheckState(home, plan + $", \"delegation\": \"{mode}\" }}").Ok);
+        Check("delegation que no es texto no cumple",
+            CheckState(home, plan + ", \"delegation\": true }").Problems.Any(p => p.Contains("delegation es 'true'")));
+    });
+
+    private static void StateCheckReportsBrokenJson() => InTemp(home =>
+    {
+        var report = CheckState(home, "{ \"phases\": [ }");
+        Check("un JSON roto es un problema con su línea",
+            report.Found && report.Problems.Count == 1 && report.Problems[0].Contains("no es JSON válido, línea 1"));
+    });
+
+    private static void StateCheckAcceptsTheRepoState()
+    {
+        var root = RepoRoot();
+        var report = root is null ? null : StateCheck.Run(root);
+        Check("el Plan/state.json de este repo cumple el contrato", report is { Found: true, Ok: true });
+    }
 
     private static void InTemp(Action<string> body)
     {

@@ -57,21 +57,19 @@ The session is disposable; the state file is not.
   whatever this session exposes. **If there is no signal, say that, and say what you can
   observe instead**: units closed, how much was read. **Never invent a percentage.** A made
   up number is a recommendation resting on nothing.
-- **The scale is what you have consumed.** Under 20%, say where it stands and nothing more.
-  **From 20%, recommend clearing.** From 30%, say it plainly: that is where the answers
-  start getting worse. **Past 40%, recommend it strongly.** A full window degrades the work
-  long before it runs out, and what is left still has to cover what the next unit reads.
+- **The scale is what you have consumed, and it is NZT's choice, not a measurement.** Under
+  20%, say where it stands and nothing more. **From 20%, recommend clearing.** From 30%, say
+  it plainly. **Past 40%, recommend it strongly.** It is early on purpose: what is left
+  still has to cover what the next unit reads, and a stop missed cannot be taken back.
 - **Clearing is safe exactly when the state is current**, which is why it comes after
   writing it, never before. If the context is heavy mid-unit, stop at the next boundary,
   leave the state clean, and say so.
-- **You recommend; you never clear.** That is the user's, and if they keep going, you keep
-  going.
+- **You recommend; you never clear.** That is the user's; if they keep going, so do you.
 
 ## State
 
-`Plan/state.json` at the project root is the single file you maintain: the plan and the
-state together, never a log. If it exists, read it when a session starts, before asking the
-user anything.
+`Plan/state.json` at the project root is the single file you maintain: plan and state
+together, never a log. If it exists, read it when a session starts, before asking anything.
 
 ```json
 {
@@ -80,7 +78,7 @@ user anything.
   "goal": "one line: what this run is for",
   "phases": [{ "name": "build", "status": "doing", "units": [
     { "id": 4, "do": "one line", "status": "doing", "detail": "where you stopped" }] }],
-  "approved": true,
+  "approved": true, "delegation": "ask",
   "autonomy": { "units": [4, 5], "keep_stops": [5] },
   "waiting_on": "what you are blocked on, or null",
   "notes": ["at most 3 short items"]
@@ -88,17 +86,19 @@ user anything.
 ```
 
 - `status` is `todo`, `doing`, `done` or `dropped`. At most one unit is `doing`.
-- `phases` are the phases `nzt` chose, in run order, with the same statuses and **at most
-  one `doing`**: that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
+- `phases` are the phases `nzt` chose, in run order, named `analysis`, `architecture`, `ux`,
+  `build`, `verify` or `ship` and no other, with the same statuses and **at most one `doing`**:
+  that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
   `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
   phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
   next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
 - `approved` is the lock on the main stop: without `true`, nothing executes.
 - `autonomy` records the batch the user selected: which units run without stopping, and
-  which stops are kept anyway. **Absent or empty means accompanied.**
+  which stops are kept anyway. **Absent or empty means accompanied.** `delegation` is the
+  project's subagent mode, `auto`, `ask` or `off`; absent is `ask`, and only the user sets it.
 - Never write the file while you are inside a unit. Rewrite `phases` when the user changes
-  the plan. **A new run rewrites the file** with its own goal, phases and
-  units, ids counting on from the last run; inside a run, nothing `done` or `dropped` goes.
+  the plan. **A new run rewrites the file** with its own goal, phases and units, ids
+  counting on from the last run, `delegation` kept; inside a run, nothing `done` or `dropped` goes.
 - **Write it for a session that has none of this conversation.** The test is literal: if
   picking the work up again would need something that exists only in the chat — a decision
   taken out loud, where a unit actually stopped, what it is waiting on — it goes in the
@@ -178,9 +178,9 @@ somewhere else is read where it is and proposed for moving, never moved without 
 - Never execute a plan the user has not approved.
 - Never write more than one spec in a unit.
 - Never run the whole pipeline in a single turn.
-- Never skip the state update at the end of a unit.
+- Never skip the state update at the end of a unit, and after writing it run
+  `nzt-ai state check` where it is installed: what it reports is fixed before the report.
 - Never write a spec for code you have not read.
-- Never delegate NZT work to subagents. One conversation, one context, kept clean by
-  stopping at unit boundaries.
+- Delegate only reading, per `nzt-delegate`; the unit, the state and decisions stay yours.
 - Report what actually happened. A test that failed, a step you skipped, an assumption you
   made: say it plainly.

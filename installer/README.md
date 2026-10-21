@@ -64,10 +64,13 @@ mods, y el método no se pidió.
 
 ## Dónde queda instalado
 
-| Proveedor | Instrucciones | Skills | Cómo se activa |
-|---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/SKILL.md` | abrir `claude` en cualquier proyecto |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/SKILL.md` | iniciar `codex` |
+| Proveedor | Instrucciones | Skills | Subagente | Cómo se activa |
+|---|---|---|---|---|
+| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/SKILL.md` | `~/.claude/agents/nzt-explorer.md` | abrir `claude` en cualquier proyecto |
+| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/SKILL.md` | `$CODEX_HOME/agents/nzt-explorer.toml` | iniciar `codex` |
+
+El subagente es el explorador de solo lectura al que `nzt-delegate` manda las lecturas
+largas. Desinstalar lo saca y deja tus otros agentes.
 
 `CODEX_HOME` es `~/.codex` por defecto. Cambiarlo mueve las instrucciones, **no** las skills.
 
@@ -154,7 +157,9 @@ sección 10 de `specs/nzt-installer.md`):
 
 Cada comando baja el binario de la plataforma a una carpeta temporal, verifica su SHA256
 contra `SHA256SUMS`, corre `install --provider <id>` sin menú y borra la carpeta. El script
-no escribe nada del proveedor: eso lo hace el CLI, con las reglas de siempre.
+no escribe nada del proveedor: eso lo hace el CLI, con las reglas de siempre, y el CLI se
+copia como `nzt-ai` (sección 12 de la spec). Corrido con `dotnet run` no se copia: no es un
+binario de un solo archivo.
 `NZT_UNINSTALL=1` desinstala —en Claude Code, el método y los mods que instaló este CLI— y
 `NZT_DRY_RUN=1` simula; el resto de las variables está en la sección 10.3 de la spec. **El
 repositorio tiene que ser público** para que la descarga anónima funcione.

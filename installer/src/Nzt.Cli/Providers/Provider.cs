@@ -18,6 +18,12 @@ public sealed class Provider
 
     public required string SkillsDirectory { get; init; }
 
+    /// <summary>Donde el proveedor busca los subagentes de usuario (D71).</summary>
+    public required string AgentsDirectory { get; init; }
+
+    /// <summary>Qué archivos de `agents/` son de este proveedor: su formato sale de la extensión.</summary>
+    public required string AgentExtension { get; init; }
+
     /// <summary>El adapter que se concatena al kernel para este proveedor.</summary>
     public required string AdapterFile { get; init; }
 
@@ -38,9 +44,9 @@ public sealed class Provider
 
     // ── Claude Code ────────────────────────────────────────────────────────────
     // Global de usuario: ~/.claude/CLAUDE.md y ~/.claude/skills/<nombre>/SKILL.md.
-    // Sin plugin y sin subagente: el CLAUDE.md de usuario se carga en todo
-    // proyecto, y las skills sueltas en ~/.claude/skills son el mecanismo
-    // documentado para el alcance personal.
+    // Sin plugin: el CLAUDE.md de usuario se carga en todo proyecto, y las
+    // skills sueltas en ~/.claude/skills son el mecanismo documentado para el
+    // alcance personal. Los subagentes de usuario van en ~/.claude/agents.
     public static Provider ClaudeCode(string? homeDirectory = null)
     {
         var root = Path.Combine(homeDirectory ?? Home, ".claude");
@@ -50,6 +56,8 @@ public sealed class Provider
             DisplayName = "Claude Code",
             InstructionsFile = Path.Combine(root, "CLAUDE.md"),
             SkillsDirectory = Path.Combine(root, "skills"),
+            AgentsDirectory = Path.Combine(root, "agents"),
+            AgentExtension = ".md",
             AdapterFile = "adapter-claude.md",
             Usage = "Abrí claude en cualquier proyecto: el CLAUDE.md de usuario se carga solo."
         };
@@ -58,7 +66,9 @@ public sealed class Provider
     // ── Codex ──────────────────────────────────────────────────────────────────
     // Las instrucciones van en $CODEX_HOME/AGENTS.md (por defecto ~/.codex), y
     // las skills NO van ahí: el scope de usuario documentado es ~/.agents/skills.
-    // Cambiar CODEX_HOME mueve las instrucciones, no las skills.
+    // Cambiar CODEX_HOME mueve las instrucciones, no las skills. Los agentes de
+    // usuario van en ~/.codex/agents; que sigan a CODEX_HOME es inferido, no
+    // documentado.
     public static Provider Codex(string? homeDirectory = null, string? codexHome = null)
     {
         var home = homeDirectory ?? Home;
@@ -76,6 +86,8 @@ public sealed class Provider
             DisplayName = "Codex",
             InstructionsFile = Path.Combine(root, "AGENTS.md"),
             SkillsDirectory = skills,
+            AgentsDirectory = Path.Combine(root, "agents"),
+            AgentExtension = ".toml",
             AdapterFile = "adapter-codex.md",
             Usage = "Iniciá codex: el hilo principal carga NZT desde el AGENTS.md global.",
             // Hay guías de terceros que ubican las skills en ~/.codex/skills. Si esa
