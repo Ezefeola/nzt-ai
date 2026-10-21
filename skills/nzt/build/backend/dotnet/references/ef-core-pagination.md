@@ -34,7 +34,6 @@ case returns `Result<PagedResponseDto<XResponseDto>>` (`nzt-build-csharp-dtos`).
 
 ```csharp
 PagedResponseDto<OrderSummaryResponseDto> page = await dbContext.Orders
-    .AsNoTracking()
     .Where(order => order.CustomerId == request.CustomerId)
     .OrderByDescending(order => order.CreatedOn)
     .ThenBy(order => order.Id)

@@ -15,7 +15,6 @@ materialised, nothing to untrack.
 
 ```csharp
 List<OrderSummaryResponseDto> orders = await dbContext.Orders
-    .AsNoTracking()
     .Where(order => order.CustomerId == request.CustomerId)
     .Select(order => new OrderSummaryResponseDto
     {
@@ -27,7 +26,9 @@ List<OrderSummaryResponseDto> orders = await dbContext.Orders
 ```
 
 Here **a related field comes through the navigation without `Include`**, and the count through
-`order.Lines.Count`. A mapping helper in the final `Select` can run on the client.
+`order.Lines.Count`. **No `AsNoTracking()`: the result holds no entity.** A mapping helper in
+the final `Select` can run on the client, and if it receives the entity, the entity is
+tracked (`ef-core.md`).
 
 ## Loading the entity
 
@@ -39,7 +40,7 @@ warrants it.
 ## Optional filters
 
 ```csharp
-IQueryable<Order> query = dbContext.Orders.AsNoTracking();
+IQueryable<Order> query = dbContext.Orders;
 
 if (request.Status is not null)
 {
@@ -74,8 +75,8 @@ parameterise the holes.
 
 ## Closing checklist
 
-- [ ] The query projects to its response DTO, with `AsNoTracking()`, and no `Include` where a
-      projection would do.
+- [ ] The query projects to its response DTO, with no `Include` where a projection would do;
+      `AsNoTracking()` only where entities are loaded to read.
 - [ ] The operator matches the intent: `AnyAsync` for existence, `FirstOrDefaultAsync` over
       `SingleOrDefaultAsync`, aggregates in the database.
 - [ ] Raw SQL only where LINQ cannot express it, and always parameterised.

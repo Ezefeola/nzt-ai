@@ -93,8 +93,8 @@ value pasted into the text.
 
 ## Closing checklist
 
-- [ ] The query projects to its response DTO, untracked, with no eager loading where a
-      projection would do.
+- [ ] The query projects to its response DTO, with no eager loading where a projection would
+      do; an entity loaded only to read is loaded untracked.
 - [ ] Any entity load is justified by the query being unable to express the read; one query or
       one per collection accounts for duplication, round trips and read consistency.
 - [ ] Optional filters chain; filter, order and page ran on the server, in that order.

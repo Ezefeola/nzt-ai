@@ -45,9 +45,10 @@ graders:
     min: 0
     max: 0
     arm: both
-  - name: no-tracking-on-the-read
+  - name: no-tracking-marker-on-a-projection
     type: regex
     pattern: 'AsNoTracking\(\)'
+    match: not_contains
   - name: paginates-through-the-shared-extension
     type: regex
     pattern: 'PaginateAsync'
