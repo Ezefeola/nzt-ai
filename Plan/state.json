@@ -1,17 +1,77 @@
 {
   "version": 1,
-  "updated": "2026-10-20T23:30:00Z",
-  "goal": "nzt-look 0.6.0 en main: el tema por defecto es 'default' (el dibujo de Claude Code, el mod no repinta la conversación) y TEMA tiene un botón 'default'",
+  "updated": "2026-10-21T23:20:00Z",
+  "goal": "Corregir lo que vale del análisis externo de NZT: regla de tracking de EF, validar Plan/state.json con el CLI instalado como nzt-ai, escala de contexto sin afirmación sin fuente; discutir subagentes; evals al final",
   "phases": [
     {
-      "name": "discovery",
+      "name": "build",
       "status": "done",
       "units": [
         {
-          "id": 300,
-          "do": "Spec nzt-look: RN-skin-tema-por-defecto pasa a 'default'; nueva regla del tema 'default' (conversación como la dibuja Claude Code, banda y panel con paleta neutra mono, chip primero en TEMA, fijable a carpeta)",
+          "id": 304,
+          "do": "EF Core: AsNoTracking solo cuando el resultado contiene entidades (incluida la evaluación en cliente); count y proyección a DTO no lo llevan; ef-core.md, ef-core-queries.md y demás referencias",
           "status": "done",
-          "detail": "RN-skin-tema-por-defecto [modify], RN-skin-tema-default [add], QT-20 (respuesta del usuario: dibujo de Claude), Q-02 reabierta, panel región 3, flujo 1.2, encabezado 0.6.0"
+          "detail": "ef-core, -queries, -pagination, -writes, data-queries; eval stack/ef-listado invertido (not_contains), sin correr; D66 en nzt-core.md"
+        },
+        {
+          "id": 306,
+          "do": "Kernel: la escala 20/30/40% se presenta como decisión del proyecto (D40), no como hecho medido; D67 en nzt-core.md; rebuild CLAUDE.md/AGENTS.md",
+          "status": "done",
+          "detail": "core/kernel.md mismas líneas; dist/CLAUDE.md y AGENTS.md en 200 (tope C3); nzt lint 0 problemas; tokens absolutos anotado como abierto en D67"
+        },
+        {
+          "id": 309,
+          "do": "Spec nzt-installer.md: el CLI queda instalado como 'nzt-ai' (dónde, PATH, desinstalar lo saca, reinstalar actualiza); reabre D46 y la sección 10",
+          "status": "done",
+          "detail": "Sección 12 de nzt-installer.md (RN-cli-nombre, -queda-instalado, -path, -actualizar, -desinstalar, -state-check) con [add]/[modify]; QT-23..26 = A; change borrado"
+        },
+        {
+          "id": 310,
+          "do": "Scripts install.sh/.ps1 y CLI: dejar el binario 'nzt-ai' en su carpeta y en el PATH, sacarlo al desinstalar; tests del CLI",
+          "status": "done",
+          "detail": "Install/CliCommand.cs (registro HKCU\\Environment conservando REG_EXPAND_SZ + WM_SETTINGCHANGE); Program: ReportCli, --bin-dir; 117 checks verdes; PATH real y binario publicado SIN probar; dotnet run no copia (spec ajustada); READMEs"
+        },
+        {
+          "id": 305,
+          "do": "CLI: 'nzt-ai state check' valida los invariantes de Plan/state.json (statuses, un doing por nivel, ids únicos, fase doing coherente); spec y tests",
+          "status": "done",
+          "detail": "State/StateCheck.cs + comando 'state check' en Program; 12 checks nuevos (129 verdes), incluido el state.json del repo; JSON roto con línea"
+        },
+        {
+          "id": 311,
+          "do": "Kernel/adapters/nzt-plan: después de escribir el estado, correr 'nzt-ai state check' si está; entrar en el tope de 200 líneas de CLAUDE.md",
+          "status": "done",
+          "detail": "Hard rule del estado extendida, intro de State recortada; CLAUDE.md/AGENTS.md en 200; no va en nzt-plan (200 líneas, D65); D68; lint 0, 129 checks"
+        },
+        {
+          "id": 312,
+          "do": "Kernel: la línea de phases nombra la lista cerrada (analysis, architecture, ux, build, verify, ship); dentro de 200 líneas",
+          "status": "done",
+          "detail": "Recortado 'You recommend; you never clear' a una línea; CLAUDE.md/AGENTS.md en 200; lint 0; D69"
+        },
+        {
+          "id": 313,
+          "do": "state check rechaza un nombre de fase fuera de la lista; regla en nzt-installer §12.2 y comprobaciones",
+          "status": "done",
+          "detail": "Phases en StateCheck.cs; 131 checks verdes; sinónimos (discovery) también se rechazan; demo de nzt-state y estado del repo pasan"
+        }
+      ]
+    },
+    {
+      "name": "analysis",
+      "status": "done",
+      "units": [
+        {
+          "id": 307,
+          "do": "Discutir subagentes con el usuario: cuándo delegar, si NZT define los suyos, si el subagente carga kernel y skills; decidir antes de tocar la hard rule",
+          "status": "done",
+          "detail": "D70 en nzt-core.md: QT-27..29 = A (explorar ahora, paralelo después; agente propone y usuario aprueba; archivo propio corto + skills, omitClaudeMd)"
+        },
+        {
+          "id": 314,
+          "do": "Spec de delegación (D71): skill nzt-delegate (cuándo, prompt, modos auto/ask/off), nzt-explorer, campo delegation en el estado que sobrevive a una corrida nueva",
+          "status": "done",
+          "detail": "D71 en nzt-core.md y sección 7: QT-32..35 (auto explora solo, default ask, inherit con model routing abierto, por proyecto); fila del mod sin estado = propuesta sin confirmar"
         }
       ]
     },
@@ -20,34 +80,49 @@
       "status": "done",
       "units": [
         {
-          "id": 301,
-          "do": "Construir: 'default' en prefs/namesOf/paletas, compuertas de dibujo en register.tsx según el tema en vigor, chip en el panel, tests; plugin 0.6.0, README, fila del catálogo",
+          "id": 315,
+          "do": "Skill nzt-delegate: cuándo delegar, la forma del prompt de delegación, qué hacer con lo que vuelve, los modos",
           "status": "done",
-          "detail": "CLAUDE_DRAWING/NEUTRAL_THEME en palette.ts; redraws() y builtInOf en prefs.ts; drawingPrefs() en register.tsx; slugOf evita 'default'; repintar default guarda mi-mono; world.test-kit siembra nzt; 190 tests y validate verdes; tsc no corrido (npx sin tsc); dev-mods vacío, nada que sincronizar"
+          "detail": "skills/nzt/delegate/SKILL.md (104 líneas); regla 6 de autoría con excepción D71; 15 skills ~2702 chars; build y lint 0; la hard rule del kernel sigue prohibiendo hasta la 317"
+        },
+        {
+          "id": 316,
+          "do": "Instalador: ~/.claude/agents/nzt-explorer.md y ~/.codex/agents/nzt-explorer.toml con manifiesto y desinstalación; comprobaciones",
+          "status": "done",
+          "detail": "agents/nzt-explorer.md y .toml (Codex: name nzt_explorer, solo lectura y sin kernel solo por instrucción); 139 checks; dry-run real OK; dist/plugin no lleva el agente"
+        },
+        {
+          "id": 317,
+          "do": "Kernel: campo delegation en el schema, una corrida nueva lo conserva, hard rule de D70 que nombra nzt-delegate; state check valida el valor; dentro de 200",
+          "status": "done",
+          "detail": "kernel 186 líneas, CLAUDE.md/AGENTS.md 200; hard rule en una línea; StateCheck valida delegation; 145 checks; lint 0; ~/.claude/CLAUDE.md instalado sigue viejo hasta reinstalar"
+        },
+        {
+          "id": 318,
+          "do": "Mod nzt-state: fila Delegar debajo de Plan y Modo; un click cicla auto→ask→off y escribe delegation en Plan/state.json; spec del mod, código y tests",
+          "status": "done",
+          "detail": "nzt-state 0.8.0: RN-panel-delegar [add], RN-panel-solo-lee y RN-mod-lee-no-escribe [modify]; 49 tests, validate OK; sin probar en vivo ni tsc; sin aceptar"
         }
       ]
     },
     {
       "name": "verify",
-      "status": "done",
+      "status": "doing",
       "units": [
-        { "id": 302, "do": "Prueba en vivo: instalación limpia arranca en default, chip default/nzt alterna el dibujo, fijado a carpeta", "status": "dropped", "detail": "Usuario 2026-10-20 pidió commit, push a main y release directo; no se corrió por mí" }
-      ]
-    },
-    {
-      "name": "ship",
-      "status": "done",
-      "units": [
-        { "id": 303, "do": "Commit en main y push (release solo si el usuario la pide)", "status": "done", "detail": "8d1d9b0 nzt-look 0.6.0 + ea5aec3 bump 1.5.0 en main; tag v1.5.0, workflow release success, 13 assets; instalación no probada" }
+        {
+          "id": 308,
+          "do": "Evals: actualizar evals/README.md (dice 26 casos y 'doce sin correr'; hay 31 y resultados del 03 al 08/10) y correr la suite con el brazo sin plugin; el usuario la pospuso",
+          "status": "todo"
+        }
       ]
     }
   ],
   "approved": true,
-  "autonomy": { "units": [300, 301], "keep_stops": [] },
-  "waiting_on": "Usuario: aceptar nzt-look 0.6.0 tras usarlo (actualizar el mod instalado) y decir con qué sigue",
+  "autonomy": {},
+  "waiting_on": "Usuario: probar la rama analisis-externo (nzt-state 0.8.0, delegación tras reinstalar); 308 pospuesta por el usuario, va en esa misma rama antes del PR",
   "notes": [
-    "Hallazgo fuera de alcance 2026-10-20: variante auto lee AppsUseLightTheme de Windows (light.ts variantOf), que no es el fondo de la consola; eligió clara sobre consola oscura. Reportado, no arreglado",
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods: nada en prompt.submit ni al iniciar sesión",
+    "Usuario 2026-10-21: construir en paralelo con subagentes = análisis propio después de nzt-explorer (D70 QT-27); evals (308) al final, no correr ahora",
+    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods",
     "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
   ]
 }

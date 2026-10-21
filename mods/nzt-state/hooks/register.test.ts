@@ -2,7 +2,7 @@ import { describe, expect, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
 import { GLOW_STEPS, glowOf, levelOf } from './glow'
-import { parseState } from './parse'
+import { nextModeOf, parseState, withDelegation } from './parse'
 import { idOf, PHASES, timelineOf } from './phases'
 import {
   animatedSvgOf,
@@ -808,4 +808,69 @@ test('without nzt-questions, or with nothing pending, the pane says nothing abou
   expect(await ui.find({ type: 'Text', text: /para contestar|Tu turno/ })).toBeUndefined()
   expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
+})
+
+describe('delegation', () => {
+  test('absent is ask by default, a mode is kept, anything else is ask with a warning', async () => {
+    const of = (value?: unknown) => {
+      const parsed = parseState(JSON.stringify(value === undefined ? {} : { delegation: value }))
+      if (parsed.kind !== 'ok') throw new Error(parsed.kind)
+      return parsed.delegation
+    }
+    expect(of()).toEqual({ mode: 'ask', isSet: false })
+    expect(of('auto')).toEqual({ mode: 'auto', isSet: true })
+    expect(of('always')).toEqual({ mode: 'ask', isSet: false, invalid: '"always"' })
+  })
+
+  test('a press steps auto, ask, off and back to auto', async () => {
+    expect([nextModeOf('auto'), nextModeOf('ask'), nextModeOf('off')]).toEqual(['ask', 'off', 'auto'])
+  })
+
+  test('the mode is written in place and every other byte is kept', async () => {
+    const raw = '{\n  "goal": "G",\n  "approved": true,\n  "delegation": "auto",\n  "notes": []\n}\n'
+    expect(withDelegation(raw, 'ask')).toBe(raw.replace('"auto"', '"ask"'))
+  })
+
+  test('a new mode goes beside approved, as the kernel writes it', async () => {
+    const raw = '{\n  "goal": "G",\n  "approved": true,\n  "notes": []\n}\n'
+    expect(withDelegation(raw, 'off')).toBe(
+      '{\n  "goal": "G",\n  "approved": true, "delegation": "off",\n  "notes": []\n}\n',
+    )
+  })
+
+  test('without approved it opens the object; a text that is not an object is not written', async () => {
+    const raw = '{\n  "goal": "G"\n}\n'
+    expect(withDelegation(raw, 'auto')).toBe('{\n  "delegation": "auto",\n  "goal": "G"\n}\n')
+    expect(withDelegation('[1]', 'auto')).toBeUndefined()
+    expect(withDelegation('{ nope', 'auto')).toBeUndefined()
+  })
+})
+
+test('the pane shows the mode under Plan and Modo, and a press writes the next one', async ($, on) => {
+  const written: string[] = []
+  on('fs.write', async (_, e) => {
+    written.push(e.text)
+    return { value: undefined }
+  })
+  const ui = await mountPane($, on, { goal: 'Delegate', phases: [], approved: true })
+  expect(await ui.find({ type: 'Text', text: /^Delegar/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /pregunta antes \(por defecto\)/ })).toBeDefined()
+  await ui.press({ key: 'cycle-delegation' })
+  expect(written.length).toBe(1)
+  expect(JSON.parse(written[0] ?? '{}')).toEqual({
+    goal: 'Delegate',
+    phases: [],
+    approved: true,
+    delegation: 'off',
+  })
+  await ui.unmount()
+})
+
+test('a write that fails is said in the pane, and the file is left as it was', async ($, on) => {
+  on('fs.write', async () => ({ deny: 'EACCES' }))
+  const ui = await mountPane($, on, { goal: 'Locked', phases: [], approved: true, delegation: 'auto' })
+  expect(await ui.find({ type: 'Text', text: /explora sin preguntar/ })).toBeDefined()
+  await ui.press({ key: 'cycle-delegation' })
+  expect(await ui.find({ type: 'Text', text: /No se pudo cambiar el modo/ })).toBeDefined()
+  await ui.unmount()
 })

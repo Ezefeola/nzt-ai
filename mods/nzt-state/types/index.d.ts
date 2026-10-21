@@ -18,6 +18,15 @@ export type Unit = {
 
 export type Phase = { name: string; status: Status; rawStatus?: string }
 
+/** How the agent hands readings to a subagent (D71 of specs/nzt-core.md). */
+export type DelegationMode = 'auto' | 'ask' | 'off'
+
+/**
+ * The mode in force: `ask` when the file does not set it or sets something else. `isSet` says
+ * the file wrote a valid one; `invalid` keeps a value that is not a mode, as written.
+ */
+export type Delegation = { mode: DelegationMode; isSet: boolean; invalid?: string }
+
 export type Snapshot =
   | { kind: 'missing' }
   | { kind: 'error'; message: string }
@@ -33,6 +42,7 @@ export type Snapshot =
       units: Unit[]
       /** The batch the user authorised to run without stopping; both empty is accompanied. */
       autonomy: { units: number[]; keepStops: number[] }
+      delegation: Delegation
       waitingOn: string | null
       notes: string[]
     }
@@ -58,8 +68,17 @@ export type Answering = { kind: 'idle' } | { kind: 'waiting' } | { kind: 'failed
 
 declare module 'claude-code' {
   interface PluginState {
-    /** `glow` is the step of the soft glow of Tu turno and the unit in progress, while either shows. */
-    'nzt-state': { snapshot: Snapshot; expanded: Expanded; answering: Answering; glow: number }
+    /**
+     * `glow` is the step of the soft glow of Tu turno and the unit in progress, while either shows.
+     * `delegating` is why the last press on Delegar could not write the mode, or null.
+     */
+    'nzt-state': {
+      snapshot: Snapshot
+      expanded: Expanded
+      answering: Answering
+      glow: number
+      delegating: string | null
+    }
     /**
      * The one value read of nzt-questions, as its own contract declares it. Not a dependency,
      * so the pane works without it installed, and its contract is not laid here.

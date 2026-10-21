@@ -12,6 +12,9 @@
 > **0.7.0 aceptado y cerrado** (usuario 2026-10-20, unidad 298; spec 294, mockup 295, build
 > 296, prueba en vivo 297): Tu turno, AHORA y las tareas a pedido. 0.6.0, aceptado con ella.
 > Cómo llegó hasta acá, en **Historia** al final.
+> **0.8.0 construido, sin aceptar** (unidad 318, 2026-10-21): la fila **Delegar**
+> (RN-panel-delegar) y la excepción a RN-panel-solo-lee, marcadas `[add]` y `[modify]` hasta
+> que el usuario lo acepte. Origen: D71 de `specs/nzt-core.md`.
 
 ## Qué resuelve
 
@@ -43,6 +46,7 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 **Afuera**
 - **Editar o corregir el estado desde el panel.** El panel solo lee
   (`RN-mod-lee-no-escribe` de `specs/nzt-mods.md`); avisa lo que está mal y no lo arregla.
+  La única excepción es el modo de delegación (RN-panel-delegar).
 - **Codex.** Un mod es solo de Claude Code (D63).
 - **Otros artefactos**, como specs, historias o el glosario. El panel lee únicamente
   `Plan/state.json`. Las preguntas abiertas no las busca en los documentos: toma la
@@ -63,10 +67,30 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 
 ## Reglas
 
-### RN-panel-solo-lee · origin: D63
+### RN-panel-solo-lee · origin: D63; [modify] D71, usuario 2026-10-21
 El panel no escribe ningún archivo del proyecto. Lo único que guarda es su propio estado de
 sesión: qué grupos y secciones están abiertos, y si el detalle de la unidad en curso está
-desplegado.
+desplegado. **[modify] Excepción:** la clave `delegation` de `Plan/state.json`, cuando la
+persona aprieta Delegar (RN-panel-delegar).
+
+### RN-panel-delegar · [add] · origin: usuario 2026-10-21 (unidad 318 del plan); D71
+Debajo de **Plan** y **Modo**, en su misma columna, la fila **Delegar** ("Delegate") muestra
+cómo delega lecturas el agente: `auto` *· explora sin preguntar*, `ask` *· pregunta antes* u
+`off` *· no delega*. Sin la clave en el estado muestra `ask` *(por defecto)*; con un valor que
+no es un modo muestra `ask` y avisa *⚠ "always" no es un modo*. **Un clic pasa al siguiente,
+`auto → ask → off → auto`** (sin clave o inválido cuenta como `ask`, así que pasa a `off`), y
+lo escribe en el archivo:
+- relee el archivo en el momento del clic, no lo que vio el panel, para no pisar lo que el
+  agente escribió desde la última lectura;
+- cambia esa clave y deja el resto **byte por byte**; una clave nueva va al lado de
+  `approved`, como la escribe el schema del kernel (`"approved": true, "delegation": "off",`);
+- un archivo que no es un objeto JSON no se toca; si la escritura falla, el panel dice
+  *No se pudo cambiar el modo:* y el motivo.
+
+Sin `Plan/state.json` o con el archivo roto no hay fila: el panel ya muestra lo de
+RN-panel-sin-estado y RN-panel-archivo-roto. Esto reemplaza la propuesta de D71 (*la fila
+muestra `ask` y el clic no hace nada*), que el usuario no confirmó: sin estado el panel no
+dibuja Plan ni Modo.
 
 ### RN-panel-abre-con-estado · origin: reverse (R-01)
 Al empezar la sesión, el panel se abre solo si el proyecto tiene `Plan/state.json`. En un
@@ -438,7 +462,11 @@ desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el obje
 etiqueta, arriba de las fases; el aviso de preguntas pendientes en Tu turno con Contestar, y su
 ausencia sin `nzt-questions` o sin preguntas; la onda del brillo (sube y baja sin saltos, entera
 arriba y mezclada con gris abajo) y Tu turno y la unidad en curso dibujados en su brillo; el
-estado leído de la carpeta en que empezó la sesión. 42 tests. **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
+estado leído de la carpeta en que empezó la sesión; el modo de delegación (por defecto,
+válido, inválido), el ciclo, la escritura en su lugar o al lado de `approved` sin tocar otro
+byte, el archivo que no es objeto, la fila con el clic que escribe y el error de escritura
+(0.8.0). 49 tests. **Sin probar en vivo** la fila Delegar, ni el chequeo de tipos (`tsc` no
+está en esta máquina). **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
 pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueba en vivo
 ([testing/2026-10-20-en-vivo.md](testing/2026-10-20-en-vivo.md), V-03).
 
