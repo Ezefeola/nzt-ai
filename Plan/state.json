@@ -1,6 +1,5 @@
 {
   "version": 1,
-  "updated": "2026-10-21T23:20:00Z",
   "goal": "Corregir lo que vale del análisis externo de NZT: regla de tracking de EF, validar Plan/state.json con el CLI instalado como nzt-ai, escala de contexto sin afirmación sin fuente; discutir subagentes; evals al final",
   "phases": [
     {
@@ -107,19 +106,21 @@
     },
     {
       "name": "verify",
-      "status": "doing",
+      "status": "dropped",
       "units": [
         {
           "id": 308,
           "do": "Evals: actualizar evals/README.md (dice 26 casos y 'doce sin correr'; hay 31 y resultados del 03 al 08/10) y correr la suite con el brazo sin plugin; el usuario la pospuso",
-          "status": "todo"
+          "status": "dropped",
+          "detail": "Usuario 2026-10-21 la descartó: suite corrida entera con -j 4 contra lo que pide el README (por --tag), 120/186 cortadas por límite de uso; resultados borrados; README sigue diciendo 26 casos"
         }
       ]
     }
   ],
-  "approved": true,
+  "approved": true, "delegation": "ask",
   "autonomy": {},
-  "waiting_on": "Usuario: probar la rama analisis-externo (nzt-state 0.8.0, delegación tras reinstalar); 308 pospuesta por el usuario, va en esa misma rama antes del PR",
+  "updated": "2026-10-22T00:20:00Z",
+  "waiting_on": null,
   "notes": [
     "Usuario 2026-10-21: construir en paralelo con subagentes = análisis propio después de nzt-explorer (D70 QT-27); evals (308) al final, no correr ahora",
     "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods",
