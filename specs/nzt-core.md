@@ -85,7 +85,7 @@ Consecuencias directas:
   (`nzt`, los seis de fase, `nzt-learn` y los tres de área): las hojas las nombra su router,
   no el listado. Lo que **no** está verificado es si una skill omitida del listado se puede
   seleccionar igual por nombre; esa es la pregunta concreta de la fase 9.
-  **Desde D50 la pregunta pierde peso**: el listado son 14 skills y unos 2.600 chars, debajo
+  **Desde D50 la pregunta pierde peso**: el listado son 15 skills y unos 2.700 chars (D71), debajo
   del piso de 8.000. Y **el presupuesto ya no es solo de Codex**: Claude Code lo topea al 1 %
   del contexto (fila de arriba, releída el 2026-10-03).
 - **C3.** `CLAUDE.md` y `AGENTS.md` ≤ 200 líneas cada uno, y comparten una fuente única
@@ -120,8 +120,8 @@ Capa 2 — Hojas         <router>/references/<hoja>.md     se leen por tarea    
 ```
 
 **Desde D50 las hojas no son skills: son archivos de referencia de su router**, y la tabla
-del router es lo único que las nombra. El listado de skills queda en las 14 que son routers
-o que nombra el kernel. Hasta D50 las hojas eran skills y `references/` estaba declarada y
+del router es lo único que las nombra. El listado de skills queda en las 15 que son routers
+o que nombra el kernel (`nzt-delegate` se sumó con D71). Hasta D50 las hojas eran skills y `references/` estaba declarada y
 sin uso (D4, derogada).
 
 ### 4.1 Kernel (Capa 0)
@@ -172,6 +172,7 @@ skills/nzt/                      nzt
 ├─ plan/                         nzt-plan
 │  └─ close/                     nzt-plan-close             → cierre de feature (D25)
 ├─ research/                     nzt-research               → evidencia externa (D31)
+├─ delegate/                     nzt-delegate               → lectura en nzt-explorer (D71)
 ├─ discovery/                    nzt-discovery          (análisis funcional)
 │  ├─ analysis/                  nzt-discovery-analysis     → análisis append-only (T2)
 │  ├─ product/                   nzt-discovery-product      → Docs/Product/ (D57)
@@ -526,6 +527,9 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
 - `autonomy` registra la tanda autorizada (T22): qué unidades se corren sin frenar y qué
   frenos se conservan igual. **Ausente o vacío significa acompañado**, que es el default.
   Se escribe cuando el usuario la selecciona, no cuando aprueba el plan.
+- `delegation` es el modo de delegación del proyecto: `auto`, `ask` u `off` (D71). Ausente
+  significa `ask`. Es la única clave que una corrida nueva conserva, y solo la cambia el
+  usuario.
 - Al retomar, el estado se reconcilia con las decisiones actuales del usuario y con lo que
   hay en disco. **La evidencia manda sobre los hechos; no sobre los acuerdos**: el disco
   corrige qué se hizo, no qué se había acordado hacer (13.9 #25).
@@ -674,6 +678,7 @@ nzt-ai/
 │     ├─ SKILL.md
 │     ├─ <fase>/SKILL.md ...    # cada carpeta con SKILL.md es una skill
 │     └─ <fase>/references/     # las hojas de ese router (D50)
+├─ agents/                      # nzt-explorer: .md para Claude Code, .toml para Codex (D71)
 ├─ install/
 │  └─ build.ps1 / build.sh      # loop de desarrollo: genera dist/ y valida el árbol
 ├─ installer/                   # fase 10: el que instala de verdad (D24)
@@ -743,7 +748,9 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    skills.
 4. **Instrucciones, no narrativa.** Decir qué hacer; no explicar por qué en tres párrafos.
 5. **Frontmatter portable** (C1): solo `name` y `description`.
-6. **Sin dependencias de agentes**: ninguna skill puede asumir subagentes ni forks.
+6. **Sin dependencias de agentes**: ninguna skill puede asumir subagentes ni forks. La
+   única que los nombra es `nzt-delegate` (D71), y sin subagentes o sin `nzt-explorer`
+   instalado manda a leer en la conversación principal: el trabajo es el mismo.
 7. **Grados de libertad**: prescribir el procedimiento, no el criterio técnico. NZT dice
    *cómo trabajar*, el modelo decide *qué construir*.
 8. **El nombre lo dicta el path** (9.1). Todo cuelga de `skills/nzt/`, así que el prefijo
@@ -1332,7 +1339,8 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   chat, va al archivo—. Sin eso, el archivo pasa el ojo del que sí se acuerda y falla con el
   que no, que es el único caso que importa.
   **(2) El reporte de cierre suma una línea: cómo viene el contexto y si conviene limpiar.**
-  La escala es **sobre lo consumido**, y la fijó el usuario: **debajo del 20% no se recomienda
+  La escala es **sobre lo consumido**, y la fijó el usuario (es una elección, no una medición:
+  D67): **debajo del 20% no se recomienda
   nada**, **desde el 20% se recomienda limpiar**, **en el 30% se dice que se está cerca de la
   zona donde las respuestas empeoran** —la *dumb zone*— y **pasado el 40% se recomienda
   fuerte**. Es deliberadamente temprano: la ventana llena degrada el trabajo mucho antes de
@@ -1939,6 +1947,158 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     build ya arma los dos desde `core/kernel.md` (C3). Descartado por el usuario el 2026-10-17.
   - **Resultado:** `core/kernel.md` de 185 a 176 líneas; `CLAUDE.md` y `AGENTS.md` de 198 a 189.
     Unidad 212. La verificación con los evals de ruteo va en la 210.
+- **D66.** **`AsNoTracking()` va donde el resultado trae entidades, no en toda lectura.** Lo
+  que la forzó: un análisis externo de NZT (2026-10-21) señaló que `ef-core.md` pedía el
+  marcador también para contar, con un motivo falso (*"no snapshot"*: `CountAsync` no
+  materializa nada), y `ef-core-queries.md` se contradecía — *"nothing to untrack"* y el
+  marcador en la línea siguiente. *documented* ([Tracking vs. No-Tracking Queries](https://learn.microsoft.com/en-us/ef/core/querying/tracking),
+  leído el 2026-10-21): *"If the result set doesn't contain any entity types, then no tracking
+  is done"*, y una proyección que pasa la entidad a un método del cliente la materializa y la
+  rastrea.
+  - **La regla:** cargar entidades para mostrar o exportar lleva el marcador; proyectar a DTO,
+    contar, `Any` y agregados no; la proyección que entrega la entidad a un método del cliente
+    se reescribe con las columnas, y si no se puede, lleva el marcador. Cargar para modificar
+    sigue sin marcador.
+  - **Lo que no cambió:** el tracking global sigue como viene (13.4 #9). El modo de falla del
+    marcador de más es ruido; el de apagarlo global, pérdida de datos.
+  - **El eval lo sigue:** `stack/ef-listado` pedía `AsNoTracking()` en un listado proyectado;
+    ahora pide que no esté (`no-tracking-marker-on-a-projection`). Sin correr. Unidad 304.
+- **D67.** **La escala de contexto se presenta como lo que es: una elección de NZT, no una
+  medición.** Lo que la forzó: el mismo análisis externo (2026-10-21) marcó que el kernel
+  afirmaba *"that is where the answers start getting worse"* sobre el 30% sin fuente, que es
+  lo que su propio guardrail *"Say what you checked"* prohíbe.
+  - **Qué cambió:** el kernel dice que la escala es *"NZT's choice, not a measurement"*, saca
+    la afirmación del 30% y la de que la ventana llena degrada el trabajo, y deja la razón que
+    no depende de una medición: lo que queda tiene que alcanzar para la próxima unidad, y un
+    freno que no se dio no se recupera. Mismo número de líneas; `CLAUDE.md` sigue en 200 (C3).
+  - **Lo que no cambió:** los umbrales 20/30/40 sobre lo consumido, que fijó el usuario (D40).
+  - **Abierto, no adoptado:** el análisis señaló que el 20% de 1M no es el 20% de 200k, y
+    propuso expresarlo en tokens absolutos o medirlo con evals. Cambiar los números es
+    decisión del usuario; queda anotado para cuando haya una medición. Unidad 306.
+- **D68.** **Después de escribir el estado, el agente corre `nzt-ai state check` donde esté
+  instalado.** Lo que la forzó: el análisis externo (2026-10-21) marcó que los invariantes de
+  `Plan/state.json` —un `doing` por nivel, ids únicos, cerrar una fase abre la siguiente— los
+  sostiene el modelo a mano y nada los revisa. El usuario eligió que lo revise el CLI, y que
+  el CLI quede instalado como `nzt-ai` (sección 12 de `specs/nzt-installer.md`).
+  - **Dónde vive:** en la hard rule del estado, en el kernel, porque el estado se escribe
+    también en trabajo chico que no carga `nzt-plan` (D65). No se repite en `nzt-plan`: cada
+    regla una vez, y `nzt-plan` está en 200 líneas.
+  - **"Donde esté instalado":** una instalación vieja, o una corrida desde el repo, no tiene
+    `nzt-ai`; el agente no frena por eso.
+  - **C3 sigue en 200** (QT-22, usuario 2026-10-21): la recomendación de Anthropic es *"target
+    under 200 lines per CLAUDE.md file"* por adherencia ([memoria de Claude Code](https://code.claude.com/docs/en/memory),
+    leído el 2026-10-21). Subir a 250 se consideró y se descartó. La línea entró recortando
+    la introducción de *State*, que perdió *"the user"* sin perder sentido. Unidad 311.
+- **D69.** **El kernel nombra las seis fases válidas, y `state check` rechaza cualquier otra.**
+  Lo que la forzó: el agente escribió una fase `discusion` en `Plan/state.json` y el panel
+  avisó *"«discusion» no es una fase de NZT"* (usuario, 2026-10-21). Es la segunda vez:
+  `RN-panel-fase-desconocida` nació el 2026-10-19 por lo mismo. La causa: la lista cerrada
+  vivía solo en la sección 4 de `nzt`, y el kernel decía *"the phases `nzt` chose"* sin
+  nombrarlas; un agente que entra directo a `nzt-plan` no tiene de dónde sacarlas.
+  - **Qué cambió:** la línea de `phases` del kernel dice *"named `analysis`, `architecture`,
+    `ux`, `build`, `verify` or `ship` and no other"*. Entró recortando *"You recommend; you
+    never clear"* a una línea; C3 sigue en 200.
+  - **El modo profesor no suma una fase:** sus *learning phases* no van a `Plan/state.json`
+    (`nzt-learn`, *"there is no entry in `Plan/state.json`"*).
+  - **El panel no cambia:** sigue leyendo sinónimos (`discovery`, `qa`) de estados viejos; el
+    kernel pide solo los nombres canónicos. Unidades 312 y 313.
+- **D70.** **NZT delega solo exploración de lectura, en un subagente propio, y construir en
+  paralelo queda para un análisis aparte.** Lo que la forzó: el análisis externo (2026-10-21)
+  señaló la contradicción entre cuidar el contexto (20/30/40) y prohibir subagentes (*"Never
+  delegate NZT work to subagents"*). Discutido con el usuario en la unidad 307.
+  - **Lo verificado** ([Claude Code](https://code.claude.com/docs/en/sub-agents) y
+    [Codex](https://learn.chatgpt.com/codex/agent-configuration/subagents), leídos el
+    2026-10-21): en Claude Code un subagente propio **carga los `CLAUDE.md`** salvo
+    `omitClaudeMd` (Explore y Plan no), precarga skills enteras con `skills`, puede invocar las
+    demás, anida hasta tres niveles por defecto, y Claude delega solo según el `description`;
+    `isolation: worktree` existe. En Codex los agentes son TOML en `~/.codex/agents/`, las
+    skills se heredan del padre y local delega solo si se le pide o lo pide un `AGENTS.md` o
+    una skill. **Sin verificar:** si un subagente de Codex carga el `AGENTS.md` global.
+  - **Delegar no ahorra tokens totales** (el subagente lee lo mismo, y el principal relee lo
+    citado): ahorra la ventana principal, y plata si usa un modelo más chico. Razonamiento del
+    agente, aceptado por el usuario.
+  - **QT-27 · Alcance:** ahora, un explorador de solo lectura; construir en paralelo (qué
+    cuenta como "no se pisan", worktrees, quién mergea y verifica) es un análisis propio,
+    después. Lo que lo frena hoy: una unidad por vez, un solo escritor del estado, archivos
+    compartidos (glosario, stack, `.csproj`, snapshot de migraciones).
+  - **QT-28 · Quién decide:** el agente propone en el plan qué delega y por qué, y el usuario
+    lo aprueba, como la autonomía. Explorar en las situaciones nombradas —relevar código
+    desconocido, buscar en todo el repo sin saber dónde, investigar en la web— no pasa por el
+    plan, porque solo lee. Lo que devuelve es un puntero que se lee antes de afirmarse.
+  - **QT-29 · Cómo se definen:** un archivo corto por subagente, con su rol, sin el kernel
+    (`omitClaudeMd`) y con las skills de NZT precargadas o heredadas; el método no se duplica.
+    Los instala el instalador en los dos proveedores. Un subagente con el kernel cargado se
+    comportaría como principal: leería el estado, propondría un plan, esperaría aprobación.
+  - Respuestas del usuario: A en las tres, 2026-10-21. Pendiente de construir.
+- **D71.** **Spec de la delegación: `nzt-delegate`, `nzt-explorer` y el modo en el estado.**
+  Unidad 314; baja D70 a reglas que construyen las unidades 315 a 318. QT-30 y QT-31: plan
+  aprobado tal cual, una unidad por vez (usuario, 2026-10-21).
+  - **Los modos (QT-32, usuario: A).** `auto`: explora sin preguntar en las tres situaciones
+    de D70 —relevar código desconocido, buscar en todo el repo sin saber dónde, investigar en
+    la web—. `ask`: antes de cada exploración pregunta qué va a explorar y por qué, con la
+    herramienta de preguntas, y sin un sí no delega. `off`: no delega, como antes de D70.
+    Hoy solo se delega explorar; lo demás espera el análisis de construir en paralelo (D70
+    QT-27).
+  - **El campo (QT-35, usuario: A).** `"delegation": "auto" | "ask" | "off"`, en la raíz de
+    `Plan/state.json`. Vale por proyecto. **Una corrida nueva lo conserva**: es la única
+    clave que la reescritura del estado no borra. Lo cambia el usuario, a mano, desde el mod
+    o pidiéndoselo al agente; el agente nunca lo cambia por su cuenta. Sin campo, o sin
+    `Plan/state.json`, rige `ask` (QT-33, usuario: A): ningún proyecto existente pasa a
+    delegar sin aviso. Un valor fuera de los tres lo rechaza `nzt-ai state check`, y el
+    agente aplica `ask` mientras tanto.
+  - **`nzt-delegate`, skill de primer nivel como `nzt-research` (D31).** La nombra la hard
+    rule del kernel, no la tabla de ruteo, porque cualquier fase puede necesitarla. Dice:
+    - *Cuándo*: solo en las tres situaciones, solo para leer, y solo si el modo lo permite.
+      La unidad, el estado, las preguntas al usuario y toda decisión se quedan con el agente
+      principal. Una lectura que el principal va a necesitar entera, la hace él.
+    - *El prompt*: la pregunta y la decisión que alimenta, dónde mirar y dónde no, lo que ya
+      se sabe, el formato de vuelta y cuándo parar. El subagente no vio la conversación: lo
+      que no esté en el prompt no lo sabe.
+    - *Lo que vuelve*: punteros (`ruta:línea` o URL) con una afirmación de una línea cada
+      uno, marcada como vista o inferida, y lo que no miró. **Un puntero se lee antes de
+      afirmarse** (D70): lo que vuelve es evidencia del subagente, no del principal.
+  - **`nzt-explorer` (D70 QT-29).** Un archivo corto por proveedor (`~/.claude/agents/nzt-explorer.md`
+    y `~/.codex/agents/nzt-explorer.toml`): el rol, las herramientas de solo lectura y la
+    forma de la respuesta. Sin el kernel (`omitClaudeMd: true` en Claude Code) y con
+    `nzt-research` precargada para la web; el método de leer código lo trae el prompt. Su
+    texto dice que no corre el bucle de NZT: no lee ni escribe `Plan/state.json`, no propone
+    planes, no pregunta. Su `description` limita la delegación automática de Claude Code a
+    lo que el modo permite.
+    - **Modelo (QT-34):** el mismo que el principal (`inherit`) por ahora. El usuario abrió
+      *model routing*: elegir el modelo según la tarea. Se reabre cuando se analice construir
+      en paralelo o cuando haya una medición de cuánto cuesta el explorador.
+    - **Lo que leyó la 316** ([Claude Code](https://code.claude.com/docs/en/sub-agents),
+      [Codex](https://learn.chatgpt.com/codex/agent-configuration/subagents) y su
+      [AGENTS.md](https://learn.chatgpt.com/codex/guides/agents-md), leídos el 2026-10-21):
+      en Claude Code, `tools: Read, Grep, Glob, WebFetch, WebSearch`, `model: inherit`,
+      `skills: [nzt-research]` y `omitClaudeMd: true` están documentados. En Codex **no hay
+      equivalente de `omitClaudeMd`** ni clave documentada que apague el `AGENTS.md`, y
+      **no hay solo lectura por configuración**: *"Custom agent instructions can ask an agent
+      to avoid edits, but they don't create a separate read-only sandbox"* (`sandbox_mode` no
+      se puede pisar desde el agente). Las dos cosas quedan en `developer_instructions`, que
+      dice que no corre el bucle *aunque las instrucciones de NZT estén cargadas*. Sin
+      `model`, hereda el del padre (documentado). Apagar `features.shell_tool` lo dejaría sin
+      forma de leer, así que no se apaga.
+    - **En Codex se llama `nzt_explorer`**: la doc no dice qué caracteres acepta `name`, y
+      sus ejemplos usan guion bajo (`pr_explorer`, en `pr-explorer.toml`). El archivo sigue
+      siendo `nzt-explorer.toml`. Que `~/.codex/agents` siga a `CODEX_HOME` es inferido.
+  - **La hard rule (317).** Reemplaza *"Never delegate NZT work to subagents"* por una que
+    permite delegar solo exploración de lectura, según el modo del proyecto y `nzt-delegate`,
+    con la unidad, el estado y las decisiones en el principal. El schema del kernel suma
+    `delegation`, y la regla de la corrida nueva dice que lo conserva. Todo dentro de 200 (C3).
+    Hecho: *"Delegate only reading, per `nzt-delegate`; the unit, the state and decisions stay
+    yours"*, en una línea; los modos viven en la skill, no en el kernel. `core/kernel.md` de
+    187 a 186 líneas, `CLAUDE.md` y `AGENTS.md` en 200; `state check` rechaza otro valor.
+  - **El mod (318).** `nzt-state` suma una fila *Delegar* debajo de *Plan* y *Modo*: muestra
+    el modo, con `ask` cuando no hay campo. Un click lo cambia `auto → ask → off → auto` y
+    escribe solo esa clave, sin tocar el resto del archivo. Hecho en `nzt-state` 0.8.0
+    (RN-panel-delegar, unidad 318): sin estado no hay fila, porque el panel no dibuja Plan ni
+    Modo; reemplaza la propuesta de que el clic no hiciera nada. `RN-mod-lee-no-escribe`
+    queda con esa única excepción.
+  - **Fuera de alcance:** construir en paralelo (D70 QT-27), *model routing* (QT-34) y usar
+    el Explore propio de Claude Code en lugar de `nzt-explorer` (D70 QT-29 eligió un agente
+    propio). El set pasa de 14 a 15 skills; la 315 mide el listado contra el piso de Codex
+    (D50).
 
 ## 13. Revisión contra Temper v3
 
@@ -3315,8 +3475,8 @@ curiosidad.
 > historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
 > como skills) ya no valen. El plan en curso y dónde quedó viven en `Plan/state.json`.
 >
-> - **El set son 14 skills y 131 referencias** (D50): las hojas pasaron a `references/` de su
->   router; el listado ocupa ~2.540 caracteres, bajo el piso de 8.000 de Codex.
+> - **El set son 15 skills y 131 referencias** (D50, D71): las hojas pasaron a `references/` de su
+>   router; el listado ocupa ~2.700 caracteres, bajo el piso de 8.000 de Codex.
 >   `install/check-references.sh` probó cada movimiento; el build mide referencias (200
 >   líneas, `## Contents` pasadas las 100, fila en la tabla o en un índice).
 > - **El kernel dice cómo se lee una referencia** (D52, D54): *Read with* antes de la primera

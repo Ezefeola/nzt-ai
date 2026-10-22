@@ -17,6 +17,9 @@ public sealed record SkillFile(string Name, string RepoPath, string Text)
 
 public sealed record ReferenceFile(string FileName, string Text);
 
+/// <summary>Un subagente de `agents/`: cada proveedor instala los de su extensión (D71).</summary>
+public sealed record AgentFile(string FileName, string Text);
+
 /// <summary>
 /// El contenido canónico, leído de los recursos embebidos en el ejecutable: el
 /// kernel, un adapter por proveedor y el árbol de skills.
@@ -31,17 +34,21 @@ public sealed class ContentCatalog
     public string Kernel { get; }
     public IReadOnlyDictionary<string, string> Adapters { get; }
     public IReadOnlyList<SkillFile> Skills { get; }
+    public IReadOnlyList<AgentFile> Agents { get; }
 
-    private ContentCatalog(string kernel, Dictionary<string, string> adapters, List<SkillFile> skills)
+    private ContentCatalog(string kernel, Dictionary<string, string> adapters, List<SkillFile> skills,
+        List<AgentFile> agents)
     {
         Kernel = kernel;
         Adapters = adapters;
         Skills = skills;
+        Agents = agents;
     }
 
     /// <summary>Un catálogo armado a mano, para verificar reglas sin tocar el disco.</summary>
     public static ContentCatalog From(string kernel, Dictionary<string, string> adapters,
-        IEnumerable<SkillFile> skills) => new(kernel, adapters, [.. skills]);
+        IEnumerable<SkillFile> skills, IEnumerable<AgentFile>? agents = null) =>
+        new(kernel, adapters, [.. skills], [.. agents ?? []]);
 
     public int ListingChars => Skills.Sum(s => s.ListingChars);
 
@@ -56,6 +63,7 @@ public sealed class ContentCatalog
         var kernel = string.Empty;
         var adapters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var skills = new List<SkillFile>();
+        var agents = new List<AgentFile>();
         var references = new Dictionary<string, List<ReferenceFile>>(StringComparer.Ordinal);
 
         foreach (var resource in assembly.GetManifestResourceNames())
@@ -74,6 +82,8 @@ public sealed class ContentCatalog
                 kernel = text;
             else if (relative.StartsWith("core/", StringComparison.Ordinal))
                 adapters[relative["core/".Length..]] = text;
+            else if (relative.StartsWith("agents/", StringComparison.Ordinal))
+                agents.Add(new AgentFile(relative["agents/".Length..], text));
             else if (relative.StartsWith("skills/", StringComparison.Ordinal)
                      && relative.EndsWith("/SKILL.md", StringComparison.Ordinal))
             {
@@ -105,6 +115,7 @@ public sealed class ContentCatalog
                 .Select(s => references.TryGetValue(s.RepoPath, out var refs)
                     ? s with { References = [.. refs.OrderBy(r => r.FileName, StringComparer.Ordinal)] }
                     : s)
-                .OrderBy(s => s.Name, StringComparer.Ordinal)]);
+                .OrderBy(s => s.Name, StringComparer.Ordinal)],
+            [.. agents.OrderBy(a => a.FileName, StringComparer.Ordinal)]);
     }
 }

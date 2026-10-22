@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.7.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.8.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -56,8 +56,9 @@ De arriba hacia abajo muestra:
   está trabajando, se abre al terminar el turno). Si no se espera nada, no aparece.
 - Arriba a la derecha, el personaje de la fase en curso, animado, con el nombre de la fase
   debajo. A su izquierda: si el plan está aprobado, en qué modo corre (acompañado, o
-  autónomo con la tanda, cuántas unidades lleva hechas y en cuáles frena igual) y el
-  objetivo de la corrida, con la etiqueta **Objetivo**. Con menos de 40 columnas útiles no
+  autónomo con la tanda, cuántas unidades lleva hechas y en cuáles frena igual), cómo
+  delega lecturas el agente (**Delegar**: `auto`, `ask` u `off`; un clic pasa al siguiente) y
+  el objetivo de la corrida, con la etiqueta **Objetivo**. Con menos de 40 columnas útiles no
   entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
 - La línea de fases de la corrida con su estado, el porcentaje de avance
   (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.
@@ -98,8 +99,9 @@ se abrió tiene `Plan/state.json`; en una subcarpeta del proyecto, o en un proye
 no aparece, y abierto con `/nzt-state` dice que no hay estado hasta que el archivo exista.
 
 Un cambio en el estado se ve en 2 segundos como máximo, y en el acto cuando lo escribe el
-agente. Lee también los estados escritos con formatos anteriores de NZT. El panel solo lee:
-no escribe ni corrige `Plan/state.json`.
+agente. Lee también los estados escritos con formatos anteriores de NZT. Lo único que
+escribe en `Plan/state.json` es la clave `delegation`, cuando apretás Delegar, y deja el
+resto del archivo byte por byte; no corrige nada más.
 
 En la terminal se dibuja con celdas de color, y se ve completo en terminales de 24 bits
 (Windows Terminal, iTerm2, Ghostty, kitty, WezTerm; Terminal.app desde macOS Tahoe). En la

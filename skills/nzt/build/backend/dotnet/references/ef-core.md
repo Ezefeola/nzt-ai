@@ -11,10 +11,17 @@ each have their own.
 ## Tracking: the default stays, `AsNoTracking` is written
 
 EF's default is kept, so **anything that says nothing is tracked**, and **every query that
-only reads carries `AsNoTracking()`**.
+materialises entities only to read them carries `AsNoTracking()`**. EF tracks entity instances
+in the result, nothing else.
 
-- **Read to show, export or count → `AsNoTracking()`.** No snapshot, no change detection, no
+- **Load entities to show or export → `AsNoTracking()`.** No snapshot, no change detection, no
   identity resolution.
+- **Project to a DTO, count, check existence or aggregate → nothing.** No entity comes out, so
+  there is nothing to track, and the marker is noise that reads as if something were.
+- **A projection that hands the entity to a client-side method → it is tracked.**
+  `Select(order => new { Url = Format(order) })` materialises `order` and tracks it. Pass the
+  columns the method needs instead of the entity; if it cannot, the query carries
+  `AsNoTracking()`.
 - **Read to modify and save → nothing.** Tracking is exactly the mechanism that makes the
   update persist.
 

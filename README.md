@@ -39,12 +39,13 @@ qué skill cargar está *instruido en una tabla*, no librado a que el modelo adi
 descripción.
 
 **2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
-(`nzt`) y el de investigación (`nzt-research`). No hacen el trabajo:
+(`nzt`), el de investigación (`nzt-research`) y el de delegar lecturas a un subagente
+(`nzt-delegate`). No hacen el trabajo:
 leen el pedido y el documento de stack, y dicen qué referencia leer.
 
 **3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
 `references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
-listado de skills**, que el proveedor carga en toda sesión: el set entero son 14 entradas.
+listado de skills**, que el proveedor carga en toda sesión: el set entero son 15 entradas.
 
 ```
 pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
@@ -92,7 +93,8 @@ herramienta de preguntas del proveedor cuando la sesión la ofrece.
 ## Instalación
 
 Global, para toda la máquina, con **una línea por proveedor**. No hace falta clonar el repo
-ni tener .NET, y no queda ningún instalador en tu PC: queda NZT en Claude Code o en Codex.
+ni tener .NET: queda NZT en Claude Code o en Codex, y el comando `nzt-ai`, que el agente usa
+para revisar `Plan/state.json`.
 
 **Claude Code**
 
@@ -132,7 +134,8 @@ curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-c
 
 Cada línea baja el instalador a una carpeta temporal, verifica su SHA256, instala NZT en ese
 proveedor —el bloque en `CLAUDE.md` o `AGENTS.md` y las skills, y los mods si es la línea
-`install-claude-full`— y lo borra. **Para actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
+`install-claude-full`—, deja una copia como `nzt-ai` (en `%LOCALAPPDATA%\nzt\bin`, que entra
+al PATH del usuario, o en `~/.local/bin`) y borra la carpeta temporal. **Para actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
 `$env:NZT_UNINSTALL='1'; irm … | iex` en Windows o `curl … | NZT_UNINSTALL=1 sh` en el resto.
 
 Desde el repo, con .NET 10, está el instalador completo:
@@ -233,7 +236,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**14 skills y 131 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
+**15 skills y 131 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.

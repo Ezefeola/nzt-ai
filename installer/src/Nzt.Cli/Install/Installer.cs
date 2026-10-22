@@ -54,6 +54,11 @@ public static class Installer
                     reference.Text));
         }
 
+        foreach (var agent in catalog.Agents.Where(a =>
+                     string.Equals(Path.GetExtension(a.FileName), provider.AgentExtension,
+                         StringComparison.OrdinalIgnoreCase)))
+            planned.Add(new PlannedFile(Path.Combine(provider.AgentsDirectory, agent.FileName), agent.Text));
+
         return planned;
     }
 

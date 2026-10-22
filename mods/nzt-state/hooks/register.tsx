@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Answering, Expanded, Snapshot, Unit } from '../types'
-import { parseState } from './parse'
+import { nextModeOf, parseState, withDelegation } from './parse'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { GLOW_STEPS, glowOf } from './glow'
@@ -32,7 +32,8 @@ const CHARACTER = 'character'
 // CSS pixels per sprite pixel on the surfaces that draw SVG.
 const CHARACTER_SCALE = 5
 const MINI_SCALE = 4
-const LABEL = 6
+// Wide enough for Delegar and Delegate, and a space.
+const LABEL = 9
 // Columns a phase group's units sit in from the list's edge.
 const GROUP_INDENT = 4
 // Usable columns from which Plan and Mode sit to the left of the character instead of below it.
@@ -50,6 +51,7 @@ const expanded = atom({ plugin: 'nzt-state', key: 'expanded' } as const, {
 } as Expanded)
 const answering = atom({ plugin: 'nzt-state', key: 'answering' } as const, { kind: 'idle' } as Answering)
 const glow = atom({ plugin: 'nzt-state', key: 'glow' } as const, 0)
+const delegating = atom({ plugin: 'nzt-state', key: 'delegating' } as const, null as string | null)
 // What nzt-questions publishes: how many of its questions are not sent. Undefined while it is
 // not installed or has never counted, which the pane takes as none.
 const QUESTIONS_PENDING = { plugin: 'nzt-questions', key: 'pending' } as const
@@ -136,6 +138,26 @@ const openQuestions = async ($: EngineInterface) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     await update($, answering, (): Answering => ({ kind: 'failed', message }))
+  }
+}
+
+/**
+ * Steps the project's delegation mode on, writing that key and no other. It reads the file
+ * again instead of the snapshot, so a write the agent made since the last poll is kept.
+ */
+const cycleDelegation = async ($: EngineInterface) => {
+  try {
+    const raw = await $.fs.read(fileOf())
+    const current = parseState(raw)
+    if (current.kind !== 'ok') throw new Error(current.kind === 'error' ? current.message : 'no state')
+    const next = withDelegation(raw, nextModeOf(current.delegation.mode))
+    if (next === undefined) throw new Error('the file is not a JSON object')
+    if (next !== raw) await $.fs.write(fileOf(), next)
+    await update($, delegating, () => null)
+    await refresh($, true)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    await update($, delegating, () => message)
   }
 }
 
@@ -249,6 +271,7 @@ export const register: Register = (on, options) => {
     const open = await read($, expanded)
     const pressed = await read($, answering)
     const step = await read($, glow)
+    const failedDelegation = await read($, delegating)
     const asked = await questionsOf($)
     const width = Math.max(24, e.props.bodyColumns - 1)
 
@@ -476,6 +499,31 @@ export const register: Register = (on, options) => {
             )}
           </Box>
         </Box>
+        {/* The one thing the pane writes: a press steps the mode, auto → ask → off. */}
+        <Box flexDirection="row">
+          <Box width={LABEL}>
+            <Text dimColor>{t.delegate}</Text>
+          </Box>
+          <Box width={columns - LABEL}>
+            <Button key="cycle-delegation" plain onPress={() => cycleDelegation($)}>
+              <Text wrap="wrap">
+                <Text color={state.delegation.mode === 'off' ? 'inactive' : 'claude'} bold>
+                  {state.delegation.mode}
+                </Text>
+                <Text dimColor>
+                  {t.delegation[state.delegation.mode]}
+                  {state.delegation.isSet ? '' : t.delegationDefault}
+                </Text>
+                {state.delegation.invalid !== undefined && (
+                  <Text color="warning">{t.delegationInvalid(state.delegation.invalid)}</Text>
+                )}
+              </Text>
+            </Button>
+          </Box>
+        </Box>
+        {failedDelegation !== null && (
+          <Text color="error" wrap="wrap">{t.delegationFailed(failedDelegation)}</Text>
+        )}
         <Box marginTop={1} width={columns}>
           <Text wrap="wrap">
             <Text dimColor>{t.goal} </Text>

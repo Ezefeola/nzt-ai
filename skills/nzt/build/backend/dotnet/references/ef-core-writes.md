@@ -45,8 +45,8 @@ a catch just to call `RollbackAsync`.
 
 ## Closing checklist
 
-- [ ] Entities to modify were loaded tracked, with no redundant `Update` call, and read-only
-      queries carried `AsNoTracking()`.
+- [ ] Entities to modify were loaded tracked, with no redundant `Update` call, and queries that
+      loaded entities only to read carried `AsNoTracking()`.
 - [ ] One `SaveChangesAsync` at the end, with the token, and no manual transaction around it.
 - [ ] `SaveChangesAsync` is not inside a `try/catch`; races and unknown failures reach the
       global handler, and nothing classifies provider errors.

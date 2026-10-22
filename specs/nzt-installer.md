@@ -27,10 +27,15 @@ no copia sus archivos (sección 11).
 
 Instalación **global** (nivel usuario), que es el caso de uso pedido:
 
-| Proveedor | Instrucciones | Skills |
-|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` |
+| Proveedor | Instrucciones | Skills | Subagente (D71) |
+|---|---|---|---|
+| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md` |
+| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml` |
+
+El subagente sale de `agents/` del repo, y cada proveedor recibe el de su formato (`.md` o
+`.toml`). Es un archivo más del manifiesto: las mismas reglas de conflicto, edición local,
+huérfanos y desinstalación que una skill. Desinstalar saca el archivo y deja la carpeta
+`agents/`, que puede tener agentes del usuario.
 
 Dos advertencias sobre esa tabla:
 
@@ -83,11 +88,15 @@ NZT installer 0.1.0
 Y modo no interactivo, para poder scriptearlo:
 
 ```
-nzt install --provider claude-code|codex|all [--mods all|none|only] [--dry-run]
-nzt uninstall --provider claude-code|codex|all [--mods all|none|only] [--dry-run]
-nzt status
-nzt lint | verify
+nzt-ai install --provider claude-code|codex|all [--mods all|none|only] [--dry-run]
+nzt-ai uninstall --provider claude-code|codex|all [--mods all|none|only] [--dry-run]
+nzt-ai status
+nzt-ai lint | verify
+nzt-ai state check
 ```
+
+**[modify]** El comando se llama `nzt-ai` (RN-cli-nombre) y suma `state check`
+(RN-cli-state-check), sección 12.
 
 - `--dry-run` imprime exactamente lo que haría, sin tocar el disco.
 - `--mods` es la elección de la sección 11 para Claude Code: `all` el método y los mods,
@@ -112,7 +121,8 @@ nzt lint | verify
    contenido queda abajo; si no existe, se crea.
 5. **Aplana y copia las skills**: cada carpeta con `SKILL.md` va a una carpeta plana cuyo
    nombre es el path relativo con `/` → `-`. Su carpeta `references/` viaja adentro, sin
-   aplanar (D50): los routers la nombran por ruta relativa.
+   aplanar (D50): los routers la nombran por ruta relativa. Copia también el subagente del
+   proveedor a su carpeta de agentes (sección 2).
 6. **Retira los huérfanos**: lo que el manifiesto anterior instaló y ya no está en el set.
 7. **Escribe el manifiesto** y **reporta**: creados, actualizados, sin cambios, eliminados,
    conservados, y el tamaño del listado en caracteres (el presupuesto de R1).
@@ -214,6 +224,7 @@ installer/
   termina en `nztVersion` del manifiesto y en el encabezado del CLI.
 - ~~**I5. Distribución sin .NET.**~~ **Cerrada por D46**: un comando de una línea por
   proveedor, que instala NZT directo usando el CLI como herramienta de un solo uso (sección 10).
+  **[modify] 2026-10-21:** ya no es de un solo uso; queda instalado como `nzt-ai` (sección 12).
 
 ## 10. Instalación de una línea
 
@@ -284,14 +295,16 @@ puede saltearse el manifiesto, los marcadores ni el backup.
    confirmación**, como el instalador de Codex. Es seguro porque las reglas son del CLI: un
    archivo ajeno corta la instalación sin escribir, y una edición del usuario se conserva.
    Con `NZT_UNINSTALL=1` corre `uninstall` en su lugar.
-5. **Borra la carpeta temporal**, haya salido bien o mal. En la máquina queda NZT en el
-   proveedor y el manifiesto, nada más.
+5. **[modify]** **Borra la carpeta temporal**, haya salido bien o mal. En la máquina queda
+   NZT en el proveedor, el manifiesto y **`nzt-ai`, que el CLI dejó instalado al correr
+   `install`** (RN-cli-queda-instalado).
 
 - **Correr la misma línea otra vez es actualizar.** El manifiesto vive en
   `%LOCALAPPDATA%/nzt/manifests` o `~/.local/share/nzt/manifests` (sección 5), fuera del
   binario, así que un CLI recién bajado reconoce lo que instaló el anterior.
-- **Cada corrida baja el binario entero** (~38 MB). Es el precio de no dejar nada instalado;
-  lo que lo baja es el trimming de 10.1.
+- **Cada corrida baja el binario entero** (~38 MB), y reinstalar reemplaza el `nzt-ai`
+  instalado por el de esa versión (RN-cli-actualizar). Lo que baja el tamaño es el trimming
+  de 10.1.
 - En `install.sh` el código de salida es el del CLI. `install.ps1` **nunca llama a `exit`**
   —pegado en una consola abierta le cerraría la ventana al usuario— y corre dentro de un
   bloque `& { }` para no dejar variables ni funciones en la sesión; el código del CLI queda
@@ -317,8 +330,7 @@ En PowerShell una variable se pasa así:
 
 ### 10.4 Lo que no hace
 
-- **No deja el CLI instalado.** Quien quiera `nzt status` o el menú lo corre desde el repo
-  con .NET 10 (sección 3).
+- ~~**No deja el CLI instalado.**~~ **[modify]** Lo deja, como `nzt-ai`: sección 12.
 - **No instala en los dos proveedores a la vez.** Son dos líneas, una por proveedor; correr
   las dos es lo mismo que elegir *Todos* en el menú.
 - **No firma los binarios.** Si Windows SmartScreen, un antivirus o Gatekeeper los frenan,
@@ -411,6 +423,83 @@ instalador o el usuario a mano.
 
 #### Q-04 · Un mod instalado a mano, al instalar NZT, ¿se actualiza?
 - respuesta: **Sí**, sin dejar de ser del usuario · 2026-10-16
+
+## 12. El CLI instalado: `nzt-ai`
+
+Lo trae el análisis externo de NZT (2026-10-21): nada validaba `Plan/state.json`, y el
+usuario eligió que lo valide el CLI (QT-21 de `Plan/state.json`, unidad 305). Hasta acá el
+CLI no quedaba en la máquina (D46), así que el agente no tenía qué correr. Pedido del
+usuario: *"Habria que hacer que el CLI quede instalado, y que se ejecute mediante el comando
+nzt-ai"*.
+
+### 12.1 Instalado
+
+#### RN-cli-nombre · [add] · origin: usuario 2026-10-21
+El comando instalado se llama `nzt-ai`, en las tres plataformas. Los assets del release
+conservan su nombre (10.1).
+
+#### RN-cli-queda-instalado · [add] · origin: QT-25, QT-23
+Instalar —con la línea, el menú o `install`, en cualquier proveedor y con cualquier `--mods`—
+deja una copia del CLI que corre como `nzt-ai`: en Windows en `%LOCALAPPDATA%/nzt/bin`, en
+macOS y Linux en `~/.local/bin`. Lo hace el CLI, no el script, así que el menú de un binario
+del release también lo deja. **Corrido con `dotnet run` desde el repo no lo deja y lo dice**:
+no es un binario de un solo archivo, y copiar solo el ejecutable daría un `nzt-ai` que no
+arranca. Con `--dry-run` dice dónde lo dejaría y no lo deja. `--bin-dir <ruta>` lo deja en
+otra carpeta sin tocar el PATH, como `--manifest-dir`: es lo que usan las comprobaciones.
+
+#### RN-cli-path · [add] · origin: QT-24
+En Windows la carpeta se agrega al PATH del usuario, no al de la máquina, y una terminal
+nueva ya encuentra `nzt-ai`. En macOS y Linux no se toca ningún archivo del usuario: si la
+carpeta no está en el PATH, el reporte lo dice con la línea exacta para agregarla al perfil
+del shell. En los dos casos, una terminal ya abierta no lo ve hasta reabrirse, y el reporte lo
+dice.
+
+#### RN-cli-actualizar · [add] · origin: sección 6 ("reinstalar es actualizar")
+Reinstalar reemplaza el `nzt-ai` instalado por el de la versión que se está instalando.
+
+#### RN-cli-desinstalar · [add] · origin: QT-26
+`nzt-ai` y su entrada en el PATH se van cuando, después de desinstalar, no queda ningún
+proveedor ni mod instalado por el CLI. Si queda alguno, se queda, porque el agente lo usa.
+
+### 12.2 `nzt-ai state check`
+
+#### RN-cli-state-check · [add] · origin: propuesta del agente sobre QT-21, 2026-10-21
+Lee `Plan/state.json` de la carpeta actual y dice si cumple el contrato del kernel:
+
+- cada `status` es `todo`, `doing`, `done` o `dropped`, en fases y en unidades;
+- cada fase se llama `analysis`, `architecture`, `ux`, `build`, `verify` o `ship` (D69 de
+  `specs/nzt-core.md`); un sinónimo como `discovery` también es un problema, aunque el panel
+  lo lea;
+- a lo sumo una fase `doing`, y a lo sumo una unidad `doing` en todo el archivo;
+- los `id` de las unidades no se repiten;
+- una unidad `doing` vive en la fase `doing`;
+- una fase `done` no tiene unidades `todo` ni `doing`;
+- `approved` es `true` o `false`, y las unidades que nombra `autonomy` existen en el plan;
+- `delegation`, si está, es `auto`, `ask` u `off` (D71); ausente no es un problema, rige `ask`.
+
+Sin problemas, una línea y código 0. Con problemas, uno por línea, nombrando la unidad o la
+fase, y código 1. Sin archivo lo dice y sale con 0: no todo proyecto tiene estado. Un JSON
+roto es un problema, con su posición.
+
+### 12.3 Preguntas
+
+#### QT-23 · ¿Dónde queda `nzt-ai`?
+- opciones: A, junto al manifiesto (`%LOCALAPPDATA%/nzt/bin`, `~/.local/bin`); B, `~/.nzt/bin`
+  en las tres. El agente recomendó A.
+- respuesta: **A** · 2026-10-21
+
+#### QT-24 · En macOS y Linux, si la carpeta no está en el PATH, ¿qué hace?
+- opciones: A, avisa con la línea exacta y no toca el perfil; B, agrega la línea al perfil.
+  El agente recomendó A.
+- respuesta: **A** · 2026-10-21
+
+#### QT-25 · ¿Quién deja instalado `nzt-ai`: el CLI o el script?
+- opciones: A, el CLI, al instalar; B, solo el script de la línea. El agente recomendó A.
+- respuesta: **A** · 2026-10-21
+
+#### QT-26 · Al desinstalar de un proveedor, ¿se va `nzt-ai`?
+- opciones: A, cuando no queda nada instalado; B, siempre; C, nunca. El agente recomendó A.
+- respuesta: **A** · 2026-10-21
 
 ## Historia
 

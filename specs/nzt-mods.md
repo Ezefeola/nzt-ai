@@ -39,6 +39,10 @@ Si una regla del método necesita un mod para cumplirse, la regla está mal ubic
 Un mod lee los artefactos de NZT (`Plan/state.json`, specs, documentos) y no los escribe.
 El dueño de cada artefacto sigue siendo el método; un mod que escribe el estado abriría un
 segundo camino para cambiarlo que el kernel no controla.
+**[modify] Una excepción, pedida por el usuario el 2026-10-21 (D71 de `specs/nzt-core.md`):**
+`nzt-state` escribe la clave `delegation` de `Plan/state.json` y nada más. El kernel dice que
+ese valor lo pone solo el usuario, y el clic es del usuario: el agente sigue sin ver otro
+camino para cambiar el plan, las unidades ni la autonomía.
 
 ### RN-mod-solo-claude · origin: D63
 Un mod existe solo para Claude Code. Si el instalador ofrece mods, al elegir Codex no los
@@ -218,7 +222,8 @@ por delante del kernel instalado, nunca por detrás; RN-mod-lee-formatos-viejos 
 - **Mods para Codex.** Codex tiene plugins (skills, MCP, apps), pero no mods: nada que
   corra dentro de la app y dibuje en su interfaz (D24 y D63 revisados el 2026-10-16;
   `specs/nzt-installer.md` sección 1), así que no hay a qué portar un mod.
-- **Que un mod escriba artefactos de NZT** (RN-mod-lee-no-escribe).
+- **Que un mod escriba artefactos de NZT** (RN-mod-lee-no-escribe), salvo el modo de
+  delegación desde `nzt-state`.
 - **Publicar los mods en un marketplace de terceros.** El repo como marketplace alcanza
   para el caso pedido.
 
