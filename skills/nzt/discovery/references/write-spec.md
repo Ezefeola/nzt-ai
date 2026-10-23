@@ -57,6 +57,7 @@ The order accepts at most one coupon.
 |---|---|
 | US-001-aplicar-cupon | Applying a valid coupon and seeing the new total |
 | US-002-cupon-rechazado | Expired, used and unknown coupons |
+| US-003-cupon-en-soporte | As a support agent, I want to see why a coupon was rejected, so I can answer without escalating |
 
 ## Open
 - Q-13 · Does a refund return the coupon to the customer?
@@ -121,6 +122,11 @@ One line per story, saying what it covers.
   An index with marks is a second source of truth that goes stale.
 - The index can name a story that is not written yet. The stories themselves are written
   one per unit by `nzt-discovery-write-stories`.
+- **The index is the backlog**; there is no other list. A story waiting for a later
+  delivery stays one line *As… I want… so that…* until its turn, as US-003 above.
+- **Scope, rules and the whole index are written before the feature's first slice is
+  built**, whatever the plan's cadence (`nzt-plan`). What waits is a story's criteria,
+  never a rule: a rule crosses stories, and defined late it gets defined three ways.
 
 ## The spec describes the present
 
@@ -139,7 +145,7 @@ notes of `analysis.md` and architecture resolves it.
 ## Done when
 
 Rehearse it: could someone write **every** story of this feature from this file alone,
-without asking you anything?
+without asking you anything? That holds even for the stories a later delivery details.
 
 - Every rule has its slug and its `origin:`.
 - Scope is written in both directions.

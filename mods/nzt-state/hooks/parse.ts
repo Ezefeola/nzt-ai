@@ -98,20 +98,43 @@ export const parseState = (raw: string): Snapshot => {
         })
       : []
 
-  const phases = Array.isArray(state.phases)
-    ? state.phases.flatMap(item => {
+  const phasesOf = (value: unknown) =>
+    Array.isArray(value)
+      ? value.flatMap(item => {
+          if (typeof item !== 'object' || item === null) return []
+          const phase = item as Record<string, unknown>
+          if (typeof phase.name !== 'string') return []
+          return [{ name: phase.name, ...statusOf(phase.status), units: phase.units }]
+        })
+      : null
+
+  const sliced = Array.isArray(state.slices)
+    ? state.slices.flatMap((item, index) => {
         if (typeof item !== 'object' || item === null) return []
-        const phase = item as Record<string, unknown>
-        if (typeof phase.name !== 'string') return []
-        return [{ name: phase.name, ...statusOf(phase.status), units: phase.units }]
+        const slice = item as Record<string, unknown>
+        const id = text(slice.id, `#${index + 1}`)
+        return [{ id, name: text(slice.name, id), ...statusOf(slice.status), phases: phasesOf(slice.phases) ?? [] }]
       })
     : null
+
+  // The slice in progress; with none, the first still to do; with neither, the last one.
+  const current =
+    sliced === null
+      ? -1
+      : [sliced.findIndex(one => one.status === 'doing'), sliced.findIndex(one => one.status === 'todo'), sliced.length - 1]
+          .find(index => index >= 0) ?? -1
+
+  const phases = sliced === null ? phasesOf(state.phases) : (sliced[current]?.phases ?? [])
 
   // Units live in their phase (D62); a state written before that keeps them at the top.
   const units = [
     ...(phases ?? []).flatMap(phase => unitsOf(phase.units, phase.name)),
-    ...unitsOf(state.units),
+    ...(sliced === null ? unitsOf(state.units) : []),
   ]
+  const planUnits =
+    sliced === null
+      ? units
+      : sliced.flatMap(slice => slice.phases.flatMap(phase => unitsOf(phase.units, phase.name)))
 
   const autonomy = state.autonomy as Record<string, unknown> | undefined
   const ids = (value: unknown) =>
@@ -120,6 +143,9 @@ export const parseState = (raw: string): Snapshot => {
   return {
     kind: 'ok',
     goal: text(state.goal, '(no goal)'),
+    slices: sliced === null ? null : sliced.map(({ phases: _, ...slice }) => slice),
+    current,
+    planUnits,
     phases: phases === null ? null : phases.map(({ units: _, ...phase }) => phase),
     legacyPhase: typeof state.phase === 'string' ? state.phase : null,
     approved: state.approved === true,

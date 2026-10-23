@@ -150,7 +150,8 @@ that writes `qa`.
 
 Finding the defect and repairing it are different units. Record it, open the bug through
 `nzt-verify-bug`, and keep running. A repair made mid-run invalidates every result that came
-before it in that session.
+before it in that session. Inside an autonomous batch, a run with a failure also stops the
+batch once it is recorded: the next slice is never started on top of it.
 
 ## Done when
 

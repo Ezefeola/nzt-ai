@@ -55,6 +55,10 @@ export const TEXTS = {
     phaseCount: (done: number, total: number) => `${done} de ${total}`,
     severalInProgress: (count: number) => `⚠ ${count} unidades en curso: el kernel permite una sola`,
     severalPhasesInProgress: (count: number) => `⚠ ${count} fases en curso: el kernel permite una sola`,
+    slice: 'Tramo',
+    sliceOf: (n: number, total: number, name: string) => `${n} de ${total} · ${name}`,
+    nextSlice: (name: string) => `Sigue el tramo ${name}`,
+    severalSlicesInProgress: (count: number) => `⚠ ${count} tramos en curso: el kernel permite uno solo`,
     unknownPhases: (names: readonly string[], known: string) =>
       `⚠ ${names.map(name => `«${name}»`).join(', ')} ${names.length === 1 ? 'no es una fase' : 'no son fases'} de NZT: las fases son ${known}`,
     notes: 'NOTAS PARA RETOMAR',
@@ -112,6 +116,10 @@ export const TEXTS = {
     phaseCount: (done: number, total: number) => `${done} of ${total}`,
     severalInProgress: (count: number) => `⚠ ${count} units in progress: the kernel allows one`,
     severalPhasesInProgress: (count: number) => `⚠ ${count} phases in progress: the kernel allows one`,
+    slice: 'Slice',
+    sliceOf: (n: number, total: number, name: string) => `${n} of ${total} · ${name}`,
+    nextSlice: (name: string) => `Next, the slice ${name}`,
+    severalSlicesInProgress: (count: number) => `⚠ ${count} slices in progress: the kernel allows one`,
     unknownPhases: (names: readonly string[], known: string) =>
       `⚠ ${names.map(name => `“${name}”`).join(', ')} ${names.length === 1 ? 'is not an NZT phase' : 'are not NZT phases'}: the phases are ${known}`,
     notes: 'NOTES TO RESUME',

@@ -1,8 +1,20 @@
 # Screen mockup
 
+## Contents
+- What makes it a mockup and not half-built code
+- The theme defines, the design system names
+- Every state, reachable on its own
+- Honest placeholders
+- Navigation
+- Measure, do not trust
+- A prototype is a mockup that teaches
+- The two files never disagree
+- Done when
+
 Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.html`, beside the screen design it
 comes from. **Only when the user asked for one.** It is a reference to look at, never code
-to copy into the project.
+to copy into the project. A **prototype** is the same file used to learn before delivery 1
+is built: its own section below says what changes.
 
 ## What makes it a mockup and not half-built code
 
@@ -63,6 +75,24 @@ Before presenting it, and with the result written down:
 **A mockup that could not be rendered is a mockup that is not verified**, and it is reported
 that way. Do not present a file you could not open as if you had seen it.
 
+## A prototype is a mockup that teaches
+
+When delivery 1 has something to learn from users (`nzt-discovery-product`, **To learn**),
+the plan offers a prototype inside the discovery slice: the same kind of file, built to
+answer that question before code exists.
+
+- **It starts from the question, not from a screen design.** Its header names the `Q-NN`
+  it answers and who will try it. It draws the fewest screens that put the question in
+  front of a person, as one walkable flow; there may be no screen design yet.
+- **Every rule above holds**: self-contained, no business logic, honest placeholders, the
+  measurements run. A prototype that calculates is code nobody reviewed.
+- **It is thrown away. It never becomes production code**, and nobody copies markup from
+  it: the screens that ship are designed per `references/screen.md` and built from the
+  stories. That is what keeps a prototype cheap enough to be wrong.
+- What the people who tried it did and said goes into `Docs/Product/analysis.md` as the
+  answer to its `Q-NN`, in their terms. Then the file is deleted: a prototype kept around
+  becomes the design someone builds from.
+
 ## The two files never disagree
 
 - The `.md` and the `.html` describe the same screen. A change to one is a change to both,
@@ -82,3 +112,4 @@ nothing from it but the intent?
 - Every pending piece of content is visibly marked as pending, with its question.
 - The width, contrast and keyboard checks were **run**, and their results are in the report.
 - The design document and the mockup say the same thing.
+- A prototype names its `Q-NN`, and is deleted once the answer is in `analysis.md`.

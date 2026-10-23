@@ -7,6 +7,7 @@
 - Users
 - Modules
 - Constraints
+- Delivery 1
 - Scope, in both directions
 - Keep it current
 - Done when
@@ -51,6 +52,12 @@ objectives is a feature nobody should be building.
 ## Constraints
 - Billing stays in the current system; this product does not issue invoices.
 - The team is two people; nothing that needs an operations shift.
+
+## Delivery 1
+- **For:** coupons get redeemed.
+- **In:** applying a valid coupon and the rejected cases, in ordering and promotions.
+- **To learn:** whether customers find where to enter the code (Q-15). Support desk waits.
+- **Known by:** the first campaign after it ends with redemptions above zero.
 
 ## Scope
 
@@ -103,6 +110,21 @@ deadline, a budget, team size, legal or regulatory obligations.
   with the consequence, and write down their decision.
 - A technical constraint you assumed is not a constraint. It goes to architecture.
 
+## Delivery 1
+
+What reaches the user first — the MVP — and for which objective. Ask one question to define
+it: **is there anything we need to learn from users before building the rest?**
+
+- If yes, delivery 1 is the least that teaches it, and **To learn** names what. Offer an
+  HTML prototype (`nzt-ux-mockup`) when a screen can teach it before code does.
+- If no, **delivery 1 is the whole scope**, and the section says so as a decision — *"the
+  whole scope: nothing to learn first (Q-15)"* — never left out by omission.
+- **Known by** is the objective's, measured on this delivery.
+- It cuts scope, never the definition of done: coverage per area, `qa` and the user's
+  acceptance hold for every story in it.
+- It is a scope line, not a priority. Later deliveries are one line each in **Open** or in
+  the plan's shape, until their turn.
+
 ## Scope, in both directions
 
 **Out** is the half that stops work nobody asked for. Each excluded line says why, or where
@@ -125,5 +147,6 @@ using only this file?
 - Every objective says how it is known.
 - Every user row says what they cannot do today.
 - Scope is written in both directions.
+- Delivery 1 says what is in and why, or that it is the whole scope.
 - Nothing here names a technology, a component or a screen.
 - What is undecided is in **Open** with its `Q-NN`, not filled in by you.

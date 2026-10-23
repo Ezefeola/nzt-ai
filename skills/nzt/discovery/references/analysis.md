@@ -127,8 +127,9 @@ Anything the user confirms in the playback goes into the file as an answer with 
 
 ## Done when
 
-Rehearse it: could you write the artifact this feeds — the product definition, or the
-feature with **all** its stories — without asking anything else?
+Rehearse it: could you write the artifact this feeds — the product definition with its
+delivery 1, or the feature with its rules and the stories its cadence details now —
+without asking anything else?
 
 - If yes, the interview is closed.
 - If no, the gaps are in the file as open questions. They are never invented, and the

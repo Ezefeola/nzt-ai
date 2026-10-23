@@ -1,28 +1,51 @@
 {
   "version": 1,
-  "updated": "2026-10-22T01:00:00Z",
-  "goal": "Publicar v1.6.0 desde main (merge de analisis-externo): nzt-ai en el PATH, state check, delegación y nzt-explorer",
+  "updated": "2026-10-23T15:00:00Z",
+  "goal": "NZT por tramos: entrega 1/MVP, historias detalladas por entrega, QA por tramo y estado/mod organizados por tramo",
   "phases": [
     {
-      "name": "ship",
+      "name": "analysis",
       "status": "done",
       "units": [
-        {
-          "id": 319,
-          "do": "Bump a 1.6.0 (build.sh/.ps1, installer/README, csproj), puertas en local, tag v1.6.0 y push",
-          "status": "done",
-          "detail": "a8da6c2 en main; build, 145 checks y verify OK en local; workflow release success, 13 assets; instalación real con la línea no probada por mí"
-        }
+        { "id": 320, "do": "Decisiones D72+ en specs/nzt-core.md: tramo, entrega 1/MVP, modo de definir, QA por tramo, falla de QA frena el lote", "status": "done", "detail": "D72 escrita tras D71; vocabulario slice/delivery, incremento retirado" }
+      ]
+    },
+    {
+      "name": "architecture",
+      "status": "done",
+      "units": [
+        { "id": 321, "do": "Diseño del formato de estado v2 por tramo (§7 de la spec): campos, reglas, lectura del v1, qué dibuja el mod", "status": "done", "detail": "rehecho: slices en la raíz, cada tramo con sus fases v1; QT-01 tramo = lo que el plan corte" }
+      ]
+    },
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        { "id": 322, "do": "core/kernel.md: el bucle y el esquema de estado con tramos", "status": "done", "detail": "viñeta slices/cadence + fila verify; 3 líneas recortadas; CLAUDE.md y AGENTS.md en 200, build sin avisos" },
+        { "id": 323, "do": "nzt y nzt-plan: planificar por entrega y tramos, cadencia de definición, lote con QA que frena al fallar", "status": "done", "detail": "plan/references/slices.md nuevo (94 líneas); nzt-plan sigue en 200; nzt §4 con tramos; build sin avisos" },
+        { "id": 324, "do": "nzt-discovery: entrega 1/MVP en product.md y cierre del análisis por entrega en spec, historias y analysis", "status": "done", "detail": "Delivery 1 en product.md; índice = backlog y reglas antes del tramo; Done when por cadencia; build sin avisos" },
+        { "id": 325, "do": "nzt-verify y nzt-build: QA al cerrar cada tramo, manteniendo D43 (build nunca hace QA)", "status": "done", "detail": "verify: QA al terminar el tramo y falla frena el lote; build: increment -> slice; build sin avisos" },
+        { "id": 326, "do": "nzt-ux: prototipo HTML descartable para validar la entrega 1 cuando hay algo que aprender", "status": "done", "detail": "sección prototipo en mockup.md, fila en el router, Plan/prototype/ en §8; build sin avisos" },
+        { "id": 327, "do": "nzt-ai state check (StateCheck.cs) con las reglas v2 y sus tests, leyendo también v1", "status": "done", "detail": "CheckPhases compartido v1/v2; 3 pruebas nuevas; 164 checks en verde; RN-cli-state-check al día" },
+        { "id": 328, "do": "Mod nzt-state: parse y línea de tiempo por tramo (objetivo, tramo, en curso, sigue) y sus tests", "status": "done", "detail": "0.9.0: tramo en curso como plan, fila Tramo, Sigue el tramo; 54 tests y tsc en verde; sin probar en vivo" }
+      ]
+    },
+    {
+      "name": "verify",
+      "status": "done",
+      "units": [
+        { "id": 329, "do": "Puertas locales: build, checks, lint, tests del mod y state check contra un estado v1 y uno v2", "status": "done", "detail": "todo verde: build, 164 checks, lint 0, 6 mods, state check v1 y v2; nzt-ai 1.6.0 instalado rechaza v2 hasta publicar" },
+        { "id": 330, "do": "Ofrecido: eval nuevo de QA por tramo y re-correr restraint-qa-unasked", "status": "dropped", "detail": "descartada por el usuario 2026-10-23" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": {},
-  "waiting_on": null,
+  "autonomy": { "units": [324, 325, 326, 327, 328, 329] },
+  "waiting_on": "aceptación del usuario: probar nzt-state 0.9.0 en vivo y decidir commit y publicación",
   "notes": [
-    "evals/README.md sigue diciendo 26 casos (hay 31); la 308 se descartó en 2026-10-21",
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods",
-    "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
+    "Acordado 2026-10-23: MVP puede ser todo el alcance; historias detalladas por entrega y luego lote; QA fallido frena el lote; sin fases repetidas en el mod",
+    "Modelo acordado: plan = lista de tramos; cada tramo con sus fases completas y separadas; tramo = lo que el plan corte, por defecto una feature",
+    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods"
   ]
 }

@@ -10,11 +10,16 @@ saying what was tried, with what data, what was expected, and what actually happ
 
 ## When it runs
 
-**After build has finished the increment** — the stretch the plan delivers together, or
-the whole product if there is only one. Not story by story as each one is built, and not
-between two build units, unless the user asked for it: a test set written before the rest
-is built gets written against what cannot run yet. A reported bug and the two readings
-below are the exceptions — they need no finished increment.
+**After build has finished the slice** — what the plan cut to walk end to end, built in
+every area, or the whole work if the plan is not cut. Then the next slice starts. Not story
+by story as each one is built, and not between two build units of a slice, unless the user
+asked for it: a test set written before the rest is built gets written against what cannot
+run yet. A reported bug and the two readings below are the exceptions — they need no
+finished slice.
+
+**Inside an autonomous batch**, the AI's QA chains like any unit; a person's QA is a kept
+stop. **A failure stops the batch**: the run is recorded with its bug, the unit closes,
+and the plan waits on that slice and bug (`nzt-plan`). Nothing is built on what failed.
 
 If you arrived here in the middle of a build phase with no such request, say so and stop:
 the next build unit is the work.
@@ -174,7 +179,7 @@ not run, with its reason.
 
 ## Closing checklist
 
-- [ ] Run after the increment was built, or interleaved because the user asked.
+- [ ] Run after the slice was built, or interleaved because the user asked.
 - [ ] Plan written and approved before execution, naming each scenario's target.
 - [ ] `qa ✓` only where every built area's scenarios passed on their latest run.
 - [ ] Data mechanism agreed with the user and recorded in the stack document.

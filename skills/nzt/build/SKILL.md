@@ -18,8 +18,8 @@ boundary on tests: the ones that travel with the code are yours — `references/
 what makes one worth keeping, whatever the stack — and the ones derived from an
 approved test-plan scenario are `nzt-verify`'s. **Build never designs, scripts or runs
 application tests**: no test plan, no manual script, no test data. What the stack's test
-levels cannot reach is reported as *not covered until QA*, and QA runs after the increment
-is built.
+levels cannot reach is reported as *not covered until QA*, and QA runs once the slice is
+built in every area, before the next slice starts.
 
 ## Required guidance
 

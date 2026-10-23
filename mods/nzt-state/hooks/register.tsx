@@ -324,6 +324,11 @@ export const register: Register = (on, options) => {
     const following = nextOf(state.units, currentPhase)
     const ratio = counted.length === 0 ? 0 : done.length / counted.length
     const isComplete = doing.length === 0 && todo.length === 0 && invalid.length === 0
+    // With slices, the counts above are the current slice's; the plan ends with its last one.
+    const laterSlice = state.slices
+      ?.slice(state.current + 1)
+      .find(slice => slice.status === 'todo' || slice.status === 'doing')
+    const isPlanComplete = isComplete && laterSlice === undefined
 
     // A unit as the checklist marks it; the one in progress carries its detail, folded to a
     // row until the person presses it.
@@ -387,8 +392,8 @@ export const register: Register = (on, options) => {
       : undefined
 
     // An id with no unit behind it is reported, not waited on: it would never finish.
-    const batch = state.units.filter(u => state.autonomy.units.includes(u.id))
-    const unknownIds = state.autonomy.units.filter(id => !state.units.some(u => u.id === id))
+    const batch = state.planUnits.filter(u => state.autonomy.units.includes(u.id))
+    const unknownIds = state.autonomy.units.filter(id => !state.planUnits.some(u => u.id === id))
     const batchDone = batch.filter(u => u.status === 'done' || u.status === 'dropped').length
 
     const characterPhase = characterPhaseOf(state)
@@ -598,8 +603,8 @@ export const register: Register = (on, options) => {
     const nowColor = nowPhase === undefined ? 'claude' : colorOf(nowPhase)
     const position = focus === undefined ? done.length : counted.indexOf(focus) + 1
     const now = (
-      <Box key="now" marginTop={1} flexDirection="column" borderStyle="round" borderColor={isComplete ? 'success' : nowColor} paddingX={1}>
-        {isComplete ? (
+      <Box key="now" marginTop={1} flexDirection="column" borderStyle="round" borderColor={isPlanComplete ? 'success' : nowColor} paddingX={1}>
+        {isPlanComplete ? (
           <Text color="success" bold wrap="wrap">{t.complete}</Text>
         ) : (
           <Box flexDirection="column">
@@ -612,6 +617,9 @@ export const register: Register = (on, options) => {
             {previous !== undefined && row(previous, boxed)}
             {(doing.length > 0 ? doing : focus === undefined ? [] : [focus]).map(unit => row(unit, boxed))}
             {upcoming !== undefined && upcoming !== focus && row(upcoming, boxed)}
+            {(upcoming === undefined || upcoming === focus) && laterSlice !== undefined && (
+              <Text dimColor wrap="truncate-end">{`▷ ${t.nextSlice(`${laterSlice.id} · ${laterSlice.name}`)}`}</Text>
+            )}
             {doing.length > 1 && (
               <Text color="warning" wrap="wrap">{t.severalInProgress(doing.length)}</Text>
             )}
@@ -680,6 +688,44 @@ export const register: Register = (on, options) => {
           <Box flexDirection="column">
             {characterPhase !== undefined && <Box marginTop={1}>{character(inner)}</Box>}
             <Box marginTop={1}>{summary(inner)}</Box>
+          </Box>
+        )}
+
+        {/* A plan cut into slices: which one runs, then every slice on its own row. */}
+        {state.slices !== null && state.slices.length > 0 && (
+          <Box key="slices" marginTop={1} flexDirection="column">
+            <Box flexDirection="row">
+              <Box width={LABEL}>
+                <Text dimColor>{t.slice}</Text>
+              </Box>
+              <Box width={inner - LABEL}>
+                <Text bold wrap="truncate-end">
+                  {t.sliceOf(state.current + 1, state.slices.length, state.slices[state.current]?.name ?? '')}
+                </Text>
+              </Box>
+            </Box>
+            {state.slices.map((slice, index) => (
+              <Box flexDirection="row">
+                <Box width={2}>
+                  <Text color={MARK[slice.status].color}>{MARK[slice.status].glyph}</Text>
+                </Box>
+                <Box width={inner - 2}>
+                  <Text
+                    wrap="truncate-end"
+                    bold={index === state.current}
+                    dimColor={index !== state.current}
+                    strikethrough={slice.status === 'dropped'}
+                  >
+                    {`${slice.id} · ${slice.name}`}
+                  </Text>
+                </Box>
+              </Box>
+            ))}
+            {state.slices.filter(slice => slice.status === 'doing').length > 1 && (
+              <Text color="warning" wrap="wrap">
+                {t.severalSlicesInProgress(state.slices.filter(slice => slice.status === 'doing').length)}
+              </Text>
+            )}
           </Box>
         )}
 

@@ -23,6 +23,8 @@ public static class StateCheck
 
     private static readonly string[] DelegationModes = ["auto", "ask", "off"];
 
+    private static readonly string[] Cadences = ["delivery", "upfront", "just-in-time"];
+
     public static StateReport Run(string projectDirectory)
     {
         var path = Path.Combine(projectDirectory, RelativePath);
@@ -56,62 +58,46 @@ public static class StateCheck
         // Ausente es `ask` (D71); presente, tiene que ser uno de los tres.
         if (root.TryGetProperty("delegation", out var delegation)
             && !DelegationModes.Contains(Text(root, "delegation")))
-            problems.Add($"delegation es {Shown(delegation.ValueKind == JsonValueKind.String ? delegation.GetString() : delegation.GetRawText())}: "
-                + $"son {string.Join(", ", DelegationModes)}");
+            problems.Add($"delegation es {Shown(Raw(delegation))}: son {string.Join(", ", DelegationModes)}");
 
-        if (!root.TryGetProperty("phases", out var phases) || phases.ValueKind != JsonValueKind.Array)
+        var ids = new HashSet<string>();
+        var unitsDoing = new List<string>();
+
+        var hasPhases = root.TryGetProperty("phases", out var phases);
+        var hasSlices = root.TryGetProperty("slices", out var slices);
+        var version = root.TryGetProperty("version", out var versionValue) ? versionValue.GetRawText() : null;
+
+        if (hasPhases && hasSlices)
+        {
+            problems.Add("phases y slices juntos en la raíz: con tramos, las fases van dentro de cada tramo");
+            return problems;
+        }
+
+        if (hasSlices)
+        {
+            // `version` 2 es obligatorio para que una herramienta que solo entiende v1 falle
+            // diciendo que no lo entiende, en vez de leerlo a medias (D73).
+            if (version != "2")
+                problems.Add($"slices pide version 2, y version es {Shown(version)}");
+            CheckSlices(root, slices, ids, unitsDoing, problems);
+        }
+        else if (version == "2")
+        {
+            problems.Add("version 2 pide slices en lugar de phases");
+            return problems;
+        }
+        else if (!hasPhases || phases.ValueKind != JsonValueKind.Array)
         {
             problems.Add("falta phases, o no es una lista");
             return problems;
         }
-
-        var ids = new HashSet<string>();
-        var phasesDoing = new List<string>();
-        var unitsDoing = new List<string>();
-
-        var index = 0;
-        foreach (var phase in phases.EnumerateArray())
+        else
         {
-            index++;
-            var name = Text(phase, "name") ?? $"#{index}";
-            var phaseStatus = Text(phase, "status");
-
-            if (!Phases.Contains(Text(phase, "name")))
-                problems.Add($"la fase '{name}' no es una fase de NZT: son {string.Join(", ", Phases)}");
-
-            if (!Statuses.Contains(phaseStatus))
-                problems.Add($"la fase '{name}' tiene status {Shown(phaseStatus)}");
-            if (phaseStatus == "doing") phasesDoing.Add(name);
-
-            if (!phase.TryGetProperty("units", out var units) || units.ValueKind != JsonValueKind.Array)
-                continue;
-
-            foreach (var unit in units.EnumerateArray())
-            {
-                var id = unit.TryGetProperty("id", out var idValue) ? idValue.GetRawText() : null;
-                var label = id is null ? $"una unidad de '{name}'" : $"la unidad {id}";
-                var unitStatus = Text(unit, "status");
-
-                if (id is null) problems.Add($"una unidad de la fase '{name}' no tiene id");
-                else if (!ids.Add(id)) problems.Add($"el id {id} se repite");
-
-                if (!Statuses.Contains(unitStatus))
-                    problems.Add($"{label} tiene status {Shown(unitStatus)}");
-
-                if (unitStatus == "doing")
-                {
-                    unitsDoing.Add(id ?? "?");
-                    if (phaseStatus != "doing")
-                        problems.Add($"{label} está en doing, pero su fase '{name}' está en {Shown(phaseStatus)}");
-                }
-
-                if (phaseStatus == "done" && unitStatus is "todo" or "doing")
-                    problems.Add($"la fase '{name}' está done con {label} en {unitStatus}");
-            }
+            var phasesDoing = CheckPhases(phases, "", ids, unitsDoing, problems);
+            if (phasesDoing.Count > 1)
+                problems.Add($"hay {phasesDoing.Count} fases en doing ({string.Join(", ", phasesDoing)}); a lo sumo una");
         }
 
-        if (phasesDoing.Count > 1)
-            problems.Add($"hay {phasesDoing.Count} fases en doing ({string.Join(", ", phasesDoing)}); a lo sumo una");
         if (unitsDoing.Count > 1)
             problems.Add($"hay {unitsDoing.Count} unidades en doing ({string.Join(", ", unitsDoing)}); a lo sumo una");
 
@@ -125,10 +111,123 @@ public static class StateCheck
         return problems;
     }
 
+    private static void CheckSlices(JsonElement root, JsonElement slices, HashSet<string> ids,
+        List<string> unitsDoing, List<string> problems)
+    {
+        // Ausente es `upfront` (D73), como lo hacía NZT antes de los tramos.
+        if (root.TryGetProperty("cadence", out var cadence) && !Cadences.Contains(Text(root, "cadence")))
+            problems.Add($"cadence es {Shown(Raw(cadence))}: son {string.Join(", ", Cadences)}");
+
+        if (slices.ValueKind != JsonValueKind.Array)
+        {
+            problems.Add("slices no es una lista");
+            return;
+        }
+
+        var sliceIds = new HashSet<string>();
+        var slicesDoing = new List<string>();
+
+        var index = 0;
+        foreach (var slice in slices.EnumerateArray())
+        {
+            index++;
+            var id = Text(slice, "id");
+            var name = id ?? $"#{index}";
+            var sliceStatus = Text(slice, "status");
+
+            if (id is null) problems.Add($"el tramo #{index} no tiene id de texto");
+            else if (!sliceIds.Add(id)) problems.Add($"el tramo {id} se repite");
+
+            if (!Statuses.Contains(sliceStatus))
+                problems.Add($"el tramo {name} tiene status {Shown(sliceStatus)}");
+            if (sliceStatus == "doing") slicesDoing.Add(name);
+
+            if (!slice.TryGetProperty("phases", out var phases) || phases.ValueKind != JsonValueKind.Array)
+            {
+                problems.Add($"el tramo {name} no tiene phases, o no es una lista");
+                continue;
+            }
+
+            var phasesDoing = CheckPhases(phases, $" del tramo {name}", ids, unitsDoing, problems);
+            if (phasesDoing.Count > 1)
+                problems.Add($"hay {phasesDoing.Count} fases en doing en el tramo {name} ({string.Join(", ", phasesDoing)}); a lo sumo una");
+            if (phasesDoing.Count > 0 && sliceStatus != "doing")
+                problems.Add($"la fase '{phasesDoing[0]}' del tramo {name} está en doing, pero su tramo está en {Shown(sliceStatus)}");
+
+            var seen = new HashSet<string>();
+            foreach (var phase in phases.EnumerateArray())
+            {
+                var phaseName = Text(phase, "name");
+                var phaseStatus = Text(phase, "status");
+                if (phaseName is not null && !seen.Add(phaseName))
+                    problems.Add($"la fase '{phaseName}' se repite en el tramo {name}");
+                if (sliceStatus == "done" && phaseStatus is not ("done" or "dropped"))
+                    problems.Add($"el tramo {name} está done con su fase '{phaseName ?? "?"}' en {Shown(phaseStatus)}");
+            }
+        }
+
+        if (slicesDoing.Count > 1)
+            problems.Add($"hay {slicesDoing.Count} tramos en doing ({string.Join(", ", slicesDoing)}); a lo sumo uno");
+    }
+
+    /// <summary>Las reglas de una lista de fases, la de un v1 o la de cada tramo de un v2.</summary>
+    /// <returns>Los nombres de las fases en doing.</returns>
+    private static List<string> CheckPhases(JsonElement phases, string where, HashSet<string> ids,
+        List<string> unitsDoing, List<string> problems)
+    {
+        var phasesDoing = new List<string>();
+
+        var index = 0;
+        foreach (var phase in phases.EnumerateArray())
+        {
+            index++;
+            var name = Text(phase, "name") ?? $"#{index}";
+            var phaseStatus = Text(phase, "status");
+
+            if (!Phases.Contains(Text(phase, "name")))
+                problems.Add($"la fase '{name}'{where} no es una fase de NZT: son {string.Join(", ", Phases)}");
+
+            if (!Statuses.Contains(phaseStatus))
+                problems.Add($"la fase '{name}'{where} tiene status {Shown(phaseStatus)}");
+            if (phaseStatus == "doing") phasesDoing.Add(name);
+
+            if (!phase.TryGetProperty("units", out var units) || units.ValueKind != JsonValueKind.Array)
+                continue;
+
+            foreach (var unit in units.EnumerateArray())
+            {
+                var id = unit.TryGetProperty("id", out var idValue) ? idValue.GetRawText() : null;
+                var label = id is null ? $"una unidad de '{name}'{where}" : $"la unidad {id}";
+                var unitStatus = Text(unit, "status");
+
+                if (id is null) problems.Add($"una unidad de la fase '{name}'{where} no tiene id");
+                else if (!ids.Add(id)) problems.Add($"el id {id} se repite");
+
+                if (!Statuses.Contains(unitStatus))
+                    problems.Add($"{label} tiene status {Shown(unitStatus)}");
+
+                if (unitStatus == "doing")
+                {
+                    unitsDoing.Add(id ?? "?");
+                    if (phaseStatus != "doing")
+                        problems.Add($"{label} está en doing, pero su fase '{name}'{where} está en {Shown(phaseStatus)}");
+                }
+
+                if (phaseStatus == "done" && unitStatus is "todo" or "doing")
+                    problems.Add($"la fase '{name}'{where} está done con {label} en {unitStatus}");
+            }
+        }
+
+        return phasesDoing;
+    }
+
     private static string? Text(JsonElement element, string property) =>
         element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
+
+    private static string Raw(JsonElement value) =>
+        value.ValueKind == JsonValueKind.String ? value.GetString()! : value.GetRawText();
 
     private static string Shown(string? status) => status is null ? "vacío" : $"'{status}'";
 }

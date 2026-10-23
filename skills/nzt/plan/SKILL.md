@@ -27,11 +27,12 @@ is produced: the plan says what it delivers, not which files will end up existin
 
 ## Building the plan
 
-1. Take the phases chosen by `nzt` — or choose them yourself if the work is small and
-   obvious.
+1. Take the phases chosen by `nzt`, or choose them if the work is small and obvious. **A
+   product, a feature of several stories, or work to deliver early is cut into slices**:
+   read `references/slices.md` in this skill's folder before cutting.
 2. Turn each phase into its units, in dependency order. **Verify's units go after the
-   increment's last build unit, never between two**, unless the user asks for it.
-3. Write `goal`, `phases` (the first `doing`, each with its units) and `approved: false`.
+   slice's last build unit, never between two**, unless the user asks for it.
+3. Write `goal`, `phases` or `slices` (the first `doing`) and `approved: false`.
 4. Show the plan in the reply and ask for approval. Stop.
 
 Keep the plan to what you can see. Fifteen units written before the first spec exists is
@@ -79,13 +80,12 @@ Set `approved: true` only when the user approves it in this conversation. Silenc
 approval. A question about the plan is not approval.
 
 The user can change anything: reorder units, drop them, add them, change the goal. Rewrite
-`phases` and keep asking until they approve. Units already `done` keep their `id` and their
+the plan and keep asking until they approve. Units already `done` keep their `id` and their
 status; new units get new ids.
 
 **Accompanied is the default.** Offer autonomy once, with the plan, and not again:
 
-- Not answering is accompanied. It is not a pending question.
-- Approving the plan does not select autonomy.
+- Not answering is accompanied, not a pending question. Approving does not select autonomy.
 - *"Continue"* advances the next agreed stretch. It does not change mode.
 - What was selected goes into `autonomy` in the state. Absent or empty means accompanied.
 - A step that touches an environment other people share runs autonomously **only if the
@@ -95,10 +95,10 @@ status; new units get new ids.
 
 One unit per turn:
 
-1. Take the first `todo` unit of the phase in `doing`. Set it to `doing`.
+1. Take the first `todo` unit of the current phase, in the current slice if any. Set it `doing`.
 2. Load the skill that unit needs, per the routing table in your instructions.
 3. Do the unit, and mark progress where that phase marks it.
-4. Set it to `done`, update `updated`, advance `phases` if it closed its phase, write.
+4. Set it to `done`, update `updated`, advance the phase or slice it closed, write.
 5. Report, then stop.
 
 **A direct request or an approved plan authorises its ordinary steps.** Do not ask again

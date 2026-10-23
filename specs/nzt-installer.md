@@ -477,6 +477,21 @@ Lee `Plan/state.json` de la carpeta actual y dice si cumple el contrato del kern
 - `approved` es `true` o `false`, y las unidades que nombra `autonomy` existen en el plan;
 - `delegation`, si está, es `auto`, `ask` u `off` (D71); ausente no es un problema, rige `ask`.
 
+Un estado por tramos (D73 de `specs/nzt-core.md`) lleva `slices` en lugar de `phases`, y
+además:
+
+- `slices` exige `version` 2, `version` 2 exige `slices`, y `phases` y `slices` juntos en la
+  raíz es un problema;
+- `cadence`, si está, es `delivery`, `upfront` o `just-in-time`; ausente rige `upfront`;
+- cada tramo tiene un `id` de texto que no se repite, un `status` válido y su lista `phases`;
+- dentro de cada tramo valen las reglas de fases de arriba, y además ninguna fase repite
+  nombre; los `id` de unidad no se repiten en todo el archivo;
+- a lo sumo un tramo `doing`; una fase `doing` solo vive en el tramo `doing`; un tramo
+  `done` tiene todas sus fases `done` o `dropped`.
+
+Un estado con `phases` en la raíz se revisa exactamente como antes: una fase repetida en un
+v1 no es un problema.
+
 Sin problemas, una línea y código 0. Con problemas, uno por línea, nombrando la unidad o la
 fase, y código 1. Sin archivo lo dice y sale con 0: no todo proyecto tiene estado. Un JSON
 roto es un problema, con su posición.
