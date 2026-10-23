@@ -42,7 +42,7 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": { "units": [324, 325, 326, 327, 328, 329] },
-  "waiting_on": "aceptación del usuario: probar nzt-state 0.9.0 en vivo y decidir commit y publicación",
+  "waiting_on": "aceptación del usuario: todo en la rama trabajo-por-tramos (pusheada, sin merge); probar el instalador y nzt-state 0.9.0 en vivo, y el merge lo hace el usuario",
   "notes": [
     "Acordado 2026-10-23: MVP puede ser todo el alcance; historias detalladas por entrega y luego lote; QA fallido frena el lote; sin fases repetidas en el mod",
     "Modelo acordado: plan = lista de tramos; cada tramo con sus fases completas y separadas; tramo = lo que el plan corte, por defecto una feature",
