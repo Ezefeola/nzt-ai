@@ -17,6 +17,8 @@
 > que el usuario lo acepte. Origen: D71 de `specs/nzt-core.md`.
 > **0.9.0 construido, sin aceptar** (unidad 328, 2026-10-23): los tramos de un estado v2
 > (RN-panel-tramos, `[add]`). Origen: D72 y D73 de `specs/nzt-core.md`.
+> **0.9.1 construido, sin aceptar** (unidad 340, 2026-10-24): la lista de tramos plegada y
+> sin repetir el actual (RN-panel-tramos). Origen: D75 de `specs/nzt-core.md`.
 
 ## Qué resuelve
 
@@ -120,9 +122,12 @@ este repo: el agente había escrito cada cambio como una fase.
 Si el estado trae `slices` (v2), el panel muestra **el tramo en curso como si fuera el plan**:
 la línea de fases, el avance, AHORA y las tareas son las de ese tramo, y ninguna fase aparece
 dos veces. El tramo en curso es el `doing`; sin ninguno, el primero `todo`; sin ninguno, el
-último. Arriba de la línea de fases, la fila **Tramo** dice *2 de 3 · F-003 Cupones*, y debajo
-va cada tramo en un renglón, `S1 · Análisis de la entrega 1`, con la marca de
-RN-panel-lista-marcas; el actual en negrita, los demás atenuados. Si al tramo no le queda
+último. Arriba de la línea de fases, la fila **Tramo** dice *2 de 3 · F-003 Cupones*, y debajo,
+plegada, **▸ Tramos · 3** (D75, QT-04 del usuario 2026-10-24: "si hay muchos tramos se vuelve
+ilegible"): un clic, o Enter con el foco, la despliega con cada tramo en un renglón,
+`S1 · Análisis de la entrega 1`, con la marca de RN-panel-lista-marcas; el actual en negrita,
+los demás atenuados. Empieza plegada, y el panel recuerda si se abrió como las otras
+secciones. Con un solo tramo no hay sección: la fila Tramo ya lo dice todo. Si al tramo no le queda
 nada pendiente después de lo que muestra AHORA y viene otro, AHORA cierra con *▷ Sigue el
 tramo S3 · Release*. *Plan completo* recién cuando no queda tramo por hacer. La tanda cuenta
 las unidades de todos los tramos (RN-panel-tanda-ids). Con más de un tramo `doing`, avisa
@@ -481,7 +486,8 @@ válido, inválido), el ciclo, la escritura en su lugar o al lado de `approved` 
 byte, el archivo que no es objeto, la fila con el clic que escribe y el error de escritura
 (0.8.0); el estado por tramos: el tramo en curso con sus fases y unidades, la tanda sobre
 todos los tramos, la fila Tramo con cada tramo, *Sigue el tramo* y el plan completo solo tras
-el último (0.9.0). 54 tests; `tsc` sin errores en la unidad 328. **Sin probar en vivo** la fila
+el último (0.9.0); la lista de tramos plegada, que se abre y se cierra, y sin lista con un solo
+tramo (0.9.1). 55 tests en la unidad 340. **Sin probar en vivo** la fila
 Delegar ni los tramos. **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
 pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueba en vivo
 ([testing/2026-10-20-en-vivo.md](testing/2026-10-20-en-vivo.md), V-03).

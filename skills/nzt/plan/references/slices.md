@@ -57,6 +57,11 @@ before its first slice is built.** What waits is the stories' criteria, never th
 rule crosses stories, and defined late it gets defined three different ways. The story
 index, one line *As… I want… so that…* per story, is the backlog; there is no other list.
 
+**The spec and its stories are one step of the plan**, named as such — *the spec of F-001
+and its user stories* — without counting them: the count is not known until the index
+exists. When the spec closes, cut one unit per story of the index into that step. That is an
+ordinary step of the approved plan, not a change to it: it asks for no new approval.
+
 ## Inside a slice
 
 The phase rules of the state file hold inside each slice: in order, no name repeated, at
@@ -91,4 +96,5 @@ The plan table gets a **Slice** column, and under it the declarations of `propos
 - Every slice can be tried by the user on its own, and says which phases it needs.
 - The discovery slice comes first when the scope is not known yet, with re-approval after it.
 - `cadence` is written, and no feature starts building without its scope and rules.
+- Every spec the plan writes is a step that names its stories.
 - No verify unit sits between two build units of the same slice.

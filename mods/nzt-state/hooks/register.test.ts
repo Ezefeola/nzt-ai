@@ -489,13 +489,18 @@ describe('parseState with slices', () => {
   })
 })
 
-test('a plan cut into slices shows which slice runs, every slice in a row, and its own phases', async ($, on) => {
+test('a plan cut into slices shows which slice runs, every slice folded below, and its own phases', async ($, on) => {
   const ui = await mountPane($, on, SLICED)
   expect(await ui.find({ type: 'Text', text: 'Tramo' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: '2 de 3 · F-003 Cupones' })).toBeDefined()
+  // The list starts folded: the current slice is named once, in the Tramo row.
+  expect(await ui.find({ type: 'Text', text: /^▸ Tramos · 3/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'S2 · F-003 Cupones' })).toBeUndefined()
+  await ui.press({ key: 'toggle-slices' })
   for (const row of ['S1 · Análisis de la entrega 1', 'S2 · F-003 Cupones', 'S3 · Release']) {
     expect(await ui.find({ type: 'Text', text: row })).toBeDefined()
   }
+  await ui.press({ key: 'toggle-slices' })
   // The timeline is the current slice's: no phase of another slice, none twice.
   expect(await ui.find({ type: 'Text', text: /Verificación/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^[○✓] Release/ })).toBeUndefined()
@@ -503,6 +508,14 @@ test('a plan cut into slices shows which slice runs, every slice in a row, and i
   expect(await ui.find({ type: 'Text', text: /sin unidad/ })).toBeUndefined()
   // Nothing is left in S2 after the unit in progress: what follows is the next slice.
   expect(await ui.find({ type: 'Text', text: /Sigue el tramo S3 · Release/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a plan of one slice names it in the Tramo row and has no list to unfold', async ($, on) => {
+  const ui = await mountPane($, on, { ...SLICED, slices: [SLICED.slices[0]] })
+  expect(await ui.find({ type: 'Text', text: '1 de 1 · Análisis de la entrega 1' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Tramos ·/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'S1 · Análisis de la entrega 1' })).toBeUndefined()
   await ui.unmount()
 })
 

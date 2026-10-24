@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.9.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.9.1** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -60,8 +60,9 @@ De arriba hacia abajo muestra:
   delega lecturas el agente (**Delegar**: `auto`, `ask` u `off`; un clic pasa al siguiente) y
   el objetivo de la corrida, con la etiqueta **Objetivo**. Con menos de 40 columnas útiles no
   entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
-- En un plan cortado en **tramos**, la fila **Tramo** (*2 de 3 · F-003 Cupones*) y debajo
-  cada tramo en un renglón con su marca. Todo lo que sigue —fases, avance, AHORA, tareas— es
+- En un plan cortado en **tramos**, la fila **Tramo** (*2 de 3 · F-003 Cupones*) y debajo,
+  plegada, **▸ Tramos · 3**: un clic la abre con cada tramo en un renglón y su marca. Con un
+  solo tramo no hay lista. Todo lo que sigue —fases, avance, AHORA, tareas— es
   del tramo en curso; cuando no le queda nada pendiente, AHORA dice qué tramo sigue.
 - La línea de fases de la corrida con su estado, el porcentaje de avance
   (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.

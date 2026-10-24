@@ -60,14 +60,16 @@ export type Snapshot =
 
 /**
  * What the person unfolded in the pane: Tu turno, the detail of the unit in progress, the
- * tasks and the notes. `groups` holds the phase groups the person toggled, keyed by phase;
- * one never toggled follows the phase in progress.
+ * tasks, the notes and the list of slices. `groups` holds the phase groups the person
+ * toggled, keyed by phase; one never toggled follows the phase in progress.
  */
 export type Expanded = {
   turn: boolean
   detail: boolean
   tasks: boolean
   notes: boolean
+  /** Optional: a pane saved before 0.9.1 has no such key, and reads it as folded. */
+  slices?: boolean
   groups?: Record<string, boolean>
 }
 

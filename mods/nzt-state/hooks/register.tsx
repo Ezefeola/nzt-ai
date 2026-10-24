@@ -48,6 +48,7 @@ const expanded = atom({ plugin: 'nzt-state', key: 'expanded' } as const, {
   detail: false,
   tasks: false,
   notes: false,
+  slices: false,
 } as Expanded)
 const answering = atom({ plugin: 'nzt-state', key: 'answering' } as const, { kind: 'idle' } as Answering)
 const glow = atom({ plugin: 'nzt-state', key: 'glow' } as const, 0)
@@ -691,7 +692,8 @@ export const register: Register = (on, options) => {
           </Box>
         )}
 
-        {/* A plan cut into slices: which one runs, then every slice on its own row. */}
+        {/* A plan cut into slices: which one runs, and every slice folded below it, since a
+            long plan would push the phases off the pane. One slice needs no list. */}
         {state.slices !== null && state.slices.length > 0 && (
           <Box key="slices" marginTop={1} flexDirection="column">
             <Box flexDirection="row">
@@ -704,7 +706,8 @@ export const register: Register = (on, options) => {
                 </Text>
               </Box>
             </Box>
-            {state.slices.map((slice, index) => (
+            {state.slices.length > 1 && folding(t.slices, state.slices.length, 'slices')}
+            {state.slices.length > 1 && open.slices === true && state.slices.map((slice, index) => (
               <Box flexDirection="row">
                 <Box width={2}>
                   <Text color={MARK[slice.status].color}>{MARK[slice.status].glyph}</Text>

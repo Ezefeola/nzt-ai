@@ -1,40 +1,39 @@
 {
   "version": 1,
-  "updated": "2026-10-24T14:10:00Z",
-  "goal": "Kernel más liviano: el estado pasa a nzt-plan con carga obligatoria y el kernel suma un código de comunicación",
+  "updated": "2026-10-24T17:00:00Z",
+  "goal": "Ajustes de la prueba en TodoList: el paso de la spec cubre sus historias sin re-aprobar, y el panel muestra los tramos plegados",
   "phases": [
     {
       "name": "analysis",
       "status": "done",
       "units": [
-        { "id": 331, "do": "D74 en specs/nzt-core.md: estado a nzt-plan con carga obligatoria, qué queda en el kernel, código de comunicación (QT-01..03)", "status": "done", "detail": "D74 tras D73; 4.1 y §7 dicen dónde vive el esquema; referencia nueva: plan/references/proposal.md" }
+        { "id": 337, "do": "D75 en specs/nzt-core.md: historias dentro del paso de la spec (QT-05) y tramos plegados en el panel (QT-04)", "status": "done" },
+        { "id": 338, "do": "Spec del mod nzt-state: RN-panel-tramos con una línea fija y la lista plegada", "status": "done" }
       ]
     },
     {
       "name": "build",
       "status": "done",
       "units": [
-        { "id": 332, "do": "nzt-plan: liberar lugar moviendo 'How the plan is shown' y 'The documents the plan produces' a referencias", "status": "done", "detail": "plan/references/proposal.md (42 líneas), nombrada en el paso 4; SKILL.md 200 -> 169; build sin avisos" },
-        { "id": 333, "do": "nzt-plan: esquema y reglas del estado (v1 y v2) en el cuerpo de SKILL.md, no en una referencia", "status": "done", "detail": "sección 'The state file' arriba; description nombra leer/escribir el estado; 5 líneas duplicadas fuera; 200 sin aviso" },
-        { "id": 334, "do": "Kernel: estado a ~5 líneas con el disparador 'leer o escribir Plan/state.json carga nzt-plan'; compactar preguntas, autonomía, contexto, hard rules", "status": "done", "detail": "kernel 186 -> 142; State en 4 líneas, autonomía en 1, Context 12 -> 9; preguntas y 'Report what happened' pasan a Communication en la 335" },
-        { "id": 335, "do": "Kernel: sección Communication (~15 líneas) y formatos dispersos (reporte, plan, preguntas, playback) nombrados desde ahí", "status": "done", "detail": "Communication absorbe Language, Questions y 'Report what happened'; citas en stack-axes, parse.ts y 2 specs al día; CLAUDE.md 200 -> 161" }
+        { "id": 339, "do": "nzt-plan y slices.md: el paso de la spec nombra sus historias; se cortan al cerrar la spec, sin re-aprobación", "status": "done" },
+        { "id": 340, "do": "Mod nzt-state: fila Tramo sin repetir, lista plegable 'Tramos · n', sin plegable con un solo tramo; tests y versión", "status": "done" }
       ]
     },
     {
       "name": "verify",
       "status": "done",
       "units": [
-        { "id": 336, "do": "Puertas: build, lint, checks y evals de ruteo, plan/estado y frenos comparados con antes del cambio", "status": "done", "detail": "puertas en verde; evals sin baja atribuible a D74 (detalle en D74); route-verify 2/3 y stack-not-dotnet sin correr por límite" }
+        { "id": 341, "do": "Puertas: build, check-references, checks del instalador, tests del mod; sin evals (usuario 2026-10-24)", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [331, 332, 333, 334, 335, 336] },
+  "autonomy": { "units": [337, 338, 339, 340, 341] },
   "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-23: QT-01 código de comunicación = principios en el kernel + formatos en sus skills; QT-02 plan aprobado, sigue en la rama trabajo-por-tramos; QT-03 autónomo completo",
-    "Pendiente de la corrida anterior (320-329, pusheada en trabajo-por-tramos, sin merge): aceptación del usuario y prueba en vivo de nzt-state 0.9.0",
-    "Corrida D74 terminada 2026-10-24, sin commit; corregida la baja de plan-stories en proposal.md (3/3); falta aceptación; aparte: fixtures sin glosario y mensaje 'contrato del kernel' del CLI"
+    "Usuario 2026-10-24: QT-04 línea + plegable para los tramos; QT-05 un paso 'spec y sus historias' sin contarlas, unidades por historia sin re-aprobar",
+    "Corrida D74 commiteada (279991b) y pusheada en trabajo-por-tramos; el usuario la prueba en Systems/TodoList (puntos 3-4 ok)",
+    "Pendiente aparte: fixtures sin glosario, mensaje 'contrato del kernel' y versión -dev en binarios locales del CLI"
   ]
 }

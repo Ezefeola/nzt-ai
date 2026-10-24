@@ -2425,6 +2425,32 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     el kernel — *cada documento va por su nombre, con la explicación simple al lado; las
     palabras simples explican, no renombran*. Re-corrida: `plan-stories` 3/3, las tres dicen
     "historias de usuario", US$0.76 (`evals/results/2026-10-24-d74b-plan-stories.json`).
+- **D75.** **El paso de la spec cubre sus historias: el plan las nombra sin contarlas, y al
+  cerrar la spec se corta una unidad por historia sin volver a aprobar. El panel muestra los
+  tramos en una línea, con la lista plegada.** Lo que la forzó: la prueba en vivo de D72–D74
+  en un proyecto nuevo (usuario, 2026-10-24, `Systems/TodoList`). Con cadencia `delivery`, el
+  plan del tramo de descubrimiento tenía producto, glosario, spec y prototipo, y **ninguna
+  fila para las historias**; al cerrar la spec el agente lo notó y pidió aprobación para
+  sumar cinco unidades. Y el panel repetía el nombre del tramo: en la fila **Tramo** y en la
+  lista de debajo, que además no escala con muchos tramos.
+  - **QT-05 (usuario).** El usuario objetó que la spec y sus historias son parte de lo mismo
+    y que el plan no tiene por qué saber cuántas hay. Se acordó: **en el plan, un paso** —*la
+    spec de F-001 y sus historias*—, sin número (*"una fila es un paso, no un archivo"*);
+    **en la ejecución, una unidad por historia**, cortadas cuando el índice existe. Cortarlas
+    es un paso ordinario de lo aprobado, no un cambio de plan: no pide aprobación. Descartado:
+    spec e historias en una unidad (una revisión enorme, y una historia mal obliga a rehacer
+    el bloque). Va en `nzt-plan` y en `slices.md`.
+  - **QT-04 (usuario).** El panel muestra una línea fija, `Tramo  2 de 5 · F-001 Tareas`, y
+    debajo la lista entera plegada en `▸ Tramos · 5`, que se abre con un clic como *Ver
+    tareas*. Con un solo tramo, solo la línea. Descartados: una ventana con el anterior, el
+    actual y el siguiente (3–4 líneas fijas), y la lista sola (se pierde el *n de m*). Va en
+    RN-panel-tramos de `specs/mods/nzt-state/spec.md`.
+  - **Hecho (337–341, 2026-10-24).** `slices.md` dice que la spec y sus historias son un paso
+    y que cortarlo por historia no pide aprobación (queda en 100 líneas); `nzt-plan` no cambió.
+    `nzt-state` 0.9.1: `▸ Tramos · n` plegado, abierto con un clic, sin lista con un tramo.
+    **Puertas:** build sin avisos, `check-references` sin movidas, 164 comprobaciones, lint 0
+    problemas, marketplace válido, `nzt-state` 55 tests. **Sin evals**, por decisión del
+    usuario. **Sin probar en vivo** el panel.
 
 ## 13. Revisión contra Temper v3
 
