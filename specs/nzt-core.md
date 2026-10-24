@@ -129,13 +129,15 @@ sin uso (D4, derogada).
 Lo mínimo que el agente necesita **siempre**. Contiene:
 
 1. **El bucle de trabajo** (sección 5).
-2. **El protocolo de estado** (`Plan/state.json`, sección 7).
+2. **El disparador del estado**: `Plan/state.json` se lee al empezar, y leerlo o escribirlo
+   carga `nzt-plan`, que tiene su esquema y sus reglas (sección 7, D74).
 3. **La regla de frenos** (sección 6).
 4. **La tabla de ruteo**: qué router cargar según la intención detectada. Esto es lo que
    evita depender solo del `description` de cada skill.
 5. **Las reglas duras**: nunca hacer todo de una, nunca escribir más de una spec por vez,
    nunca ejecutar un plan sin aprobación.
-6. **La regla de idioma**: responder y generar artefactos en el idioma del usuario (D2).
+6. **La comunicación**: el idioma del usuario (D2) y los principios de toda respuesta; los
+   formatos viven en sus skills (D74).
 
 El kernel **no** explica cómo se escribe una spec ni cómo se diseña una arquitectura. Eso
 vive en las skills.
@@ -474,7 +476,9 @@ Reglas del acuerdo:
 
 `Plan/state.json` en la raíz del proyecto. **El plan vive acá adentro**, no en un `.md`
 aparte: dos archivos que describen lo mismo se desincronizan, y el agente terminaría
-gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
+gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad. Su esquema y
+sus reglas los dice `nzt-plan` en el cuerpo de su `SKILL.md`; el kernel solo dice que leerlo
+o escribirlo carga `nzt-plan` (D74).
 
 ```json
 {
@@ -2347,6 +2351,80 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     tramo repetido da el problema y código 1. El `nzt-ai` instalado (1.6.0) rechaza el v2 con
     *falta phases*, como D73 previó, hasta que se publique. `check-extraction` no aplica: es
     para extraer hojas de área. La 330 (evals) la descartó el usuario.
+- **D74.** **El esquema y las reglas de `Plan/state.json` pasan al cuerpo de `nzt-plan`, que
+  se carga siempre que se lee o se escribe el estado; el kernel suma una sección
+  *Communication* con los principios, y cada formato queda en su skill.** Lo que la forzó: el
+  kernel está en 200 justas (C3) desde D64, y cada regla nueva entró recortando otra (D67,
+  D68, D69, D71, D73). El estado era su bloque más grande (~35 líneas) para un contrato que el
+  agente usa al leer o escribir un archivo. Y la forma de comunicar estaba repartida —el
+  reporte en `nzt-plan`, las preguntas en el kernel, el playback en `nzt-discovery`, *"report
+  what actually happened"* en las hard rules— sin un lugar con lo que vale para toda
+  respuesta. Acordado con el usuario el 2026-10-23, unidad 331.
+  - **Revierte lo descartado en D65, con argumentos nuevos.** D65 dejó el esquema en el kernel
+    porque el estado se escribe también en trabajo chico que no carga `nzt-plan`, y sin el
+    esquema delante el agente lo escribiría de memoria. Lo que cambió: (1) el kernel dice que
+    **leer o escribir `Plan/state.json` carga `nzt-plan`**, un disparador por el nombre del
+    archivo que no depende de clasificar el trabajo; (2) desde D68 `nzt-ai state check`
+    revisa lo escrito, así que un formato corrido aparece en la misma unidad. Costo: el
+    trabajo chico carga `nzt-plan` al escribir el estado, lo mismo que ya paga cualquier
+    corrida de más de una unidad.
+  - **En el cuerpo de `SKILL.md`, no en una referencia** (unidad 333): una skill cargada
+    sobrevive a la compactación y una referencia no (kernel, *Routing*). Retomar es leer el
+    estado, así que el esquema no puede depender de releer un archivo.
+  - **`nzt-plan` libera lugar** (332): está en 200 (D3). *How the plan is shown* y *The
+    documents the plan produces* pasan a `plan/references/proposal.md`, que se lee al armar
+    el plan, antes de mostrarlo: es el único momento en que se usan. Entran el ejemplo v1 y
+    las reglas de v1 y v2 que hoy dice el kernel, sin cambiar ninguna. `slices.md` deja de
+    decir que el formato está *in your instructions*.
+  - **Qué queda en el kernel** (334): *State* en ~5 líneas —qué es el archivo, leerlo al
+    empezar antes de preguntar, el disparador, cuándo se omite—. El candado de aprobación y
+    el cierre de unidad con `state check` siguen en las hard rules y en *Work units and
+    stops*, porque valen antes de que `nzt-plan` esté cargado. Se compactan, sin perder
+    reglas, la autonomía (queda *acompañado por defecto*; cómo se ofrece ya lo dice
+    `nzt-plan`), *Context* y las hard rules.
+  - **El código de comunicación** (QT-01, usuario: principios en el kernel y formatos en sus
+    skills). Una sección *Communication* (~15 líneas, 335) con lo que vale para toda
+    respuesta: el idioma (absorbe *Language*), el resultado primero, lo que el usuario puede
+    probar o decidir antes que qué archivos existen, lo que pasó tal cual (absorbe la hard
+    rule *Report what actually happened*), ningún número inventado, y la forma de las
+    preguntas (absorbe *Questions*). Cierra nombrando dónde vive cada formato: el plan
+    (`nzt-plan-proposal`), el reporte de unidad y el bloque de contradicción (`nzt-plan`) y
+    el playback (`nzt-discovery`). Cada formato se dice una vez, en su skill (D65).
+  - QT-02: plan aprobado, en la rama `trabajo-por-tramos`. QT-03: autonomía completa de 331 a
+    336 (usuario, 2026-10-23).
+  - **Lo que no cambia:** el formato del estado (v1 y v2), `state check`, el panel y toda
+    regla de comportamiento: lo que sale del kernel queda dicho una vez en `nzt-plan`, o
+    repetía otra línea que queda.
+  - **Riesgo:** el disparador lo cumple el modelo, no el host. Si no carga `nzt-plan` y
+    escribe el estado de memoria, lo atrapa `state check` donde está instalado; donde no,
+    nada. Lo mide la 336 con los evals de plan y estado.
+  - **Hecho (332-335, 2026-10-23).** `nzt-plan` 200 → 169 con `proposal.md` (42 líneas) y
+    de vuelta a 200 con *The state file*; su `description` nombra leer o escribir el estado.
+    `core/kernel.md` 186 → 147; `CLAUDE.md` y `AGENTS.md` 200 → 161 (C3). Las citas que
+    apuntaban al esquema o a *Questions* del kernel (`stack-axes.md`, comentarios de
+    `parse.ts`, la spec del mod y RN-cli-state-check) quedan al día. **No cambiado:** el
+    mensaje de `nzt-ai state check` sigue diciendo *"cumple el contrato del kernel"*;
+    cambiarlo es del CLI y de una publicación.
+  - **Puertas (336, 2026-10-24).** Build sin avisos, `check-references` sin movidas, 164
+    comprobaciones del instalador, lint 0 problemas, `nzt-state` 54 tests, marketplace
+    válido. **Evals** (juez sonnet, sin brazo de control, contra la u35): ruteo 16 casos y
+    restraint 8. Iguales o mejor: `kernel-loaded`, `small-edit`, `trivial`, `foreign-repo`,
+    `package-unasked`, `test-data` y diez de ruteo en 1.00. Bajas, todas leídas en la traza:
+    `plan-stories` 1/3 (leyó `proposal.md`; llamó *casos de uso* al índice diferido de D72),
+    `close-feature` (el fixture no tiene el código que la historia marca hecho),
+    `qa-unasked`, `design-unasked` y `test-levels-unasked` (frenan por el glosario que los
+    fixtures no tienen), `design-mode`, `no-diagram` y `build-story` (juez, 1 o 2 de 3).
+    El disparador se vio andar: con estado, las corridas cargaron `nzt-plan`. **No corrieron**,
+    por el límite de sesión: 2 de 3 de `route-verify` y `stack-not-dotnet`. Costo total
+    ≈ US$27. Pendiente aparte: los fixtures sin glosario, y el grader de `qa-unasked` que dice
+    *increment*.
+  - **Corrección (2026-10-24).** La baja de `plan-stories` **sí era de D74**: la regla
+    *"Plain words in the user's terms"* de *Communication* llevó a traducir "historias de
+    usuario" por "casos de uso" en un proyecto sin glosario (la u34 decía "historia" 11
+    veces). Decidido por el usuario: la aclaración va en `plan/references/proposal.md`, no en
+    el kernel — *cada documento va por su nombre, con la explicación simple al lado; las
+    palabras simples explican, no renombran*. Re-corrida: `plan-stories` 3/3, las tres dicen
+    "historias de usuario", US$0.76 (`evals/results/2026-10-24-d74b-plan-stories.json`).
 
 ## 13. Revisión contra Temper v3
 

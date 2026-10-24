@@ -85,7 +85,7 @@ lo escribe en el archivo:
 - relee el archivo en el momento del clic, no lo que vio el panel, para no pisar lo que el
   agente escribió desde la última lectura;
 - cambia esa clave y deja el resto **byte por byte**; una clave nueva va al lado de
-  `approved`, como la escribe el schema del kernel (`"approved": true, "delegation": "off",`);
+  `approved`, como la escribe el schema de `nzt-plan` (`"approved": true, "delegation": "off",`);
 - un archivo que no es un objeto JSON no se toca; si la escritura falla, el panel dice
   *No se pudo cambiar el modo:* y el motivo.
 

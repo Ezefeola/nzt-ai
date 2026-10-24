@@ -1,51 +1,40 @@
 {
   "version": 1,
-  "updated": "2026-10-23T15:00:00Z",
-  "goal": "NZT por tramos: entrega 1/MVP, historias detalladas por entrega, QA por tramo y estado/mod organizados por tramo",
+  "updated": "2026-10-24T14:10:00Z",
+  "goal": "Kernel más liviano: el estado pasa a nzt-plan con carga obligatoria y el kernel suma un código de comunicación",
   "phases": [
     {
       "name": "analysis",
       "status": "done",
       "units": [
-        { "id": 320, "do": "Decisiones D72+ en specs/nzt-core.md: tramo, entrega 1/MVP, modo de definir, QA por tramo, falla de QA frena el lote", "status": "done", "detail": "D72 escrita tras D71; vocabulario slice/delivery, incremento retirado" }
-      ]
-    },
-    {
-      "name": "architecture",
-      "status": "done",
-      "units": [
-        { "id": 321, "do": "Diseño del formato de estado v2 por tramo (§7 de la spec): campos, reglas, lectura del v1, qué dibuja el mod", "status": "done", "detail": "rehecho: slices en la raíz, cada tramo con sus fases v1; QT-01 tramo = lo que el plan corte" }
+        { "id": 331, "do": "D74 en specs/nzt-core.md: estado a nzt-plan con carga obligatoria, qué queda en el kernel, código de comunicación (QT-01..03)", "status": "done", "detail": "D74 tras D73; 4.1 y §7 dicen dónde vive el esquema; referencia nueva: plan/references/proposal.md" }
       ]
     },
     {
       "name": "build",
       "status": "done",
       "units": [
-        { "id": 322, "do": "core/kernel.md: el bucle y el esquema de estado con tramos", "status": "done", "detail": "viñeta slices/cadence + fila verify; 3 líneas recortadas; CLAUDE.md y AGENTS.md en 200, build sin avisos" },
-        { "id": 323, "do": "nzt y nzt-plan: planificar por entrega y tramos, cadencia de definición, lote con QA que frena al fallar", "status": "done", "detail": "plan/references/slices.md nuevo (94 líneas); nzt-plan sigue en 200; nzt §4 con tramos; build sin avisos" },
-        { "id": 324, "do": "nzt-discovery: entrega 1/MVP en product.md y cierre del análisis por entrega en spec, historias y analysis", "status": "done", "detail": "Delivery 1 en product.md; índice = backlog y reglas antes del tramo; Done when por cadencia; build sin avisos" },
-        { "id": 325, "do": "nzt-verify y nzt-build: QA al cerrar cada tramo, manteniendo D43 (build nunca hace QA)", "status": "done", "detail": "verify: QA al terminar el tramo y falla frena el lote; build: increment -> slice; build sin avisos" },
-        { "id": 326, "do": "nzt-ux: prototipo HTML descartable para validar la entrega 1 cuando hay algo que aprender", "status": "done", "detail": "sección prototipo en mockup.md, fila en el router, Plan/prototype/ en §8; build sin avisos" },
-        { "id": 327, "do": "nzt-ai state check (StateCheck.cs) con las reglas v2 y sus tests, leyendo también v1", "status": "done", "detail": "CheckPhases compartido v1/v2; 3 pruebas nuevas; 164 checks en verde; RN-cli-state-check al día" },
-        { "id": 328, "do": "Mod nzt-state: parse y línea de tiempo por tramo (objetivo, tramo, en curso, sigue) y sus tests", "status": "done", "detail": "0.9.0: tramo en curso como plan, fila Tramo, Sigue el tramo; 54 tests y tsc en verde; sin probar en vivo" }
+        { "id": 332, "do": "nzt-plan: liberar lugar moviendo 'How the plan is shown' y 'The documents the plan produces' a referencias", "status": "done", "detail": "plan/references/proposal.md (42 líneas), nombrada en el paso 4; SKILL.md 200 -> 169; build sin avisos" },
+        { "id": 333, "do": "nzt-plan: esquema y reglas del estado (v1 y v2) en el cuerpo de SKILL.md, no en una referencia", "status": "done", "detail": "sección 'The state file' arriba; description nombra leer/escribir el estado; 5 líneas duplicadas fuera; 200 sin aviso" },
+        { "id": 334, "do": "Kernel: estado a ~5 líneas con el disparador 'leer o escribir Plan/state.json carga nzt-plan'; compactar preguntas, autonomía, contexto, hard rules", "status": "done", "detail": "kernel 186 -> 142; State en 4 líneas, autonomía en 1, Context 12 -> 9; preguntas y 'Report what happened' pasan a Communication en la 335" },
+        { "id": 335, "do": "Kernel: sección Communication (~15 líneas) y formatos dispersos (reporte, plan, preguntas, playback) nombrados desde ahí", "status": "done", "detail": "Communication absorbe Language, Questions y 'Report what happened'; citas en stack-axes, parse.ts y 2 specs al día; CLAUDE.md 200 -> 161" }
       ]
     },
     {
       "name": "verify",
       "status": "done",
       "units": [
-        { "id": 329, "do": "Puertas locales: build, checks, lint, tests del mod y state check contra un estado v1 y uno v2", "status": "done", "detail": "todo verde: build, 164 checks, lint 0, 6 mods, state check v1 y v2; nzt-ai 1.6.0 instalado rechaza v2 hasta publicar" },
-        { "id": 330, "do": "Ofrecido: eval nuevo de QA por tramo y re-correr restraint-qa-unasked", "status": "dropped", "detail": "descartada por el usuario 2026-10-23" }
+        { "id": 336, "do": "Puertas: build, lint, checks y evals de ruteo, plan/estado y frenos comparados con antes del cambio", "status": "done", "detail": "puertas en verde; evals sin baja atribuible a D74 (detalle en D74); route-verify 2/3 y stack-not-dotnet sin correr por límite" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [324, 325, 326, 327, 328, 329] },
-  "waiting_on": "aceptación del usuario: todo en la rama trabajo-por-tramos (pusheada, sin merge); probar el instalador y nzt-state 0.9.0 en vivo, y el merge lo hace el usuario",
+  "autonomy": { "units": [331, 332, 333, 334, 335, 336] },
+  "waiting_on": null,
   "notes": [
-    "Acordado 2026-10-23: MVP puede ser todo el alcance; historias detalladas por entrega y luego lote; QA fallido frena el lote; sin fases repetidas en el mod",
-    "Modelo acordado: plan = lista de tramos; cada tramo con sus fases completas y separadas; tramo = lo que el plan corte, por defecto una feature",
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods"
+    "Usuario 2026-10-23: QT-01 código de comunicación = principios en el kernel + formatos en sus skills; QT-02 plan aprobado, sigue en la rama trabajo-por-tramos; QT-03 autónomo completo",
+    "Pendiente de la corrida anterior (320-329, pusheada en trabajo-por-tramos, sin merge): aceptación del usuario y prueba en vivo de nzt-state 0.9.0",
+    "Corrida D74 terminada 2026-10-24, sin commit; corregida la baja de plan-stories en proposal.md (3/3); falta aceptación; aparte: fixtures sin glosario y mensaje 'contrato del kernel' del CLI"
   ]
 }

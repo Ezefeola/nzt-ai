@@ -1,12 +1,50 @@
 ---
 name: nzt-plan
-description: Use when a plan has to be built, approved, changed, executed or resumed - work cut into units, recorded in Plan/state.json, run one at a time, with a stop at each boundary.
+description: Use when a plan has to be built, approved, changed, executed or resumed, and whenever Plan/state.json is read or written - its schema and rules live here.
 ---
 
 # Planning and execution
 
-The plan is each phase's units in `Plan/state.json`. There is no separate plan file. The
-schema is in your instructions; do not restate it here.
+## The state file
+
+`Plan/state.json` at the project root is plan and state together: no separate plan file,
+never a log, progress lives in the artifacts. Write it from this section, never from memory.
+
+```json
+{
+  "version": 1,
+  "updated": "2026-09-16T14:22:00Z",
+  "goal": "one line: what this run is for",
+  "phases": [{ "name": "build", "status": "doing", "units": [
+    { "id": 4, "do": "one line", "status": "doing", "detail": "where you stopped" }] }],
+  "approved": true, "delegation": "ask",
+  "autonomy": { "units": [4, 5], "keep_stops": [5] },
+  "waiting_on": "what you are blocked on, or null",
+  "notes": ["at most 3 short items"]
+}
+```
+
+- `status` is `todo`, `doing`, `done` or `dropped`. At most one unit is `doing`. Every entry, one line.
+- `phases` are the phases `nzt` chose, in run order, named `analysis`, `architecture`, `ux`,
+  `build`, `verify` or `ship` and no other, with the same statuses and **at most one `doing`**:
+  that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
+  `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
+  phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
+  next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
+- **A plan cut into slices** has `version` 2 and `slices` (`id`, `name`, `status`, `phases`)
+  in place of `phases`: each is walked end to end under the rules above, one `doing` at most;
+  `cadence` (`delivery`, `upfront`, `just-in-time`; absent `upfront`) says how; the method
+  is in `references/slices.md`.
+- `approved` is the lock on the main stop: without `true`, nothing executes.
+- `autonomy` records the batch the user selected: which units run without stopping, and
+  which stops are kept anyway. **Absent or empty means accompanied.** `delegation` is the
+  project's subagent mode, `auto`, `ask` or `off`; absent is `ask`, and only the user sets it.
+- Never write the file while you are inside a unit. Rewrite the plan when the user changes
+  it. **A new run rewrites the file** with its own goal, phases and units, ids counting on
+  from the last run, `delegation` kept; inside a run, nothing `done` or `dropped` is deleted.
+- **Write it for a session that has none of this conversation**: a decision taken out loud,
+  where a unit actually stopped, what it is waiting on — if resuming needs it, it goes in
+  the file. Context gets cleared; what is not here is gone.
 
 ## Cutting the work into units
 
@@ -33,7 +71,8 @@ is produced: the plan says what it delivers, not which files will end up existin
 2. Turn each phase into its units, in dependency order. **Verify's units go after the
    slice's last build unit, never between two**, unless the user asks for it.
 3. Write `goal`, `phases` or `slices` (the first `doing`) and `approved: false`.
-4. Show the plan in the reply and ask for approval. Stop.
+4. Show the plan in the reply, as `references/proposal.md` in this skill's folder says —
+   the table, its declarations and the documents it lists — and ask for approval. Stop.
 
 Keep the plan to what you can see. Fifteen units written before the first spec exists is
 guesswork: plan the phase you are in and the shape of the rest.
@@ -42,52 +81,18 @@ guesswork: plan the phase you are in and the shape of the rest.
 questions start when that step starts. The plan message carries the plan and the autonomy
 offer, and no definition questions.
 
-### How the plan is shown
-
-- **Markdown, never inside a code block**, so the table renders.
-- One row per step, saying **what it produces and why**: the *why* lets the user judge the
-  approach, not only the order. Analysis produces the glossary, the spec and its stories.
-- Under the table, three declarations: **where it stops**, **what it leaves out**, and what
-  it covers beyond the minimum so the user can drop it. *"I am leaving out coupon
-  administration: that is F-009 and you did not ask for it"* is what makes scope reviewable.
-- One line for each phase you skipped and why.
-
-## The documents the plan produces
-
-The plan lists the documents it will produce, and the user keeps or drops them line by
-line. Three categories:
-
-| Category | Behaviour |
-|---|---|
-| **Mandatory** | Not offered, declared. Without it the work cannot continue |
-| **Offered** | Appears as a line of the plan; the user can drop it |
-| **On request** | Does not appear unless the user asks for it |
-
-- Offering one, say what dropping it loses: not *"do you want the ADR?"* but *"without it,
-  this decision gets re-argued in three months with no record of what was weighed"*.
-- **Mandatory:** the stack per component and area, designed with it or read from evidence
-  before its code is touched, with `architecture.md` naming its root; the product definition and the glossary, from Analysis on, the
-  glossary updated by every unit that adds or changes a term. **Offered: feature design.**
-- A document that already exists and that the change affects is kept current as part of the
-  work, never offered as optional.
-- Do not ask what you can verify — a version, a capability, a package's maintenance state.
-  Ask the user about tradeoffs and material changes, and never re-ask what the project
-  already decided: if the stack answers it, read it.
-
 ## Approval and autonomy
 
 Set `approved: true` only when the user approves it in this conversation. Silence is not
 approval. A question about the plan is not approval.
 
 The user can change anything: reorder units, drop them, add them, change the goal. Rewrite
-the plan and keep asking until they approve. Units already `done` keep their `id` and their
-status; new units get new ids.
+the plan and keep asking until they approve: `done` units keep id and status, new get new ids.
 
 **Accompanied is the default.** Offer autonomy once, with the plan, and not again:
 
 - Not answering is accompanied, not a pending question. Approving does not select autonomy.
 - *"Continue"* advances the next agreed stretch. It does not change mode.
-- What was selected goes into `autonomy` in the state. Absent or empty means accompanied.
 - A step that touches an environment other people share runs autonomously **only if the
   selection named that environment**.
 
@@ -162,9 +167,8 @@ The report has four fields, in 3–5 lines:
 - Finishing early does not cancel an agreed stop, and a progress report does not create a
   new approval gate or end the task.
 - **Every report ends saying where the context stands**, as the kernel requires. Advising to
-  clear is a different thing: it fires from 20% consumed — strongly past 40% — or for a
-  concrete benefit you name, and only after persisting. Finishing a unit does not justify it
-  on its own, and a reset is neither a completion gate nor evidence of verification.
+  clear fires at its thresholds or for a concrete benefit you name, only after persisting;
+  finishing a unit alone does not justify it; a reset is no completion gate nor verification.
 
 ## Stopping early
 
@@ -187,14 +191,10 @@ are still unclear, and do not redo finished work without a reason.
 
 ## Rules
 
-- Never execute a plan while `approved` is `false`.
 - Never do two units in one turn without explicit authorisation for that batch.
 - Never leave a unit `doing` at the end of a turn without a `detail` line.
-- Never rewrite history: a unit that was dropped is `dropped`, not deleted.
 - **A feature is closed by the user's acceptance, and closing it is a unit**: read
   `references/close.md` in this skill's folder, which sweeps its markers, brings its documents
   current and writes its history entry. A feature with markers left in its spec is not done.
-- The state holds the continuation and the plan; progress lives in the artifacts. Keep it
-  to one line per unit, or it stops being state and becomes a document.
 - The plan serves the work. If it stops describing reality, fix the plan; do not follow it
   off a cliff.

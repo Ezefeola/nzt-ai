@@ -2,7 +2,7 @@
 
 Produces a plan cut into **slices**: pieces walked end to end, each with its own phases, so
 value reaches the user — and a defect reaches you — before the whole scope is built. The
-state format is in your instructions; this file says how to cut and run it.
+state format is in *The state file* of `nzt-plan`; this file says how to cut and run it.
 
 ## When
 
@@ -59,7 +59,7 @@ index, one line *As… I want… so that…* per story, is the backlog; there is
 
 ## Inside a slice
 
-The phase rules of your instructions hold inside each slice: in order, no name repeated, at
+The phase rules of the state file hold inside each slice: in order, no name repeated, at
 most one `doing`. **Verify runs once the slice is built in every area**, never between two
 build units of it: build never designs or runs application tests.
 
@@ -80,7 +80,7 @@ The batch stops. Nothing is built on top of what failed.
 
 ## How it is shown
 
-The plan table gets a **Slice** column, and under it the usual declarations, plus:
+The plan table gets a **Slice** column, and under it the declarations of `proposal.md`, plus:
 
 - the cadence, and why;
 - which slices run in a batch and which stops are kept — the autonomy offer, once;

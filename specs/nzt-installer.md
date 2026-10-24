@@ -464,7 +464,8 @@ proveedor ni mod instalado por el CLI. Si queda alguno, se queda, porque el agen
 ### 12.2 `nzt-ai state check`
 
 #### RN-cli-state-check · [add] · origin: propuesta del agente sobre QT-21, 2026-10-21
-Lee `Plan/state.json` de la carpeta actual y dice si cumple el contrato del kernel:
+Lee `Plan/state.json` de la carpeta actual y dice si cumple el contrato del estado (hasta D74
+en el kernel, desde D74 en `nzt-plan`):
 
 - cada `status` es `todo`, `doing`, `done` o `dropped`, en fases y en unidades;
 - cada fase se llama `analysis`, `architecture`, `ux`, `build`, `verify` o `ship` (D69 de

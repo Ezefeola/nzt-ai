@@ -8,7 +8,7 @@ export const DELEGATION_MODES: DelegationMode[] = ['auto', 'ask', 'off']
 const isMode = (value: unknown): value is DelegationMode =>
   DELEGATION_MODES.includes(value as DelegationMode)
 
-/** Absent or not a mode is `ask`, as the kernel says; a value that is not one is kept to show. */
+/** Absent or not a mode is `ask`, as `nzt-plan` says; a value that is not one is kept to show. */
 const delegationOf = (value: unknown): Delegation =>
   isMode(value)
     ? { mode: value, isSet: true }
@@ -23,7 +23,7 @@ export const nextModeOf = (mode: DelegationMode): DelegationMode =>
 /**
  * The text of Plan/state.json with `delegation` set to `mode` and every other byte as it was,
  * so a press does not reformat the agent's file. A new key goes beside `approved`, as the
- * kernel's schema writes it. Undefined when the text is not a JSON object: nothing is written.
+ * schema in `nzt-plan` writes it. Undefined when the text is not a JSON object: nothing is written.
  */
 export const withDelegation = (raw: string, mode: DelegationMode): string | undefined => {
   let data: unknown
@@ -59,7 +59,7 @@ export const withDelegation = (raw: string, mode: DelegationMode): string | unde
   return candidates.find(isRight) ?? `${JSON.stringify({ ...state, delegation: mode }, null, 2)}\n`
 }
 
-/** A value outside the kernel's four is kept as written, so the pane can show it. */
+/** A value outside the four of `nzt-plan` is kept as written, so the pane can show it. */
 const statusOf = (value: unknown): { status: Status; rawStatus?: string } =>
   STATUSES.includes(value as UnitStatus)
     ? { status: value as UnitStatus }
