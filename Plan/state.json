@@ -1,38 +1,30 @@
 {
   "version": 1,
-  "updated": "2026-10-24T20:00:00Z",
-  "goal": "Una tabla por tramo y la palabra tramo en el plan; nzt-questions cierra lo contestado fuera del panel; aceptación de D72-D74",
+  "updated": "2026-10-24T21:00:00Z",
+  "goal": "Cerrar nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 tras la aceptación del usuario, y dejar la rama lista para el PR",
   "phases": [
-    {
-      "name": "analysis",
-      "status": "done",
-      "units": [
-        { "id": 347, "do": "D77 en specs/nzt-core.md: QT-06 tramo, QT-07 tabla por tramo, QT-08 cerrar preguntas al mandar un mensaje, aceptación D72-D74", "status": "done" }
-      ]
-    },
     {
       "name": "build",
       "status": "done",
       "units": [
-        { "id": 348, "do": "slices.md y proposal.md: una tabla por tramo bajo su título, el por qué en una línea, la palabra tramo fijada", "status": "done" },
-        { "id": 349, "do": "nzt-questions 0.2.0: RN-preg-contestadas-afuera, prompt.submit y AskUserQuestion cierran las preguntas; spec y README", "status": "done" }
+        { "id": 351, "do": "Cierre de los mods: barrer [add]/[modify], encabezados, Historia, catálogo de nzt-mods.md; aceptación de D75-D77 en D77", "status": "done" }
       ]
     },
     {
-      "name": "verify",
+      "name": "ship",
       "status": "done",
       "units": [
-        { "id": 350, "do": "Puertas: build, check-references, 164 checks, lint, validate, nzt-questions 27 tests, nzt-state 55; sin evals", "status": "done" }
+        { "id": 352, "do": "Commit y push de trabajo-por-tramos; el usuario arma el PR a main", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [347, 348, 349, 350] },
-  "waiting_on": null,
+  "autonomy": { "units": [351, 352] },
+  "waiting_on": "el usuario arma el PR de trabajo-por-tramos a main y avisa para hacer el release",
   "notes": [
-    "Usuario 2026-10-24: puntos 3-13 de la prueba en vivo perfectos: D72-D74 y nzt-state 0.8.0/0.9.0 aceptados; sin aceptar D75-D77, nzt-state 0.9.1, nzt-questions 0.2.0",
-    "Pendiente: cierre de los mods (barrer [add]/[modify]) tras su aceptación; merge a main y publicar versión del CLI",
-    "Pendiente aparte: fixtures sin glosario, mensaje 'contrato del kernel' y versión -dev en binarios locales del CLI"
+    "Usuario 2026-10-24: aceptadas D72-D77, nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 (estos dos sin prueba en vivo)",
+    "Release después del merge: subir <Version> del CLI, tag vX.Y.Z; sumar mensaje 'contrato de nzt-plan' y versión -dev en binarios locales",
+    "Pendiente aparte: fixtures de evals sin glosario y grader de qa-unasked que dice increment"
   ]
 }

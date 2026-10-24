@@ -6,8 +6,8 @@
 > `specs/mods/nzt-questions/mockup.html` (unidad 203) y diseño técnico (unidad 205) · Depende de: `specs/nzt-mods.md` (reglas de todo mod
 > y catálogo de la sección 5). D64 de `specs/nzt-core.md` dice cómo pregunta el agente de NZT;
 > el panel reconoce esa forma como un caso más, sin depender de ella.
-> **0.2.0 construido, sin aceptar** (2026-10-24): las preguntas contestadas fuera del panel se
-> cierran (RN-preg-contestadas-afuera, `[add]`). Origen: D77 de `specs/nzt-core.md`.
+> **0.2.0 aceptado y cerrado** (usuario 2026-10-24): las preguntas contestadas fuera del panel
+> se cierran (RN-preg-contestadas-afuera). Origen: D77 de `specs/nzt-core.md`; en **Historia**.
 > El usuario lo pidió el 2026-10-17: *"poder ver las preguntas que tiene el agente y
 > responderlas … de forma organizada como con la tool de questions que tiene pero el agente no
 > siempre la usa"*.
@@ -94,7 +94,7 @@ Si el prompt ya tiene texto escrito, el mensaje se agrega al final y el borrador
 Las preguntas llevadas al prompt se marcan como enviadas y dejan de contar como pendientes. Si el
 mensaje no se manda, siguen ahí como enviadas y se pueden llevar otra vez.
 
-### RN-preg-contestadas-afuera · [add] · origin: usuario 2026-10-24 (QT-08: "al mandar cualquier mensaje"), D77
+### RN-preg-contestadas-afuera · origin: usuario 2026-10-24 (QT-08: "al mandar cualquier mensaje"), D77
 Cuando la persona manda un mensaje que no es un comando —escrito o llevado desde el panel—, las
 preguntas que el panel tenía se cierran y dejan de contar como pendientes, salteadas incluidas:
 ese mensaje es la respuesta. Las preguntas de un turno en el que el agente usó
@@ -517,3 +517,17 @@ Modo para los detalles: **juntos**, una ronda · usuario 2026-10-17. Diagrama de
 ### QT-12 · Opción de idioma
 - abierto, detalle: `idioma` `es`/`en`, `es` por defecto, como los otros mods (RN-preg-idioma).
 - respuesta: opción `idioma`, `es` o `en`, `es` por defecto. · usuario 2026-10-17, ronda juntos por la tool de preguntas
+
+## Historia
+
+Una entrada por ciclo de cambio cerrado, la más nueva arriba. Empieza en 0.2.0: lo anterior está
+en el encabezado.
+
+### 2026-10-24 · Lo contestado afuera se cierra — 0.2.0
+Type:     add
+Change:   un mensaje que no es comando cierra las preguntas pendientes, salteadas incluidas, y un turno que preguntó con `AskUserQuestion` no deja las suyas en el panel.
+Reason:   el usuario, en la prueba en vivo: "si la contesto con la tool o por prompt el mod de preguntas no se actualiza queda con preguntas viejas que ya fueron respondidas".
+Before:   solo se cerraba lo llevado al prompt desde el panel; lo demás quedaba pendiente para siempre.
+Now:      el mensaje de la persona es la respuesta; lo que el agente vuelve a preguntar aparece de nuevo.
+Impact:   RN-preg-contestadas-afuera nueva · RN-preg-enviadas sigue igual hasta que se manda un mensaje
+Decision: QT-08 del usuario, "al mandar cualquier mensaje"; descartado cerrar solo lo nombrado por id.

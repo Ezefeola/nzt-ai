@@ -2502,9 +2502,11 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     (plan, `nzt-plan` al tocar el estado, retomar tras `/clear`, comunicación, `state check`,
     tramos, QA por tramo, estado v2, panel 0.9.0 con Delegar, pregunta suelta y edición
     mínima): *"fueron todas perfectas así que queda bien todo"*. **D72, D73 y D74 quedan
-    aceptadas**, y `nzt-state` 0.8.0 y 0.9.0. **Sin aceptar todavía:** D75–D77, `nzt-state`
-    0.9.1 y `nzt-questions` 0.2.0. Los marcadores `[add]`/`[modify]` de las specs de los mods
-    los barre su cierre, que es una unidad aparte.
+    aceptadas**, y `nzt-state` 0.8.0 y 0.9.0. Después el usuario aceptó también **D75, D76 y
+    D77**, `nzt-state` 0.9.1 y `nzt-questions` 0.2.0 (*"apruebo, acepto lo del cierre de
+    mods"*, 2026-10-24) — estos dos últimos **sin probar en vivo**. Cierre de los mods: marcas
+    `[add]`/`[modify]` barridas, encabezados, entradas de **Historia** y catálogo de
+    `specs/nzt-mods.md` al día.
   - **Hecho (2026-10-24).** `nzt-questions` 27 tests (2 nuevos), validate pasa.
 
 ## 13. Revisión contra Temper v3
