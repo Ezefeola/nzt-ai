@@ -18,7 +18,9 @@
 > medidor, sin la palabra del tramo y con naranja desde el 30 · **0.5.0 (269 y 270, 2026-10-19):**
 > el look sigue tras `/clear` (*"cuando limpio contexto se pierde el look elegido"*) y botón que
 > lleva NZT oscuro y claro a `/theme` · **0.6.0 (300 a 303, 2026-10-20):** tema `default`, el
-> dibujo de Claude Code, por defecto y primero en TEMA ·
+> dibujo de Claude Code, por defecto y primero en TEMA · **0.7.0 (D80, 2026-10-24):** las
+> marcas siguen al kernel, que pasó a 30/40: dos marcas, amarillo desde el 30 y rojo desde el 40,
+> sin naranja; reglas con `[modify]` hasta probarlo en vivo ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
@@ -37,7 +39,7 @@ las llamadas a herramientas, los diffs, la salida de la consola, las tablas y el
 trabaja con NZT tampoco tiene un aspecto propio de la marca. Este mod junta tres cosas en uno: un
 **tema** que cambia los colores de lo que dibuja (y, aparte, los temas NZT de Claude Code), una
 **banda de uso** sobre el prompt con contexto, límites del plan y costo, y una **conversación
-redibujada** más fácil de leer. Las marcas 20/30/40 del kernel y la cifra que recibe el agente
+redibujada** más fácil de leer. Las marcas 30/40 del kernel y la cifra que recibe el agente
 siguen estando, como en `nzt-context`.
 
 ## Alcance
@@ -49,7 +51,7 @@ siguen estando, como en `nzt-context`.
 - **Temas NZT de Claude Code:** NZT oscuro y NZT claro elegibles en `/theme`, para que el borde del
   prompt, el spinner propio y los textos de Claude Code también lleven la marca.
 - **La banda de uso** sobre el prompt, con sus partes prendidas o apagadas una por una: contexto con
-  las marcas 20/30/40, límite de 5 horas, límite semanal, costo de la sesión, **modelo y effort de
+  las marcas 30/40, límite de 5 horas, límite semanal, costo de la sesión, **modelo y effort de
   la sesión** y botón para limpiar la sesión (`/clear`).
 - **El panel de opciones** (`/nzt-look`): elegir tema con vista previa, prender y apagar partes,
   repintar un color.
@@ -60,7 +62,7 @@ siguen estando, como en `nzt-context`.
 - **Diseñar un tema con Claude:** pedirle "un tema que se sienta como un atardecer" y que el agente
   lo arme y lo aplique.
 - **Un tema por carpeta:** fijar un tema a un proyecto y volver al de siempre.
-- **La capa NZT:** las marcas 20/30/40 del kernel en la banda y la línea de contexto al agente con
+- **La capa NZT:** las marcas 30/40 del kernel en la banda y la línea de contexto al agente con
   cada prompt (lo que hacía `nzt-context`, ya retirado).
 - Español e inglés en lo que ve el usuario.
 
@@ -69,7 +71,7 @@ siguen estando, como en `nzt-context`.
   temas propios de Claude Code y rechaza uno de plugin (spike S-01 y S-02). La persona lo elige una
   vez en `/theme`; el mod dice cómo.
 - **El aviso de compactar al 70% de la referencia.** Choca con el kernel, que recomienda limpiar
-  desde el 20%; la banda avisa en las marcas del kernel (RN-skin-marcas-kernel).
+  desde el 30%; la banda avisa en las marcas del kernel (RN-skin-marcas-kernel).
 - **Avisar que hay una versión nueva.** La referencia lo hace una vez por día; en NZT los mods se
   actualizan por el marketplace (`specs/nzt-mods.md` sección 6).
 - **Ofrecerles a otros mods el dibujo de markdown** (en la referencia). Ningún mod
@@ -184,11 +186,11 @@ medidor: `Contexto`, `Límite 5h`, `Límite semanal`, `Costo` (en inglés `Conte
   (RN-skin-limites). *Objeción del agente, dicha una vez.*
 - *Las dos filas de 0.3.0 quedan reemplazadas* por esta línea (0.4.0).
 
-#### RN-skin-marcas-kernel · origin: kernel (Context), RN-ctx-tramos y RN-ctx-marcas de `nzt-context`
-El contexto se muestra de 0 a 100% con las marcas 20, 30 y 40 a la vista, y su color cambia en esos
-cortes: neutro por debajo del 20%, amarillo (aviso) desde el 20%, naranja desde el 30% y rojo
-(error) desde el 40% (usuario 2026-10-18). El naranja es la mitad entre el aviso y el error
-del tema, porque los temas no traen uno (*propuesta del agente*). Los cortes son los del kernel y no se configuran.
+#### RN-skin-marcas-kernel · origin: kernel (Context), RN-ctx-tramos y RN-ctx-marcas de `nzt-context`; D80 [modify]
+El contexto se muestra de 0 a 100% con las marcas 30 y 40 a la vista, y su color cambia en esos
+cortes: neutro por debajo del 30%, amarillo (aviso) desde el 30% y rojo (error) desde el 40%.
+Los cortes son los del kernel y no se configuran. *Hasta 0.6.0 eran tres marcas, 20/30/40, con
+naranja desde el 30 (usuario 2026-10-18); D80 llevó el kernel a 30/40 (usuario 2026-10-24).*
 
 #### RN-skin-limites · origin: investigado 2026-10-17 (`$.session.usage()`)
 Los límites del plan son los que da la sesión: el de 5 horas y el semanal, cada uno con su
@@ -199,7 +201,7 @@ porcentaje y lo que falta para que se renueve. No hay límite diario. Si la cuen
 El costo es el de la sesión en dólares, como lo da Claude Code.
 
 #### RN-skin-limpiar · origin: usuario 2026-10-17 ("en vez de tener boton compactar quiero tener boton 'clear' para limpiar la sesion"); reemplaza a RN-skin-compactar
-El botón limpiar corre `/clear`. Se resalta desde la marca 20, que es donde el kernel empieza a
+El botón limpiar corre `/clear`. Se resalta desde la marca 30 [modify], que es donde el kernel empieza a
 recomendar limpiar. El mod nunca limpia solo: muestra, y la persona decide (kernel, Context). La
 banda no tiene botón para compactar.
 
@@ -368,6 +370,10 @@ Mockup `specs/mods/nzt-look/mockup-banda.html`, un estado por hash (`#state=b-hi
 terminal y escritorio. Se revisa cuando cambian las partes de la banda, sus cortes o lo que el panel
 deja elegir. Referencia: la referencia, leída en su código (`rows.tsx`, `svg-usage.ts`,
 `settings.tsx`). Q-05: la banda va "tal cual".
+
+> **Desde 0.7.0 (D80) las marcas son 30 y 40** [modify]: donde este diseño dice 20/30/40, *desde el
+> 20%* o naranja, vale RN-skin-marcas-kernel —neutro bajo el 30, amarillo desde el 30, rojo desde
+> el 40— y el botón limpiar es principal desde el 30. El mockup sigue con las tres marcas.
 
 ### Banda
 
@@ -769,7 +775,7 @@ diagramas también se escriben acá (QT-18).
 | `light.ts` | la variante clara calculada (QT-06) y leer claro u oscuro del tema de Claude Code (QT-03) | no |
 | `prefs.ts` | leer y validar lo guardado, con valores por defecto si falta algo o está roto | no |
 | `i18n.ts` | los textos en `es` y `en` (QT-14) | no |
-| `kernel.ts` | los tramos 20/30/40, la palabra de cada tramo y la línea al agente (QT-10) | no |
+| `kernel.ts` | los tramos 30/40 (D80 [modify]), la palabra de cada tramo y la línea al agente (QT-10) | no |
 | `band.tsx`, `panel.tsx` | la banda y el panel, como árboles de elementos | no |
 | `tools.tsx`, `shell.tsx`, `diff.tsx` | las filas de herramientas, la consola y el diff | no |
 | `reply.tsx`, `markdown.ts`, `highlight.ts`, `math.ts`, `mermaid.ts` | la respuesta del agente: tablas, avisos, tareas, enlaces, código, fórmulas y diagramas | no |

@@ -95,7 +95,7 @@ const drawPreview = ({ Box, Text }: Pick<PanelElements, 'Box' | 'Text'>, palette
       <Text>
         <Text color={palette.muted}>{`${t.context} `}</Text>
         {drawCells({ Text }, frame, colors)}
-        {drawContextText({ Text }, { kind: 'ok', percent: 34, level: 'high', tokens: null }, frame, colors)}
+        {drawContextText({ Text }, { kind: 'ok', percent: 34, level: 'warn', tokens: null }, frame, colors)}
       </Text>
     </Box>
   )

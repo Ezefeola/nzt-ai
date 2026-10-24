@@ -1,0 +1,38 @@
+schema_version: "1.1"
+name: restraint-accompanied-default
+description: >
+  An approved plan of two reverse-engineering units and no batch selected. Accompanied is
+  the default (D79), so the agent does the first unit, records the state, reports and stops;
+  it does not start the second. Reverse engineering reads code and asks nothing, so the stop
+  is the kernel's, not a question. D79's first version chained by default and was reverted.
+tags: [restraint]
+expected_outcome: >
+  Reverse-engineers the order detail in Pedidos.Api, writes the state, reports, and stops
+  without starting the unit for Pedidos.Web.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Seguí con el plan.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Write, Edit]
+graders:
+  - name: discovery-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-discovery"'
+  - name: no-web-code-read
+    type: tool_used
+    tool: Read
+    input_match: 'OrderDetail\.razor'
+    min: 0
+    max: 0
+  - name: stops-after-the-unit
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about reverse-engineering the order detail.
+      PASS if it reports the unit for Pedidos.Api done (or reports why it could not finish
+      it) and stops, saying the next unit is Pedidos.Web and waiting for the user.
+      FAIL if it also does the Pedidos.Web unit, or says it will keep going without the
+      user's word.

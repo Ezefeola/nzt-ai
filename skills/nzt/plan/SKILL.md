@@ -89,22 +89,22 @@ approval. A question about the plan is not approval.
 The user can change anything: reorder units, drop them, add them, change the goal. Rewrite
 the plan and keep asking until they approve: `done` units keep id and status, new get new ids.
 
-**Accompanied is the default.** Offer autonomy once, with the plan, and not again:
-
-- Not answering is accompanied, not a pending question. Approving does not select autonomy.
-- *"Continue"* advances the next agreed stretch. It does not change mode.
-- A step that touches an environment other people share runs autonomously **only if the
-  selection named that environment**.
+**Accompanied is the default**: every unit stops. Offer autonomy once, with the plan, as a
+**closed list of units** in `autonomy.units`, never open-ended: **the next N units**, or
+**up to a checkpoint** — the end of an analysis, architecture or UX phase, a phase's own
+stop, a feature's acceptance —, always offered, with every unit up to it named by id. A
+unit cut later joins a batch only if the user adds it. Not answering is
+accompanied, approving selects no autonomy, and *"continue"* advances the next agreed
+stretch without changing mode. A step that touches an environment other people share runs
+without stopping **only if the user named that environment**.
 
 ## Executing
-
-One unit per turn:
 
 1. Take the first `todo` unit of the current phase, in the current slice if any. Set it `doing`.
 2. Load the skill that unit needs, per the routing table in your instructions.
 3. Do the unit, and mark progress where that phase marks it.
 4. Set it to `done`, update `updated`, advance the phase or slice it closed, write.
-5. Report, then stop.
+5. Report. Take the next unit only if the batch lists it and no batch stop is due; else stop.
 
 **A direct request or an approved plan authorises its ordinary steps.** Do not ask again
 for each file or each repair: a new door opens for new scope or a material decision, not
@@ -166,9 +166,8 @@ The report has four fields, in 3–5 lines:
 - Every open `[TO-DEFINE]` appears in **every** report until it is resolved.
 - Finishing early does not cancel an agreed stop, and a progress report does not create a
   new approval gate or end the task.
-- **Every report ends saying where the context stands**, as the kernel requires. Advising to
-  clear fires at its thresholds or for a concrete benefit you name, only after persisting;
-  finishing a unit alone does not justify it; a reset is no completion gate nor verification.
+- **The report that crosses a context mark says so**, as the kernel requires: advising to
+  clear fires there or for a concrete benefit you name, after persisting, never as a gate.
 
 ## Stopping early
 
@@ -191,7 +190,7 @@ are still unclear, and do not redo finished work without a reason.
 
 ## Rules
 
-- Never do two units in one turn without explicit authorisation for that batch.
+- Never chain into a unit `autonomy.units` does not list, nor past the kernel's batch stops.
 - Never leave a unit `doing` at the end of a turn without a `detail` line.
 - **A feature is closed by the user's acceptance, and closing it is a unit**: read
   `references/close.md` in this skill's folder, which sweeps its markers, brings its documents

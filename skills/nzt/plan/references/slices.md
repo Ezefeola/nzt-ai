@@ -6,15 +6,15 @@ state format is in *The state file* of `nzt-plan`; this file says how to cut and
 
 ## When
 
-- A new product, a feature of several stories, or work the user wants delivered early.
-- Not a reported bug, not a small change, not one story alone: those stay a plan with
-  `phases`, which is a plan of one slice.
+- Full-size work (`nzt`'s sizes), or work the user wants delivered early.
+- Not direct or standard work — a bug, a small change, one or two stories: those stay a
+  plan with `phases`, which is a plan of one slice.
 
 ## What a slice is
 
-What the plan cuts to walk end to end, with the phases it needs. **By default a feature.**
-Cut smaller — one story, or the fewest that can only be tested together — when faster
-feedback is worth the extra stops. The cut is a line of the plan, and the user approves it.
+What the plan cuts to walk end to end, with its phases. **By default a feature of up to
+three stories**; a bigger one, slices of one to three tried together, so QA comes early. The
+cut is a plan line the user approves: a bigger slice is their call, never the default.
 
 - A slice is cut by outcome the user can try, never by layer or by file.
 - Work that belongs to the whole run — the product definition, a final release — is its own
@@ -89,7 +89,7 @@ The batch stops. Nothing is built on top of what failed.
 a slice column, which leaves blank cells. Under the tables, the declarations of `proposal.md`, plus:
 
 - the cadence, and why;
-- which slices run in a batch and which stops are kept — the autonomy offer, once;
+- the autonomy offer, once, as `nzt-plan` says: the next N units or up to a checkpoint;
 - the shape of what comes after delivery 1, in one line.
 
 ## Done when

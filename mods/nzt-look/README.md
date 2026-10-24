@@ -1,10 +1,10 @@
 # nzt-look
 
-> Versión **0.6.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
+> Versión **0.7.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
 
 Cambia **cómo se ve una sesión de Claude Code**: un tema de colores, una banda sobre el prompt
 con lo que llevás gastado, y la conversación redibujada para leerla de un vistazo. Reemplaza a
-`nzt-context`: el contexto con las marcas 20/30/40 del método sigue en la banda, y el agente
+`nzt-context`: el contexto con las marcas 30/40 del método sigue en la banda, y el agente
 sigue recibiendo la cifra con cada prompt.
 
 ```
@@ -49,8 +49,8 @@ original queda como estaba. También podés **pedirle a Claude un tema** ("uno q
 atardecer"): lo arma y lo aplica.
 
 **La banda** es una línea: el modelo con su effort (`◇ Opus 5.5 · high`; el effort aparece con el
-primer pedido al modelo), `Contexto` con las marcas 20, 30 y 40 (amarillo desde el 20%, naranja desde el
-30% y rojo desde el 40%), `Límite 5h` y `Límite semanal` con lo que falta para que se renueven, `Costo`
+primer pedido al modelo), `Contexto` con las marcas 30 y 40 (amarillo desde el 30% y rojo desde el
+40%), `Límite 5h` y `Límite semanal` con lo que falta para que se renueven, `Costo`
 y `0: /clear`. El botón se apaga mientras Claude trabaja y **pide
 una segunda pulsación** antes de limpiar: limpiar borra la conversación y no se deshace. Si no
 entra en el ancho, se van primero los tokens, las cuentas regresivas, el costo, el effort, el modelo, el semanal, el de 5

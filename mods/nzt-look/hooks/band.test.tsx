@@ -28,22 +28,22 @@ const OPUS: Running = { model: 'claude-opus-5-5', effort: 'high' }
 const model = (u: Usage, columns = 160, more: { isWorking?: boolean; isConfirming?: boolean; parts?: typeof DEFAULT_PREFS.band; running?: Running } = {}) =>
   bandModelOf({ usage: u, running: more.running ?? NO_RUNNING, now: NOW, parts: more.parts ?? DEFAULT_PREFS.band, columns, isWorking: more.isWorking ?? false, isConfirming: more.isConfirming ?? false, t })
 
-test("the kernel's stretches: under 20, from 20, from 30, from 40", async () => {
-  expect([19, 20, 29, 30, 39, 40].map(levelOf)).toEqual(['low', 'warn', 'warn', 'high', 'high', 'critical'])
+test("the kernel's stretches: under 30, from 30, from 40", async () => {
+  expect([20, 29, 30, 39, 40].map(levelOf)).toEqual(['low', 'low', 'warn', 'warn', 'critical'])
 })
 
-test('the context turns yellow from 20, orange from 30 and red from 40, with no word for it', async () => {
+test('the context turns yellow from 30 and red from 40, with no word for it', async () => {
   const palette = paletteOf('nzt', [], 'dark')
-  const colors = (['low', 'warn', 'high', 'critical'] as const).map(level => levelColor(palette, level))
-  expect(colors).toEqual([palette.user, palette.warn, '#e5b284', palette.err])
-  expect(model(usage(34))?.context).toEqual({ kind: 'ok', percent: 34, level: 'high', tokens: '68k/200k' })
+  const colors = (['low', 'warn', 'critical'] as const).map(level => levelColor(palette, level))
+  expect(colors).toEqual([palette.user, palette.warn, palette.err])
+  expect(model(usage(34))?.context).toEqual({ kind: 'ok', percent: 34, level: 'warn', tokens: '68k/200k' })
 })
 
-test('the clear button is dim under 20, the main action from 20, and gone while Claude works', async () => {
-  expect(model(usage(12))?.clear).toBe('dim')
-  expect(model(usage(24))?.clear).toBe('main')
-  expect(model(usage(24), 160, { isWorking: true })?.clear).toBeNull()
-  expect(model(usage(24), 160, { isConfirming: true })?.clear).toBe('confirm')
+test('the clear button is dim under 30, the main action from 30, and gone while Claude works', async () => {
+  expect(model(usage(24))?.clear).toBe('dim')
+  expect(model(usage(34))?.clear).toBe('main')
+  expect(model(usage(34), 160, { isWorking: true })?.clear).toBeNull()
+  expect(model(usage(34), 160, { isConfirming: true })?.clear).toBe('confirm')
 })
 
 test('the windows show what is used and what is left to reset', async () => {
@@ -124,7 +124,7 @@ test('narrow, after the tokens, the countdowns and the cost go the effort and th
 
 test('the agent line is short, English, and says the stretch', async () => {
   const line = agentLineOf({ kind: 'ok', percent: 34, tokens: 68_000, window: 200_000 })
-  expect(line).toBe('[nzt-look] Context used: 34% (68k of 200k tokens), 30%+, say it plainly.')
+  expect(line).toBe('[nzt-look] Context used: 34% (68k of 200k tokens), 30%+, recommend clearing.')
   expect(line.split(/\s+/).length).toBeLessThan(20)
 })
 

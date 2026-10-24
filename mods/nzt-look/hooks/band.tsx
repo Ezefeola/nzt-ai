@@ -1,11 +1,10 @@
 import type { ClientElements, Elements } from 'claude-code'
 
 import type { BandPart, Level, Palette, Running, Usage } from '../types'
-import { mix } from './contrast'
 import type { Texts } from './i18n'
 import { abbreviate, costOf, countdownOf, levelOf, MARKS, modelNameOf } from './kernel'
 
-/** The context meter: ten cells of 10%, with the kernel's marks as three cells more between them. */
+/** The context meter: ten cells of 10%, with the kernel's marks as two cells more between them. */
 export const CELLS = 10
 const LIMIT_CELLS = 8
 const GAP = 2
@@ -46,12 +45,9 @@ export type BandInput = {
   t: Texts
 }
 
-/** The themes carry no orange, so the 30 mark takes the halfway between their warning and error. */
-export const orangeOf = (palette: Palette): string => mix(palette.warn, palette.err, 0.5)
-
-/** A context color: the theme's accent, then yellow from 20, orange from 30 and red from 40. */
+/** A context color: the theme's accent, then yellow from 30 and red from 40. */
 export const levelColor = (palette: Palette, level: Level): string =>
-  level === 'low' ? palette.user : level === 'warn' ? palette.warn : level === 'high' ? orangeOf(palette) : palette.err
+  level === 'low' ? palette.user : level === 'warn' ? palette.warn : palette.err
 
 /** The plan's windows warn from 80% and turn to error from 95%: their cuts, not the kernel's. */
 export const limitColor = (palette: Palette, percent: number): string =>
@@ -170,7 +166,7 @@ export type MeterFrame = {
   filled: number
   /** Cells drawn bright, as a stretch of light runs along the fill while a turn works. */
   bright: readonly number[]
-  /** The mark (20, 30, 40) drawn off in this frame, as it blinks on being crossed. */
+  /** The mark (30, 40) drawn off in this frame, as it blinks on being crossed. */
   blinkOff: number | null
   /** Past 40, the pulse's off beat: the percentage drawn without its pill. */
   pulseOff: boolean
@@ -186,12 +182,11 @@ export const stillFrame = (percent: number): MeterFrame => ({
 })
 
 /** The colors a meter frame needs, plain data so a surface module can carry them. */
-export type MeterColors = { low: string; warn: string; high: string; critical: string; muted: string; fg: string; surface: string }
+export type MeterColors = { low: string; warn: string; critical: string; muted: string; fg: string; surface: string }
 
 export const meterColorsOf = (palette: Palette): MeterColors => ({
   low: palette.user,
   warn: palette.warn,
-  high: orangeOf(palette),
   critical: palette.err,
   muted: palette.muted,
   fg: palette.fg,

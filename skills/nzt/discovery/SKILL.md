@@ -53,7 +53,9 @@ unit, not a second document.
 
 **The product definition and the glossary are mandatory.** A new product writes both in
 Analysis, before its first spec; an existing one without them gets them when a feature
-enters Analysis, the glossary with that feature's terms. **The glossary is never left
+enters Analysis, the glossary with that feature's terms. **In standard work or an existing
+product, the product definition is a first version** (`references/product.md`) that grows
+with each feature, not a whole product interview first. **The glossary is never left
 behind**: every unit that introduces, renames or narrows a term — spec, story, change,
 reverse engineering — updates its entry in the same unit, code name included. A term build
 needs and the glossary lacks comes back here as an entry, never as a name coined in code.

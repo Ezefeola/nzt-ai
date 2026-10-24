@@ -41,12 +41,29 @@ objective and with review dates, and has no entry in `Plan/state.json`.
 For an existing project not on NZT, the request decides:
 
 - **Small change** → do the work; write only the spec for what you touch.
-- **New feature** → analysis for that feature, plus the product definition and the glossary
-  if they are missing — the glossary with this feature's terms. Do not back-fill other features.
+- **New feature** → analysis for that feature, plus the product definition — its first
+  version — and the glossary if they are missing, the glossary with this feature's terms. Do
+  not back-fill other features.
 - **Reported bug** → reproduce, fix, verify. No specs, no plan, no ceremony.
 - **"Put this project in order"** → adoption: reverse engineering.
 
-## 4. Choose the phases
+## 4. Size the work
+
+The size decides how much method the work carries. It is read from what the work touches,
+never from how the user phrased it.
+
+| Size | The work is | How it runs |
+|---|---|---|
+| **Direct** | A reported bug, a small change, a chore: one unit | No plan and no state. The phases it needs, then report |
+| **Standard** | An improvement, or a feature of one or two stories that fits the current architecture: no new component, no stack decision, at most one new screen | A plan of `phases`, no slices, approved once. Its documents: the spec and its stories, and the product definition's first version if there is none |
+| **Full** | A new product, a feature of three or more stories, a new component, a stack decision, or several new screens | Slices, per `nzt-plan` |
+
+- **In doubt, the lighter size.** When the work outgrows it — a fourth story, a component
+  nobody planned — say so and propose the next size; never grow it silently.
+- **Size cuts ceremony, never the definition of done**: criteria, coverage per area, `qa`
+  and the user's acceptance hold at every size.
+
+## 5. Choose the phases
 
 Name only the phases this work actually needs, in order. A phase earns its place when it
 changes what gets built:
@@ -64,11 +81,11 @@ Be able to say in one line why you skipped each phase you skipped. A one-line ch
 build and verify, nothing else. Skipping is normal; skipping silently is not.
 
 The phases you name become the run's `phases` in `Plan/state.json`, in this order; a
-skipped phase is not listed. **A new product, a feature of several stories, or work the
-user wants delivered early is cut into slices**, each with the phases it needs, starting
-with discovery: `nzt-plan` cuts them. Say so in your one line.
+skipped phase is not listed. **Full-size work, or work the user wants delivered early, is
+cut into slices**, each with the phases it needs, starting with discovery: `nzt-plan` cuts
+them. Say so in your one line.
 
-## 5. Hand off
+## 6. Hand off
 
 - The request is about learning a skill → load `nzt-learn` and stop here. So is one that
   continues a topic in `Learn/<topic>/` — a delivery to correct, an assessment, a review that
@@ -84,13 +101,13 @@ with discovery: `nzt-plan` cuts them. Say so in your one line.
 
 ## Done when
 
-You can say, in one line, which situation this is and which phases the work needs, and you
-have handed off. This skill never produces an artifact.
+You can say, in one line, which situation this is, its size and which phases the work
+needs, and you have handed off. This skill never produces an artifact.
 
 ## Rules
 
 - Never propose a plan from this skill. That is `nzt-plan`.
 - Never skip step 1. Resuming from a stale assumption costs more than reading a file.
 - Never classify a project by its name or by what the user called it. Look at the ground.
-- Say which situation you classified and why, in one line, before handing off. A wrong
-  classification is cheap to correct now and expensive to correct three units later.
+- Say which situation and size you classified and why, in one line, before handing off. A
+  wrong classification is cheap to correct now and expensive to correct three units later.

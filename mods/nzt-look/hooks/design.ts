@@ -17,7 +17,7 @@ export const DESIGN_SPEC = {
     'Designs a theme for the nzt-look mod and applies it at once, when the person asks for one ("a theme that feels like a sunset").',
     'Give a short name and a dark palette of 15 colors as #rrggbb; give a light one too, or one is derived.',
     'read, write, run, search, web, mcp, other: the color of each kind of tool row.',
-    'user: the accent (the prompt, headers, the band under 20%). fg: body text. muted: secondary text and rules.',
+    'user: the accent (the prompt, headers, the band under 30%). fg: body text. muted: secondary text and rules.',
     'surface: what cards and tables are drawn on. zebra: every other table row, close to surface.',
     'ok, err, warn: success, failure and warning.',
     'Text colors should read on surface and zebra; the mod nudges any that do not, keeping their hue.',

@@ -400,6 +400,8 @@ completo. Al arrancar, el agente clasifica la situación y entra donde correspon
 
 **Regla anti‑rigidez:** el plan se ajusta al pedido, no al revés. Un cambio de una línea no
 dispara PRD, arquitectura ni UX. El agente debe poder justificar por qué salteó una fase.
+**Desde D78 la regla tiene forma**: `nzt` dimensiona todo pedido como **directo** (sin plan ni
+estado), **estándar** (plan de `phases`, sin tramos, aprobado una vez) o **completo** (tramos).
 
 ### 5.2 Ingeniería inversa
 
@@ -419,20 +421,25 @@ Al terminar cada unidad, el agente **obligatoriamente**:
 
 1. Actualiza `Plan/state.json`.
 2. Reporta en 3–5 líneas qué hizo y qué sigue.
-3. **Para y espera**.
+3. **Para y espera**, salvo dentro de una tanda que el usuario eligió (D79).
 
 Reglas específicas:
 
 - Las specs se escriben **de a una**. Nunca un lote.
 - El plan se aprueba antes de ejecutarse. Modificarlo es siempre una opción del usuario.
-- **Acompañado es el default.** El agente puede encadenar N unidades sin frenar **solo** si
-  el usuario lo autorizó explícitamente para esa tanda ("hacé las 3 specs de corrido"). La
-  autonomía **se ofrece una sola vez, al presentar el plan**, y de ahí en más (T22):
-  **no responder es acompañado**, no una pregunta pendiente; **aprobar el plan no
-  selecciona autonomía**; **"continuemos" avanza el siguiente tramo acordado y no cambia de
-  modo**; y **lo seleccionado se registra en el estado**, donde vacío o ausente significa
-  acompañado. Un despliegue a un entorno compartido se corre autónomo solo si la selección
-  nombró ese entorno (13.7 #1).
+- **Acompañado es el default.** El agente puede encadenar unidades sin frenar **solo** si
+  el usuario eligió una tanda para esa corrida. La autonomía **se ofrece una sola vez, al
+  presentar el plan**, y desde D79 en dos formas, las dos **una lista cerrada de unidades**
+  por id, nunca abierta: **las próximas N unidades**, o **hasta un hito** —el cierre de una
+  fase de análisis, arquitectura o UX, un freno propio de una fase, la aceptación—, ofrecida
+  siempre, con cada unidad hasta el hito nombrada por id. Una unidad
+  que se corta después entra a la tanda solo si el usuario la suma. **Toda tanda frena igual**
+  ante un fallo, una contradicción, una pregunta que traba y **pasado el 40% de contexto**, al
+  terminar la unidad en curso, le queden unidades o no. Y de ahí en más (T22): **no responder
+  es acompañado**; **aprobar el plan no selecciona autonomía**; **"continuemos" avanza el
+  siguiente tramo acordado y no cambia de modo**; y **lo seleccionado se registra en el
+  estado**, donde vacío o ausente significa acompañado. Un despliegue a un entorno compartido
+  se corre autónomo solo si la selección nombró ese entorno (13.7 #1).
 - **El orden del freno importa**: punto seguro → escribir el estado → recién entonces
   reportar. Un reporte escrito primero y persistido después se pierde si la sesión termina
   entre los dos (13.9 #18).
@@ -462,7 +469,9 @@ Reglas del acuerdo:
   convenciones.
 - **Obligatorios también: la definición de producto y el glosario** (D56). Un producto
   nuevo los produce en Análisis, antes de la primera spec; uno existente que no los tiene
-  los obtiene cuando una feature entra a Análisis. **El glosario se mantiene al día en la
+  los obtiene cuando una feature entra a Análisis. **En trabajo estándar o en un producto
+  existente, la definición de producto es una primera versión que crece con cada feature**
+  (D82). **El glosario se mantiene al día en la
   misma unidad que introduce o cambia un término** —spec, historia, cambio o cierre—, y un
   término que build necesita y no está es una entrada de glosario que escribe discovery, no
   un nombre que se pregunta o se inventa a mitad del código.
@@ -528,9 +537,10 @@ o escribirlo carga `nzt-plan` (D74).
   una advertencia (commits sin push, un archivo que no se borra sin el ok del usuario). No
   son un log. El panel `nzt-state` las muestra como **Notas para retomar** (usuario,
   2026-10-15).
-- `autonomy` registra la tanda autorizada (T22): qué unidades se corren sin frenar y qué
+- `autonomy` registra la tanda autorizada (T22, D79): qué unidades se corren sin frenar y qué
   frenos se conservan igual. **Ausente o vacío significa acompañado**, que es el default.
-  Se escribe cuando el usuario la selecciona, no cuando aprueba el plan.
+  Se escribe cuando el usuario la selecciona, no cuando aprueba el plan, y siempre es una
+  lista cerrada de ids.
 - `delegation` es el modo de delegación del proyecto: `auto`, `ask` u `off` (D71). Ausente
   significa `ask`. Es la única clave que una corrida nueva conserva, y solo la cambia el
   usuario.
@@ -2508,6 +2518,94 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     `[add]`/`[modify]` barridas, encabezados, entradas de **Historia** y catálogo de
     `specs/nzt-mods.md` al día.
   - **Hecho (2026-10-24).** `nzt-questions` 27 tests (2 nuevos), validate pasa.
+- **D78.** **`nzt` dimensiona todo pedido en tres tamaños —directo, estándar y completo— y el
+  tamaño decide cuánta ceremonia lleva.** Lo que la forzó: una revisión externa del método
+  (usuario, 2026-10-24, rama `ceremonia-por-nivel`) pensando en equipos de analistas y devs.
+  Entre el *small change* y el flujo completo no había nada: una mejora o una feature de una
+  historia entraba a `nzt-plan` con la misma forma que un producto nuevo, y eso es lo que más
+  se usa en el día a día.
+  - **Qué cambió:** sección *4. Size the work* de `nzt` con la tabla. **Directo:** un bug, un
+    cambio chico, una tarea técnica; sin plan ni estado. **Estándar:** una mejora o una feature
+    de una o dos historias que entra en la arquitectura actual —sin componente nuevo, sin
+    decisión de stack, a lo sumo una pantalla nueva—; plan de `phases`, sin tramos, aprobado
+    una vez, con la spec, sus historias y la primera versión de producto si falta.
+    **Completo:** producto nuevo, feature de tres historias o más, componente nuevo, decisión
+    de stack o varias pantallas; tramos, como hasta ahora. Ante la duda, el más liviano; si el
+    trabajo crece, se dice y se propone el siguiente, nunca se agranda en silencio. **El tamaño
+    recorta ceremonia, nunca la definición de terminado**: criterios, cobertura por área, `qa`
+    y aceptación valen en los tres. El kernel lo nombra en su primer párrafo; `proposal.md`
+    dice que el plan estándar es una tabla con sus declaraciones, sin tramos ni cadencia, y
+    que el diseño técnico se ofrece en estándar solo si toca un contrato o el modelo de datos.
+  - **Descartado:** la spec estándar con las historias adentro. El archivo de historia es el
+    único lugar de donde se lee el avance (T1) y lo usan verify, el cierre y el panel:
+    sacarlo en un tamaño partía el método en dos formatos.
+  - **Revisado y sin cambio:** el glosario ya pide solo términos con significado propio
+    (*What earns an entry*), y `analysis.md` ya se crea con la primera pregunta. La revisión
+    los había marcado como peso; leídos, no lo eran.
+- **D79.** **Acompañado sigue siendo el default; la autonomía se ofrece en dos formas, las dos
+  una lista cerrada de unidades, y toda tanda frena pasado el 40% de contexto.** Lo que la
+  forzó: la misma revisión, y la corrección del usuario sobre su primera versión.
+  - **Primera versión, revertida.** Hacía default a *por hitos*: aprobado el plan, las
+    unidades se encadenaban hasta el cierre de una fase. El usuario la objetó (2026-10-24):
+    la persona puede querer seguir el trabajo punto por punto o cuidar el contexto; ante una
+    compactación la IA trabaja mal, y si llega al 50% sin cerrar la fase y sigue, alucina más.
+    *"No debe por default decir voy a frenar hasta que se termine este hito, porque si el
+    trabajo es muy grande el riesgo a que salga mal también lo es."* La protección que tenía
+    era débil: el kernel solo recomendaba limpiar, y en una tanda eso no frena nada.
+  - **Las dos formas (usuario):** **las próximas N unidades**, o **hasta un hito** —el cierre
+    de una fase de análisis, arquitectura o UX, un freno propio de una fase, la aceptación—.
+    Las dos se escriben en `autonomy.units` por id, nunca abiertas. **Hasta un hito se ofrece
+    siempre**, con todas sus unidades nombradas: la propuesta del agente de topearlo en cuatro
+    unidades la descartó el usuario (*"no quiero tope de 4 unidades, que ofrezca siempre lo
+    del hito"*); lo que acota un tramo largo es el freno del 40%. Una unidad que se corta
+    después —una por historia— entra a la tanda solo si el usuario la suma.
+  - **Frenos de toda tanda:** un fallo, una contradicción, una pregunta que traba, y **pasado
+    el 40% de contexto**, al terminar la unidad en curso, le queden unidades o no. Es el freno
+    duro que faltaba: la autonomía nunca pasa por encima del cuidado del contexto.
+  - **Sin cambio de esquema:** `autonomy` sigue igual; `state check` y el panel `nzt-state`
+    siguen valiendo.
+  - **Qué cambió:** el kernel (*Work units and stops*), `nzt-plan` (*Approval and autonomy*,
+    paso 5 de *Executing* y la regla de encadenar) y `slices.md` (la oferta bajo las tablas).
+    `nzt-verify` y `test-run.md` quedaron como en `main`.
+- **D80.** **La escala de contexto pasa a 30/40, y se dice al cruzar una marca, no en cada
+  reporte.** Lo que la forzó: el usuario, 2026-10-24: *"me cierra lo que dijiste del contexto
+  al 20% quizás estaría bueno que el umbral sea desde el 30 y 40"*. Es la decisión que D67
+  dejó abierta.
+  - **Qué cambió:** bajo el 30% no se dice nada; desde el 30% se recomienda limpiar; pasado
+    el 40%, fuerte. Se dice en el reporte que cruza una marca y cuando se pregunta: una línea
+    en cada reporte deja de leerse. Sin señal del host, se dice una vez. `nzt-plan` deja de
+    exigir el contexto en todo reporte.
+  - **Mods:** `nzt-look` 0.7.0 sigue al kernel —dos marcas, amarillo desde el 30 y rojo desde
+    el 40, sin naranja; botón limpiar principal desde el 30; la línea al agente dice
+    `30%+, recommend clearing`— y `nzt-hub` 0.4.1 cambia el texto de la tarjeta Aspecto.
+    Reglas con `[modify]` en sus specs hasta probarlo en vivo. El mockup de la banda queda con
+    tres marcas, anotado en la spec.
+- **D81.** **Un tramo es por defecto una feature de hasta tres historias.** Lo que la forzó:
+  la misma revisión. La regla de QA después del tramo está bien (probar contra algo a medio
+  construir produce casos que salen mal); lo que la hacía lenta era el tamaño del tramo.
+  `slices.md`: una feature más grande se corta en tramos de una a tres historias que se
+  prueban juntas; un tramo más grande lo decide el usuario, nunca el default.
+- **D82.** **La definición de producto puede empezar como primera versión.** Lo que la forzó:
+  la misma revisión. En un producto existente, o en trabajo estándar, pedir la entrevista de
+  producto entera antes de la primera feature frena el trabajo que se pidió. Sigue siendo
+  obligatoria (D56). `product.md` suma *A first version*: objetivos (al menos el que sirve la
+  feature), usuarios que toca, alcance en las dos direcciones y abiertos, con la línea
+  `> First version: grows with each feature.`; módulos, restricciones y entrega 1 esperan a
+  la entrevista de producto. Sigue siendo el acta: nada sale del repositorio.
+  - **Hecho (D78–D82, 2026-10-24, rama `ceremonia-por-nivel`).** Kernel 149 líneas,
+    `nzt` 113, `nzt-plan` 199, `product.md` 167, `slices.md` 101, `proposal.md` 57.
+    `nzt-look` 190 tests y `nzt-hub` 18, validate pasa en los dos y en el marketplace.
+    Casos nuevos `routing/size-standard` y `restraint/accompanied-default`. **Puertas:** build
+    sin avisos, `check-references` sin movidas, 164 comprobaciones, lint 0 problemas,
+    marketplace válido. **Sin probar en vivo.**
+  - **Evals dirigidas (2026-10-24, una corrida por caso, sin brazo de ablación, juez haiku,
+    US$1,96 en total; reportes en `evals/results/2026-10-24-ceremonia/`).** `kernel-loaded`,
+    `small-edit` y `plan-stories` 1.0. `size-standard` 0.5: el plan sale estándar —una tabla,
+    sin tramos ni cadencia, el diseño técnico ofrecido con su porqué— y el juez lo rechaza sin
+    decir por qué; falta re-juzgarlo con sonnet. `accompanied-default` 0.67: la fixture
+    `project.sh` tiene código de muestra sin comportamiento, el agente frena con una pregunta y
+    el freno del kernel queda sin medir. La oferta de tanda (*"por defecto paro después de cada
+    paso; si preferís, …de corrido"*) apareció en los tres planes. El freno del 40% no se midió.
 
 ## 13. Revisión contra Temper v3
 

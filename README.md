@@ -20,7 +20,7 @@ NZT existe para evitar:
 | Sin NZT | Con NZT |
 |---|---|
 | Escribe código antes de que nadie haya definido qué tiene que hacer | Primero el análisis funcional, y lo que no está definido **es una pregunta, no una suposición** |
-| Arranca y no para hasta que algo se rompe | Corta en unidades revisables y **frena a esperarte** al final de cada una |
+| Arranca y no para hasta que algo se rompe | Corta en unidades revisables y **frena a esperarte** al final de cada una; si querés avanzar, le das una tanda cerrada (N unidades, o hasta un hito) y frena igual pasado el 40% de contexto |
 | Se le termina el contexto y perdiste el hilo | El plan y el estado viven en `Plan/state.json`: se retoma sin volver a explicar |
 | Elige el patrón que le gusta hoy, distinto del de ayer | El documento de stack decide, y **una carpeta instalada no es una autorización** |
 | Te dice que funciona | Reporta lo que pasó: el test que falló, el paso que salteó, la suposición que hizo |
@@ -52,8 +52,10 @@ pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
 ```
 
 El bucle que impone el kernel es siempre el mismo: **entender → proponer → ejecutar por
-unidades → verificar → registrar**, escalado al pedido. Un cambio de una línea no dispara el
-método completo; eso está escrito en el kernel y es lo que hace que se banque el uso diario.
+unidades → verificar → registrar**, escalado al pedido en tres tamaños: **directo** (un bug,
+un cambio chico: sin plan ni estado), **estándar** (una mejora o una feature de una o dos
+historias: un plan corto, aprobado una vez) y **completo** (un producto, una feature grande:
+por tramos de una a tres historias). Eso es lo que hace que se banque el uso diario.
 
 ### Las fases
 
@@ -176,7 +178,7 @@ artefacto del método para mostrar algo.
 | [`nzt-files`](mods/nzt-files/README.md) | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: carpetas que se abren y cierran, marcas de git, lo que Claude lee y escribe, y el archivo elegido debajo, solo para leer y sin ocupar contexto | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
 | [`nzt-hub`](mods/nzt-hub/README.md) | Genérico | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | `/plugin install nzt-hub --marketplace Ezefeola/nzt-ai` |
 | [`nzt-questions`](mods/nzt-questions/README.md) | Genérico | Panel lateral para contestar de a una, con opciones, las preguntas que el agente escribió en el chat; deja las respuestas en un solo mensaje en el prompt, sin mandarlo | `/plugin install nzt-questions --marketplace Ezefeola/nzt-ai` |
-| [`nzt-look`](mods/nzt-look/README.md) | Genérico, con capa NZT | Temas (NZT y quince más, oscuros y claros), una banda sobre el prompt con el contexto y sus marcas 20/30/40, los límites del plan, el costo, el modelo con su effort y `/clear`, y la conversación redibujada: herramientas, consola, diffs, tablas, código, fórmulas y diagramas | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
+| [`nzt-look`](mods/nzt-look/README.md) | Genérico, con capa NZT | Temas (NZT y quince más, oscuros y claros), una banda sobre el prompt con el contexto y sus marcas 30/40, los límites del plan, el costo, el modelo con su effort y `/clear`, y la conversación redibujada: herramientas, consola, diffs, tablas, código, fórmulas y diagramas | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
 
 ### Instalarlos
 
