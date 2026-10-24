@@ -21,7 +21,7 @@ is built: its own section below says what changes.
 - **Self-contained**: one file, no network requests, no build step, no imports. It opens
   from disk.
 - **No business logic.** Interaction is limited to showing the states. Nothing calculates,
-  validates or persists.
+  validates or persists. A prototype is the one exception, in its own section.
 - **It imitates the component library instead of using it.** That is precisely what stops
   it turning into unfinished production code, and it is a feature, not a shortcut.
 - A header comment ties it to its source: the screen design, the stories, and the date.
@@ -84,14 +84,28 @@ answer that question before code exists.
 - **It starts from the question, not from a screen design.** Its header names the `Q-NN`
   it answers and who will try it. It draws the fewest screens that put the question in
   front of a person, as one walkable flow; there may be no screen design yet.
-- **Every rule above holds**: self-contained, no business logic, honest placeholders, the
-  measurements run. A prototype that calculates is code nobody reviewed.
-- **It is thrown away. It never becomes production code**, and nobody copies markup from
-  it: the screens that ship are designed per `references/screen.md` and built from the
-  stories. That is what keeps a prototype cheap enough to be wrong.
-- What the people who tried it did and said goes into `Docs/Product/analysis.md` as the
-  answer to its `Q-NN`, in their terms. Then the file is deleted: a prototype kept around
-  becomes the design someone builds from.
+- **It is used, not just looked at.** The person does the task for real — adds, edits,
+  removes — and **the business rules its flow touches apply**, as the spec states them: a
+  prototype that lets through what a rule forbids teaches the wrong thing. Data lives in
+  memory, unless a rule it shows is about keeping it.
+- **Its header lists the rules it implements**, by slug, with the date of the spec it read:
+  that list is what says it is out of date when a rule changes.
+- **Every other rule above holds**: self-contained and opened with a double click, honest
+  placeholders, the measurements run. Lightweight is the point: plain HTML and a little
+  script, nothing to install.
+- **It never becomes production code**, and nobody copies markup from it: the screens that
+  ship are designed per `references/screen.md` and built from the stories. That is what
+  keeps a prototype cheap enough to be wrong.
+
+**When it has taught what it was for**, what the people who tried it did and said goes into
+`Docs/Product/analysis.md` as the answer to its `Q-NN`, in their terms. Then **the user
+decides its fate**, asked with what each option costs:
+
+- **Delete it.** Nothing is left to keep in step; what it taught is already recorded.
+- **Keep it** in `Docs/UX/prototype/<slug>.html`, to show and try. It is then maintained: a
+  change to a rule in its header, or to a screen it draws, updates it in the same unit. A
+  prototype nobody keeps current lies with the authority of what looks real — if it will
+  not be maintained, delete it.
 
 ## The two files never disagree
 
@@ -108,8 +122,9 @@ Rehearse it: could the user click through every state of this screen, and a deve
 nothing from it but the intent?
 
 - Every state in the design is drawn and reachable by hash.
-- No network request, no business logic, no second palette.
+- No network request, no second palette, and no business logic outside a prototype.
 - Every pending piece of content is visibly marked as pending, with its question.
 - The width, contrast and keyboard checks were **run**, and their results are in the report.
 - The design document and the mockup say the same thing.
-- A prototype names its `Q-NN`, and is deleted once the answer is in `analysis.md`.
+- A prototype names its `Q-NN` and the rules it implements; once the answer is in
+  `analysis.md`, it is deleted or kept and maintained, as the user decided.

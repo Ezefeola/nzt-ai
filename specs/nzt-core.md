@@ -624,7 +624,8 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │  │  ├─ rfc/RFC-NNN-<slug>.md # propuesta en discusión, a pedido (D35)
 │  │  └─ tech-debt.md          # trabajo técnico diferido, con su impacto (D29)
 │  ├─ UX/
-│  │  └─ design-system.md · ui-components.md   # de nzt-ux-system (D11)
+│  │  ├─ design-system.md · ui-components.md   # de nzt-ux-system (D11); marca y voz (D76)
+│  │  └─ prototype/<slug>.html                 # prototipo conservado y mantenido, si el usuario lo eligió (D76)
 │  ├─ Operations/
 │  │  ├─ deployment.md         # entornos con su autorizador, pipeline, rollback (T16)
 │  │  └─ releases.md           # log append-only de despliegues y rollbacks (T16)
@@ -638,7 +639,7 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
    ├─ state.json               # plan + estado, actualizado por unidad
-   ├─ prototype/<slug>.html    # prototipo de la entrega 1, temporal: se borra al registrar lo aprendido (D72)
+   ├─ prototype/<slug>.html    # prototipo de la entrega 1: al registrar lo aprendido, se borra o pasa a Docs/UX/prototype/ (D72, D76)
    └─ specs/
       └─ F-NNN-<slug>/       # "<feature>" en el resto del documento (D6)
          ├─ spec.md            # transversal: alcance, reglas, NFR, índice de historias
@@ -2451,6 +2452,34 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     **Puertas:** build sin avisos, `check-references` sin movidas, 164 comprobaciones, lint 0
     problemas, marketplace válido, `nzt-state` 55 tests. **Sin evals**, por decisión del
     usuario. **Sin probar en vivo** el panel.
+- **D76.** **El prototipo es usable y aplica las reglas de negocio que muestra; al cerrarlo,
+  el usuario decide si se borra o queda como prototipo mantenido. El design system se ofrece
+  cuando el plan elige UX, con una sección de marca y voz.** Lo que la forzó: la prueba en
+  `Systems/TodoList` (usuario, 2026-10-24). El agente iba a borrar el prototipo al anotar
+  Q-19, y el plan no tenía diseño de pantalla: lo visual decidido se perdía con el archivo.
+  El usuario quiere además un lugar mantenido para la marca —colores, logo, estilo— y un
+  prototipo que la persona pueda usar, no solo un selector de estados.
+  - **Destino al cerrar (usuario).** Lo que enseñó va siempre a `analysis.md`. Después el
+    usuario elige: **borrarlo**, o **conservarlo** en `Docs/UX/prototype/<slug>.html`,
+    mantenido. Si nadie lo va a mantener, se borra: un prototipo viejo miente con la
+    autoridad de lo visual.
+  - **Usable, con las reglas (usuario).** Un solo HTML, que se abre con doble clic, sin red,
+    sin build ni imports; se usa de verdad y aplica las reglas de la spec que su flujo toca.
+    **Objetado una vez:** las reglas quedan en dos lugares. Lo que lo contiene: la cabecera
+    lista por slug las reglas que implementa y la fecha de la spec; conservado, cambiar una
+    de esas reglas lo actualiza en la misma unidad, como a todo documento afectado. **Nunca
+    pasa a código de producción**: la app se construye desde las historias. El mockup de
+    una pantalla diseñada sigue sin lógica.
+  - **Design system ofrecido, no obligatorio (usuario).** UX sigue opcional: obligarlo va
+    contra la agilidad. Cuando el plan elige UX en un producto con pantalla, `proposal.md`
+    ofrece `Docs/UX/design-system.md` con lo que se pierde sin él. `system.md` suma **marca**
+    (logo como ruta a su archivo, tipografía, paleta por roles con valores
+    `provisional` hasta que exista un tema en código, que desde ahí manda) y **voz de los
+    textos**.
+  - **Hecho (342–346, 2026-10-24).** `mockup.md` (130 líneas), `system.md` (132),
+    `ux/SKILL.md`, `proposal.md`, `slices.md` y el árbol de §7. **Puertas:** build sin avisos,
+    `check-references` sin movidas, 164 comprobaciones, lint 0 problemas, marketplace válido.
+    **Sin evals** (usuario); ningún caso nombra el prototipo.
 
 ## 13. Revisión contra Temper v3
 

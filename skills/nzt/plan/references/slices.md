@@ -35,8 +35,8 @@ Slices come out of discovery; you cannot cut what you do not know yet.
 The product's delivery 1 (`nzt-discovery`'s `product.md`) says what reaches the user first
 and for which objective. Its slices are planned; later deliveries stay as one line in the
 plan's shape, never as units. When delivery 1 has something to learn from users, **offer an
-HTML prototype** (`nzt-ux`) inside the discovery slice: it is thrown away, never turned into
-production code. In a new product, the first build slice is the **walking skeleton**: the
+HTML prototype** (`nzt-ux`) inside the discovery slice: usable, deleted or kept as the user
+decides, never turned into production code. In a new product, the first build slice is the **walking skeleton**: the
 whole path end to end in its thinnest form, real code the next slices grow.
 
 **Delivery 1 cuts scope, never the definition of done**: coverage per area, `qa` and the

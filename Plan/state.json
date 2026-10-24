@@ -1,39 +1,39 @@
 {
   "version": 1,
-  "updated": "2026-10-24T17:00:00Z",
-  "goal": "Ajustes de la prueba en TodoList: el paso de la spec cubre sus historias sin re-aprobar, y el panel muestra los tramos plegados",
+  "updated": "2026-10-24T19:00:00Z",
+  "goal": "Prototipo usable con reglas y destino decidido al cerrar; design system con marca y voz, ofrecido cuando hay UX",
   "phases": [
     {
       "name": "analysis",
       "status": "done",
       "units": [
-        { "id": 337, "do": "D75 en specs/nzt-core.md: historias dentro del paso de la spec (QT-05) y tramos plegados en el panel (QT-04)", "status": "done" },
-        { "id": 338, "do": "Spec del mod nzt-state: RN-panel-tramos con una línea fija y la lista plegada", "status": "done" }
+        { "id": 342, "do": "D76 en specs/nzt-core.md: destino del prototipo, prototipo usable con reglas, design system ofrecido con marca y voz", "status": "done" }
       ]
     },
     {
       "name": "build",
       "status": "done",
       "units": [
-        { "id": 339, "do": "nzt-plan y slices.md: el paso de la spec nombra sus historias; se cortan al cerrar la spec, sin re-aprobación", "status": "done" },
-        { "id": 340, "do": "Mod nzt-state: fila Tramo sin repetir, lista plegable 'Tramos · n', sin plegable con un solo tramo; tests y versión", "status": "done" }
+        { "id": 343, "do": "ux/references/mockup.md: prototipo usable con las reglas, cabecera con sus RN, destino al cerrar", "status": "done" },
+        { "id": 344, "do": "ux/references/system.md: sección de marca (logo, paleta por roles, tipografía) y voz de los textos", "status": "done" },
+        { "id": 345, "do": "plan/references/proposal.md y ux/SKILL.md: design system ofrecido cuando el plan elige UX; dónde cae el prototipo", "status": "done" }
       ]
     },
     {
       "name": "verify",
       "status": "done",
       "units": [
-        { "id": 341, "do": "Puertas: build, check-references, checks del instalador, tests del mod; sin evals (usuario 2026-10-24)", "status": "done" }
+        { "id": 346, "do": "Puertas: build, check-references, checks del instalador, lint; sin evals (usuario 2026-10-24)", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [337, 338, 339, 340, 341] },
+  "autonomy": { "units": [342, 343, 344, 345, 346] },
   "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-24: QT-04 línea + plegable para los tramos; QT-05 un paso 'spec y sus historias' sin contarlas, unidades por historia sin re-aprobar",
-    "Corrida D74 commiteada (279991b) y pusheada en trabajo-por-tramos; el usuario la prueba en Systems/TodoList (puntos 3-4 ok)",
+    "Usuario 2026-10-24: destino del prototipo al cerrar (borrar o mockup mantenido); UX opcional, design system ofrecido; prototipo usable con reglas, liviano",
+    "D74 (279991b) y D75 (c52d529) pusheadas en trabajo-por-tramos; el usuario prueba en Systems/TodoList",
     "Pendiente aparte: fixtures sin glosario, mensaje 'contrato del kernel' y versión -dev en binarios locales del CLI"
   ]
 }

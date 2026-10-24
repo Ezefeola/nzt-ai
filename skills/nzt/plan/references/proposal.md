@@ -31,7 +31,10 @@ line. Three categories:
   this decision gets re-argued in three months with no record of what was weighed"*.
 - **Mandatory:** the stack per component and area, designed with it or read from evidence
   before its code is touched, with `architecture.md` naming its root; the product definition and the glossary, from Analysis on, the
-  glossary updated by every unit that adds or changes a term. **Offered: feature design.**
+  glossary updated by every unit that adds or changes a term. **Offered: feature design**;
+  and, when the plan chooses UX for a product with screens and it has none yet, the design
+  system with its brand and voice — without it, every screen and prototype invents its own
+  colours and texts.
 - A document that already exists and that the change affects is kept current as part of the
   work, never offered as optional.
 - Do not ask what you can verify — a version, a capability, a package's maintenance state.

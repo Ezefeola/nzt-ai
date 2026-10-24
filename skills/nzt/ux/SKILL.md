@@ -34,9 +34,9 @@ row is not the guidance, the file is.
 |---|---|---|
 | One screen: layout, content, states, navigation | `references/screen.md` | — |
 | An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | — |
-| A throwaway prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | — |
+| A usable prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | — |
 | The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | — |
-| The design system, shared components, or the visual direction | `references/system.md` | — |
+| The design system, shared components, the visual direction, or the brand and its voice | `references/system.md` | — |
 | Judging a design, a mockup or a built screen against its task | `references/review.md` | — |
 
 Wherever a file names `nzt-ux-<name>`, it means `references/<name>.md` in this folder
@@ -67,7 +67,8 @@ plan back.
 
 - One screen design, with its mockup beside it if there is one →
   `Plan/specs/<feature>/ux-ui/`
-- A prototype → `Plan/prototype/<slug>.html`, deleted once what it taught is recorded
+- A prototype → `Plan/prototype/<slug>.html`; once what it taught is recorded, deleted or
+  kept in `Docs/UX/prototype/<slug>.html` and maintained, as the user decides
 - Visual direction and the design system → `Docs/UX/design-system.md`; the shared component
   inventory → `Docs/UX/ui-components.md`. Both written and maintained per `references/system.md`
 - The end user's manual, one file per audience → `Docs/Manual/<audience>.html`, its images
