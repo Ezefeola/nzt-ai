@@ -1,30 +1,21 @@
 {
   "version": 1,
-  "updated": "2026-10-24T21:00:00Z",
-  "goal": "Cerrar nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 tras la aceptación del usuario, y dejar la rama lista para el PR",
+  "updated": "2026-10-24T23:30:00Z",
+  "goal": "Publicar NZT v2.0.0 desde main tras el merge del PR #7 (trabajo por tramos)",
   "phases": [
-    {
-      "name": "build",
-      "status": "done",
-      "units": [
-        { "id": 351, "do": "Cierre de los mods: barrer [add]/[modify], encabezados, Historia, catálogo de nzt-mods.md; aceptación de D75-D77 en D77", "status": "done" }
-      ]
-    },
     {
       "name": "ship",
       "status": "done",
       "units": [
-        { "id": 352, "do": "Commit y push de trabajo-por-tramos; el usuario arma el PR a main", "status": "done" }
+        { "id": 353, "do": "Release v2.0.0: subir la versión en main, tag v2.0.0 y workflow de release", "status": "done", "detail": "1bdafb7 bump 2.0.0 en main; tag v2.0.0, workflow release success (gates, 6 binarios, notify-landing), 13 assets; instalación desde el release no probada" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [351, 352] },
-  "waiting_on": "el usuario arma el PR de trabajo-por-tramos a main y avisa para hacer el release",
+  "waiting_on": "Usuario: decir con qué sigue",
   "notes": [
-    "Usuario 2026-10-24: aceptadas D72-D77, nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 (estos dos sin prueba en vivo)",
-    "Release después del merge: subir <Version> del CLI, tag vX.Y.Z; sumar mensaje 'contrato de nzt-plan' y versión -dev en binarios locales",
+    "No entró en v2.0.0: mensaje 'contrato de nzt-plan' y versión -dev en binarios locales (anotados para este release, quedan para el próximo)",
     "Pendiente aparte: fixtures de evals sin glosario y grader de qa-unasked que dice increment"
   ]
 }
