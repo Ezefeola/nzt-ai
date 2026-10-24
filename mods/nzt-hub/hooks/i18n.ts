@@ -39,7 +39,7 @@ export const TEXTS = {
       'nzt-changes': { title: 'Cambios', desc: 'Lo que Claude editó en el último turno o contra HEAD, un diff por vez.' },
       'nzt-files': { title: 'Archivos', desc: 'El proyecto como el explorador de VS Code, solo para leer.' },
       'nzt-questions': { title: 'Preguntas', desc: 'Las preguntas del agente, de a una y con opciones, al prompt en un mensaje.' },
-      'nzt-look': { title: 'Aspecto', desc: 'Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.' },
+      'nzt-look': { title: 'Aspecto', desc: 'Temas, banda de uso con las marcas 30/40 de NZT y la conversación redibujada.' },
     } satisfies Record<ModId, Mod>,
   },
   en: {
@@ -72,7 +72,7 @@ export const TEXTS = {
       'nzt-changes': { title: 'Changes', desc: "What Claude edited in the last turn or against HEAD, one diff at a time." },
       'nzt-files': { title: 'Files', desc: "The project like VS Code's explorer, read only." },
       'nzt-questions': { title: 'Questions', desc: "The agent's questions, one at a time with options, to the prompt in one message." },
-      'nzt-look': { title: 'Look', desc: "Themes, a usage band with NZT's 20/30/40 marks and a redrawn conversation." },
+      'nzt-look': { title: 'Look', desc: "Themes, a usage band with NZT's 30/40 marks and a redrawn conversation." },
     } satisfies Record<ModId, Mod>,
   },
 } as const

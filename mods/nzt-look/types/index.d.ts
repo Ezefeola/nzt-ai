@@ -84,8 +84,8 @@ export type Prefs = {
 /** A theme of the person's own: a repainted one (`mi-<tema>`) or one the agent designed. */
 export type CustomTheme = { name: string; label: string; dark: Palette; light: Palette }
 
-/** Which stretch of the kernel's scale the context is in: under 20, from 20, from 30, from 40. */
-export type Level = 'low' | 'warn' | 'high' | 'critical'
+/** Which stretch of the kernel's scale the context is in: under 30, from 30, from 40. */
+export type Level = 'low' | 'warn' | 'critical'
 
 /** The session's context fill, or none while the engine has not reported one. */
 export type Reading = { kind: 'none' } | { kind: 'ok'; percent: number; tokens: number; window: number }

@@ -9,6 +9,7 @@
 - Constraints
 - Delivery 1
 - Scope, in both directions
+- A first version
 - Keep it current
 - Done when
 
@@ -133,6 +134,19 @@ it lives instead.
 - What the user dismissed goes here in their terms, not paraphrased into something softer.
 - Something that is neither in nor out is an open question, not scope.
 
+## A first version
+
+When a feature enters Analysis in standard work, or in an existing product with no
+document, the product definition starts as a **first version**: the feature's work is not
+held up by a whole product interview nobody asked for.
+
+- It carries **Objectives** — at least the one this feature serves —, the **Users** it
+  touches, **Scope** in both directions and **Open**. Modules, constraints and delivery 1
+  wait for the product interview.
+- It opens with `> First version: grows with each feature.` Each feature that enters
+  Analysis adds what it establishes; the line goes when the product interview completes it.
+- It is still the minutes: every line traces to the user, never to the repository.
+
 ## Keep it current
 
 The document describes the present. A change edits it in place; a second document that says
@@ -147,6 +161,7 @@ using only this file?
 - Every objective says how it is known.
 - Every user row says what they cannot do today.
 - Scope is written in both directions.
-- Delivery 1 says what is in and why, or that it is the whole scope.
+- Delivery 1 says what is in and why, or that it is the whole scope — or the file is a
+  first version, with the sections that one carries.
 - Nothing here names a technology, a component or a screen.
 - What is undecided is in **Open** with its `Q-NN`, not filled in by you.

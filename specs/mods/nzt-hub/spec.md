@@ -133,8 +133,8 @@ Contexto. La 0.3.0 se separó de la 0.4.0 en la 225: `nzt-context` se retira ya,
 **0.4.0, con la publicación de `nzt-look`:**
 - **Entra Aspecto** (`nzt-look`), última del grupo *Para cualquier proyecto*, en el orden del
   catálogo: glifo **◐** en el azul que tenía Contexto; título **Aspecto** / **Look** (Q-10); línea
-  *Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.* /
-  *Themes, a usage band with NZT's 20/30/40 marks and a redrawn conversation.* Lleva **Abrir ›**,
+  *Temas, banda de uso con las marcas 30/40 de NZT y la conversación redibujada.* /
+  *Themes, a usage band with NZT's 30/40 marks and a redrawn conversation.* Lleva **Abrir ›**,
   que corre `/nzt-look`, o **Copiar instalación** si no está (Q-08). [add]
 - La portada vuelve a contar `n de 5 instalados`.
 - **Sin medir todavía:** el mockup cambió una fila por otra del mismo largo; la medición a 320 y
@@ -166,7 +166,7 @@ sigue valiendo.
 - **Preguntas**: glifo `?` en rosa; *Las preguntas del agente, de a una y con opciones, al prompt
   en un mensaje.* El glifo, el color y el texto, propuesta del agente (Q-08 de
   `specs/mods/nzt-questions/spec.md`).
-- **Contexto** dice *con las marcas 20/30/40 de NZT* (RN-hub-capa-nzt).
+- **Contexto** dice *con las marcas 30/40 de NZT* (RN-hub-capa-nzt; 0.4.1, D80) [modify].
 - La portada cuenta `n de 5 instalados`, con un punto por mod.
 - **Arreglo del mockup de 0.1.0:** a 320 px, `se abre al terminar el turno` se salía de la tarjeta
   en el estado *Claude trabajando* (medido el 2026-10-17; la medición de 0.1.0 miraba solo el
@@ -313,7 +313,7 @@ aprieta y Escape cierra.
 ### Q-08 · ¿Cómo se ve la tarjeta de `nzt-skins`?
 - bloquea: la fila de Skins en el mockup y en el código de 0.3.0
 - propuesta del agente: título **Skins** en los dos idiomas, glifo ◐ en el azul de Contexto, y la
-  línea *Temas, banda de uso con las marcas 20/30/40 de NZT y la conversación redibujada.*
+  línea *Temas, banda de uso con las marcas 30/40 de NZT y la conversación redibujada.* [modify]
 - respuesta: "perfecto". · 2026-10-17 · *el título lo supera Q-10*
 
 ### Q-10 · El mod se renombra a `nzt-look`: ¿cómo se llama su tarjeta?

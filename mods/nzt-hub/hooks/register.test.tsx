@@ -64,7 +64,7 @@ test('Aspecto is the last of the generic mods, and without nzt-look it copies it
   await openPane($)
   const ui = await mount($)
   expect(await ui.find({ type: 'Text', text: 'Aspecto' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /marcas 20\/30\/40/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /marcas 30\/40/ })).toBeDefined()
   expect(await ui.find({ key: 'open:nzt-look' })).toBeUndefined()
   expect(await ui.find({ key: 'copy:nzt-look' })).toBeDefined()
 })

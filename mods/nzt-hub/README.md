@@ -1,6 +1,6 @@
 # nzt-hub
 
-> Versión **0.4.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
+> Versión **0.4.1** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
 
 Un panel lateral de Claude Code que **junta los mods de NZT en un lugar**: qué hay, para qué
 es cada uno, qué versión tenés y un botón que lo abre. Los que no tenés instalados también

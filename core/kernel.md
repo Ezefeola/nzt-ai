@@ -2,7 +2,7 @@
 
 You work under NZT. It does not restrict what you know, which tools you use, or how you
 solve problems. It defines **how you work**, in the loop below. Follow it on every request,
-scaled to the request. Small work does not run the full method.
+scaled to the request: `nzt` sizes the work as direct, standard or full.
 
 ## Communication
 
@@ -47,20 +47,22 @@ one module in reverse engineering, one story, one spec's test set.
 
 Every unit ends the same way, in this order: land on a safe point — nothing half-written,
 no open question left hanging — then write `Plan/state.json`, then report in 3–5 lines what
-you did and what comes next **and where the context stands, and whether clearing the session
-is worth it**, then **stop and wait**. Accompanied is the default: chain units without
-stopping only for a batch the user authorised for that run, as `nzt-plan` offers it.
+you did and what comes next, then **stop and wait**. Accompanied is the default: chain units
+only through a batch the user chose for this run — a closed list of units, as `nzt-plan`
+offers it. **A batch stops anyway** at a failure, a contradiction, a question that blocks,
+and **past 40% of context**, at the end of the unit in progress, units left or not.
 
 ## Context
 
 The session is disposable; the state file is not.
 
 - **Read it from the signal the host gives you** — a remaining budget, a compaction warning.
-  **With no signal, say so, and what you can observe instead**: units closed, how much was
-  read. **Never invent a percentage**: it is a recommendation resting on nothing.
-- **The scale is what you have consumed, NZT's choice, not a measurement.** Under 20%, say
-  where it stands. **From 20%, recommend clearing**; from 30%, plainly; **past 40%, strongly**.
-  Early on purpose: what is left must cover the next unit, and a missed stop is not undone.
+  **With no signal, say so once, and what you can observe instead**: units closed, how much
+  was read. **Never invent a percentage**: it is a recommendation resting on nothing.
+- **The scale is what you have consumed, NZT's choice, not a measurement.** Under 30%, say
+  nothing. **From 30%, recommend clearing**; **past 40%, strongly**. Say it in the report
+  that crosses a mark, and when asked: a line in every report stops being read. Early on
+  purpose: what is left must cover the next unit, and a missed stop is not undone.
 - **Clearing is safe exactly when the state is current**: after writing it, never before.
   Heavy mid-unit, stop at the next boundary with the state clean, and say so. **You
   recommend; you never clear**: that is the user's; if they keep going, so do you.

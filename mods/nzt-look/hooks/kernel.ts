@@ -2,12 +2,11 @@ import type { Level, Limit, Reading, Usage } from '../types'
 
 /** The kernel's marks, in percent; each one opens the level named beside it. Not configurable. */
 export const MARKS = [
-  { at: 20, level: 'warn' },
-  { at: 30, level: 'high' },
+  { at: 30, level: 'warn' },
   { at: 40, level: 'critical' },
 ] as const satisfies readonly { at: number; level: Level }[]
 
-const RANK: Record<Level, number> = { low: 0, warn: 1, high: 2, critical: 3 }
+const RANK: Record<Level, number> = { low: 0, warn: 1, critical: 2 }
 
 export const levelOf = (percent: number): Level =>
   MARKS.reduce<Level>((level, mark) => (percent >= mark.at ? mark.level : level), 'low')
@@ -69,9 +68,8 @@ export const modelNameOf = (model: string): string => {
 export const effortOf = (effort: string | number | undefined): string | null => (effort === undefined ? null : String(effort))
 
 const ZONE: Record<Level, string> = {
-  low: 'under 20%, no action',
-  warn: '20%+, recommend clearing',
-  high: '30%+, say it plainly',
+  low: 'under 30%, no action',
+  warn: '30%+, recommend clearing',
   critical: '40%+, recommend strongly',
 }
 

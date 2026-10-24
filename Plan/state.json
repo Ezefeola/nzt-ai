@@ -1,21 +1,26 @@
 {
   "version": 1,
-  "updated": "2026-10-24T23:30:00Z",
-  "goal": "Publicar NZT v2.0.0 desde main tras el merge del PR #7 (trabajo por tramos)",
+  "updated": "2026-10-24T23:59:00Z",
+  "goal": "Menos ceremonia sin bajar la calidad: tamaños, frenos por hitos, contexto 30/40, tramos chicos y producto en primera versión (D78-D82)",
   "phases": [
     {
-      "name": "ship",
+      "name": "build",
       "status": "done",
       "units": [
-        { "id": 353, "do": "Release v2.0.0: subir la versión en main, tag v2.0.0 y workflow de release", "status": "done", "detail": "1bdafb7 bump 2.0.0 en main; tag v2.0.0, workflow release success (gates, 6 binarios, notify-landing), 13 assets; instalación desde el release no probada" }
+        { "id": 354, "do": "D78 tres tamaños en nzt (directo, estándar, completo) y el plan estándar en proposal.md", "status": "done" },
+        { "id": 355, "do": "D79 acompañado por defecto; tanda cerrada de N unidades o hasta un hito (tope 4); toda tanda frena pasado el 40% (primera versión por hitos revertida)", "status": "done" },
+        { "id": 356, "do": "D80 contexto 30/40 dicho al cruzar una marca; nzt-look 0.7.0 y nzt-hub 0.4.1", "status": "done" },
+        { "id": 357, "do": "D81 tramos de una a tres historias y D82 primera versión de product.md", "status": "done" },
+        { "id": 358, "do": "Spec fundacional, README y casos de eval size-standard y checkpoint-chain", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "waiting_on": "Usuario: decir con qué sigue",
+  "waiting_on": "Usuario: revisar la rama ceremonia-por-nivel, probarla en vivo y decidir evals y PR",
   "notes": [
-    "No entró en v2.0.0: mensaje 'contrato de nzt-plan' y versión -dev en binarios locales (anotados para este release, quedan para el próximo)",
-    "Pendiente aparte: fixtures de evals sin glosario y grader de qa-unasked que dice increment"
+    "Rama ceremonia-por-nivel sin commitear: el usuario no pidió commit",
+    "Sin evals por decisión del usuario; casos nuevos escritos y sin correr",
+    "Pendiente aparte: fixtures de evals con el formato de estado viejo y sin glosario"
   ]
 }

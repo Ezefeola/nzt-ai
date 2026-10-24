@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: route-size-standard
+description: >
+  An improvement of one story on a feature that already exists, in a project on NZT. Since
+  D78 `nzt` sizes it as standard: a plan of phases, no slices and no cadence, approved once.
+  Before D78 any work of more than one unit got the full shape of a new product.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-plan (possibly through nzt) and shows one short plan table for the date filter,
+  sized as standard, with no slices and no cadence, offering only what the filter earns,
+  waiting for approval.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Al listado de pedidos por cliente agregale un filtro por rango de fechas.
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Write, Edit]
+graders:
+  - name: plan-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan"'
+  - name: sized-standard
+    type: llm
+    criteria: |
+      The reply is in Spanish and proposes a plan for a date-range filter on the existing
+      order listing by customer.
+      PASS if it is one plan table (or one short list of steps) without slices (tramos) and
+      without a cadence, waiting for the user's approval, and every document it offers says
+      what in this work calls for it.
+      FAIL if it cuts the work into slices or tramos, proposes a cadence, offers a document
+      with no reason tied to this filter (a design system for a screen that already exists,
+      a full product interview), or starts writing code or specs before approval.
