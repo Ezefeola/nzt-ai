@@ -1,6 +1,6 @@
 # nzt-questions
 
-> Versión **0.1.0** · spec en [`specs/mods/nzt-questions/spec.md`](../../specs/mods/nzt-questions/spec.md)
+> Versión **0.2.0** · spec en [`specs/mods/nzt-questions/spec.md`](../../specs/mods/nzt-questions/spec.md)
 
 Un panel lateral de Claude Code para **contestar las preguntas que el agente escribió como
 texto**: de a una, con sus opciones y la recomendada primero, y con un botón que deja todas las
@@ -71,7 +71,10 @@ y `/nzt-questions` otra vez lo cierra. Con el panel enfocado:
 **Revisar y llevar al prompt ›** muestra el mensaje como va a quedar, una línea por pregunta
 contestada (`QT-02: A — main, igual que a mano`, `3: Que quede en el prompt`, la nota como
 ` · nota: …`). **Llevar al prompt ›** lo agrega después de lo que ya tenías escrito, sin
-mandarlo: lo revisás y apretás Enter. Las salteadas no van y siguen pendientes. Si el mensaje no
+mandarlo: lo revisás y apretás Enter. Las salteadas no van, y siguen pendientes hasta que mandes
+un mensaje: **cualquier mensaje que mandes cierra las preguntas que había**, porque es tu
+respuesta, y las que contestaste en la ventana de preguntas del agente no quedan esperando. Lo
+que el agente vuelva a preguntar aparece de nuevo. Si el mensaje no
 se manda, **Llevar otra vez ›** lo vuelve a poner.
 
 ## Idioma

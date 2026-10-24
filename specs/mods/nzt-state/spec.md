@@ -12,10 +12,10 @@
 > **0.7.0 aceptado y cerrado** (usuario 2026-10-20, unidad 298; spec 294, mockup 295, build
 > 296, prueba en vivo 297): Tu turno, AHORA y las tareas a pedido. 0.6.0, aceptado con ella.
 > Cómo llegó hasta acá, en **Historia** al final.
-> **0.8.0 construido, sin aceptar** (unidad 318, 2026-10-21): la fila **Delegar**
+> **0.8.0 aceptado** por el usuario el 2026-10-24 en la prueba en vivo (unidad 318, 2026-10-21): la fila **Delegar**
 > (RN-panel-delegar) y la excepción a RN-panel-solo-lee, marcadas `[add]` y `[modify]` hasta
 > que el usuario lo acepte. Origen: D71 de `specs/nzt-core.md`.
-> **0.9.0 construido, sin aceptar** (unidad 328, 2026-10-23): los tramos de un estado v2
+> **0.9.0 aceptado** por el usuario el 2026-10-24 en la prueba en vivo (unidad 328, 2026-10-23): los tramos de un estado v2
 > (RN-panel-tramos, `[add]`). Origen: D72 y D73 de `specs/nzt-core.md`.
 > **0.9.1 construido, sin aceptar** (unidad 340, 2026-10-24): la lista de tramos plegada y
 > sin repetir el actual (RN-panel-tramos). Origen: D75 de `specs/nzt-core.md`.

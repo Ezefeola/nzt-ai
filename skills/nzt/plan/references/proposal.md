@@ -8,6 +8,10 @@ user to keep or drop. Read it before showing a plan, new or rewritten.
 - **Markdown, never inside a code block**, so the table renders.
 - One row per step, saying **what it produces and why**: the *why* lets the user judge the
   approach, not only the order. Analysis produces the glossary, the spec and its stories.
+- **The *why* fits in one line.** A cell that wraps to five rows is a report, not a plan:
+  the detail goes in the unit's report when it is done.
+- **The plan's own words are fixed**: a slice is a *tramo* in Spanish, as the state panel
+  shows it — never a synonym of your own (*porción*, *etapa*), which reads as a new thing.
 - **Every document goes by its name** — the spec, the user stories, the glossary — with a
   plain explanation beside it. Plain words explain a document; they never rename it, or the
   user approves a "list of use cases" and gets stories.

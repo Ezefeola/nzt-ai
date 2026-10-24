@@ -2480,6 +2480,32 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     `ux/SKILL.md`, `proposal.md`, `slices.md` y el árbol de §7. **Puertas:** build sin avisos,
     `check-references` sin movidas, 164 comprobaciones, lint 0 problemas, marketplace válido.
     **Sin evals** (usuario); ningún caso nombra el prototipo.
+- **D77.** **El plan muestra una tabla por tramo, bajo su título, y la palabra es *tramo*;
+  el panel de preguntas cierra lo contestado fuera de él. D72–D74 quedan aceptadas.** Lo que
+  la forzó: la prueba en `Systems/TodoList` (usuario, 2026-10-24). El plan de construcción
+  salió en una tabla con columna *Porción*: celdas vacías en cada grupo y filas de cinco
+  renglones en la terminal; el agente tradujo *slice* a su manera, y el panel y la spec dicen
+  *tramo*. Y `nzt-questions` dejaba pendientes las preguntas contestadas por
+  `AskUserQuestion` o escritas en el prompt, porque solo cerraba lo llevado desde el panel.
+  - **QT-06 (usuario): *tramo*.** Fijado en `proposal.md` con los sinónimos prohibidos
+    (*porción*, *etapa*). Descartadas *etapa* (se confunde con las fases) y *bloque*.
+  - **QT-07 (usuario, opción A de tres ejemplos): una tabla por tramo**, con `S2 · Nombre`
+    de título y tres columnas; el *por qué* en una línea, el detalle en el reporte de la
+    unidad. Descartadas una tabla con el tramo repetido en cada fila (ancha) y una lista sin
+    tabla (pierde las columnas). En `slices.md` (100 líneas) y `proposal.md`.
+  - **QT-08 (usuario): cualquier mensaje cierra las preguntas.** RN-preg-contestadas-afuera,
+    `nzt-questions` 0.2.0: un mensaje que no es comando cierra lo pendiente, salteadas
+    incluidas; un turno con `AskUserQuestion` no deja sus preguntas en el panel; lo que el
+    agente repite vuelve. Descartado: cerrar solo lo que el mensaje nombra por id (*"dale, la
+    primera"* lo dejaría pendiente).
+  - **Aceptación.** El usuario probó en vivo los puntos 3–13 de la lista de la unidad 336
+    (plan, `nzt-plan` al tocar el estado, retomar tras `/clear`, comunicación, `state check`,
+    tramos, QA por tramo, estado v2, panel 0.9.0 con Delegar, pregunta suelta y edición
+    mínima): *"fueron todas perfectas así que queda bien todo"*. **D72, D73 y D74 quedan
+    aceptadas**, y `nzt-state` 0.8.0 y 0.9.0. **Sin aceptar todavía:** D75–D77, `nzt-state`
+    0.9.1 y `nzt-questions` 0.2.0. Los marcadores `[add]`/`[modify]` de las specs de los mods
+    los barre su cierre, que es una unidad aparte.
+  - **Hecho (2026-10-24).** `nzt-questions` 27 tests (2 nuevos), validate pasa.
 
 ## 13. Revisión contra Temper v3
 

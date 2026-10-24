@@ -85,7 +85,8 @@ The batch stops. Nothing is built on top of what failed.
 
 ## How it is shown
 
-The plan table gets a **Slice** column, and under it the declarations of `proposal.md`, plus:
+**One table per slice**, under a heading with its id and name (`S2 · Walking skeleton`) — never
+a slice column, which leaves blank cells. Under the tables, the declarations of `proposal.md`, plus:
 
 - the cadence, and why;
 - which slices run in a batch and which stops are kept — the autonomy offer, once;
@@ -93,8 +94,7 @@ The plan table gets a **Slice** column, and under it the declarations of `propos
 
 ## Done when
 
-- Every slice can be tried by the user on its own, and says which phases it needs.
+- Every slice can be tried on its own, says which phases it needs, and is its own table.
 - The discovery slice comes first when the scope is not known yet, with re-approval after it.
-- `cadence` is written, and no feature starts building without its scope and rules.
-- Every spec the plan writes is a step that names its stories.
+- `cadence` is written; no feature is built without its scope, rules and a step for its stories.
 - No verify unit sits between two build units of the same slice.

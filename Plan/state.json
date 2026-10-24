@@ -1,39 +1,38 @@
 {
   "version": 1,
-  "updated": "2026-10-24T19:00:00Z",
-  "goal": "Prototipo usable con reglas y destino decidido al cerrar; design system con marca y voz, ofrecido cuando hay UX",
+  "updated": "2026-10-24T20:00:00Z",
+  "goal": "Una tabla por tramo y la palabra tramo en el plan; nzt-questions cierra lo contestado fuera del panel; aceptación de D72-D74",
   "phases": [
     {
       "name": "analysis",
       "status": "done",
       "units": [
-        { "id": 342, "do": "D76 en specs/nzt-core.md: destino del prototipo, prototipo usable con reglas, design system ofrecido con marca y voz", "status": "done" }
+        { "id": 347, "do": "D77 en specs/nzt-core.md: QT-06 tramo, QT-07 tabla por tramo, QT-08 cerrar preguntas al mandar un mensaje, aceptación D72-D74", "status": "done" }
       ]
     },
     {
       "name": "build",
       "status": "done",
       "units": [
-        { "id": 343, "do": "ux/references/mockup.md: prototipo usable con las reglas, cabecera con sus RN, destino al cerrar", "status": "done" },
-        { "id": 344, "do": "ux/references/system.md: sección de marca (logo, paleta por roles, tipografía) y voz de los textos", "status": "done" },
-        { "id": 345, "do": "plan/references/proposal.md y ux/SKILL.md: design system ofrecido cuando el plan elige UX; dónde cae el prototipo", "status": "done" }
+        { "id": 348, "do": "slices.md y proposal.md: una tabla por tramo bajo su título, el por qué en una línea, la palabra tramo fijada", "status": "done" },
+        { "id": 349, "do": "nzt-questions 0.2.0: RN-preg-contestadas-afuera, prompt.submit y AskUserQuestion cierran las preguntas; spec y README", "status": "done" }
       ]
     },
     {
       "name": "verify",
       "status": "done",
       "units": [
-        { "id": 346, "do": "Puertas: build, check-references, checks del instalador, lint; sin evals (usuario 2026-10-24)", "status": "done" }
+        { "id": 350, "do": "Puertas: build, check-references, 164 checks, lint, validate, nzt-questions 27 tests, nzt-state 55; sin evals", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [342, 343, 344, 345, 346] },
+  "autonomy": { "units": [347, 348, 349, 350] },
   "waiting_on": null,
   "notes": [
-    "Usuario 2026-10-24: destino del prototipo al cerrar (borrar o mockup mantenido); UX opcional, design system ofrecido; prototipo usable con reglas, liviano",
-    "D74 (279991b) y D75 (c52d529) pusheadas en trabajo-por-tramos; el usuario prueba en Systems/TodoList",
+    "Usuario 2026-10-24: puntos 3-13 de la prueba en vivo perfectos: D72-D74 y nzt-state 0.8.0/0.9.0 aceptados; sin aceptar D75-D77, nzt-state 0.9.1, nzt-questions 0.2.0",
+    "Pendiente: cierre de los mods (barrer [add]/[modify]) tras su aceptación; merge a main y publicar versión del CLI",
     "Pendiente aparte: fixtures sin glosario, mensaje 'contrato del kernel' y versión -dev en binarios locales del CLI"
   ]
 }

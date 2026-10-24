@@ -39,6 +39,9 @@ let currentKey: string | null = null
 let isFocusInIndex = false
 // The element the answers start at, as the last drawing laid them out.
 let firstAnswerKey: string | null = null
+// Whether the agent asked through AskUserQuestion in the turn under way: the person answered
+// there, so the questions its text repeats are not left waiting in the pane.
+let isAskedByTool = false
 let t: Texts = TEXTS.es
 
 const reasonOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
@@ -189,13 +192,32 @@ export const register: Register = (on, options) => {
 
   on('turn.complete', async ($, e, next) => {
     const ended = await next(e)
+    const wasAskedByTool = isAskedByTool
+    isAskedByTool = false
     // A subagent's questions are not for the person, and a cut turn did not finish asking.
-    if (e.agentId === undefined && !e.isAborted) {
+    if (e.agentId === undefined && !e.isAborted && !wasAskedByTool) {
       await arrive($, e.answer).catch(error =>
         update($, notice, (): Notice => ({ kind: 'readFailed', message: reasonOf(error) })).catch(() => undefined),
       )
     }
     return ended
+  })
+
+  on('tool.call', async ($, e, next) => {
+    if (e.tool === 'AskUserQuestion') isAskedByTool = true
+    return next(e)
+  })
+
+  // A message the person sends answers what was asked, typed or taken from the pane; what
+  // the agent asks again comes back with its next answer.
+  on('prompt.submit', async ($, e, next) => {
+    const entered = await next(e)
+    if (e.command === undefined) {
+      await save($, () => []).catch(() => undefined)
+      await update($, current, () => null).catch(() => undefined)
+      await update($, view, () => 'question').catch(() => undefined)
+    }
+    return entered
   })
 
   on('command.run', { command: 'nzt-questions' }, async $ => {

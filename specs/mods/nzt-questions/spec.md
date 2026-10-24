@@ -6,6 +6,8 @@
 > `specs/mods/nzt-questions/mockup.html` (unidad 203) y diseño técnico (unidad 205) · Depende de: `specs/nzt-mods.md` (reglas de todo mod
 > y catálogo de la sección 5). D64 de `specs/nzt-core.md` dice cómo pregunta el agente de NZT;
 > el panel reconoce esa forma como un caso más, sin depender de ella.
+> **0.2.0 construido, sin aceptar** (2026-10-24): las preguntas contestadas fuera del panel se
+> cierran (RN-preg-contestadas-afuera, `[add]`). Origen: D77 de `specs/nzt-core.md`.
 > El usuario lo pidió el 2026-10-17: *"poder ver las preguntas que tiene el agente y
 > responderlas … de forma organizada como con la tool de questions que tiene pero el agente no
 > siempre la usa"*.
@@ -91,6 +93,14 @@ Si el prompt ya tiene texto escrito, el mensaje se agrega al final y el borrador
 ### RN-preg-enviadas · origin: propuesta del agente, confirmada por el usuario (Q-06)
 Las preguntas llevadas al prompt se marcan como enviadas y dejan de contar como pendientes. Si el
 mensaje no se manda, siguen ahí como enviadas y se pueden llevar otra vez.
+
+### RN-preg-contestadas-afuera · [add] · origin: usuario 2026-10-24 (QT-08: "al mandar cualquier mensaje"), D77
+Cuando la persona manda un mensaje que no es un comando —escrito o llevado desde el panel—, las
+preguntas que el panel tenía se cierran y dejan de contar como pendientes, salteadas incluidas:
+ese mensaje es la respuesta. Las preguntas de un turno en el que el agente usó
+`AskUserQuestion` no entran al panel: se contestaron ahí. Si el agente vuelve a preguntar algo
+en una respuesta posterior, aparece de nuevo. Se encontró en la prueba en vivo de
+`Systems/TodoList`: lo contestado por la tool o por el prompt seguía pendiente en el panel.
 
 ### RN-preg-apertura · origin: usuario 2026-10-17 (Q-05)
 El panel se abre con `/nzt-questions`, y `/nzt-questions` otra vez lo cierra. Además se abre solo

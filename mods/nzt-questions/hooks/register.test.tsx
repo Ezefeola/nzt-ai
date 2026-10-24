@@ -33,6 +33,8 @@ const fakeSession = (on: On, opts: { draft?: string; isPlaced?: boolean; isFille
     return { isFilled: opts.isFilled !== false }
   })
   on('turn.complete', async () => ({ text: '' }) as never)
+  on('tool.call', async () => ({ result: {} }) as never)
+  on('prompt.submit', async (_, e) => ({ text: e.text }) as never)
   return session
 }
 
@@ -75,6 +77,29 @@ test("a subagent's answer and a cut turn bring no questions", async ($, on) => {
   expect(session.opens).toBe(0)
   const ui = await mount($)
   expect(await ui.find({ type: 'Text', text: 'No hay preguntas pendientes.' })).toBeDefined()
+})
+
+test('a message the person sends answers what was asked, and a slash command does not', async ($, on) => {
+  fakeSession(on)
+  await turnEnds($, ANSWER)
+  await $.prompt.submit({ text: '/nzt-questions', command: 'nzt-questions' } as never)
+  const ui = await mount($)
+  expect(await ui.find({ type: 'Text', text: '¿Quién hace el commit?' })).toBeDefined()
+  await $.prompt.submit({ text: 'la primera, dale' } as never)
+  expect(await ui.find({ type: 'Text', text: 'No hay preguntas pendientes.' })).toBeDefined()
+  // Asked again, they come back.
+  await turnEnds($, ANSWER)
+  expect(await ui.find({ type: 'Text', text: '¿Quién hace el commit?' })).toBeDefined()
+})
+
+test('the questions of a turn that asked through AskUserQuestion are not left waiting', async ($, on) => {
+  const session = fakeSession(on)
+  await $.tool.call({ tool: 'AskUserQuestion', questions: [] } as never)
+  await turnEnds($, ANSWER)
+  expect(session.opens).toBe(0)
+  // The next turn, with no tool, asks as usual.
+  await turnEnds($, ANSWER)
+  expect(session.opens).toBe(1)
 })
 
 test('with no room beside the conversation, it says once that there are questions to answer', async ($, on) => {
