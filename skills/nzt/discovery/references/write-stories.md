@@ -7,6 +7,7 @@
 - Coverage per area, and QA
 - One story is one story
 - No priorities
+- When a story is written
 - Changing a story
 - Done when
 
@@ -105,6 +106,15 @@ backend ✓ · frontend ✓ · qa —
 
 No `P1` / `P2` / `P3`, and no severity column. The work is already ordered by dependency
 and by the agreed plan; a second ranking contradicts the first one the day they disagree.
+**Delivery 1** in `product.md` is a scope line, not a priority: it says which stories reach
+the user first, not which matter more.
+
+## When a story is written
+
+When the plan's cadence says (`nzt-plan`): `delivery` details the stories of the current
+delivery before its first build slice, `upfront` all of them, `just-in-time` each one in
+its own slice. Until then the story is one line in the spec's index. **Its rules are
+already in the spec either way**: a story never waits for a rule.
 
 ## Changing a story
 

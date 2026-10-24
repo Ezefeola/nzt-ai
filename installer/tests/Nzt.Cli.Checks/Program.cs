@@ -67,6 +67,9 @@ public static class Program
         StateCheckCatchesEveryBrokenInvariant();
         StateCheckAcceptsEachDelegationModeAndItsAbsence();
         StateCheckReportsBrokenJson();
+        StateCheckAcceptsASlicedState();
+        StateCheckCatchesEveryBrokenSliceInvariant();
+        StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
 
         Console.WriteLine();
@@ -887,6 +890,81 @@ public static class Program
         var report = CheckState(home, "{ \"phases\": [ }");
         Check("un JSON roto es un problema con su línea",
             report.Found && report.Problems.Count == 1 && report.Problems[0].Contains("no es JSON válido, línea 1"));
+    });
+
+    private static void StateCheckAcceptsASlicedState() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "version": 2, "approved": true, "cadence": "delivery",
+              "slices": [
+                { "id": "S1", "name": "Análisis de la entrega 1", "status": "done", "phases": [
+                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] }] },
+                { "id": "S2", "name": "F-003 Cupones", "status": "doing", "phases": [
+                  { "name": "build", "status": "doing", "units": [
+                    { "id": 2, "status": "done" }, { "id": 3, "status": "doing" }] },
+                  { "name": "verify", "status": "todo", "units": [{ "id": 4, "status": "todo" }] }] },
+                { "id": "S3", "name": "Release", "status": "todo", "phases": [
+                  { "name": "ship", "status": "todo", "units": [] }] }],
+              "autonomy": { "units": [3, 4] } }
+            """);
+        Check("un estado por tramos que cumple el contrato no tiene problemas", report.Found && report.Ok);
+        foreach (var cadence in new[] { "upfront", "just-in-time" })
+            Check($"cadence {cadence} cumple", CheckState(home, $$"""
+                { "version": 2, "approved": true, "cadence": "{{cadence}}", "slices": [] }
+                """).Ok);
+        Check("sin cadence el estado por tramos cumple",
+            CheckState(home, """{ "version": 2, "approved": true, "slices": [] }""").Ok);
+    });
+
+    private static void StateCheckCatchesEveryBrokenSliceInvariant() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "version": 2, "approved": true, "cadence": "sprint",
+              "slices": [
+                { "id": "S1", "status": "done", "phases": [
+                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                  { "name": "build", "status": "todo", "units": [{ "id": 2, "status": "todo" }] }] },
+                { "id": "S2", "status": "doing", "phases": [
+                  { "name": "build", "status": "doing", "units": [{ "id": 3, "status": "doing" }] },
+                  { "name": "verify", "status": "doing", "units": [{ "id": 3, "status": "todo" }] },
+                  { "name": "build", "status": "todo", "units": [] }] },
+                { "id": "S2", "status": "doing", "phases": [] },
+                { "id": "S4", "status": "todo", "phases": [
+                  { "name": "build", "status": "doing", "units": [{ "id": 5, "status": "doing" }] }] },
+                { "status": "todo" }] }
+            """);
+
+        bool Says(string text) => report.Problems.Any(p => p.Contains(text));
+        Check("una cadencia que no existe", Says("cadence es 'sprint'"));
+        Check("un tramo done con una fase pendiente", Says("el tramo S1 está done con su fase 'build' en 'todo'"));
+        Check("dos fases en doing en un tramo", Says("hay 2 fases en doing en el tramo S2"));
+        Check("una fase repetida en un tramo", Says("la fase 'build' se repite en el tramo S2"));
+        Check("un id de tramo repetido", Says("el tramo S2 se repite"));
+        Check("más de un tramo en doing", Says("hay 2 tramos en doing"));
+        Check("una fase en doing fuera del tramo en doing", Says("la fase 'build' del tramo S4 está en doing, pero su tramo está en 'todo'"));
+        Check("un id de unidad repetido entre fases", Says("el id 3 se repite"));
+        Check("más de una unidad en doing entre tramos", Says("hay 2 unidades en doing"));
+        Check("un tramo sin id", Says("el tramo #5 no tiene id de texto"));
+        Check("un tramo sin fases", Says("el tramo #5 no tiene phases"));
+    });
+
+    private static void StateCheckRejectsAMixedOrUnversionedSlicedState() => InTemp(home =>
+    {
+        Check("phases y slices juntos no cumple",
+            CheckState(home, """{ "version": 2, "approved": true, "phases": [], "slices": [] }""")
+                .Problems.Any(p => p.Contains("phases y slices juntos")));
+        Check("slices sin version 2 no cumple",
+            CheckState(home, """{ "version": 1, "approved": true, "slices": [] }""")
+                .Problems.Any(p => p.Contains("slices pide version 2, y version es '1'")));
+        Check("version 2 sin slices no cumple",
+            CheckState(home, """{ "version": 2, "approved": true, "phases": [] }""")
+                .Problems.Any(p => p.Contains("version 2 pide slices")));
+        Check("un v1 con una fase repetida se sigue leyendo como antes",
+            CheckState(home, """
+                { "version": 1, "approved": true, "phases": [
+                  { "name": "build", "status": "done", "units": [] },
+                  { "name": "build", "status": "todo", "units": [] }] }
+                """).Ok);
     });
 
     private static void StateCheckAcceptsTheRepoState()

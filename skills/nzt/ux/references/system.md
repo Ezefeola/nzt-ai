@@ -3,6 +3,7 @@
 ## Contents
 - The document names; the code defines
 - Visual direction
+- Brand and voice
 - Shared components
 - Changing it
 - Done when
@@ -68,6 +69,24 @@ as a decision.
 6. Alternatives vary **one meaningful dimension** — density, typographic voice, colour
    temperature — not three versions of the same thing.
 
+## Brand and voice
+
+The direction, once agreed, is written in `design-system.md` as the product's brand, so every
+screen, mockup and prototype reads it from one place instead of inventing it again.
+
+- **Logo**: the path to its file in the project, and where it may and may not appear. No
+  logo is written as *none yet*, never drawn as a placeholder someone mistakes for one.
+- **Typography**: the families and the role each one plays.
+- **Palette by role** — primary action, surface, text, danger — each with its value. **Before
+  any theme exists in code, the values live here marked `provisional`**; once the theme is
+  written, it holds them and this section keeps only the roles, as *The document names*
+  says.
+- **Voice of the texts**: how the product talks to the person — formal or not, how it says an
+  error, how it invites an empty state to fill — with one example per case. A text a story
+  fixes is copied from the story; the voice is what lets the rest be written without asking.
+- A change to any of these is a change to the system (*Changing it*), and the screens,
+  mockups and kept prototypes that show it are brought in step in the same unit.
+
 ## Shared components
 
 `Docs/UX/ui-components.md` is coarse-grained and short. A component earns an entry only when:
@@ -103,7 +122,10 @@ Rehearse it: could someone design the next screen without inventing a convention
 without asking you which component to reuse?
 
 - Every role says when it is used **and its limit**.
-- No value that lives in the theme is copied here.
+- No value that lives in the theme is copied here; before a theme exists, values are marked
+  `provisional`.
+- Brand and voice are written once a direction is agreed: logo, typography, palette by
+  role, and the voice with its examples.
 - Accessibility says how it is met, and the verifiable requirement is in the product's NFRs.
 - Every component in the inventory has at least two users, or the decision it carries.
 - A visual direction, if it was needed, has its references, its contrast checked, and one

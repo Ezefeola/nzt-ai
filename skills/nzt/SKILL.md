@@ -56,16 +56,17 @@ changes what gets built:
 - **UX** — a person will look at a screen that does not exist yet.
 - **Build** — always, if code changes.
 - **Verify** — always, if behavior changes. **It is QA, and it runs after build has
-  finished the increment** — the stretch the plan delivers together, or the whole product
-  if there is only one. Not story by story, and never interleaved with build unless the
-  user asked for it.
+  finished the slice** — what the plan cut to walk end to end, or the whole work if it is
+  not cut. Never interleaved with build inside a slice unless the user asked for it.
 - **Ship** — the user asked for a release, a pipeline or a deploy.
 
 Be able to say in one line why you skipped each phase you skipped. A one-line change needs
 build and verify, nothing else. Skipping is normal; skipping silently is not.
 
 The phases you name become the run's `phases` in `Plan/state.json`, in this order; a
-skipped phase is not listed.
+skipped phase is not listed. **A new product, a feature of several stories, or work the
+user wants delivered early is cut into slices**, each with the phases it needs, starting
+with discovery: `nzt-plan` cuts them. Say so in your one line.
 
 ## 5. Hand off
 

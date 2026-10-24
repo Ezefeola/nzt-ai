@@ -96,9 +96,10 @@ needs and the glossary lacks comes back here as an entry, never as a name coined
 
 ## Done when
 
-You could write the artifact this feeds — the product definition, or the feature with
-**all** its stories — without asking anything else. If you cannot, the gaps are written
-down as open questions. They are never invented.
+You could write the artifact this feeds — the product definition with its delivery 1, or
+the feature's scope, all its rules, its story index and the stories the plan's cadence
+details now — without asking anything else. If you cannot, the gaps are written down as
+open questions. They are never invented.
 
 ## Closing checklist
 

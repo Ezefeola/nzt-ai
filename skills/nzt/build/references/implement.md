@@ -58,7 +58,7 @@ from.**
 - **What those tests cannot reach is not yours to prove.** A rule that only shows through
   the API, a row that only a real engine confirms, a screen nobody drove: report it as
   *not covered until QA* and keep building. **Never write a test plan, a manual script or
-  test data to get evidence for it** — that is `nzt-verify`, and it runs once the increment
+  test data to get evidence for it** — that is `nzt-verify`, and it runs once the slice
   is built, against the whole of it.
 - `qa` is not yours, and neither is `[x]`: `nzt-verify` marks `qa`, and only the user
   accepts.

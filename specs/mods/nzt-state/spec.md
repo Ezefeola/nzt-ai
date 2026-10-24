@@ -12,9 +12,9 @@
 > **0.7.0 aceptado y cerrado** (usuario 2026-10-20, unidad 298; spec 294, mockup 295, build
 > 296, prueba en vivo 297): Tu turno, AHORA y las tareas a pedido. 0.6.0, aceptado con ella.
 > Cómo llegó hasta acá, en **Historia** al final.
-> **0.8.0 construido, sin aceptar** (unidad 318, 2026-10-21): la fila **Delegar**
-> (RN-panel-delegar) y la excepción a RN-panel-solo-lee, marcadas `[add]` y `[modify]` hasta
-> que el usuario lo acepte. Origen: D71 de `specs/nzt-core.md`.
+> **0.8.0 a 0.9.1 aceptados y cerrados** (usuario 2026-10-24, tras la prueba en vivo en
+> `Systems/TodoList`): la fila **Delegar** y su excepción a RN-panel-solo-lee (0.8.0, D71),
+> los tramos de un estado v2 (0.9.0, D72 y D73) y su lista plegada (0.9.1, D75).
 
 ## Qué resuelve
 
@@ -67,13 +67,13 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 
 ## Reglas
 
-### RN-panel-solo-lee · origin: D63; [modify] D71, usuario 2026-10-21
+### RN-panel-solo-lee · origin: D63; D71, usuario 2026-10-21
 El panel no escribe ningún archivo del proyecto. Lo único que guarda es su propio estado de
 sesión: qué grupos y secciones están abiertos, y si el detalle de la unidad en curso está
-desplegado. **[modify] Excepción:** la clave `delegation` de `Plan/state.json`, cuando la
+desplegado. **Excepción:** la clave `delegation` de `Plan/state.json`, cuando la
 persona aprieta Delegar (RN-panel-delegar).
 
-### RN-panel-delegar · [add] · origin: usuario 2026-10-21 (unidad 318 del plan); D71
+### RN-panel-delegar · origin: usuario 2026-10-21 (unidad 318 del plan); D71
 Debajo de **Plan** y **Modo**, en su misma columna, la fila **Delegar** ("Delegate") muestra
 cómo delega lecturas el agente: `auto` *· explora sin preguntar*, `ask` *· pregunta antes* u
 `off` *· no delega*. Sin la clave en el estado muestra `ask` *(por defecto)*; con un valor que
@@ -83,7 +83,7 @@ lo escribe en el archivo:
 - relee el archivo en el momento del clic, no lo que vio el panel, para no pisar lo que el
   agente escribió desde la última lectura;
 - cambia esa clave y deja el resto **byte por byte**; una clave nueva va al lado de
-  `approved`, como la escribe el schema del kernel (`"approved": true, "delegation": "off",`);
+  `approved`, como la escribe el schema de `nzt-plan` (`"approved": true, "delegation": "off",`);
 - un archivo que no es un objeto JSON no se toca; si la escritura falla, el panel dice
   *No se pudo cambiar el modo:* y el motivo.
 
@@ -113,6 +113,21 @@ línea de fases lo muestra igual, tal como viene (RN-panel-fases-tal-cual), y de
 no son fases y cuáles son: *⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las
 fases son Análisis, Arquitectura, UX, Build, Verificación, Release*. Se encontró con el estado de
 este repo: el agente había escrito cada cambio como una fase.
+
+### RN-panel-tramos · origin: D72 y D73 de `specs/nzt-core.md` (usuario 2026-10-23: "sin fases repetidas en el mod")
+Si el estado trae `slices` (v2), el panel muestra **el tramo en curso como si fuera el plan**:
+la línea de fases, el avance, AHORA y las tareas son las de ese tramo, y ninguna fase aparece
+dos veces. El tramo en curso es el `doing`; sin ninguno, el primero `todo`; sin ninguno, el
+último. Arriba de la línea de fases, la fila **Tramo** dice *2 de 3 · F-003 Cupones*, y debajo,
+plegada, **▸ Tramos · 3** (D75, QT-04 del usuario 2026-10-24: "si hay muchos tramos se vuelve
+ilegible"): un clic, o Enter con el foco, la despliega con cada tramo en un renglón,
+`S1 · Análisis de la entrega 1`, con la marca de RN-panel-lista-marcas; el actual en negrita,
+los demás atenuados. Empieza plegada, y el panel recuerda si se abrió como las otras
+secciones. Con un solo tramo no hay sección: la fila Tramo ya lo dice todo. Si al tramo no le queda
+nada pendiente después de lo que muestra AHORA y viene otro, AHORA cierra con *▷ Sigue el
+tramo S3 · Release*. *Plan completo* recién cuando no queda tramo por hacer. La tanda cuenta
+las unidades de todos los tramos (RN-panel-tanda-ids). Con más de un tramo `doing`, avisa
+que el kernel permite uno solo. Un estado sin `slices` se dibuja exactamente como antes.
 
 ### RN-panel-unidad-en-su-fase · origin: D62 (unidad 76)Las unidades se leen dentro de su fase (`phases[].units`), y la lista las muestra bajo el
 nombre de su fase, en el orden del plan: las fases en el orden del archivo y, dentro de cada
@@ -465,8 +480,11 @@ arriba y mezclada con gris abajo) y Tu turno y la unidad en curso dibujados en s
 estado leído de la carpeta en que empezó la sesión; el modo de delegación (por defecto,
 válido, inválido), el ciclo, la escritura en su lugar o al lado de `approved` sin tocar otro
 byte, el archivo que no es objeto, la fila con el clic que escribe y el error de escritura
-(0.8.0). 49 tests. **Sin probar en vivo** la fila Delegar, ni el chequeo de tipos (`tsc` no
-está en esta máquina). **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
+(0.8.0); el estado por tramos: el tramo en curso con sus fases y unidades, la tanda sobre
+todos los tramos, la fila Tramo con cada tramo, *Sigue el tramo* y el plan completo solo tras
+el último (0.9.0); la lista de tramos plegada, que se abre y se cierra, y sin lista con un solo
+tramo (0.9.1). 55 tests en la unidad 340. **Probados en vivo** por el usuario la fila
+Delegar y los tramos (2026-10-24). **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
 pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueba en vivo
 ([testing/2026-10-20-en-vivo.md](testing/2026-10-20-en-vivo.md), V-03).
 
@@ -474,6 +492,15 @@ pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueb
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. Empieza en 0.7.0: lo anterior está
 en el encabezado y en **Hallazgos resueltos**.
+
+### 2026-10-24 · Delegar y los tramos — 0.8.0 a 0.9.1
+Type:     add
+Change:   la fila Delegar muestra y cambia el modo de delegación del estado; un estado v2 se dibuja por su tramo en curso, con la fila Tramo y la lista de tramos plegada.
+Reason:   D71 (el usuario quería ver y cambiar la delegación desde el panel), D72–D73 (NZT trabaja por tramos) y D75 ("si hay muchos tramos se vuelve ilegible", y el nombre del tramo salía dos veces).
+Before:   el panel no escribía nada y solo entendía un estado con `phases`.
+Now:      escribe solo la clave `delegation`; con `slices`, fases, avance, AHORA y tareas son las del tramo en curso, y la lista de tramos se abre con un clic.
+Impact:   RN-panel-delegar y RN-panel-tramos nuevas · RN-panel-solo-lee con su excepción
+Decision: QT-04 del usuario (una línea y la lista plegada). Aceptado tras la prueba en vivo, puntos 3–13.
 
 ### 2026-10-20 · Tu turno, AHORA y las tareas a pedido — 0.7.0
 Type:     modify

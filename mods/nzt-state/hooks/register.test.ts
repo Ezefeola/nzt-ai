@@ -441,6 +441,99 @@ test('with no unit in progress, the first pending of the phase in progress is th
   await ui.unmount()
 })
 
+const SLICED = {
+  version: 2,
+  goal: 'Cupones · entrega 1',
+  cadence: 'delivery',
+  slices: [
+    { id: 'S1', name: 'Análisis de la entrega 1', status: 'done', phases: [
+      { name: 'analysis', status: 'done', units: [{ id: 1, do: 'Spec F-003', status: 'done' }] },
+    ] },
+    { id: 'S2', name: 'F-003 Cupones', status: 'doing', phases: [
+      { name: 'build', status: 'done', units: [{ id: 2, do: 'Construir US-001', status: 'done' }] },
+      { name: 'verify', status: 'doing', units: [{ id: 3, do: 'QA de US-001', status: 'doing' }] },
+    ] },
+    { id: 'S3', name: 'Release', status: 'todo', phases: [
+      { name: 'ship', status: 'todo', units: [{ id: 4, do: 'Publicar', status: 'todo' }] },
+    ] },
+  ],
+  approved: true,
+  autonomy: { units: [3, 4] },
+}
+
+describe('parseState with slices', () => {
+  test('phases and units are the current slice, and the batch sees every unit', async () => {
+    const state = parseState(JSON.stringify(SLICED))
+    if (state.kind !== 'ok') throw new Error(state.kind)
+    expect(state.slices?.map(s => `${s.id}:${s.status}`)).toEqual(['S1:done', 'S2:doing', 'S3:todo'])
+    expect(state.current).toBe(1)
+    expect(state.phases?.map(p => p.name)).toEqual(['build', 'verify'])
+    expect(state.units.map(u => u.id)).toEqual([2, 3])
+    expect(state.planUnits.map(u => u.id)).toEqual([1, 2, 3, 4])
+  })
+
+  test('with no slice in progress the first to do is current; with neither, the last', async () => {
+    const waiting = parseState(JSON.stringify({ ...SLICED, slices: SLICED.slices.map(s => ({ ...s, status: s.id === 'S1' ? 'done' : 'todo' })) }))
+    if (waiting.kind !== 'ok') throw new Error(waiting.kind)
+    expect(waiting.current).toBe(1)
+    const finished = parseState(JSON.stringify({ ...SLICED, slices: SLICED.slices.map(s => ({ ...s, status: 'done' })) }))
+    if (finished.kind !== 'ok') throw new Error(finished.kind)
+    expect(finished.current).toBe(2)
+  })
+
+  test('a plan that is not cut has no slices, and its plan units are its units', async () => {
+    const state = parseState(STATE)
+    if (state.kind !== 'ok') throw new Error(state.kind)
+    expect(state.slices).toBe(null)
+    expect(state.planUnits).toEqual(state.units)
+  })
+})
+
+test('a plan cut into slices shows which slice runs, every slice folded below, and its own phases', async ($, on) => {
+  const ui = await mountPane($, on, SLICED)
+  expect(await ui.find({ type: 'Text', text: 'Tramo' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '2 de 3 · F-003 Cupones' })).toBeDefined()
+  // The list starts folded: the current slice is named once, in the Tramo row.
+  expect(await ui.find({ type: 'Text', text: /^▸ Tramos · 3/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'S2 · F-003 Cupones' })).toBeUndefined()
+  await ui.press({ key: 'toggle-slices' })
+  for (const row of ['S1 · Análisis de la entrega 1', 'S2 · F-003 Cupones', 'S3 · Release']) {
+    expect(await ui.find({ type: 'Text', text: row })).toBeDefined()
+  }
+  await ui.press({ key: 'toggle-slices' })
+  // The timeline is the current slice's: no phase of another slice, none twice.
+  expect(await ui.find({ type: 'Text', text: /Verificación/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^[○✓] Release/ })).toBeUndefined()
+  // The batch spans slices: unit 4 lives in S3 and is not reported as missing.
+  expect(await ui.find({ type: 'Text', text: /sin unidad/ })).toBeUndefined()
+  // Nothing is left in S2 after the unit in progress: what follows is the next slice.
+  expect(await ui.find({ type: 'Text', text: /Sigue el tramo S3 · Release/ })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a plan of one slice names it in the Tramo row and has no list to unfold', async ($, on) => {
+  const ui = await mountPane($, on, { ...SLICED, slices: [SLICED.slices[0]] })
+  expect(await ui.find({ type: 'Text', text: '1 de 1 · Análisis de la entrega 1' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /Tramos ·/ })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'S1 · Análisis de la entrega 1' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('with slices, AHORA says the plan is complete only after the last slice', async ($, on) => {
+  const ui = await mountPane($, on, {
+    ...SLICED,
+    slices: [
+      { ...SLICED.slices[0], status: 'done' },
+      { id: 'S2', name: 'F-003 Cupones', status: 'done', phases: [
+        { name: 'verify', status: 'done', units: [{ id: 3, do: 'QA', status: 'done' }] },
+      ] },
+    ],
+    autonomy: {},
+  })
+  expect(await ui.find({ type: 'Text', text: /Plan completo/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('with the plan complete, AHORA says so', async ($, on) => {
   const ui = await mountPane($, on, {
     goal: 'Done',

@@ -61,7 +61,7 @@ table.
 An axis is a tradeoff, so it is **asked in every mode**, with a recommendation — never decided
 alone, and never asked before the technology that decides which router's axes apply.
 
-- **Asked the way the kernel's *Questions* says**: one question per axis with its `QT-NN`, its
+- **Asked the way the kernel's *Communication* says**: one question per axis with its `QT-NN`, its
   options the values of the table, each value's cost as its consequence.
 - **Group them into one round**, ordered by what depends on them: the technology first, then the
   generic axes, then the router's.
@@ -82,7 +82,7 @@ table offers — and that is the user's decision, as `stack.md` says.
 - [ ] Every value was copied from a build table, spelled exactly as there.
 - [ ] The generic axes were answered, plus the router's own axes when the technology has one.
 - [ ] Each axis was asked with its options, its cost and a recommendation, as the kernel's
-      *Questions* says, in one round.
+      *Communication* says, in one round.
 - [ ] Every answer has its `QT-NN` and its row; a concept outside the tables is an open gap,
       not an invented value.
 - [ ] An existing component's axes came from its code, and only what the code cannot settle

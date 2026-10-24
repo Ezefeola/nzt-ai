@@ -1,28 +1,30 @@
 {
   "version": 1,
-  "updated": "2026-10-22T01:00:00Z",
-  "goal": "Publicar v1.6.0 desde main (merge de analisis-externo): nzt-ai en el PATH, state check, delegación y nzt-explorer",
+  "updated": "2026-10-24T21:00:00Z",
+  "goal": "Cerrar nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 tras la aceptación del usuario, y dejar la rama lista para el PR",
   "phases": [
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        { "id": 351, "do": "Cierre de los mods: barrer [add]/[modify], encabezados, Historia, catálogo de nzt-mods.md; aceptación de D75-D77 en D77", "status": "done" }
+      ]
+    },
     {
       "name": "ship",
       "status": "done",
       "units": [
-        {
-          "id": 319,
-          "do": "Bump a 1.6.0 (build.sh/.ps1, installer/README, csproj), puertas en local, tag v1.6.0 y push",
-          "status": "done",
-          "detail": "a8da6c2 en main; build, 145 checks y verify OK en local; workflow release success, 13 assets; instalación real con la línea no probada por mí"
-        }
+        { "id": 352, "do": "Commit y push de trabajo-por-tramos; el usuario arma el PR a main", "status": "done" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": {},
-  "waiting_on": null,
+  "autonomy": { "units": [351, 352] },
+  "waiting_on": "el usuario arma el PR de trabajo-por-tramos a main y avisa para hacer el release",
   "notes": [
-    "evals/README.md sigue diciendo 26 casos (hay 31); la 308 se descartó en 2026-10-21",
-    "Usuario 2026-10-19: no mencionar el proyecto de referencia en nada del repo; código desde cero. Contexto cero en los mods",
-    "Paleta NZT del usuario: #fff069 contraste, #07100f fondo, #244146 secundario/gradiente, #72f4cd botones e íconos, #f4faf7 texto; manda sobre presentation/styles.css."
+    "Usuario 2026-10-24: aceptadas D72-D77, nzt-state 0.8.0-0.9.1 y nzt-questions 0.2.0 (estos dos sin prueba en vivo)",
+    "Release después del merge: subir <Version> del CLI, tag vX.Y.Z; sumar mensaje 'contrato de nzt-plan' y versión -dev en binarios locales",
+    "Pendiente aparte: fixtures de evals sin glosario y grader de qa-unasked que dice increment"
   ]
 }

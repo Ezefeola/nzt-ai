@@ -18,6 +18,9 @@ export type Unit = {
 
 export type Phase = { name: string; status: Status; rawStatus?: string }
 
+/** A slice of a plan cut into slices (D73 of specs/nzt-core.md), without its phases. */
+export type Slice = { id: string; name: string; status: Status; rawStatus?: string }
+
 /** How the agent hands readings to a subagent (D71 of specs/nzt-core.md). */
 export type DelegationMode = 'auto' | 'ask' | 'off'
 
@@ -33,6 +36,14 @@ export type Snapshot =
   | {
       kind: 'ok'
       goal: string
+      /**
+       * The plan's slices in order, null in a plan that is not cut. With slices, `phases` and
+       * `units` are the current slice's, and `current` is its index.
+       */
+      slices: Slice[] | null
+      current: number
+      /** Every unit of the plan, across slices: what a batch is counted against. */
+      planUnits: Unit[]
       /** The run's phases in order with their status; null in a state written before them. */
       phases: Phase[] | null
       /** The single current phase an older state.json carries instead of `phases`. */
@@ -49,14 +60,16 @@ export type Snapshot =
 
 /**
  * What the person unfolded in the pane: Tu turno, the detail of the unit in progress, the
- * tasks and the notes. `groups` holds the phase groups the person toggled, keyed by phase;
- * one never toggled follows the phase in progress.
+ * tasks, the notes and the list of slices. `groups` holds the phase groups the person
+ * toggled, keyed by phase; one never toggled follows the phase in progress.
  */
 export type Expanded = {
   turn: boolean
   detail: boolean
   tasks: boolean
   notes: boolean
+  /** Optional: a pane saved before 0.9.1 has no such key, and reads it as folded. */
+  slices?: boolean
   groups?: Record<string, boolean>
 }
 

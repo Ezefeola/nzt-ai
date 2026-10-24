@@ -129,13 +129,15 @@ sin uso (D4, derogada).
 Lo mínimo que el agente necesita **siempre**. Contiene:
 
 1. **El bucle de trabajo** (sección 5).
-2. **El protocolo de estado** (`Plan/state.json`, sección 7).
+2. **El disparador del estado**: `Plan/state.json` se lee al empezar, y leerlo o escribirlo
+   carga `nzt-plan`, que tiene su esquema y sus reglas (sección 7, D74).
 3. **La regla de frenos** (sección 6).
 4. **La tabla de ruteo**: qué router cargar según la intención detectada. Esto es lo que
    evita depender solo del `description` de cada skill.
 5. **Las reglas duras**: nunca hacer todo de una, nunca escribir más de una spec por vez,
    nunca ejecutar un plan sin aprobación.
-6. **La regla de idioma**: responder y generar artefactos en el idioma del usuario (D2).
+6. **La comunicación**: el idioma del usuario (D2) y los principios de toda respuesta; los
+   formatos viven en sus skills (D74).
 
 El kernel **no** explica cómo se escribe una spec ni cómo se diseña una arquitectura. Eso
 vive en las skills.
@@ -474,7 +476,9 @@ Reglas del acuerdo:
 
 `Plan/state.json` en la raíz del proyecto. **El plan vive acá adentro**, no en un `.md`
 aparte: dos archivos que describen lo mismo se desincronizan, y el agente terminaría
-gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
+gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad. Su esquema y
+sus reglas los dice `nzt-plan` en el cuerpo de su `SKILL.md`; el kernel solo dice que leerlo
+o escribirlo carga `nzt-plan` (D74).
 
 ```json
 {
@@ -542,6 +546,60 @@ gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad.
 - El usuario lo edita a mano cuando quiere: reordenar, sacar unidades, cambiar el alcance.
 - Se omite solo para trabajo de una sola unidad en un proyecto que todavía no tiene estado.
 
+### Tramos (v2, D72 y D73)
+
+Cuando el plan trabaja por tramos, la raíz lleva `slices` en lugar de `phases`, y cada
+tramo lleva sus propias fases, cada una exactamente como una fase de v1:
+
+```json
+{
+  "version": 2,
+  "goal": "Cupones en el checkout — entrega 1",
+  "cadence": "delivery",
+  "slices": [
+    { "id": "S1", "name": "Análisis de la entrega 1", "status": "done", "phases": [
+      { "name": "analysis", "status": "done", "units": [
+        { "id": 1, "do": "Spec F-003 con alcance, reglas e índice", "status": "done" },
+        { "id": 2, "do": "US-001 Aplicar cupón", "status": "done" },
+        { "id": 3, "do": "US-002 Cupón rechazado", "status": "done" } ] } ] },
+    { "id": "S2", "name": "F-003 Cupones", "status": "doing", "phases": [
+      { "name": "architecture", "status": "done", "units": [
+        { "id": 4, "do": "Diseño técnico de F-003", "status": "done" } ] },
+      { "name": "build", "status": "doing", "units": [
+        { "id": 5, "do": "Construir US-001", "status": "done" },
+        { "id": 6, "do": "Construir US-002", "status": "doing", "detail": "falta el cupón ya usado" } ] },
+      { "name": "verify", "status": "todo", "units": [
+        { "id": 7, "do": "QA de US-001 y US-002", "status": "todo" } ] } ] },
+    { "id": "S3", "name": "Release de la entrega 1", "status": "todo", "phases": [
+      { "name": "ship", "status": "todo", "units": [] } ] }
+  ],
+  "approved": true,
+  "autonomy": { "units": [6, 7] },
+  "waiting_on": null,
+  "notes": []
+}
+```
+
+- **Un estado con `phases` en la raíz es v1** y vale todo lo anterior: es un plan de un
+  solo tramo. Con `slices`, `version` es `2`, y `phases` no aparece en la raíz.
+- Un tramo tiene `id` (texto, único: `S1`, `S2`…), `name`, `status` con los cuatro valores,
+  y `phases`. **Dentro de cada tramo valen las reglas de fases de arriba**: nombres de D69,
+  en orden, sin repetir, a lo sumo una `doing`, y la que cierra pasa la siguiente a `doing`.
+  Los ids de unidad son únicos en todo el archivo.
+- A lo sumo un tramo en `doing`; la unidad en curso está en la fase `doing` de ese tramo.
+  Cuando cierra la última fase de un tramo, en la misma escritura el tramo pasa a `done` y
+  el siguiente a `doing`, con su primera fase en `doing`.
+- **Qué es un tramo lo corta el plan** (D72, QT-01): por defecto una feature con sus fases;
+  una historia o un par cuando conviene feedback más rápido. Lo de toda la corrida —el
+  producto, el release— va en su propio tramo.
+- `cadence`: `delivery`, `upfront` o `just-in-time` (D72), y dice cómo se cortaron los
+  tramos: con `delivery`, el primer tramo es el análisis de la entrega y los siguientes no
+  lo repiten. Ausente es `upfront`. Es del plan: una corrida nueva lo vuelve a decidir.
+- Si el QA de un tramo falla, su unidad queda `done`, verify sigue `doing`, `waiting_on`
+  nombra el tramo y el bug, y el lote frena. Autorizado el arreglo, `build` del tramo se
+  reabre con esa unidad y verify vuelve a `todo` con una corrida nueva: el único caso en
+  que una fase `done` vuelve atrás.
+
 ## 8. Artefactos en el proyecto destino
 
 Tres lugares, separados por vida útil y por dueño: lo que es del producto vive en `Docs/`
@@ -566,7 +624,8 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │  │  ├─ rfc/RFC-NNN-<slug>.md # propuesta en discusión, a pedido (D35)
 │  │  └─ tech-debt.md          # trabajo técnico diferido, con su impacto (D29)
 │  ├─ UX/
-│  │  └─ design-system.md · ui-components.md   # de nzt-ux-system (D11)
+│  │  ├─ design-system.md · ui-components.md   # de nzt-ux-system (D11); marca y voz (D76)
+│  │  └─ prototype/<slug>.html                 # prototipo conservado y mantenido, si el usuario lo eligió (D76)
 │  ├─ Operations/
 │  │  ├─ deployment.md         # entornos con su autorizador, pipeline, rollback (T16)
 │  │  └─ releases.md           # log append-only de despliegues y rollbacks (T16)
@@ -580,6 +639,7 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
    ├─ state.json               # plan + estado, actualizado por unidad
+   ├─ prototype/<slug>.html    # prototipo de la entrega 1: al registrar lo aprendido, se borra o pasa a Docs/UX/prototype/ (D72, D76)
    └─ specs/
       └─ F-NNN-<slug>/       # "<feature>" en el resto del documento (D6)
          ├─ spec.md            # transversal: alcance, reglas, NFR, índice de historias
@@ -2099,6 +2159,355 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     el Explore propio de Claude Code en lugar de `nzt-explorer` (D70 QT-29 eligió un agente
     propio). El set pasa de 14 a 15 skills; la 315 mide el listado contra el piso de Codex
     (D50).
+- **D72.** **NZT trabaja por tramos: la entrega 1 se define en el producto, las historias se
+  detallan por entrega y el QA cierra cada tramo.** Lo que la forzó: la crítica de que SDD es
+  cascada (usuario, 2026-10-23). El análisis del set mostró que NZT no es cascada a nivel
+  proyecto —fases elegidas por pedido, plan de lo visible, alcance en dos direcciones— pero
+  sí una mini-cascada dentro de cada corrida: el análisis cierra con **todas** las historias
+  escritas (`nzt-discovery`, *Done when*), las fases van en orden con una sola en curso, y el
+  QA espera al final del incremento (D43). La unidad de entrega por defecto era la feature,
+  no la historia, y no había concepto de MVP ni de primera entrega. Discutido con el
+  usuario el 2026-10-23, unidad 320; todo lo de abajo es acuerdo suyo salvo lo marcado.
+  - **Lo leído** (2026-10-23): el [Manifiesto ágil](https://agilemanifesto.org/principles.html)
+    (*"early and continuous delivery of valuable software"*, *"maximizing the amount of work
+    not done"*); la [Scrum Guide 2020](https://scrumguides.org/scrum-guide.html) (*"an
+    Increment may be delivered to stakeholders prior to the end of the Sprint"*, el
+    refinamiento es continuo, nada entra sin la *Definition of Done*); [Jeffries](https://ronjeffries.com/xprog/articles/expcardconversationconfirmation/)
+    (la tarjeta es *"a token representing the requirement"*); [Wake](https://xp123.com/invest-in-good-stories-and-smart-tasks/)
+    (INVEST, corte vertical de la torta); [Patton](https://www.jpattonassociates.com/the-new-backlog/)
+    (un backlog plano es *"a bag of context-free mulch"*; columna vertebral, líneas de
+    entrega, *walking skeleton* primero); [Ries](http://www.startuplessonslearned.com/2009/08/minimum-viable-product-guide.html)
+    (el MVP es para *"validated learning"*, no siempre hace falta); [Kniberg](https://blog.crisp.se/2016/01/25/henrikkniberg/making-sense-of-mvp)
+    (*earliest testable / usable / lovable*). El *walking skeleton* de Cockburn solo se
+    encontró en fuentes secundarias: sin verificar en su fuente.
+  - **Vocabulario.** **Tramo** (*slice*): lo que el plan corta para recorrer de punta a
+    punta, con sus propias fases. **Por defecto una feature**; el plan la parte en tramos
+    más chicos —una historia, o las mínimas que se prueban juntas— cuando conviene feedback
+    más rápido, y el usuario lo aprueba (QT-01, usuario 2026-10-23). Es la rebanada vertical
+    que el QA cierra. **Entrega**
+    (*delivery*): los tramos que juntos cumplen un objetivo del producto; la **entrega 1**
+    es el MVP. *Release* no se usa para esto porque es de `nzt-ship`. El **incremento** de
+    D43 se retira en favor de *tramo*: dos palabras para lo mismo se desincronizan.
+  - **La entrega 1 vive en el producto.** `product.md` suma la sección de la entrega 1: qué
+    historias o capacidades entran, para qué objetivo, y cómo se sabe que funcionó (el
+    *Known by* del objetivo). Al definirla, la pregunta es **"¿hay algo que necesitemos
+    aprender de los usuarios antes de construir el resto?"**. Si sí, la entrega 1 es lo
+    mínimo que lo enseña. Si no, **la entrega 1 es todo el alcance**, y queda escrito como
+    decisión, no como omisión (Ries: el MVP no siempre hace falta). **El MVP recorta
+    alcance, nunca la definición de terminado**: cobertura por área, `qa` y aceptación no
+    cambian. Es una línea de alcance, no una prioridad, así que convive con *No priorities*
+    de `write-stories`.
+  - **Prototipo y esqueleto son dos cosas.** El **prototipo** es para aprender si es lo
+    correcto: el mockup HTML de `nzt-ux`, descartable, ofrecido cuando la entrega 1 tiene
+    algo que aprender. **Nunca se convierte en código de producción.** El **esqueleto** es
+    código real: en un producto nuevo, el primer tramo recorre el sistema de punta a punta
+    en su forma más fina, y los siguientes lo engordan.
+  - **Cadencia de definición, elegida en el plan.** Tres modos: **por entrega** (default de
+    un plan nuevo): se detallan las historias de la entrega en curso y después se larga a
+    construir; las siguientes quedan como una línea *Como… quiero… para…* en el índice de
+    la spec hasta su turno. **Todo al inicio**: lo que NZT hacía hasta D72, para cuando el
+    problema está claro. **Justo a tiempo**: se detalla cada historia al tomarla, para
+    cuando casi no se sabe nada. **En los tres, el alcance, las reglas de negocio y el índice
+    de la feature se escriben completos antes del primer tramo**: lo que se difiere son los
+    criterios de las historias, nunca las reglas, porque una regla cruza historias y
+    definida tarde se define tres veces distinta. Lo que cambia después entra por
+    `nzt-discovery-change`. El índice de historias es el backlog: no hay `backlog.md` suelto
+    (Patton).
+  - **El QA cierra cada tramo.** Construir el tramo → QA del tramo → siguiente tramo. **D43
+    sigue en pie**: el QA es su propia unidad, después de que el tramo está construido en
+    todas sus áreas, y build nunca diseña ni corre pruebas de aplicación. Lo que D43
+    prohibió era probar en medio de construir lo que todavía no corre; un tramo terminado
+    corre entero. Un bug reportado y las dos lecturas de `nzt-verify` siguen sin tramo.
+  - **Quién hace el QA.** La IA o una persona. El de la IA se encadena dentro del lote
+    autónomo; el de una persona es un freno conservado (`keep_stops`) en esa unidad.
+    *Propuesto por el agente, no adoptado*: que la persona pruebe un tramo mientras la IA
+    construye el siguiente. Queda fuera de esta corrida.
+  - **Si el QA falla dentro del lote, el lote frena** (usuario: opción A, sobre B arreglar y
+    seguir y C registrar y seguir). El bug queda en el archivo de testing, `waiting_on`
+    dice qué tramo y qué bug, y se reporta. Nada se construye encima de algo que falló.
+  - **El estado y el panel se organizan por tramo, y cada tramo lleva sus fases completas y
+    separadas** (usuario): *"si lo que vamos a hacer es análisis de la spec 1 […] se haría
+    la arquitectura, el build, QA y verificación de esa misma, al terminar se pasaría a la
+    spec 2 que tiene sus x fases"*. Las fases no cambian; lo nuevo es el nivel de arriba. Se
+    descartaron las fases alternadas `build → verify → build → verify` —pasan `state check`
+    y el panel las dibuja (observado en `StateCheck.cs` y `phases.ts`), pero el usuario no
+    quiere fases repetidas en el mod—, meter las unidades de QA en la fase `build`, que
+    rompía *cada unidad vive en su fase*, y un primer diseño de D73 con los tramos dentro
+    de `build`, que el usuario rechazó porque fundía verify en build. El panel muestra
+    **objetivo, tramo** (cuál y cuántos van, con sus fases), **en curso** y **sigue**. El
+    formato lo diseña D73.
+  - **Lo que no cambia:** una unidad por turno con su freno, la autonomía tal cual (T22),
+    la cobertura por criterio, no asumir (`[TO-DEFINE]`), las reglas en la feature, el
+    cierre de la feature de una pasada (`close.md`) y la separación build/verify de D43.
+  - **Restricción:** C3 mide `CLAUDE.md` y `AGENTS.md` armados —kernel más adaptador—, y
+    estaban en 200 justas: lo que sume D72 al kernel entra recortando otro tanto.
+  - **Fuera de alcance:** QA humano en paralelo, subir versión y publicar, y reescribir los
+    estados v1 de otros proyectos (se siguen leyendo). Lo construyen las unidades 322 a 328.
+- **D73.** **Formato de estado v2: el plan es una lista de tramos, y cada tramo lleva sus
+  propias fases con sus unidades, como un v1 en chico.** Diseño de la unidad 321 sobre D72,
+  rehecho tras la corrección del usuario (2026-10-23): un primer diseño metía los tramos
+  dentro de `build` y fundía verify en build; el usuario lo rechazó porque las fases tienen
+  que seguir separadas tal cual. El contrato queda en la sección 7.
+  - **La forma.** Con tramos, la raíz lleva `slices` en lugar de `phases`. Cada tramo tiene
+    `id`, `name`, `status` y `phases`, y cada fase de un tramo es exactamente una fase de
+    v1: `name` de las seis de D69, `status`, `units`. Las reglas de fases de v1 valen dentro
+    de cada tramo: en orden, sin repetir nombre, a lo sumo una `doing`, la que cierra pasa
+    la siguiente a `doing` en la misma escritura.
+  - **Un v1 es un plan de un tramo.** Un estado con `phases` en la raíz se lee como hoy y
+    nadie lo reescribe. Un bug, un cambio chico o una feature sin cortar siguen siendo v1.
+    `version: 2` es obligatorio con `slices`, para que una herramienta vieja detecte que no
+    lo entiende en vez de leerlo a medias (hoy `StateCheck.cs` exige `phases` y fallaría
+    con un mensaje claro: observado en el código). `phases` y `slices` juntos en la raíz es
+    un error.
+  - **Entre tramos.** A lo sumo un tramo `doing`; la unidad en curso está en la fase `doing`
+    del tramo `doing`. Cuando cierra la última fase de un tramo, en la misma escritura el
+    tramo pasa a `done` y el siguiente a `doing` con su primera fase en `doing`. La
+    siguiente unidad es la primera `todo` de la fase en curso del tramo en curso.
+  - **La cadencia es cómo se cortan los tramos** (D72). `delivery`: un primer tramo con el
+    análisis de la entrega —las specs y sus historias— y después un tramo por feature, o
+    más chico, con arquitectura, UX, build y verify; así se define primero y se larga
+    después. `just-in-time`: cada tramo trae su propio análisis. `upfront`: todo el
+    análisis de la corrida en el primer tramo, como NZT hacía. El campo `cadence` en la raíz
+    registra lo elegido; ausente es `upfront`, como `delegation` (D71) no cambia nada sin
+    aviso. Es del plan: una corrida nueva lo vuelve a decidir.
+  - **Lo que es de toda la corrida** —la definición de producto, un release al final— va en
+    su propio tramo (*Producto*, *Release*), con su fase. No hay fases sueltas fuera de
+    tramos: un solo nivel de agrupamiento.
+  - **El discovery es el primer tramo, y al cerrarlo el plan se reaprueba** (usuario,
+    2026-10-23). Los tramos salen del discovery: un producto o una feature nueva arranca con
+    un plan que solo conoce ese primer tramo y dibuja la forma del resto. Cuando cierra, el
+    plan se reescribe con los tramos concretos —cuáles, en qué orden, de qué tamaño, con qué
+    cadencia— y el usuario lo aprueba: ahí se decide el MVP y el lote. Un bug o un cambio
+    chico no lo necesitan; una feature en un producto ya definido lleva su discovery en un
+    tramo propio o dentro del de la feature, según la cadencia.
+  - **El QA que falla** (D72, opción A): la unidad de verify queda `done` —corrió, y su
+    resultado está en el archivo de testing—, la fase verify sigue `doing`, `waiting_on`
+    nombra el tramo y el bug, y el lote frena. Cuando el usuario autoriza el arreglo, la
+    fase `build` del tramo **se reabre** a `doing` con la unidad del arreglo, y verify vuelve
+    a `todo` con una unidad nueva para la nueva corrida. Es el único caso en que una fase
+    `done` vuelve atrás, y solo dentro del tramo en curso.
+  - **Qué valida `state check` además de v1:** `version: 2` con `slices`; no `phases` y
+    `slices` juntos; `cadence` dentro de sus tres valores; ids de tramo únicos y de unidad
+    únicos en todo el archivo; a lo sumo un tramo `doing`; dentro de cada tramo, las reglas
+    de fases de v1 (nombres de D69, sin repetir, a lo sumo una `doing`, una fase `done` sin
+    unidades abiertas); una fase `doing` solo en el tramo `doing`; un tramo `done` con todas
+    sus fases `done` o `dropped`.
+  - **Qué dibuja el panel:** las filas **Objetivo · Tramo · En curso · Sigue**. *Tramo*
+    dice *2 de 3 · nombre*, y debajo **la línea de tiempo de las fases de ese tramo**, la
+    misma de hoy: ninguna fase aparece dos veces. Los tramos terminados y los que vienen se
+    listan en una línea cada uno con su marca de estado. *Sigue* es la próxima unidad del
+    tramo, o el próximo tramo si el actual termina. Un v1 se dibuja exactamente como antes.
+  - **Kernel (322):** una viñeta de tres líneas suma `slices`, `version` 2 y `cadence`, y
+    remite a `nzt-plan`; la fila de `nzt-verify` dice *QA once the slice is built*. Entró
+    recortando tres: *one line each* se fundió en la viñeta de `status`, *write it for a
+    session…* bajó a tres líneas, y la entrada de *Routing* a una. `CLAUDE.md` y `AGENTS.md`
+    siguen en 200 (C3); el ejemplo JSON del kernel queda en v1. *"Si una unidad necesita un
+    párrafo, es más de una unidad"* salió del kernel y queda solo en `nzt-plan`: el usuario
+    lo aceptó (2026-10-23), porque cortar unidades es trabajo de `nzt-plan`.
+  - **`nzt` y `nzt-plan` (323).** `nzt-plan` estaba en 200, así que el método va a una hoja
+    nueva, `plan/references/slices.md` (94 líneas): cuándo cortar, qué es un tramo, el
+    discovery primero con reaprobación, la entrega 1 con prototipo y esqueleto, las tres
+    cadencias, QA dentro del tramo y quién lo hace, el QA que falla, y cómo se muestra el
+    plan (columna *Tramo*). El router la nombra en *Building the plan* y queda en 200,
+    fundiendo dos viñetas de autonomía. `nzt` §4 dice que verify corre al terminar el
+    tramo y que el trabajo grande se corta en tramos empezando por discovery.
+  - **`nzt-discovery` (324).** `product.md` suma la sección *Delivery 1* (para qué objetivo,
+    qué entra, qué se aprende, *Known by*) con la pregunta de D72 y "todo el alcance" escrito
+    como decisión. `write-spec.md`: el índice es el backlog, una historia diferida queda en
+    una línea *As… I want… so that…*, y alcance, reglas e índice se escriben antes del primer
+    tramo. `write-stories.md`: la entrega 1 no es prioridad, y *When a story is written*
+    según la cadencia. El *Done when* del router y de `analysis.md` cambia "todas las
+    historias" por "las que la cadencia detalla ahora", con todas las reglas.
+  - **`nzt-verify` y `nzt-build` (325).** *When it runs* de verify dice *after build has
+    finished the slice*, construido en todas sus áreas, y después el tramo siguiente; un
+    párrafo nuevo: dentro del lote el QA de la IA se encadena, el de una persona es un freno
+    conservado, y una falla frena el lote. `test-run.md` lo repite en *Do not fix while
+    testing*. En build, `SKILL.md` e `implement.md` cambian *increment* por *slice*; D43
+    queda igual. El eval `restraint/qa-unasked` todavía dice *increment* en su grader: no se
+    tocó, su re-corrida era la 330, descartada.
+  - **`nzt-ux` (326).** `mockup.md` suma *A prototype is a mockup that teaches*: parte del
+    `Q-NN` de *To learn*, no de un diseño de pantalla; dibuja el flujo mínimo; valen todas
+    las reglas del mockup; nunca pasa a producción; lo que la gente hizo va a
+    `Docs/Product/analysis.md` y el archivo se borra. El router suma su fila (ofrecido por
+    el plan) y su lugar. **Decisión del agente, dentro del alcance:** vive en
+    `Plan/prototype/<slug>.html` —es temporal, como `change.md`, y no es de una feature
+    porque se hace antes de que existan— y la sección 8 lo suma al árbol.
+  - **`state check` (327).** `StateCheck.cs` saca las reglas de una lista de fases a un
+    método que corren la raíz de un v1 y cada tramo de un v2, con los mismos mensajes para
+    v1; suma las reglas v2 de arriba. Tres pruebas nuevas en `Nzt.Cli.Checks` (un v2 que
+    cumple con las tres cadencias, cada invariante de tramo roto, mezcla y versión); 164
+    comprobaciones en verde. **Decisión del agente:** "sin repetir nombre" se exige solo
+    dentro de un tramo; un v1 con fases repetidas sigue pasando, porque D73 dice que v1 se
+    lee como hoy. RN-cli-state-check de `specs/nzt-installer.md` suma las reglas.
+  - **`nzt-state` 0.9.0 (328).** `parse.ts` lee `slices`: `phases` y `units` pasan a ser las
+    del tramo en curso (el `doing`, si no el primer `todo`, si no el último) y `planUnits`
+    todas, para la tanda. El panel suma la fila **Tramo** con cada tramo en un renglón, y
+    AHORA cierra con *Sigue el tramo* cuando al tramo no le queda nada; *Plan completo* recién
+    tras el último. Regla RN-panel-tramos `[add]` en la spec del mod; 54 tests y `tsc` en
+    verde. Sin probar en vivo.
+  - **Puertas locales (329), 2026-10-23.** Build sin avisos, `CLAUDE.md` y `AGENTS.md` en
+    200; `check-references` sin movidas; 164 comprobaciones del instalador; lint con 0
+    problemas; los seis mods validan y pasan sus tests (nzt-state 54). `state check` desde el
+    código: el v1 de este repo y el ejemplo v2 de la sección 7 cumplen, y un v2 con un id de
+    tramo repetido da el problema y código 1. El `nzt-ai` instalado (1.6.0) rechaza el v2 con
+    *falta phases*, como D73 previó, hasta que se publique. `check-extraction` no aplica: es
+    para extraer hojas de área. La 330 (evals) la descartó el usuario.
+- **D74.** **El esquema y las reglas de `Plan/state.json` pasan al cuerpo de `nzt-plan`, que
+  se carga siempre que se lee o se escribe el estado; el kernel suma una sección
+  *Communication* con los principios, y cada formato queda en su skill.** Lo que la forzó: el
+  kernel está en 200 justas (C3) desde D64, y cada regla nueva entró recortando otra (D67,
+  D68, D69, D71, D73). El estado era su bloque más grande (~35 líneas) para un contrato que el
+  agente usa al leer o escribir un archivo. Y la forma de comunicar estaba repartida —el
+  reporte en `nzt-plan`, las preguntas en el kernel, el playback en `nzt-discovery`, *"report
+  what actually happened"* en las hard rules— sin un lugar con lo que vale para toda
+  respuesta. Acordado con el usuario el 2026-10-23, unidad 331.
+  - **Revierte lo descartado en D65, con argumentos nuevos.** D65 dejó el esquema en el kernel
+    porque el estado se escribe también en trabajo chico que no carga `nzt-plan`, y sin el
+    esquema delante el agente lo escribiría de memoria. Lo que cambió: (1) el kernel dice que
+    **leer o escribir `Plan/state.json` carga `nzt-plan`**, un disparador por el nombre del
+    archivo que no depende de clasificar el trabajo; (2) desde D68 `nzt-ai state check`
+    revisa lo escrito, así que un formato corrido aparece en la misma unidad. Costo: el
+    trabajo chico carga `nzt-plan` al escribir el estado, lo mismo que ya paga cualquier
+    corrida de más de una unidad.
+  - **En el cuerpo de `SKILL.md`, no en una referencia** (unidad 333): una skill cargada
+    sobrevive a la compactación y una referencia no (kernel, *Routing*). Retomar es leer el
+    estado, así que el esquema no puede depender de releer un archivo.
+  - **`nzt-plan` libera lugar** (332): está en 200 (D3). *How the plan is shown* y *The
+    documents the plan produces* pasan a `plan/references/proposal.md`, que se lee al armar
+    el plan, antes de mostrarlo: es el único momento en que se usan. Entran el ejemplo v1 y
+    las reglas de v1 y v2 que hoy dice el kernel, sin cambiar ninguna. `slices.md` deja de
+    decir que el formato está *in your instructions*.
+  - **Qué queda en el kernel** (334): *State* en ~5 líneas —qué es el archivo, leerlo al
+    empezar antes de preguntar, el disparador, cuándo se omite—. El candado de aprobación y
+    el cierre de unidad con `state check` siguen en las hard rules y en *Work units and
+    stops*, porque valen antes de que `nzt-plan` esté cargado. Se compactan, sin perder
+    reglas, la autonomía (queda *acompañado por defecto*; cómo se ofrece ya lo dice
+    `nzt-plan`), *Context* y las hard rules.
+  - **El código de comunicación** (QT-01, usuario: principios en el kernel y formatos en sus
+    skills). Una sección *Communication* (~15 líneas, 335) con lo que vale para toda
+    respuesta: el idioma (absorbe *Language*), el resultado primero, lo que el usuario puede
+    probar o decidir antes que qué archivos existen, lo que pasó tal cual (absorbe la hard
+    rule *Report what actually happened*), ningún número inventado, y la forma de las
+    preguntas (absorbe *Questions*). Cierra nombrando dónde vive cada formato: el plan
+    (`nzt-plan-proposal`), el reporte de unidad y el bloque de contradicción (`nzt-plan`) y
+    el playback (`nzt-discovery`). Cada formato se dice una vez, en su skill (D65).
+  - QT-02: plan aprobado, en la rama `trabajo-por-tramos`. QT-03: autonomía completa de 331 a
+    336 (usuario, 2026-10-23).
+  - **Lo que no cambia:** el formato del estado (v1 y v2), `state check`, el panel y toda
+    regla de comportamiento: lo que sale del kernel queda dicho una vez en `nzt-plan`, o
+    repetía otra línea que queda.
+  - **Riesgo:** el disparador lo cumple el modelo, no el host. Si no carga `nzt-plan` y
+    escribe el estado de memoria, lo atrapa `state check` donde está instalado; donde no,
+    nada. Lo mide la 336 con los evals de plan y estado.
+  - **Hecho (332-335, 2026-10-23).** `nzt-plan` 200 → 169 con `proposal.md` (42 líneas) y
+    de vuelta a 200 con *The state file*; su `description` nombra leer o escribir el estado.
+    `core/kernel.md` 186 → 147; `CLAUDE.md` y `AGENTS.md` 200 → 161 (C3). Las citas que
+    apuntaban al esquema o a *Questions* del kernel (`stack-axes.md`, comentarios de
+    `parse.ts`, la spec del mod y RN-cli-state-check) quedan al día. **No cambiado:** el
+    mensaje de `nzt-ai state check` sigue diciendo *"cumple el contrato del kernel"*;
+    cambiarlo es del CLI y de una publicación.
+  - **Puertas (336, 2026-10-24).** Build sin avisos, `check-references` sin movidas, 164
+    comprobaciones del instalador, lint 0 problemas, `nzt-state` 54 tests, marketplace
+    válido. **Evals** (juez sonnet, sin brazo de control, contra la u35): ruteo 16 casos y
+    restraint 8. Iguales o mejor: `kernel-loaded`, `small-edit`, `trivial`, `foreign-repo`,
+    `package-unasked`, `test-data` y diez de ruteo en 1.00. Bajas, todas leídas en la traza:
+    `plan-stories` 1/3 (leyó `proposal.md`; llamó *casos de uso* al índice diferido de D72),
+    `close-feature` (el fixture no tiene el código que la historia marca hecho),
+    `qa-unasked`, `design-unasked` y `test-levels-unasked` (frenan por el glosario que los
+    fixtures no tienen), `design-mode`, `no-diagram` y `build-story` (juez, 1 o 2 de 3).
+    El disparador se vio andar: con estado, las corridas cargaron `nzt-plan`. **No corrieron**,
+    por el límite de sesión: 2 de 3 de `route-verify` y `stack-not-dotnet`. Costo total
+    ≈ US$27. Pendiente aparte: los fixtures sin glosario, y el grader de `qa-unasked` que dice
+    *increment*.
+  - **Corrección (2026-10-24).** La baja de `plan-stories` **sí era de D74**: la regla
+    *"Plain words in the user's terms"* de *Communication* llevó a traducir "historias de
+    usuario" por "casos de uso" en un proyecto sin glosario (la u34 decía "historia" 11
+    veces). Decidido por el usuario: la aclaración va en `plan/references/proposal.md`, no en
+    el kernel — *cada documento va por su nombre, con la explicación simple al lado; las
+    palabras simples explican, no renombran*. Re-corrida: `plan-stories` 3/3, las tres dicen
+    "historias de usuario", US$0.76 (`evals/results/2026-10-24-d74b-plan-stories.json`).
+- **D75.** **El paso de la spec cubre sus historias: el plan las nombra sin contarlas, y al
+  cerrar la spec se corta una unidad por historia sin volver a aprobar. El panel muestra los
+  tramos en una línea, con la lista plegada.** Lo que la forzó: la prueba en vivo de D72–D74
+  en un proyecto nuevo (usuario, 2026-10-24, `Systems/TodoList`). Con cadencia `delivery`, el
+  plan del tramo de descubrimiento tenía producto, glosario, spec y prototipo, y **ninguna
+  fila para las historias**; al cerrar la spec el agente lo notó y pidió aprobación para
+  sumar cinco unidades. Y el panel repetía el nombre del tramo: en la fila **Tramo** y en la
+  lista de debajo, que además no escala con muchos tramos.
+  - **QT-05 (usuario).** El usuario objetó que la spec y sus historias son parte de lo mismo
+    y que el plan no tiene por qué saber cuántas hay. Se acordó: **en el plan, un paso** —*la
+    spec de F-001 y sus historias*—, sin número (*"una fila es un paso, no un archivo"*);
+    **en la ejecución, una unidad por historia**, cortadas cuando el índice existe. Cortarlas
+    es un paso ordinario de lo aprobado, no un cambio de plan: no pide aprobación. Descartado:
+    spec e historias en una unidad (una revisión enorme, y una historia mal obliga a rehacer
+    el bloque). Va en `nzt-plan` y en `slices.md`.
+  - **QT-04 (usuario).** El panel muestra una línea fija, `Tramo  2 de 5 · F-001 Tareas`, y
+    debajo la lista entera plegada en `▸ Tramos · 5`, que se abre con un clic como *Ver
+    tareas*. Con un solo tramo, solo la línea. Descartados: una ventana con el anterior, el
+    actual y el siguiente (3–4 líneas fijas), y la lista sola (se pierde el *n de m*). Va en
+    RN-panel-tramos de `specs/mods/nzt-state/spec.md`.
+  - **Hecho (337–341, 2026-10-24).** `slices.md` dice que la spec y sus historias son un paso
+    y que cortarlo por historia no pide aprobación (queda en 100 líneas); `nzt-plan` no cambió.
+    `nzt-state` 0.9.1: `▸ Tramos · n` plegado, abierto con un clic, sin lista con un tramo.
+    **Puertas:** build sin avisos, `check-references` sin movidas, 164 comprobaciones, lint 0
+    problemas, marketplace válido, `nzt-state` 55 tests. **Sin evals**, por decisión del
+    usuario. **Sin probar en vivo** el panel.
+- **D76.** **El prototipo es usable y aplica las reglas de negocio que muestra; al cerrarlo,
+  el usuario decide si se borra o queda como prototipo mantenido. El design system se ofrece
+  cuando el plan elige UX, con una sección de marca y voz.** Lo que la forzó: la prueba en
+  `Systems/TodoList` (usuario, 2026-10-24). El agente iba a borrar el prototipo al anotar
+  Q-19, y el plan no tenía diseño de pantalla: lo visual decidido se perdía con el archivo.
+  El usuario quiere además un lugar mantenido para la marca —colores, logo, estilo— y un
+  prototipo que la persona pueda usar, no solo un selector de estados.
+  - **Destino al cerrar (usuario).** Lo que enseñó va siempre a `analysis.md`. Después el
+    usuario elige: **borrarlo**, o **conservarlo** en `Docs/UX/prototype/<slug>.html`,
+    mantenido. Si nadie lo va a mantener, se borra: un prototipo viejo miente con la
+    autoridad de lo visual.
+  - **Usable, con las reglas (usuario).** Un solo HTML, que se abre con doble clic, sin red,
+    sin build ni imports; se usa de verdad y aplica las reglas de la spec que su flujo toca.
+    **Objetado una vez:** las reglas quedan en dos lugares. Lo que lo contiene: la cabecera
+    lista por slug las reglas que implementa y la fecha de la spec; conservado, cambiar una
+    de esas reglas lo actualiza en la misma unidad, como a todo documento afectado. **Nunca
+    pasa a código de producción**: la app se construye desde las historias. El mockup de
+    una pantalla diseñada sigue sin lógica.
+  - **Design system ofrecido, no obligatorio (usuario).** UX sigue opcional: obligarlo va
+    contra la agilidad. Cuando el plan elige UX en un producto con pantalla, `proposal.md`
+    ofrece `Docs/UX/design-system.md` con lo que se pierde sin él. `system.md` suma **marca**
+    (logo como ruta a su archivo, tipografía, paleta por roles con valores
+    `provisional` hasta que exista un tema en código, que desde ahí manda) y **voz de los
+    textos**.
+  - **Hecho (342–346, 2026-10-24).** `mockup.md` (130 líneas), `system.md` (132),
+    `ux/SKILL.md`, `proposal.md`, `slices.md` y el árbol de §7. **Puertas:** build sin avisos,
+    `check-references` sin movidas, 164 comprobaciones, lint 0 problemas, marketplace válido.
+    **Sin evals** (usuario); ningún caso nombra el prototipo.
+- **D77.** **El plan muestra una tabla por tramo, bajo su título, y la palabra es *tramo*;
+  el panel de preguntas cierra lo contestado fuera de él. D72–D74 quedan aceptadas.** Lo que
+  la forzó: la prueba en `Systems/TodoList` (usuario, 2026-10-24). El plan de construcción
+  salió en una tabla con columna *Porción*: celdas vacías en cada grupo y filas de cinco
+  renglones en la terminal; el agente tradujo *slice* a su manera, y el panel y la spec dicen
+  *tramo*. Y `nzt-questions` dejaba pendientes las preguntas contestadas por
+  `AskUserQuestion` o escritas en el prompt, porque solo cerraba lo llevado desde el panel.
+  - **QT-06 (usuario): *tramo*.** Fijado en `proposal.md` con los sinónimos prohibidos
+    (*porción*, *etapa*). Descartadas *etapa* (se confunde con las fases) y *bloque*.
+  - **QT-07 (usuario, opción A de tres ejemplos): una tabla por tramo**, con `S2 · Nombre`
+    de título y tres columnas; el *por qué* en una línea, el detalle en el reporte de la
+    unidad. Descartadas una tabla con el tramo repetido en cada fila (ancha) y una lista sin
+    tabla (pierde las columnas). En `slices.md` (100 líneas) y `proposal.md`.
+  - **QT-08 (usuario): cualquier mensaje cierra las preguntas.** RN-preg-contestadas-afuera,
+    `nzt-questions` 0.2.0: un mensaje que no es comando cierra lo pendiente, salteadas
+    incluidas; un turno con `AskUserQuestion` no deja sus preguntas en el panel; lo que el
+    agente repite vuelve. Descartado: cerrar solo lo que el mensaje nombra por id (*"dale, la
+    primera"* lo dejaría pendiente).
+  - **Aceptación.** El usuario probó en vivo los puntos 3–13 de la lista de la unidad 336
+    (plan, `nzt-plan` al tocar el estado, retomar tras `/clear`, comunicación, `state check`,
+    tramos, QA por tramo, estado v2, panel 0.9.0 con Delegar, pregunta suelta y edición
+    mínima): *"fueron todas perfectas así que queda bien todo"*. **D72, D73 y D74 quedan
+    aceptadas**, y `nzt-state` 0.8.0 y 0.9.0. Después el usuario aceptó también **D75, D76 y
+    D77**, `nzt-state` 0.9.1 y `nzt-questions` 0.2.0 (*"apruebo, acepto lo del cierre de
+    mods"*, 2026-10-24) — estos dos últimos **sin probar en vivo**. Cierre de los mods: marcas
+    `[add]`/`[modify]` barridas, encabezados, entradas de **Historia** y catálogo de
+    `specs/nzt-mods.md` al día.
+  - **Hecho (2026-10-24).** `nzt-questions` 27 tests (2 nuevos), validate pasa.
 
 ## 13. Revisión contra Temper v3
 
