@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 
 import { segmentsOf } from './markdown'
-import { fitColumns, wrapCell } from './reply'
+import { fitColumns, sharesOf, wrapCell } from './reply'
 import { start, world } from './world.test-kit'
 import type { Engine } from './world.test-kit'
 
@@ -49,7 +49,7 @@ test('the table, the callout and the tasks are drawn, the prose stays Claude Cod
   await start($)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await mountReply($, surface, REPLY)
-    expect(await ui.find({ type: 'Text', text: / Ruta +│ Límite │ Ventana / })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Ruta/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '▲ Aviso' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: '1 de 2' })).toBeDefined()
     expect(await ui.find({ type: 'Markdown', text: /Listo\. Cambié el límite/ })).toBeDefined()
@@ -65,6 +65,34 @@ test('a reply the mod draws starts with Claude Code’s bullet on the terminal; 
   expect(await terminal.find({ type: 'Text', text: '● ' })).toBeDefined()
   const desktop = await mountReply($, 'desktop', table, 'b2')
   expect(await desktop.find({ type: 'Text', text: '● ' })).toBeUndefined()
+})
+
+test('on the terminal a table is a grid of padded lines split by │', async ($, on) => {
+  world(on)
+  await start($)
+
+  const ui = await mountReply($, 'terminal', REPLY, 'g1')
+
+  expect(await ui.find({ type: 'Text', text: / Ruta +│ Límite │ Ventana / })).toBeDefined()
+})
+
+test('on the desktop a table is a grid of boxes: one per cell, its text alone, wrapping in its column', async ($, on) => {
+  world(on)
+  await start($)
+  const wide = '| Unidad | Qué produce |\n|---|--:|\n| 243 | Quito toda mención de la referencia en specs, mockups y el código del mod |'
+
+  const ui = await mountReply($, 'desktop', wide, 'g2', 40)
+
+  expect(await ui.findAll({ type: 'Text', text: /│/ })).toEqual([])
+  expect(await ui.find({ type: 'Text', text: 'Unidad' })).toMatchObject({ props: { bold: true } })
+  expect(await ui.find({ type: 'Text', text: '243' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^Quito toda mención .* del mod$/ })).toMatchObject({ props: { wrap: 'wrap' } })
+  expect(await ui.find({ type: 'Text', text: 'claude-code' })).toBeUndefined()
+})
+
+test('each column takes a share of the row by its longest text, a short one at least 6, a long one at most 40', async () => {
+  expect(sharesOf([3, 70])).toEqual([13, 87])
+  expect(sharesOf([10, 10])).toEqual([50, 50])
 })
 
 test('a table past 14 rows folds, and ▾ shows the rest', async ($, on) => {

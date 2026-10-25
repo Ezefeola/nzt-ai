@@ -82,8 +82,3 @@ export const agentLineOf = (reading: Reading): string =>
 /** The notice a turn's next tool result carries when the context crossed a mark mid-turn. */
 export const crossingLineOf = (reading: Reading & { kind: 'ok' }): string =>
   `[nzt-look] Context crossed a mark: now ${reading.percent}% (${abbreviate(reading.tokens)} of ${abbreviate(reading.window)} tokens), ${ZONE[levelOf(reading.percent)]}.`
-
-/** How long the clear button waits for its second press. */
-export const CONFIRM_MS = 5000
-
-export const isConfirming = (confirmAt: number | null, now: number): boolean => confirmAt !== null && now - confirmAt < CONFIRM_MS

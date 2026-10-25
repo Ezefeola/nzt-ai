@@ -103,6 +103,16 @@ Claude Code pone el panel **al costado de la conversación** solo en pantalla co
 la terminal de 110 columnas o más (al empezar la sesión, de 144); ahí lo abre de 58 columnas y
 con todo el alto. Si no, `/nzt-files` lo pone **sobre el prompt**, de 24 filas, y dice por qué.
 
+En la **app de escritorio** el panel va en una pestaña al costado, sin marco ni botón Cerrar (la
+pestaña tiene los suyos) y sin las fichas de las teclas: ahí se usa con el mouse. La pestaña
+**Archivos** es solo el árbol, entero, y se recorre con el scroll de la app. **Al elegir un
+archivo se abre en una pestaña propia**, con su nombre y su ✕: el archivo entero, con su scroll,
+y Markdown, Copiar ruta y Abrir arriba. Cerrar Archivos cierra también esa pestaña. Se ve como el
+explorador que trae la app: lupa y búsqueda arriba con **Solo lo cambiado** al lado; carpetas
+con su flecha en un lugar fijo que gira al abrirse, archivos con su ícono, un clic en cualquier parte de la fila la abre, y solo la marca de git a la
+derecha; lo que Claude lee o escribe, como un punto de color junto al nombre; y el archivo con su
+ruta en migas y **Ver la fuente** para un Markdown. El C# conserva los colores de Visual Studio, con su sangría. Un archivo cambiado se ve como código, con sus líneas `+` `−` en el detalle; un C# cambiado, como el diff de Visual Studio, con sus colores y verde lo agregado y rojo lo borrado.
+
 Mientras está abierto se actualiza solo: cada vez que Claude escribe un archivo o corre un
 comando, y cada 3 segundos para lo que cambie por fuera. El panel solo lee: no edita, no
 crea, no renombra ni borra nada, ni hace operaciones de git.

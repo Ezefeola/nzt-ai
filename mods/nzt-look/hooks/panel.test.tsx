@@ -48,6 +48,17 @@ const disk = (on: On, held: Record<string, string> = {}) => {
 
 const THEMES_FOLDER = '/home/ana/.claude/themes'
 
+test('the session start copies NZT oscuro and claro where /theme reads them, saying nothing', async ($, on) => {
+  const seen = world(on)
+  mock.env(on, { HOME: '/home/ana' })
+  const files = disk(on)
+
+  await start($)
+
+  expect(Object.keys(files).sort()).toEqual([`${THEMES_FOLDER}/nzt-dark.json`, `${THEMES_FOLDER}/nzt-light.json`])
+  expect(seen.toasts).toEqual([])
+})
+
 test('the copy button puts NZT oscuro and claro in the person themes folder', async ($, on) => {
   world(on)
   mock.env(on, { HOME: '/home/ana' })

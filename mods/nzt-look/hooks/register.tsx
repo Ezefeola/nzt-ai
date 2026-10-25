@@ -34,7 +34,7 @@ import { bandModelOf, drawCells, drawContextText, drawDesktopBand, drawTerminalB
 import type { LiveProps } from './band-live'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
-import { agentLineOf, CONFIRM_MS, crossingLineOf, effortOf, isAbove, isConfirming, levelOf, NO_USAGE, usageOf } from './kernel'
+import { agentLineOf, crossingLineOf, effortOf, isAbove, levelOf, NO_USAGE, usageOf } from './kernel'
 import { colorfgbgLight, gnomeLight, isNztClaudeTheme, macLight, variantNamed, variantOf, windowsLight } from './light'
 import { DEFAULT_THEME, hexOf } from './palette'
 import { drawPanel } from './panel'
@@ -75,8 +75,6 @@ const systemLightAtom = atom({ plugin: 'nzt-look', key: 'systemLight' } as const
 const usageAtom = atom({ plugin: 'nzt-look', key: 'usage' } as const, NO_USAGE as Usage)
 const runningAtom = atom({ plugin: 'nzt-look', key: 'running' } as const, { model: null, effort: null } as Running)
 const toldAtom = atom({ plugin: 'nzt-look', key: 'told' } as const, null as Level | null)
-const confirmAtAtom = atom({ plugin: 'nzt-look', key: 'confirmAt' } as const, null as number | null)
-const isClearingAtom = atom({ plugin: 'nzt-look', key: 'isClearing' } as const, false)
 const liveFailedAtom = atom({ plugin: 'nzt-look', key: 'liveFailed' } as const, false)
 const minuteAtom = atom({ plugin: 'nzt-look', key: 'minute' } as const, 0)
 const noticeAtom = atom({ plugin: 'nzt-look', key: 'notice' } as const, null as PanelNotice | null)
@@ -186,7 +184,11 @@ async function refreshAppearance($: EngineInterface) {
   if (light !== (await read($, systemLightAtom))) await update($, systemLightAtom, () => light)
 }
 
-/** The theme and the variant in force, and the palette they draw with. */
+/**
+ * The theme and the variant in force, and the palette they draw with. The app is drawn with the
+ * same variant as the terminal: nothing tells a plugin whether the app is light or dark, and the
+ * app can differ from the system, so only the person's choice can match it.
+ */
 async function look($: EngineInterface) {
   const prefs = await read($, prefsAtom)
   const custom = await read($, customAtom)
@@ -245,11 +247,12 @@ async function claudeThemesFolder($: EngineInterface): Promise<string | null> {
 
 /**
  * Copies NZT oscuro and claro where /theme lists the person's themes. A file there already that
- * differs is left alone: /theme edits that copy in place, and the person's changes win.
+ * differs is left alone: /theme edits that copy in place, and the person's changes win. On its
+ * own at the session's start it says nothing (`isQuiet`); pressed in the panel, it says how it went.
  */
-async function installThemes($: EngineInterface) {
+async function installThemes($: EngineInterface, isQuiet = false) {
   const folder = await claudeThemesFolder($)
-  if (folder === null) return say($, { kind: 'installFailed', reason: t.noHome })
+  if (folder === null) return isQuiet ? undefined : say($, { kind: 'installFailed', reason: t.noHome })
   try {
     const kept: string[] = []
     for (const file of CLAUDE_THEME_FILES) {
@@ -259,9 +262,10 @@ async function installThemes($: EngineInterface) {
       if (held === null) await $.fs.write(target, text as string)
       else if (held !== text) kept.push(file)
     }
-    await say($, { kind: 'installed', folder, kept })
+    if (!isQuiet) await say($, { kind: 'installed', folder, kept })
   } catch (error) {
-    await say($, { kind: 'installFailed', reason: reasonOf(error) })
+    if (isQuiet) logDebug($, 'install themes', error)
+    else await say($, { kind: 'installFailed', reason: reasonOf(error) })
   }
 }
 
@@ -396,28 +400,6 @@ async function refreshUsage($: EngineInterface): Promise<Usage> {
   return now
 }
 
-/** The clear button: the first press asks to confirm, a second one within five seconds clears. */
-async function pressClear($: EngineInterface) {
-  const now = await $.clock.now()
-  if (isConfirming(await read($, confirmAtAtom), now)) {
-    await update($, confirmAtAtom, () => null)
-    await update($, isClearingAtom, () => true)
-    // A command run from inside the hook a press is waiting on is refused, so it starts in a
-    // dispatch of its own.
-    $.clock.after(1, () => {
-      $.command
-        .run({ command: 'clear' } as never)
-        .catch((error: unknown) => $.ui.toast(t.clearFailed(reasonOf(error))))
-        .finally(() => update($, isClearingAtom, () => false))
-    })
-    return
-  }
-  await update($, confirmAtAtom, () => now)
-  $.clock.after(CONFIRM_MS, () => {
-    update($, confirmAtAtom, at => (at === now ? null : at)).catch(() => undefined)
-  })
-}
-
 /** A call of the main thread ended: its time, the turn's counts, and the file it created or edited. */
 async function noteCall($: EngineInterface, tool: string, input: unknown, ran: { deny?: string; result?: unknown; isError?: boolean }) {
   const id = (input as { tool_use_id: string }).tool_use_id
@@ -528,10 +510,6 @@ async function tickTurn($: EngineInterface) {
   if (await read($, isTurningAtom)) await update($, secondAtom, second => second + 1)
 }
 
-async function cancelClear($: EngineInterface) {
-  if ((await read($, confirmAtAtom)) !== null) await update($, confirmAtAtom, () => null)
-}
-
 const lastCodeOf = (markdown: string): string | null => {
   const blocks = [...markdown.matchAll(/^```[^\n]*\n([\s\S]*?)^```/gm)]
   return blocks.at(-1)?.[1]?.replace(/\n$/, '') ?? null
@@ -549,6 +527,7 @@ export const register: Register = (on, options) => {
     loadedFor = await $.session.id().catch(() => undefined)
     await load($).catch(error => logDebug($, 'load', error))
     await readThemeSetting($)
+    await installThemes($, true)
     await refreshAppearance($)
     $.clock.every(APPEARANCE_MS, () => {
       refreshAppearance($).catch(error => logDebug($, 'appearance', error))
@@ -602,7 +581,6 @@ export const register: Register = (on, options) => {
   })
 
   on('prompt.submit', async ($, e, next) => {
-    await cancelClear($)
     if (e.command === undefined && e.isMeta !== true) {
       await update($, turnAtom, () => ({ tools: 0, added: 0, removed: 0 }))
       await update($, touchedAtom, () => ({}))
@@ -656,7 +634,6 @@ export const register: Register = (on, options) => {
     if (e.reason === 'clear') {
       await update($, usageAtom, () => NO_USAGE)
       await update($, toldAtom, () => null)
-      await update($, confirmAtAtom, () => null)
     }
     return next(e)
   })
@@ -673,36 +650,27 @@ export const register: Register = (on, options) => {
     return next(e)
   }).catch(($, e, next) => next(e))
 
-  // Typing cancels a clear waiting for its second press.
-  on('prompt.change', async ($, e, next) => {
-    if (e.text !== '') await cancelClear($)
-    return next(e)
-  })
-
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) return next(e)
     const { prefs, palette } = await look($)
     await read($, minuteAtom)
-    const now = await $.clock.now()
-    const isClearing = await read($, isClearingAtom)
     const model = bandModelOf({
       usage: await read($, usageAtom),
       running: await read($, runningAtom),
-      now,
+      now: await $.clock.now(),
       parts: prefs.band,
-      columns: e.props.bodyColumns,
-      isWorking: e.props.isWorking || isClearing,
-      isConfirming: isConfirming(await read($, confirmAtAtom), now),
+      // The app lays the band out in pixels and wraps it onto a second line when narrow, so
+      // counting terminal cells there would only hide figures that fit.
+      columns: e.surface === 'desktop' ? Infinity : e.props.bodyColumns,
       t,
     })
     if (model === null) return next(e)
-    const handlers = { onClear: () => pressClear($), onCancel: () => cancelClear($) }
     const elements = $.ui.resolve(e)
     if (e.surface === 'desktop' && 'Svg' in elements) {
-      const { Box, Text, Button, Svg } = elements
-      return drawDesktopBand({ Box, Text, Button, Svg }, model, palette, t, handlers)
+      const { Box, Text, Svg } = elements
+      return drawDesktopBand({ Box, Text, Svg }, model, palette, t)
     }
-    const { Box, Text, Button } = elements
+    const { Box, Text } = elements
     const colors = meterColorsOf(palette)
     const context = model.context
     let contextNode: unknown = null
@@ -722,7 +690,7 @@ export const register: Register = (on, options) => {
         )
       }
     }
-    return drawTerminalBand({ Box, Text, Button }, model, palette, t, handlers, contextNode)
+    return drawTerminalBand({ Box, Text }, model, palette, t, contextNode)
   })
 
   on('ui.render', { component: 'ToolUse' }, async ($, e, next) => {

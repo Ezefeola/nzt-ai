@@ -31,10 +31,10 @@ const openPane = ($: Engine) =>
     presentation: { isFullscreen: true, columns: 160 },
   })
 
-const mount = ($: Engine, bodyRows = 40, bodyColumns = 60) =>
+const mount = ($: Engine, bodyRows = 40, bodyColumns = 60, surface: 'terminal' | 'desktop' = 'terminal') =>
   $.ui.mount({
     plugin: 'nzt-hub',
-    surface: 'terminal',
+    surface,
     component: 'Pane',
     requestId: 'nzt-hub',
     viewport: { columns: bodyColumns + 4, rows: bodyRows + 4 },
@@ -143,4 +143,91 @@ test('the command again closes the pane', async ($, on) => {
   await openPane($)
   await mount($)
   expect(await openPane($)).toEqual({ text: 'Panel de mods cerrado.' })
+})
+
+test('in the app the pane goes unframed and drawn whole: no Close, rule or key chips; the terminal keeps them', async ($, on) => {
+  fakeSession(on)
+  await openPane($)
+
+  const desk = await mount($, 12, 60, 'desktop')
+  const term = await mount($, 12)
+
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.borderStyle).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.height).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Button' })).map(button => button.props.hotkey).filter(Boolean)).toEqual([])
+  expect(await desk.find({ key: 'close' })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /^─+$/ })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /↓ \d más/ })).toBeUndefined()
+  expect(await desk.find({ key: 'copy:nzt-look' })).toBeDefined()
+  expect(await term.find({ key: 'close' })).toBeDefined()
+  expect(await term.find({ type: 'Text', text: /↓ \d más/ })).toBeDefined()
+})
+
+test('in the app Abrir and the install are buttons of the app with their words, and the mod keeps its color in its bar', async ($, on) => {
+  fakeSession(on)
+  await openPane($)
+
+  const ui = await mount($, 40, 36, 'desktop')
+
+  expect(await ui.find({ key: 'open:nzt-state' })).toMatchObject({ props: { label: 'Abrir ›', variant: 'secondary' } })
+  expect(await ui.find({ key: 'copy:nzt-files' })).toMatchObject({ props: { label: '⧉ Copiar instalación' } })
+  const bars = (await ui.findAll({ type: 'Box', key: 'bar' } as never)).map(bar => bar.props.backgroundColor)
+  expect(bars).toContain('gray')
+  // nzt-state and nzt-changes are installed.
+  expect(bars.filter(color => color !== 'gray')).toHaveLength(2)
+})
+
+test('in the app a description wraps instead of running off the pane', async ($, on) => {
+  fakeSession(on)
+  await openPane($)
+
+  const ui = await mount($, 40, 30, 'desktop')
+
+  expect(await ui.find({ type: 'Text', text: /Plan\/state\.json/ })).toMatchObject({ props: { wrap: 'wrap' } })
+})
+
+test('in the app the command opens the pane beside the conversation and prints nothing', async ($, on) => {
+  fakeSession(on)
+  on('session.surfaces', async () => ({ value: ['desktop'] }) as never)
+
+  expect((await openPane($)).text).toBeUndefined()
+})
+
+const wheel = (contentRows: number) => ({
+  component: 'Pane' as const,
+  requestId: 'nzt-hub',
+  offset: 1,
+  by: 1,
+  bodyRows: 10,
+  contentRows,
+  origin: { kind: 'person' as const },
+  pointer: { row: 4, column: 3 },
+})
+
+test('a wheel over a pane taller than its body goes on to the app, which scrolls it', async ($, on) => {
+  fakeSession(on)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await openPane($)
+
+  await $.ui.scroll(wheel(40))
+
+  expect(reached).toEqual([1])
+})
+
+test('a wheel over a pane as tall as its body moves the list, as on the terminal', async ($, on) => {
+  fakeSession(on)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await openPane($)
+
+  await $.ui.scroll(wheel(10))
+
+  expect(reached).toEqual([])
 })

@@ -1,6 +1,6 @@
 # nzt-look
 
-> Versión **0.7.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
+> Versión **0.8.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
 
 Cambia **cómo se ve una sesión de Claude Code**: un tema de colores, una banda sobre el prompt
 con lo que llevás gastado, y la conversación redibujada para leerla de un vistazo. Reemplaza a
@@ -13,7 +13,7 @@ sigue recibiendo la cifra con cada prompt.
 ┃ ● Read 2 · Grep 1                                            ▸
 ✻ Baked for 41s · 6 herramientas · +18 −3
 
-▰▰▰▰▰▰▱▱▱▱▱▱▱  34% contexto · 68k/200k · limpiá pronto   ▰▰▰▱▱▱▱▱ 41% 5h · 2h15   $1.84   0: /clear
+▰▰▰▰▰▰▱▱▱▱▱▱▱  34% contexto · 68k/200k · limpiá pronto   ▰▰▰▱▱▱▱▱ 41% 5h · 2h15   $1.84
 ```
 
 **Es opcional** y sirve en cualquier proyecto, use NZT o no. Funciona solo en Claude Code
@@ -50,16 +50,20 @@ atardecer"): lo arma y lo aplica.
 
 **La banda** es una línea: el modelo con su effort (`◇ Opus 5.5 · high`; el effort aparece con el
 primer pedido al modelo), `Contexto` con las marcas 30 y 40 (amarillo desde el 30% y rojo desde el
-40%), `Límite 5h` y `Límite semanal` con lo que falta para que se renueven, `Costo`
-y `0: /clear`. El botón se apaga mientras Claude trabaja y **pide
-una segunda pulsación** antes de limpiar: limpiar borra la conversación y no se deshace. Si no
-entra en el ancho, se van primero los tokens, las cuentas regresivas, el costo, el effort, el modelo, el semanal, el de 5
-horas y el botón.
+40%), `Límite 5h` y `Límite semanal` con lo que falta para que se renueven, y `Costo`. Si no
+entra en el ancho, se van primero los tokens, las cuentas regresivas, el costo, el effort, el modelo, el semanal y el de 5
+horas. En la app de escritorio no se va nada: si la ventana es angosta, la banda baja a
+una segunda línea.
 
 **NZT oscuro y NZT claro** para `/theme`: el borde del prompt y el spinner los pinta el tema de
-Claude Code, y un mod no puede elegirlo por vos. En el panel, **copiar NZT oscuro y claro a /theme**
-los deja en `~/.claude/themes/` (un archivo que ya está y es distinto no se pisa); después elegí
-uno en `/theme`. Queda guardado en tu configuración, y elegirlo pone también el mod en `nzt`.
+Claude Code, y un mod no puede elegirlo por vos. El mod los copia solo a `~/.claude/themes/` al
+empezar cada sesión, y también con **copiar NZT oscuro y claro a /theme** en el panel (un archivo
+que ya está y es distinto no se pisa); después elegí uno en `/theme`. Queda guardado en tu configuración, y elegirlo pone también el mod en `nzt`.
+
+En la **app de escritorio** manda la variante que elijas en el panel, como en la terminal. El mod
+no puede saber si la app está en claro u oscuro, y la app puede estar distinta del sistema: si la
+usás en oscuro, elegí la variante oscura (con `auto` sigue al sistema, que puede no coincidir). El
+porcentaje del contexto, mientras está bajo, va en el color de texto de la app y se lee en los dos modos.
 
 El look elegido se mantiene después de `/clear`, `/resume` y `/branch`.
 

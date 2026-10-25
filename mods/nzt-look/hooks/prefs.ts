@@ -4,7 +4,7 @@ import { toLight } from './light'
 import { CLAUDE_DRAWING, DEFAULT_THEME, NEUTRAL_THEME, paletteFrom, THEMES, themeNamed } from './palette'
 import type { Theme, Words } from './palette'
 
-export const BAND_PARTS = ['context', 'fiveHour', 'week', 'cost', 'model', 'clear'] as const satisfies readonly BandPart[]
+export const BAND_PARTS = ['context', 'fiveHour', 'week', 'cost', 'model'] as const satisfies readonly BandPart[]
 
 export const PARTS = [
   'tools',
@@ -27,7 +27,7 @@ export const DEFAULT_PREFS: Prefs = {
   theme: CLAUDE_DRAWING,
   variant: 'auto',
   isDrawing: true,
-  band: { context: true, fiveHour: true, week: true, cost: true, model: true, clear: true },
+  band: { context: true, fiveHour: true, week: true, cost: true, model: true },
   agentLine: true,
   parts: Object.fromEntries(PARTS.map(part => [part, true])) as Record<Part, boolean>,
   calm: false,

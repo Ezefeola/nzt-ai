@@ -5,7 +5,9 @@
 > aceptado tras probarlo en vivo el 2026-10-17 (unidad 210) y cerrado; **0.3.0 en curso**: sin
 > `nzt-context`, que se retira ya (M4 de `specs/nzt-mods.md`, unidad 226); **0.4.0 construida**
 > en la unidad 239 (2026-10-18), sin aceptar: la tarjeta Aspecto de `nzt-look`, que sale con su
-> publicación (aprobado el 2026-10-17, unidades 218 y 225).
+> publicación (aprobado el 2026-10-17, unidades 218 y 225). **0.5.0 (unidad 366, 2026-10-25):** la
+> app de escritorio (H-25 de `specs/mods/revision-escritorio.md`), con `[modify]` hasta que el
+> usuario lo vea en la app.
 > Marcas `[add]`, `[modify]` y `[remove]` hasta cerrar cada una; código en `mods/nzt-hub/`; Historia al final · mockup en
 > `specs/mods/nzt-hub/mockup.html` (unidades 153 y 158, dirección C) · Depende de: `specs/nzt-mods.md` (reglas de todo mod y catálogo de la sección 5).
 > El usuario pidió el mod el 2026-10-14: "un panel principal que tenga botones por cada MOD de
@@ -105,6 +107,16 @@ funcionando.
 ### RN-hub-alto · origin: propuesta del agente (mismo criterio que RN-files-alto de `nzt-files`)
 El panel tiene siempre el mismo alto. Si las tarjetas no entran, la lista se recorre con su
 propio scroll y el botón Cerrar no se mueve.
+
+### RN-hub-escritorio · origin: H-25 de `specs/mods/revision-escritorio.md`, por QT-11, QT-12 y H-17 de nzt-files
+**[modify]** En la app de escritorio el panel va en su pestaña sin marco, sin regla y sin `Cerrar`,
+porque la pestaña de la app ya pone título y cierre; sus botones van sin la ficha de su tecla.
+Todo va entero y lo desplaza el scroll de la app (RN-hub-alto no rige ahí). El banner de bloques
+queda como en la consola: en la captura del usuario forma las letras, contra lo que suponía H-06.
+Cada mod lleva a la izquierda una franja de su color (gris si no está instalado) tan alta como su
+tarjeta; su descripción se parte en líneas en lugar de cortarse. `Abrir ›` y `⧉ Copiar
+instalación` son botones de la app con su texto, porque la app no pinta el fondo de color de un
+botón: el color del mod queda en la franja y el ícono. En la consola nada de esto cambia.
 
 ### RN-hub-acento · origin: mismo criterio que RN-cambios-acento de `nzt-changes` (usuario 2026-10-14)
 El panel sigue la estética de NZT: el acento y la etiqueta NZT de los otros mods.
@@ -353,6 +365,13 @@ aprieta y Escape cierra.
     panel. **Sin decidir:** se ve al probar en vivo.
 
 ## Tests
+
+**0.5.0 (unidad 366, 2026-10-25): 24 tests**, todos pasan, más `claude plugin validate`; `tsc` no
+corrió (no hay compilador instalado). Seis nuevos prueban la app: sin marco, alto, Cerrar, regla,
+fichas ni `↓ n más` (y la consola con ellos), los botones con su texto y la franja de color por
+mod, la descripción que se parte, el comando que no imprime nada y la rueda que sigue a la app
+cuando el panel es más alto que el cuerpo. **No cubierto hasta QA:** que la app estire la franja
+al alto de la tarjeta.
 
 `claude plugin test mods/nzt-hub`: 17 tests.
 - 7 de la lógica pura: el catálogo, los grupos por tipo y el grupo vacío que no se muestra, el

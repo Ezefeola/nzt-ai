@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { contentOf, dotsOf, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, thumbOf, topAtRow, treeWindow, withDeleted } from './tree'
+import { contentOf, dotsOf, fittingCount, marksOf, MAX_LINES, rowsOf, sortedOf, textWindow, thumbOf, topAtRow, treeWindow, withDeleted } from './tree'
 
 const status = (...entries: string[]) => [...entries, ''].join('\0')
 const file = (name: string) => ({ name, isDir: false, size: 0, mtimeMs: 0 })
@@ -125,4 +125,15 @@ describe('textWindow', () => {
   test('a long line takes the rows it wraps to', async () => {
     const wide = ['x'.repeat(100), 'short', 'short']
     expect(textWindow(wide, 0, 3, 40)).toMatchObject({ first: 0, count: 1 })
-  })})
+  })
+})
+
+describe('fittingCount', () => {
+  test('counts the texts that fit whole with the gap between them', async () => {
+    expect(fittingCount(['abc', 'de', 'fgh'], 6)).toBe(2)
+  })
+
+  test('a first text larger than the limit is still one', async () => {
+    expect(fittingCount(['x'.repeat(10), 'y'], 4)).toBe(1)
+  })
+})

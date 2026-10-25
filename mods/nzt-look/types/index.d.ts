@@ -40,7 +40,7 @@ export type Variant = 'dark' | 'light'
 export type VariantPref = 'auto' | Variant
 
 /** The parts of the usage band, each switched on or off by itself. */
-export type BandPart = 'context' | 'fiveHour' | 'week' | 'cost' | 'model' | 'clear'
+export type BandPart = 'context' | 'fiveHour' | 'week' | 'cost' | 'model'
 
 /**
  * The model the main conversation runs on and its effort. The effort arrives only with a model
@@ -137,10 +137,6 @@ declare module 'claude-code' {
       running: Running
       /** The highest level the agent has been told this session; null before the first. */
       told: Level | null
-      /** When the clear button was first pressed; null while it is not asking to confirm. */
-      confirmAt: number | null
-      /** True from the confirmed press until the session is cleared. */
-      isClearing: boolean
       /** Set once the animated band failed on a surface: drawn still from then on. */
       liveFailed: boolean
       notice: PanelNotice | null

@@ -1,7 +1,9 @@
 # Mod · nzt-files — explorador del proyecto
 
 > Estado: **aceptado** por el usuario en 0.2.0 el 2026-10-20 ("te apruebo todo lo demás") y
-> cerrado (unidad 287); 0.1.0, aceptado el 2026-10-14 y cerrado en la 146. Código en
+> cerrado (unidad 287); 0.1.0, aceptado el 2026-10-14 y cerrado en la 146. **0.5.7 (unidad 363,
+> 2026-10-25):** la app de escritorio, reglas con `[modify]` hasta que el usuario lo vea en la app
+> (H-15 a H-22, QT-11 a QT-18 de `specs/mods/revision-escritorio.md`). Código en
 > `mods/nzt-files/`, mockup en
 > `specs/mods/nzt-files/mockup.html`. Cómo llegó hasta acá, en **Historia** al final · Depende de:
 > `specs/nzt-mods.md` (reglas de todo mod).
@@ -62,6 +64,51 @@ El panel se abre solo al costado de la conversación cuando empieza la sesión, 
 ajuste **Abrir al empezar** esté apagado. `/nzt-files` lo abre o lo cierra. Si no hay lugar al
 costado, se abre sobre el prompt y `/nzt-files` dice dónde quedó; al empezar la sesión, sin
 lugar al costado, no se abre solo.
+**[modify] En la app de escritorio (P-02 de `specs/mods/revision-escritorio.md`, usuario
+2026-10-24):** la app pone el panel a su costado y `/nzt-files` no imprime nada: el aviso habla de
+una terminal en pantalla completa, que la app no tiene.
+
+### RN-files-escritorio · origin: usuario 2026-10-25 (QT-11 a QT-14 de `specs/mods/revision-escritorio.md`)
+**[modify]** En la app de escritorio el panel va sin marco, sin el título `NZT Archivos` y sin
+`Cerrar`, porque la pestaña de la app ya los pone; arriba queda la línea de repo y rama. Sus
+botones van sin la ficha de su tecla, y por eso sin tecla: en la app se usa el mouse (la API no
+tiene tecla sin ficha). El campo de búsqueda ocupa el ancho y Enter dice `Abrir`. En la consola
+nada de esto cambia.
+
+### RN-files-escritorio-pestaña · origin: usuario 2026-10-25 (QT-14 y H-17 de `specs/mods/revision-escritorio.md`)
+**[modify]** En la app, la pestaña **Archivos** es solo el árbol, con la búsqueda, los botones de
+± Cambios, Desplegar y Plegar, la línea de repo y rama y la de git: el árbol va entero y lo
+desplaza el scroll de la app. **Elegir un archivo lo abre en una pestaña propia**, con el nombre
+del archivo de título y su ✕; elegir otro la reutiliza con el nuevo nombre. Esa pestaña muestra la
+ruta, el detalle, Markdown (en un `.md`), Copiar ruta y Abrir, y debajo el archivo entero con el
+scroll de la app: el código en el elemento de código de la app, numerado y cortado al ancho; el C#
+con los colores de Visual Studio del mod (RN-files-colores-cs), en fuente mono, una fila por línea
+cortada al ancho y con su sangría (H-20); un archivo cambiado, como código, igual que uno sin cambios, y el detalle suma sus líneas `+` `−`; un C# cambiado, como el diff de Visual Studio: sus colores, cada línea con su número, la agregada sobre verde y la borrada sobre rojo, sin `@@` ni `+` `−` (H-22, QT-21); un Markdown, dibujado. Si el archivo pasa lo que la app
+dibuja de una vez (100.000 caracteres), muestra sus primeras líneas enteras y el detalle dice
+cuántas se ven. Cerrar esa pestaña deja el árbol sin archivo elegido; cerrar Archivos (con su ✕ o
+con `/nzt-files`) cierra también la del archivo. En la app no hay ▲ ▼ ni Ampliar (usuario
+2026-10-25: *"es todo por scroll"*), ni barra propia: la app desplaza todo. Una barra propia con el mapa se
+probó en 0.5.4 (QT-19) y se sacó porque la app no le pasa la rueda al mod (H-22). Un mapa de cambios
+arriba (QT-20, 0.5.6) también se sacó: el usuario lo vio y no sirve. En la consola nada de
+esto cambia.
+
+### RN-files-escritorio-aspecto · origin: usuario 2026-10-25 (QT-15 a QT-18 y H-18 de `specs/mods/revision-escritorio.md`)
+**[modify]** En la app el explorador se ve como el que la app ya trae, sin perder lo propio
+(QT-15): arriba la lupa y el campo de búsqueda a lo ancho con su `Abrir`, y a su derecha solo el
+botón `Solo lo cambiado`, que se ve como botón principal mientras está activo; en la app no hay
+Desplegar todo ni Plegar todo (usuario 2026-10-25, H-19, reemplaza los íconos de QT-17). Cada
+fila, más alta y con margen como las de la app, se abre con un clic en cualquier parte de su
+largo, no solo en el nombre (usuario 2026-10-25, H-21); lleva una flecha en un lugar fijo, que en
+la carpeta abierta es la misma flecha girada y no mueve el nombre, o un ícono de contorno en el archivo
+(código, imagen u hoja), el nombre en peso normal, y a la derecha solo la marca de git
+y, en un archivo modificado, sus líneas `+` `−` (QT-16): sin fecha ni tamaño, y sin Σ. La fila
+elegida tiene fondo y la fila bajo el puntero, uno más suave. Lo que Claude lee, escribe o
+commitea va en un punto de su color junto al nombre, porque la app no pinta el texto de un botón.
+La pestaña del archivo lleva la ruta como migas y, a su derecha, los botones `Ver la fuente` o
+`Ver dibujado` (en un `.md`), `Copiar ruta` y `Abrir con la app`; debajo, el detalle en chico
+(QT-18; en texto y no en íconos porque la app dibuja el nombre del botón, H-19).
+Diferencias con el de la app que la API no deja evitar: el fondo de la fila elegida no tiene
+esquinas redondeadas.
 
 ### RN-files-dividido · origin: usuario 2026-10-14 (Q-01: "los dos a la vez"); lo ampliado, Q-07
 El panel muestra el árbol arriba y el archivo elegido abajo, al mismo tiempo, salvo mientras
@@ -655,6 +702,48 @@ campo de búsqueda queda usable.
   Code se verían lavados (sin probar).
 
 ## Tests
+
+**0.5.7 (unidad 363, 2026-10-25): 142 tests**, todos pasan, más `validate`; `tsc` no corrió. Sin el
+mapa; un archivo cambiado va en el `Code` de la app como uno sin cambios, con `+12` `-3` en el
+detalle; un C# cambiado, pintado línea por línea con los colores de Visual Studio. **No cubierto
+hasta QA:** cómo se ven en la app los fondos con transparencia bajo el C# coloreado.
+**0.5.6 (unidad 363, 2026-10-25): 144 tests**, todos pasan, más `validate`; `tsc` no corrió. El mapa
+de cambios arriba (región `map-live.tsx`) marca el cambio y apunta a su línea pintada; un archivo
+sin cambios no lo tiene. **No cubierto hasta QA:** que el clic en el mapa haga scrollear a la app
+(el kit de pruebas no resuelve el `$.ui.scroll` de un mod).
+**0.5.5 (unidad 363, 2026-10-25): 142 tests**, todos pasan, más `validate`; `tsc` no corrió. Sin la
+barra de 0.5.4: el archivo cambiado sigue pintado línea por línea y la rueda sobre él le llega a la
+app, que lo desplaza entero. **No cubierto hasta QA:** cómo se ven los fondos con transparencia.
+**0.5.4 (unidad 363, 2026-10-25): 145 tests**, todos pasan, más `validate`; `tsc` no corrió (no
+hay compilador). En la app, el archivo cambiado se pinta línea por línea sin `Code` ni `@@`, con
+su barra propia (región `bar-live.tsx`) cuando no entra; el mapa marca el cambio, un clic en él
+lo trae a la vista, la rueda mueve el archivo y no le llega a la app, y la de un archivo sin
+cambios sí le llega. **No cubierto hasta QA:** que la app mande la rueda a la pestaña cuando el
+contenido entra en ella (H-16 no lo confirmó), cuántas filas ocupa la cabecera (el mod supone 5)
+y cómo se ven los fondos con transparencia.
+**0.5.3 (unidad 363, 2026-10-25): 140 tests**, todos pasan, más `validate`; `tsc` no corrió (no
+hay compilador instalado ni los tipos del motor en `.claude-plugin/types/`). En la app cada fila
+es una región propia del mod (`row-live.tsx`) que toma el clic en todo su ancho (H-21): un clic
+en el extremo derecho abre la carpeta, uno que se suelta fuera de la fila no hace nada, y la
+fila dibujada abierta es la cerrada con la otra flecha. **No cubierto hasta QA:** que la app
+pinte el hover de la fila sobre la región, cómo dibuja las flechas ᐳ ᐯ en su fuente, y Tab entre
+filas, que ya no son botones.
+**0.5.2 (unidad 363, 2026-10-25): 138 tests**, todos pasan, más `validate` y `tsc`; el de C# en la
+app pide los colores de Visual Studio, la fuente mono, una fila por línea y la sangría con
+espacios duros (H-20). **No cubierto hasta QA:** que la app respete el espacio duro. 0.5.1: los de
+`desktop` dibujan las filas (la flecha › ⌄ en el nombre del botón de la carpeta, que es lo que
+la app dibuja; íconos; solo la marca de git; sin Σ), solo `Solo lo cambiado` junto a la búsqueda
+y principal mientras está activo, el punto de actividad y ver fuente o dibujado. **No cubierto
+hasta QA:** que la app acepte el gris con transparencia (`#8b949e38`) de la fila elegida y el
+hover, y el alto de las filas con el paso `xs` de la app.
+**0.4.0 (unidad 363, 2026-10-25): 134 tests**, todos pasan, más `claude plugin validate` y
+`tsc` con los tipos de 2.1.308. Los de la app dibujan el árbol en `desktop` y la pestaña del
+archivo aparte: se abre al elegir y no en la consola, el archivo va entero y sin ▲ ▼ ni barra,
+el C# en el código de la app, el tope de una dibujada, copiar ruta, cerrar Archivos cierra las
+dos, y la rueda sigue a la app cuando el árbol es más alto que el cuerpo (este falla sin el
+cambio). **No cubierto hasta QA:** cerrar cualquiera de las dos pestañas con su ✕ (el kit no
+levanta un cierre de la persona), qué pestaña muestra la app al abrir la del archivo, y cómo dibuja la app
+el `Code` cortado al ancho.
 
 `claude plugin test mods/nzt-files`: **120 tests** en 0.2.0 (2026-10-19, unidad 293), todos pasan:
 20 de la lógica del árbol (`tree.test.ts`), 40 de la lógica nueva (con los colores de C# y las

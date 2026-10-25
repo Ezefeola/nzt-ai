@@ -41,10 +41,10 @@ const fakeSession = (on: On, opts: { draft?: string; isPlaced?: boolean; isFille
 const turnEnds = ($: Engine, answer: string, extra: { agentId?: string; isAborted?: boolean } = {}) =>
   $.turn.complete({ answer, durationMs: 1, isAborted: false, turnId: 't1', reason: 'answer', ...extra } as never)
 
-const mount = ($: Engine, bodyRows = 40, bodyColumns = 60) =>
+const mount = ($: Engine, bodyRows = 40, bodyColumns = 60, surface: 'terminal' | 'desktop' = 'terminal') =>
   $.ui.mount({
     plugin: 'nzt-questions',
-    surface: 'terminal',
+    surface,
     component: 'Pane',
     requestId: 'nzt-questions',
     viewport: { columns: bodyColumns + 4, rows: bodyRows + 4 },
@@ -195,4 +195,113 @@ test('the command opens the pane and, run again, closes it', async ($, on) => {
     $.command.run({ command: 'nzt-questions', args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 160 } })
   expect(await run()).toEqual({ text: 'Panel de preguntas abierto.' })
   expect(await run()).toEqual({ text: 'Panel de preguntas cerrado.' })
+})
+
+/** A click along the right end of a row in the app, released on it. */
+const clickRow = async (ui: Awaited<ReturnType<typeof mount>>, key: string) => {
+  await ui.resize({ columns: 40, rows: 1, in: key })
+  await ui.pointer({ type: 'down', x: 38, y: 0, button: 'left', in: key })
+  await ui.pointer({ type: 'up', x: 38, y: 0, button: 'left', in: key })
+}
+
+test('in the app the pane goes unframed and drawn whole: no title, Close, rules, keys line, list-or-answer or key chips; the terminal keeps them', async ($, on) => {
+  fakeSession(on)
+  await turnEnds($, ANSWER)
+
+  const desk = await mount($, 40, 60, 'desktop')
+  const term = await mount($)
+
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.borderStyle).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.height).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Button' })).map(button => button.props.hotkey).filter(Boolean)).toEqual([])
+  expect(await desk.find({ key: 'close' })).toBeUndefined()
+  expect(await desk.find({ key: 'swap' })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: ' NZT ' })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /^─+$/ })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /Tab recorrer/ })).toBeUndefined()
+  expect(await term.find({ key: 'close' })).toBeDefined()
+  expect(await term.find({ key: 'swap' })).toBeDefined()
+  expect(await term.find({ type: 'Text', text: /Tab recorrer/ })).toBeDefined()
+})
+
+test('in the app the list is drawn whole, and a click anywhere along a row shows its question', async ($, on) => {
+  fakeSession(on)
+  const many = Array.from({ length: 12 }, (_, i) => `QT-${String(i + 10)} · ¿Pregunta número ${i + 1}?`).join('\n\n')
+  await turnEnds($, many)
+  const ui = await mount($, 40, 30, 'desktop')
+  expect(await ui.find({ type: 'Text', text: /^↓ \d+ más$/ })).toBeUndefined()
+
+  await clickRow(ui, 'go:QT-21')
+
+  expect(await ui.find({ type: 'Text', text: '¿Pregunta número 12?' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^ QT-21 · ¿Pregunta número 12\?$/, in: 'go:QT-21' })).toMatchObject({ props: { bold: true } })
+})
+
+test('in the app a click anywhere along an option picks it, and the option keeps its colors', async ($, on) => {
+  fakeSession(on)
+  await turnEnds($, ANSWER)
+  const ui = await mount($, 40, 60, 'desktop')
+  expect(await ui.find({ key: 'review' })).toBeUndefined()
+
+  await clickRow(ui, 'option:main, igual que a mano')
+
+  expect(await ui.find({ type: 'Text', text: /^●$/, in: 'option:main, igual que a mano' })).toMatchObject({ props: { color: '#f48fb1' } })
+  expect(await ui.find({ type: 'Text', text: /^ ★ recomendada$/, in: 'option:main, igual que a mano' })).toMatchObject({ props: { color: 'claude' } })
+  expect(await ui.find({ key: 'review' })).toMatchObject({ props: { variant: 'primary' } })
+  expect(await ui.find({ type: 'Text', text: /^1 de 2 contestadas$/ })).toBeDefined()
+})
+
+test('in the app the answers go to the prompt with the primary button', async ($, on) => {
+  const session = fakeSession(on)
+  await turnEnds($, ANSWER)
+  const ui = await mount($, 40, 60, 'desktop')
+  await clickRow(ui, 'option:main, igual que a mano')
+  await ui.press({ key: 'next' })
+  await ui.input({ key: 'other:que quede en el prompt o se manda solo', text: 'Que quede en el prompt' })
+  expect(await ui.find({ key: 'take' })).toMatchObject({ props: { variant: 'primary' } })
+
+  await ui.press({ key: 'take' })
+
+  expect(session.fills.map(fill => fill.text)).toEqual(['QT-02: A — main, igual que a mano\n2: Que quede en el prompt'])
+  expect(await ui.find({ type: 'Text', text: /Está en el prompt/ })).toBeDefined()
+  expect(await ui.find({ key: 'again' })).toMatchObject({ props: { variant: 'primary' } })
+})
+
+const wheel = (contentRows: number) => ({
+  component: 'Pane' as const,
+  requestId: 'nzt-questions',
+  offset: 1,
+  by: 1,
+  bodyRows: 10,
+  contentRows,
+  origin: { kind: 'person' as const },
+  pointer: { row: 4, column: 3 },
+})
+
+test('a wheel over a pane taller than its body goes on to the app, which scrolls it', async ($, on) => {
+  fakeSession(on)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await turnEnds($, ANSWER)
+
+  await $.ui.scroll(wheel(40))
+
+  expect(reached).toEqual([1])
+})
+
+test('a wheel over a pane as tall as its body moves the options, as on the terminal', async ($, on) => {
+  fakeSession(on)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await turnEnds($, ANSWER)
+
+  await $.ui.scroll(wheel(10))
+
+  expect(reached).toEqual([])
 })

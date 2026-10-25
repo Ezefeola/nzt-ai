@@ -6,6 +6,7 @@ import { nextModeOf, parseState, withDelegation } from './parse'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { GLOW_STEPS, glowOf } from './glow'
+import type { GlowPress, GlowProps } from './glow-live'
 import { colorOf, idOf, knownPhasesOf, labelOf, timelineOf, unknownPhasesOf } from './phases'
 import {
   animatedSvgOf,
@@ -266,12 +267,28 @@ export const register: Register = (on, options) => {
     return ran
   })
 
+  // A click or Enter on the glowing Tu turno folds or unfolds it, as its Button does on the terminal.
+  on('ui.message', { requestId: PANE }, async ($, e) => {
+    const press = (e.data as Partial<GlowPress> | null)?.press
+    if (press === 'turn') await update($, expanded, now => ({ ...now, turn: !now.turn }))
+    return {}
+  })
+
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Button } = $.ui.resolve(e)
+    const elements = $.ui.resolve(e)
+    const { Box, Text, Button } = elements
+    // The terminal is a grid of cells, where columns counted and rows padded with spaces line
+    // up. The other surfaces lay boxes out as flex in a proportional font, where spaces in a
+    // row collapse and a width counted in cells is a guess: there a column takes what is left.
+    const isGrid = e.surface === 'terminal'
+    // On the terminal the glow is a value the pane reads, so each step draws it again. Elsewhere
+    // a redraw of the pane restarts the hover of its buttons: a Client glows on its own clock,
+    // and a surface with none draws the glow at its full tone.
+    const Client = !isGrid && 'Client' in elements ? elements.Client : undefined
     const state = await read($, snapshot)
     const open = await read($, expanded)
     const pressed = await read($, answering)
-    const step = await read($, glow)
+    const step = isGrid ? await read($, glow) : GLOW_STEPS / 2
     const failedDelegation = await read($, delegating)
     const asked = await questionsOf($)
     const width = Math.max(24, e.props.bodyColumns - 1)
@@ -300,6 +317,10 @@ export const register: Register = (on, options) => {
     const toggle = (key: Folded) => () =>
       update($, expanded, now => ({ ...now, [key]: now[key] !== true }))
 
+    const fill = (columns: number) => (isGrid ? { width: columns } : { flexGrow: 1, flexShrink: 1, minWidth: 0 })
+    const across = (columns: number) => (isGrid ? { width: columns } : {})
+    const padded = (text: string, columns: number) => (isGrid ? text.padEnd(columns) : text)
+
     // A section the person folds and unfolds with a click, or Enter under the focus.
     // The terminal inverts each Text of a Button under the pointer in its own color
     // and offers no transition, so the label is one Text padded to the full row:
@@ -308,7 +329,7 @@ export const register: Register = (on, options) => {
       <Box marginTop={1}>
         <Button key={`toggle-${key}`} plain onPress={toggle(key)}>
           <Text bold color="claude">
-            {`${open[key] === true ? '▾' : '▸'} ${label} · ${count}`.padEnd(inner)}
+            {padded(`${open[key] === true ? '▾' : '▸'} ${label} · ${count}`, inner)}
           </Text>
         </Button>
       </Box>
@@ -333,13 +354,12 @@ export const register: Register = (on, options) => {
 
     // A unit as the checklist marks it; the one in progress carries its detail, folded to a
     // row until the person presses it.
-    const row = (unit: Unit, columns: number, indent = 0) => {
+    // `place` tells apart the same unit drawn in AHORA and in the tasks, each glow its own.
+    const row = (unit: Unit, columns: number, indent: number, place: 'now' | 'tasks' | 'invalid') => {
       const isNext = unit.id === following?.id
       // The unit in progress glows softly in its phase's color, mark and text alike.
-      const lit =
-        unit.status === 'doing'
-          ? glowOf(unit.phase === undefined ? DOING_COLOR : colorOf(unit.phase), step, DOING_DEPTH)
-          : undefined
+      const doingColor = unit.phase === undefined ? DOING_COLOR : colorOf(unit.phase)
+      const lit = unit.status === 'doing' ? glowOf(doingColor, step, DOING_DEPTH) : undefined
       const mark = isNext
         ? { glyph: '▷', color: colorOf(unit.phase ?? '') }
         : lit !== undefined
@@ -360,18 +380,33 @@ export const register: Register = (on, options) => {
           {unit.status === 'invalid' && <Text color="warning"> · status {unit.rawStatus || '—'}</Text>}
         </Text>
       )
+      const glows = Client !== undefined && unit.status === 'doing'
+      const glowing = (part: string, props: Omit<GlowProps, 'color' | 'depth' | 'press'>) =>
+        Client !== undefined && (
+          <Client
+            key={`glow-${part}-${place}-${unit.id}`}
+            module="./glow-live.tsx"
+            props={{ ...props, color: doingColor, depth: DOING_DEPTH, press: null }}
+          />
+        )
       return (
         <Box flexDirection="column" marginLeft={indent}>
           <Box flexDirection="row">
             <Box width={2}>
-              <Text color={mark.color} bold={unit.status === 'doing'}>{mark.glyph}</Text>
+              {glows ? (
+                glowing('mark', { text: mark.glyph, isBold: true, wrap: 'truncate-end' })
+              ) : (
+                <Text color={mark.color} bold={unit.status === 'doing'}>{mark.glyph}</Text>
+              )}
             </Box>
             <Box width={idWidth}>
               <Text dimColor>{unit.id}</Text>
             </Box>
-            <Box width={textWidth}>
+            <Box {...fill(textWidth)}>
               {/* A Button holds text only: the unit's text is what a press unfolds the detail from. */}
-              {hasDetail ? (
+              {glows ? (
+                glowing('text', { text: unit.do, isBold: true, wrap: 'wrap' })
+              ) : hasDetail ? (
                 <Button key={`detail-${unit.id}`} plain onPress={toggle('detail')}>{text}</Button>
               ) : (
                 text
@@ -379,8 +414,15 @@ export const register: Register = (on, options) => {
             </Box>
           </Box>
           {hasDetail && (
-            <Box marginLeft={2 + idWidth} width={textWidth}>
-              <Text dimColor wrap={open.detail ? 'wrap' : 'truncate-end'}>{unit.detail}</Text>
+            <Box marginLeft={2 + idWidth} {...across(textWidth)}>
+              {/* Where the unit's text glows outside a Button, the detail is what a press unfolds. */}
+              {glows ? (
+                <Button key={`detail-${place}-${unit.id}`} plain onPress={toggle('detail')}>
+                  <Text dimColor wrap={open.detail ? 'wrap' : 'truncate-end'}>{unit.detail}</Text>
+                </Button>
+              ) : (
+                <Text dimColor wrap={open.detail ? 'wrap' : 'truncate-end'}>{unit.detail}</Text>
+              )}
             </Box>
           )}
         </Box>
@@ -443,9 +485,11 @@ export const register: Register = (on, options) => {
       )
     })
 
-    const character = (columns: number) =>
+    // Its box: a width in cells on the terminal; elsewhere its own size beside Plan, or the
+    // whole row when it stands above them.
+    const character = (box: object) =>
       characterPhase !== undefined && (
-          <Box flexDirection="column" alignItems="center" width={columns}>
+          <Box flexDirection="column" alignItems="center" {...box}>
             {Raster !== undefined && (
               <Raster
                 key={CHARACTER}
@@ -467,7 +511,7 @@ export const register: Register = (on, options) => {
 
     // Plan, mode and goal: the column beside the character, or under it when they are stacked.
     const summary = (columns: number) => (
-      <Box flexDirection="column" width={columns}>
+      <Box flexDirection="column" {...fill(columns)}>
         <Box flexDirection="row">
           <Box width={LABEL}>
             <Text dimColor>{t.plan}</Text>
@@ -482,7 +526,7 @@ export const register: Register = (on, options) => {
           <Box width={LABEL}>
             <Text dimColor>{t.mode}</Text>
           </Box>
-          <Box width={columns - LABEL}>
+          <Box {...fill(columns - LABEL)}>
             {state.autonomy.units.length === 0 ? (
               <Text wrap="wrap">
                 {t.accompanied}<Text dimColor>{t.stopsEachUnit}</Text>
@@ -510,7 +554,7 @@ export const register: Register = (on, options) => {
           <Box width={LABEL}>
             <Text dimColor>{t.delegate}</Text>
           </Box>
-          <Box width={columns - LABEL}>
+          <Box {...fill(columns - LABEL)}>
             <Button key="cycle-delegation" plain onPress={() => cycleDelegation($)}>
               <Text wrap="wrap">
                 <Text color={state.delegation.mode === 'off' ? 'inactive' : 'claude'} bold>
@@ -530,7 +574,7 @@ export const register: Register = (on, options) => {
         {failedDelegation !== null && (
           <Text color="error" wrap="wrap">{t.delegationFailed(failedDelegation)}</Text>
         )}
-        <Box marginTop={1} width={columns}>
+        <Box marginTop={1} {...across(columns)}>
           <Text wrap="wrap">
             <Text dimColor>{t.goal} </Text>
             <Text bold>{state.goal}</Text>
@@ -547,13 +591,28 @@ export const register: Register = (on, options) => {
     const yourTurn = isYourTurn && (
       <Box key="your-turn" marginTop={1} flexDirection="column">
         {/* A Button holds text only: the title and the folded text are each one, pressing alike. */}
-        <Box flexDirection="row" gap={1} width={inner}>
+        <Box flexDirection="row" gap={1} {...across(inner)}>
           <Box flexShrink={0}>
-            <Button key="toggle-turn" plain onPress={toggle('turn')}>
-              <Text color={glowOf(TURN_COLOR, step, TURN_DEPTH)} bold>
-                {`${open.turn ? '▾' : '▸'} ${t.yourTurn}`}
-              </Text>
-            </Button>
+            {Client !== undefined ? (
+              <Client
+                key="glow-turn"
+                module="./glow-live.tsx"
+                props={{
+                  text: `${open.turn ? '▾' : '▸'} ${t.yourTurn}`,
+                  color: TURN_COLOR,
+                  depth: TURN_DEPTH,
+                  isBold: true,
+                  wrap: 'truncate-end',
+                  press: 'turn',
+                } satisfies GlowProps}
+              />
+            ) : (
+              <Button key="toggle-turn" plain onPress={toggle('turn')}>
+                <Text color={glowOf(TURN_COLOR, step, TURN_DEPTH)} bold>
+                  {`${open.turn ? '▾' : '▸'} ${t.yourTurn}`}
+                </Text>
+              </Button>
+            )}
           </Box>
           {!open.turn && (
             <Box flexGrow={1} flexShrink={1} overflow="hidden">
@@ -615,9 +674,9 @@ export const register: Register = (on, options) => {
               </Text>
               <Text dimColor>{t.unitOf(position, counted.length)}</Text>
             </Box>
-            {previous !== undefined && row(previous, boxed)}
-            {(doing.length > 0 ? doing : focus === undefined ? [] : [focus]).map(unit => row(unit, boxed))}
-            {upcoming !== undefined && upcoming !== focus && row(upcoming, boxed)}
+            {previous !== undefined && row(previous, boxed, 0, "now")}
+            {(doing.length > 0 ? doing : focus === undefined ? [] : [focus]).map(unit => row(unit, boxed, 0, "now"))}
+            {upcoming !== undefined && upcoming !== focus && row(upcoming, boxed, 0, "now")}
             {(upcoming === undefined || upcoming === focus) && laterSlice !== undefined && (
               <Text dimColor wrap="truncate-end">{`▷ ${t.nextSlice(`${laterSlice.id} · ${laterSlice.name}`)}`}</Text>
             )}
@@ -634,7 +693,7 @@ export const register: Register = (on, options) => {
     const isGroupOpen = (phase: string) => open.groups?.[phase] ?? phase === currentPhase
     const tasks = groupsOf(state.units).map(group => {
       if (group.phase === undefined) {
-        return <Box flexDirection="column" marginTop={1}>{group.units.map(unit => row(unit, inner))}</Box>
+        return <Box flexDirection="column" marginTop={1}>{group.units.map(unit => row(unit, inner, 0, "tasks"))}</Box>
       }
       const phase = group.phase
       const live = group.units.filter(u => u.status !== 'dropped' && u.status !== 'invalid')
@@ -642,27 +701,35 @@ export const register: Register = (on, options) => {
       const isGroupDone = live.length > 0 && finished === live.length
       const label = `${isGroupOpen(phase) ? '▾' : '▸'} ${isGroupDone ? '✓ ' : ''}${labelOf(phase, lang)}`
       const count = t.phaseCount(finished, live.length)
+      const toggleGroup = () =>
+        update($, expanded, now => ({
+          ...now,
+          groups: { ...now.groups, [phase]: !(now.groups?.[phase] ?? phase === currentPhase) },
+        }))
       return (
         <Box flexDirection="column" marginTop={1}>
-          <Box flexDirection="row">
-            <Box width={2} />
-            {mini(phase, `mini-tasks-${phase}`)}
-            <Button
-              key={`toggle-group-${phase}`}
-              plain
-              onPress={() =>
-                update($, expanded, now => ({
-                  ...now,
-                  groups: { ...now.groups, [phase]: !(now.groups?.[phase] ?? phase === currentPhase) },
-                }))
-              }
-            >
-              <Text bold color={colorOf(phase)}>
-                {`${label}${' '.repeat(Math.max(1, inner - 2 - MINI_WIDTH - 1 - label.length - count.length))}${count}`}
-              </Text>
-            </Button>
-          </Box>
-          {isGroupOpen(phase) && group.units.map(unit => row(unit, inner, GROUP_INDENT))}
+          {isGrid ? (
+            <Box flexDirection="row">
+              <Box width={2} />
+              {mini(phase, `mini-tasks-${phase}`)}
+              <Button key={`toggle-group-${phase}`} plain onPress={toggleGroup}>
+                <Text bold color={colorOf(phase)}>
+                  {`${label}${' '.repeat(Math.max(1, inner - 2 - MINI_WIDTH - 1 - label.length - count.length))}${count}`}
+                </Text>
+              </Button>
+            </Box>
+          ) : (
+            <Box flexDirection="row" alignItems="center" gap={1}>
+              {mini(phase, `mini-tasks-${phase}`)}
+              <Box flexGrow={1} flexShrink={1} minWidth={0}>
+                <Button key={`toggle-group-${phase}`} plain onPress={toggleGroup}>
+                  <Text bold color={colorOf(phase)}>{label}</Text>
+                </Button>
+              </Box>
+              <Text dimColor>{count}</Text>
+            </Box>
+          )}
+          {isGroupOpen(phase) && group.units.map(unit => row(unit, inner, GROUP_INDENT, "tasks"))}
         </Box>
       )
     })
@@ -683,11 +750,11 @@ export const register: Register = (on, options) => {
           <Box marginTop={1} flexDirection="row">
             {summary(inner - WIDTH - SIDE_BY_SIDE_GAP)}
             <Box width={SIDE_BY_SIDE_GAP} />
-            {character(WIDTH)}
+            {character(isGrid ? { width: WIDTH } : { flexShrink: 0 })}
           </Box>
         ) : (
           <Box flexDirection="column">
-            {characterPhase !== undefined && <Box marginTop={1}>{character(inner)}</Box>}
+            {characterPhase !== undefined && <Box marginTop={1}>{character(fill(inner))}</Box>}
             <Box marginTop={1}>{summary(inner)}</Box>
           </Box>
         )}
@@ -700,7 +767,7 @@ export const register: Register = (on, options) => {
               <Box width={LABEL}>
                 <Text dimColor>{t.slice}</Text>
               </Box>
-              <Box width={inner - LABEL}>
+              <Box {...fill(inner - LABEL)}>
                 <Text bold wrap="truncate-end">
                   {t.sliceOf(state.current + 1, state.slices.length, state.slices[state.current]?.name ?? '')}
                 </Text>
@@ -712,7 +779,7 @@ export const register: Register = (on, options) => {
                 <Box width={2}>
                   <Text color={MARK[slice.status].color}>{MARK[slice.status].glyph}</Text>
                 </Box>
-                <Box width={inner - 2}>
+                <Box {...fill(inner - 2)}>
                   <Text
                     wrap="truncate-end"
                     bold={index === state.current}
@@ -753,10 +820,16 @@ export const register: Register = (on, options) => {
             {Math.round(ratio * 100)}%
           </Text>
         </Box>
-        <Text>
-          <Text color={isComplete ? 'success' : 'claude'}>{'━'.repeat(filled)}</Text>
-          <Text color="inactive">{'━'.repeat(inner - filled)}</Text>
-        </Text>
+        {isGrid ? (
+          <Text>
+            <Text color={isComplete ? 'success' : 'claude'}>{'━'.repeat(filled)}</Text>
+            <Text color="inactive">{'━'.repeat(inner - filled)}</Text>
+          </Text>
+        ) : (
+          <Box key="progress" flexDirection="row" height={1} backgroundColor="inactive">
+            <Box width={`${Math.round(ratio * 100)}%`} backgroundColor={isComplete ? 'success' : 'claude'} />
+          </Box>
+        )}
         {updated && (
           <Box flexDirection="row" justifyContent="flex-end">
             <Text dimColor>{t.updated(updated)}</Text>
@@ -768,7 +841,7 @@ export const register: Register = (on, options) => {
             <Text color="warning" wrap="wrap">
               {t.invalid(invalid.length)}
             </Text>
-            {invalid.map(unit => row(unit, boxed))}
+            {invalid.map(unit => row(unit, boxed, 0, "invalid"))}
           </Box>
         )}
 
@@ -779,7 +852,7 @@ export const register: Register = (on, options) => {
             <Button key="toggle-tasks" plain onPress={toggle('tasks')}>
               <Text bold color="claude">
                 {`☰ ${open.tasks ? t.hideTasks : t.showTasks}`}
-                <Text dimColor bold={false}>{` · ${state.units.length}`.padEnd(inner - 2 - (open.tasks ? t.hideTasks : t.showTasks).length)}</Text>
+                <Text dimColor bold={false}>{padded(` · ${state.units.length}`, inner - 2 - (open.tasks ? t.hideTasks : t.showTasks).length)}</Text>
               </Text>
             </Button>
           </Box>
@@ -794,7 +867,7 @@ export const register: Register = (on, options) => {
                 <Box width={2}>
                   <Text dimColor>•</Text>
                 </Box>
-                <Box width={inner - 2}>
+                <Box {...fill(inner - 2)}>
                   <Text dimColor wrap="wrap">{note}</Text>
                 </Box>
               </Box>

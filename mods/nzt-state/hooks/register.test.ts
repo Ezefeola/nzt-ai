@@ -133,7 +133,7 @@ test('the pane draws the unit in progress and what comes next', async ($, on) =>
         view: {},
       },
     })
-    expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
+    // The unit in progress glows: where its text is drawn is each surface's, in the glow tests.
     expect(await ui.find({ type: 'Text', text: /de 3 unidades hechas/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /^33%$/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /hace 2 h/ })).toBeDefined()
@@ -156,10 +156,11 @@ test('the pane draws the unit in progress and what comes next', async ($, on) =>
     await ui.press({ key: 'toggle-tasks' })
     expect(await ui.find({ type: 'Text', text: /☰ Ocultar tareas/ })).toBeDefined()
 
-    // Each phase a group; only the one in progress open, a finished one with its check.
-    expect(await ui.find({ type: 'Text', text: /^▾ Build +0 de 1$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /^▸ ✓ Análisis +1 de 1$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /^▸ Verificación +0 de 1$/ })).toBeDefined()
+    // Each phase a group; only the one in progress open, a finished one with its check. How
+    // its heading lines up is each surface's, in the tests below.
+    expect(await ui.find({ type: 'Text', text: /^▾ Build/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^▸ ✓ Análisis/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^▸ Verificación/ })).toBeDefined()
     await ui.press({ key: 'toggle-group-analysis' })
     const dropped = await ui.find({ type: 'Text', text: /Old idea/ })
     expect(dropped?.props).toMatchObject({ strikethrough: true })
@@ -757,6 +758,124 @@ test('a narrow pane stacks the character above Plan and Mode', async ($, on) => 
 test('the desktop pane puts Plan and Mode beside the character too', async ($, on) => {
   const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 60)
   expect(rowWithCharacterAndPlan(await ui.drawn())).toBeDefined()
+  await ui.unmount()
+})
+
+/** Every string the tree draws, in the order written. */
+const stringsOf = (node: unknown): string[] => {
+  if (typeof node === 'string') return [node]
+  if (node === null || typeof node !== 'object') return []
+  return ((node as Drawn).children ?? []).flatMap(stringsOf)
+}
+
+/** Every Box in the tree, in the order written. */
+const boxesOf = (node: unknown): Drawn[] => {
+  if (node === null || typeof node !== 'object') return []
+  const el = node as Drawn
+  return [...(el.type === 'Box' ? [el] : []), ...(el.children ?? []).flatMap(boxesOf)]
+}
+
+/** The state with its tasks and notes unfolded, so every row the pane can pad is drawn. */
+const unfold = async (ui: Awaited<ReturnType<typeof mountPane>>) => {
+  await ui.press({ key: 'toggle-tasks' })
+  await ui.press({ key: 'toggle-notes' })
+}
+
+test('the terminal pads each heading to the edge and draws the progress as a rule', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE))
+  await unfold(ui)
+
+  const drawn = stringsOf(await ui.drawn())
+
+  expect(await ui.find({ type: 'Text', text: /^▾ Build +0 de 1$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^▸ ✓ Análisis +1 de 1$/ })).toBeDefined()
+  expect(drawn.some(text => text.startsWith('━'))).toBe(true)
+  await ui.unmount()
+})
+
+test('the desktop lays the pane out as boxes: no padding, no rule of glyphs, a bar for progress', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop')
+  await unfold(ui)
+
+  const tree = await ui.drawn()
+
+  // A run of spaces collapses in a proportional font: nothing lines up by padding.
+  expect(stringsOf(tree).filter(text => / {2}/.test(text))).toEqual([])
+  expect(stringsOf(tree).filter(text => text.includes('━'))).toEqual([])
+  // The heading's name and count are two texts, the count at the end of the row.
+  expect(await ui.find({ type: 'Text', text: /^▾ Build$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^▸ ✓ Análisis$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^1 de 1$/ })).toBeDefined()
+  // One unit of three done: the bar's fill is a third of its track.
+  const progress = boxesOf(tree).find(box => box.props?.key === 'progress')
+  expect(progress?.children?.[0]).toMatchObject({ type: 'Box', props: { width: '33%' } })
+  await ui.unmount()
+})
+
+const WAITING = { ...JSON.parse(STATE), waiting_on: 'Approve the plan' }
+
+test('on the terminal the glow is drawn by the pane: Tu turno and the unit in progress in its tone', async ($, on) => {
+  const ui = await mountPane($, on, WAITING)
+
+  const turn = await ui.find({ type: 'Text', text: /Tu turno/ })
+  const unit = await ui.find({ type: 'Text', text: /Draw the pane/ })
+
+  expect(turn?.props?.color).toMatch(/^#[0-9a-f]{6}$/)
+  expect(unit?.props?.color).toMatch(/^#[0-9a-f]{6}$/)
+  expect(await ui.find({ type: 'Client' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('on the desktop the glow runs on its own clock, so the pane is not drawn again each step', async ($, on) => {
+  const ui = await mountPane($, on, WAITING, 'desktop')
+  const pane = JSON.stringify(await ui.drawn())
+  const before = await ui.find({ type: 'Text', text: /Tu turno/, in: 'glow-turn' })
+
+  await ui.advance(220 * 3)
+
+  const after = await ui.find({ type: 'Text', text: /Tu turno/, in: 'glow-turn' })
+  expect(after?.props?.color).not.toBe(before?.props?.color)
+  expect(JSON.stringify(await ui.drawn())).toBe(pane)
+  expect(await ui.find({ type: 'Text', text: /Draw the pane/, in: 'glow-text-now-2' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^▶$/, in: 'glow-mark-now-2' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('on the desktop Tu turno is no Button, which the app would draw in its own color, but a glowing text', async ($, on) => {
+  const ui = await mountPane($, on, WAITING, 'desktop')
+
+  const turn = await ui.drawn({ in: 'glow-turn' })
+
+  expect(turn).toMatchObject({
+    type: 'Box',
+    children: [{ type: 'Text', props: { color: expect.stringMatching(/^#[0-9a-f]{6}$/) }, children: [expect.stringMatching(/^▸ .*Tu turno$/)] }],
+  })
+  expect(await ui.find({ type: 'Button', in: 'glow-turn' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('on the desktop a click released on Tu turno unfolds it, and one released off it does not', async ($, on) => {
+  const ui = await mountPane($, on, WAITING, 'desktop')
+  await ui.resize({ columns: 14, rows: 1, in: 'glow-turn' })
+
+  await ui.pointer({ type: 'down', x: 3, y: 0, button: 'left', in: 'glow-turn' })
+  await ui.pointer({ type: 'up', x: 30, y: 0, button: 'left', in: 'glow-turn' })
+  expect(await ui.find({ type: 'Text', text: /^▸ .*Tu turno$/, in: 'glow-turn' })).toBeDefined()
+
+  await ui.pointer({ type: 'down', x: 3, y: 0, button: 'left', in: 'glow-turn' })
+  await ui.pointer({ type: 'up', x: 3, y: 0, button: 'left', in: 'glow-turn' })
+  expect(await ui.find({ type: 'Text', text: /^▾ .*Tu turno$/, in: 'glow-turn' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('on the desktop Enter on Tu turno unfolds it, and the detail unfolds the unit in progress', async ($, on) => {
+  const ui = await mountPane($, on, WAITING, 'desktop')
+
+  await ui.key({ key: 'return', in: 'glow-turn' })
+  await ui.press({ key: 'detail-now-2' })
+
+  expect(await ui.find({ type: 'Text', text: /^▾ .*Tu turno$/, in: 'glow-turn' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /header drawn/ })).toMatchObject({ props: { wrap: 'wrap' } })
   await ui.unmount()
 })
 

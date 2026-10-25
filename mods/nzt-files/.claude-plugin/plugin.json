@@ -1,6 +1,6 @@
 {
   "name": "nzt-files",
-  "version": "0.2.0",
+  "version": "0.5.7",
   "description": "Browse the project like an editor's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file beneath",
   "author": { "name": "Ezefeola" },
   "types": "./types/index.d.ts",

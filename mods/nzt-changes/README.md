@@ -1,6 +1,6 @@
 # nzt-changes
 
-> Versión **0.5.0** · spec en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md)
+> Versión **0.6.0** · spec en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md)
 
 Un panel lateral de Claude Code para recorrer los cambios **un diff por vez**, con el diseño
 de [Replay Theater](https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/replay-theater),
@@ -89,6 +89,13 @@ Arriba a la derecha, bajo la línea que separa el índice, qué líneas se ven (
 Claude Code pone el panel **al costado de la conversación** solo en pantalla completa y con
 la terminal de 110 columnas o más; ahí lo abre de 58 columnas, como Replay Theater, y con
 todo el alto. Si no, lo pone **sobre el prompt**, de 24 filas, y `/nzt-changes` dice por qué.
+
+En la **app de escritorio** el panel va en su pestaña, sin marco ni Cerrar, y lo desplaza el
+scroll de la app: arriba Turno y HEAD, el paso y Anterior / Siguiente; después el índice entero,
+donde un clic en cualquier parte de la fila abre un grupo o salta a ese paso; y debajo el diff
+del paso, pintado como el de Visual Studio: cada línea con su número, la agregada sobre verde y
+la borrada sobre rojo, y el C# con sus colores. En la app los botones no tienen tecla: se usa el
+mouse.
 
 La vista HEAD se actualiza sola mientras el panel está abierto. La vista Turno cambia al
 terminar cada turno en el que Claude editó algo. El panel solo lee: no hace stage, no

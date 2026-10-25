@@ -15,6 +15,10 @@
 > **0.8.0 a 0.9.1 aceptados y cerrados** (usuario 2026-10-24, tras la prueba en vivo en
 > `Systems/TodoList`): la fila **Delegar** y su excepción a RN-panel-solo-lee (0.8.0, D71),
 > los tramos de un estado v2 (0.9.0, D72 y D73) y su lista plegada (0.9.1, D75).
+> **0.10.0 construido** (unidad 361, 2026-10-24): el panel se arma en la app de escritorio con
+> cajas flex en lugar de columnas contadas (sección **Escritorio**); en la terminal no cambia
+> nada. Revisión que lo pidió: `specs/mods/revision-escritorio.md`. Visto andar en la app por el
+> usuario el 2026-10-24 ("funciono bien ahora el mod").
 
 ## Qué resuelve
 
@@ -334,13 +338,41 @@ dibujo lo cambia en las dos.
 
 - Un cambio en el estado aparece en el panel **en 2 segundos como máximo**, y **en el acto**
   cuando lo escribe el agente con Write o Edit (R-05, aceptado por el usuario).
-- Se dibuja igual en la terminal y en la app de escritorio. Los tests montan el panel en
-  las dos superficies.
+- Muestra lo mismo en la terminal y en la app de escritorio, cada una acomodado a su manera
+  (sección **Escritorio**). Los tests montan el panel en las dos superficies.
 - Cambiar el idioma se ve sin reiniciar la sesión.
 - El personaje anima a unos 4 cuadros por segundo sin redibujar el resto del panel.
 - El color completo se ve en terminales de 24 bits (Windows Terminal, iTerm2, Ghostty,
   kitty, WezTerm; Terminal.app desde macOS Tahoe 26). En una terminal de 256 colores el
   dibujo puede salir con tonos aproximados: no se garantiza.
+
+## Escritorio (0.10.0)
+
+La terminal es una grilla de celdas; la app de escritorio dibuja cada `Box` como una caja flex
+y cada `Text` en una fuente proporcional, donde los espacios seguidos se juntan en uno y un
+ancho contado en columnas no coincide con lo que se ve (H-02 y H-05 de
+`specs/mods/revision-escritorio.md`). Por eso, fuera de la terminal, el panel:
+
+- **No rellena con espacios.** Las filas plegables (Notas, Tramos, Ver tareas) llevan solo su
+  texto, y el encabezado de cada fase pone el nombre a la izquierda y el conteo (`1 de 1`) al
+  final de la fila, como dos textos.
+- **Dibuja el avance como una barra**: una caja del ancho del panel en gris con el relleno en
+  el color del avance, del porcentaje de unidades hechas, en lugar de la línea de `━`.
+- **Deja que cada columna tome lo que queda**: el texto de cada unidad, el de Modo y Delegar,
+  los tramos y las notas crecen al lado de su marca o su etiqueta en lugar de un ancho fijo; las
+  marcas, los ids y las etiquetas sí conservan su ancho.
+- **El personaje toma su tamaño** al lado de Plan y Modo, y se centra en la fila cuando va arriba.
+- **El brillo late por su cuenta.** Tu turno y la unidad en curso se dibujan en una región propia
+  (`hooks/glow-live.tsx`) con su reloj. La app dibuja cada botón con su estilo nativo y no toma
+  el color del texto de adentro (H-09), así que lo que brilla no es un botón: en Tu turno,
+  la región misma toma el clic (soltado sobre el texto) y Enter o espacio tras un clic, y se
+  subraya bajo el puntero (QT-06, usuario 2026-10-24: el título entero clickeable y amarillo);
+  la unidad en curso se despliega con un clic en su detalle. El
+  panel ya no se vuelve a dibujar en cada paso del brillo: en la app, cada redibujo hacía titilar
+  el gris del hover de todos los botones (H-08, visto por el usuario el 2026-10-24).
+
+Es construcción: no cambia qué muestra el panel ni cuándo, solo cómo se acomoda. La terminal
+se dibuja igual que en 0.9.1.
 
 ## Bugs
 
@@ -483,7 +515,13 @@ byte, el archivo que no es objeto, la fila con el clic que escribe y el error de
 (0.8.0); el estado por tramos: el tramo en curso con sus fases y unidades, la tanda sobre
 todos los tramos, la fila Tramo con cada tramo, *Sigue el tramo* y el plan completo solo tras
 el último (0.9.0); la lista de tramos plegada, que se abre y se cierra, y sin lista con un solo
-tramo (0.9.1). 55 tests en la unidad 340. **Probados en vivo** por el usuario la fila
+tramo (0.9.1); en la terminal, el encabezado de fase rellenado hasta el borde y el avance como
+línea, y en el escritorio, ningún texto con espacios seguidos ni línea de `━`, el encabezado
+partido en nombre y conteo, y la barra de avance con su relleno en el porcentaje; el brillo en la terminal dibujado por el
+panel y en el escritorio en su región, que cambia de tono sin que el panel cambie, y Tu turno
+que brilla sin ser botón, el clic soltado sobre él que lo despliega y el soltado afuera que no,
+Enter, y el detalle de la unidad en curso que se despliega (0.10.0).
+62 tests en la unidad 361 (55 en la 340). **Probados en vivo** por el usuario la fila
 Delegar y los tramos (2026-10-24). **Sin test:** que el brillo avance en vivo (un paso por cuadro del reloj del personaje, 10
 pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueba en vivo
 ([testing/2026-10-20-en-vivo.md](testing/2026-10-20-en-vivo.md), V-03).

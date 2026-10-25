@@ -28,8 +28,6 @@ const PANE = {
   view: {},
 } as const
 
-const SURFACES = ['terminal', 'desktop'] as const
-
 /** What every `ui.open` asked for, in order. */
 const opens: Record<string, unknown>[] = []
 
@@ -73,7 +71,7 @@ const openPane = ($: Engine, presentation = { isFullscreen: false, columns: 120 
     presentation,
   })
 
-const mount = ($: Engine, surface: (typeof SURFACES)[number]) =>
+const mount = ($: Engine, surface: 'terminal' | 'desktop') =>
   $.ui.mount({
     plugin: 'nzt-changes',
     surface,
@@ -104,22 +102,20 @@ test('after a turn with edits the pane opens on them, one step at a time', async
   fakeGit(on, REPO, [], { 'C:/repo/README.md': 'old\n' })
   await turnWith($, [EDIT, { tool: 'Write', file_path: 'C:/repo/new.md', content: 'x\ny\n' }])
   await openPane($)
-  for (const surface of SURFACES) {
-    const ui = await mount($, surface)
-    expect(await ui.find({ type: 'Text', text: /paso 1 de 2/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: '2 ediciones · 2 archivos' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /new.md$/ })).toBeDefined()
-    expect(await ui.find({ type: 'Code', text: '@@ -1,1 +1,1 @@\n-old\n+new' })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: /paso 2 de 2/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /archivo nuevo/ })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: /paso 2 de 2/ })).toBeDefined()
-    await ui.press({ key: 'prev' })
-    await ui.press({ key: 'prev' })
-    expect(await ui.find({ type: 'Text', text: /paso 1 de 2/ })).toBeDefined()
-  }
+  const ui = await mount($, 'terminal')
+  expect(await ui.find({ type: 'Text', text: /paso 1 de 2/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '2 ediciones · 2 archivos' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /new.md$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Code', text: '@@ -1,1 +1,1 @@\n-old\n+new' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: /paso 2 de 2/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /archivo nuevo/ })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: /paso 2 de 2/ })).toBeDefined()
+  await ui.press({ key: 'prev' })
+  await ui.press({ key: 'prev' })
+  expect(await ui.find({ type: 'Text', text: /paso 1 de 2/ })).toBeDefined()
 })
 
 test('a Write over an existing file is a rewrite with only its changed lines', async ($, on) => {
@@ -353,24 +349,22 @@ test('a diff that fits has no ruler and says how many lines it has', async ($, o
 test('with no edits in the turn it opens on HEAD, ordered by mark and then folder', async ($, on) => {
   fakeGit(on, REPO)
   await openPane($)
-  for (const surface of SURFACES) {
-    const ui = await mount($, surface)
-    expect(await ui.find({ type: 'Text', text: /paso 1 de 5/ })).toBeDefined()
-    // Modified at the root, modified in Plan, new, deleted, renamed.
-    expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /modificado/ })).toBeDefined()
-    expect(await ui.find({ type: 'Code', text: '@@ -1,2 +1,2 @@\n keep\n-old\n+new' })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: 'Plan/state.json' })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: 'specs/new.md' })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: 'img/logo.png' })).toBeDefined()
-    await ui.press({ key: 'next' })
-    expect(await ui.find({ type: 'Text', text: 'docs/a.md → docs/b.md' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /renombrado/ })).toBeDefined()
-    for (let i = 0; i < 4; i++) await ui.press({ key: 'prev' })
-  }
+  const ui = await mount($, 'terminal')
+  expect(await ui.find({ type: 'Text', text: /paso 1 de 5/ })).toBeDefined()
+  // Modified at the root, modified in Plan, new, deleted, renamed.
+  expect(await ui.find({ type: 'Text', text: 'README.md' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /modificado/ })).toBeDefined()
+  expect(await ui.find({ type: 'Code', text: '@@ -1,2 +1,2 @@\n keep\n-old\n+new' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: 'Plan/state.json' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: 'specs/new.md' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: 'img/logo.png' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: 'docs/a.md → docs/b.md' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /renombrado/ })).toBeDefined()
+  for (let i = 0; i < 4; i++) await ui.press({ key: 'prev' })
 })
 
 test('the views switch with their buttons', async ($, on) => {
@@ -411,15 +405,13 @@ test('a file Claude edited says so in the HEAD view', async ($, on) => {
 test('an empty turn and a clean tree say so', async ($, on) => {
   fakeGit(on, { root: 'C:/repo', status: '', numstat: '' })
   await openPane($)
-  for (const surface of SURFACES) {
-    const ui = await mount($, surface)
-    expect(await ui.find({ type: 'Text', text: /Sin cambios contra HEAD/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /sin pasos/ })).toBeDefined()
-    await ui.press({ key: 'view-turn' })
-    expect(await ui.find({ type: 'Text', text: /no editó archivos/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /h muestra todo lo que cambió contra HEAD/ })).toBeDefined()
-    await ui.press({ key: 'view-head' })
-  }
+  const ui = await mount($, 'terminal')
+  expect(await ui.find({ type: 'Text', text: /Sin cambios contra HEAD/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /sin pasos/ })).toBeDefined()
+  await ui.press({ key: 'view-turn' })
+  expect(await ui.find({ type: 'Text', text: /no editó archivos/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /h muestra todo lo que cambió contra HEAD/ })).toBeDefined()
+  await ui.press({ key: 'view-head' })
 })
 
 test('outside a repository HEAD says so and the turn view still works', async ($, on) => {
@@ -486,4 +478,172 @@ test('in English the pane speaks English', { options: { language: 'en' } }, asyn
   const ui = await mount($, 'terminal')
   expect(await ui.find({ type: 'Text', text: /step 1 of 5/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /modified/ })).toBeDefined()
+})
+
+/** A click along the right end of an index row in the app, released on it. */
+const clickRow = async (ui: Awaited<ReturnType<typeof mount>>, key: string) => {
+  await ui.resize({ columns: 40, rows: 1, in: key })
+  await ui.pointer({ type: 'down', x: 38, y: 0, button: 'left', in: key })
+  await ui.pointer({ type: 'up', x: 38, y: 0, button: 'left', in: key })
+}
+
+const ADDED_BG = '#2ea04333'
+const REMOVED_BG = '#f8514933'
+
+test('in the app a turn steps one at a time, its diff painted line by line with no hunk header and no marker', async ($, on) => {
+  fakeGit(on, REPO, [], { 'C:/repo/README.md': 'old\n' })
+  await turnWith($, [EDIT, { tool: 'Write', file_path: 'C:/repo/new.md', content: 'x\ny\n' }])
+  await openPane($)
+
+  const ui = await mount($, 'desktop')
+
+  expect(await ui.find({ type: 'Text', text: 'paso 1 de 2' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '2 ediciones · 2 archivos' })).toBeDefined()
+  expect(await ui.find({ type: 'Code' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /@@|^[+-](old|new)$/ })).toBeUndefined()
+  const backgrounds = (await ui.findAll({ type: 'Box' })).map(box => box.props.backgroundColor).filter(Boolean)
+  expect(backgrounds).toEqual(expect.arrayContaining([REMOVED_BG, ADDED_BG]))
+  expect(await ui.find({ type: 'Text', text: 'old' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'new' })).toBeDefined()
+  await ui.press({ key: 'next' })
+  expect(await ui.find({ type: 'Text', text: 'paso 2 de 2' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /archivo nuevo/ })).toBeDefined()
+})
+
+test('in the app the file shows its name, and its folder under it, so a long path never hides the name', async ($, on) => {
+  fakeGit(on, REPO)
+  await openPane($)
+
+  const ui = await mount($, 'desktop')
+  await ui.press({ key: 'next' })
+
+  expect(await ui.find({ type: 'Text', text: 'state.json' })).toMatchObject({ props: { bold: true } })
+  expect(await ui.find({ type: 'Text', text: 'Plan' })).toMatchObject({ props: { dimColor: true } })
+})
+
+test('in the app a C# diff keeps the Visual Studio colors, in the code font', async ($, on) => {
+  fakeGit(on, REPO, [], { 'C:/repo/App.cs': 'return a;\n' })
+  await turnWith($, [{ tool: 'Edit', file_path: 'C:/repo/App.cs', old_string: 'return a;', new_string: 'return b;' }])
+  await openPane($)
+
+  const ui = await mount($, 'desktop')
+
+  const words = await ui.findAll({ type: 'Text', text: /^return$/ })
+  expect(words.map(word => word.props.color)).toEqual(['#D8A0DF', '#D8A0DF'])
+  const lines = (await ui.findAll({ type: 'Text' })).filter(found => found.props.mono === true)
+  expect(lines.length).toBeGreaterThan(0)
+})
+
+test('in the app the HEAD index is drawn whole, and a click anywhere along a row opens a title or jumps to a step', async ($, on) => {
+  fakeGit(on, { ...REPO, status: `${TWELVE}\0`, numstat: '' })
+  await openPane($)
+  const ui = await mount($, 'desktop')
+  expect(await ui.find({ key: 'step:0' })).toBeUndefined()
+
+  await clickRow(ui, 'group:M')
+  await clickRow(ui, 'group:M/src')
+
+  expect(await ui.find({ key: 'step:11' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /más$/ })).toBeUndefined()
+  await clickRow(ui, 'step:11')
+  expect(await ui.find({ type: 'Text', text: 'paso 12 de 12' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'f11.ts', in: 'step:11' })).toMatchObject({ props: { bold: true } })
+})
+
+test('in the app the view on is the primary button, since the app does not color text inside one', async ($, on) => {
+  fakeGit(on, REPO)
+  await turnWith($, [EDIT])
+  await openPane($)
+  const ui = await mount($, 'desktop')
+  expect(await ui.find({ key: 'view-turn' })).toMatchObject({ props: { variant: 'primary' } })
+
+  await ui.press({ key: 'view-head' })
+
+  expect(await ui.find({ key: 'view-head' })).toMatchObject({ props: { variant: 'primary', label: 'HEAD' } })
+  expect(await ui.find({ key: 'view-turn' })).toMatchObject({ props: { variant: 'secondary', label: 'Turno' } })
+  expect(await ui.find({ type: 'Text', text: 'paso 1 de 5' })).toBeDefined()
+})
+
+test('in the app the pane goes unframed and drawn whole: no title, Close, ruler, arrows, position line or key chips; the terminal keeps them', async ($, on) => {
+  fakeGit(on, REPO, [], { 'C:/repo/README.md': 'old\n' })
+  await turnWith($, [longWrite(60), EDIT])
+  await openPane($)
+
+  const desk = await mount($, 'desktop')
+  const term = await mount($, 'terminal')
+
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.borderStyle).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Box' })).map(box => box.props.height).filter(Boolean)).toEqual([])
+  expect((await desk.findAll({ type: 'Button' })).map(button => button.props.hotkey).filter(Boolean)).toEqual([])
+  expect(await desk.find({ key: 'close' })).toBeUndefined()
+  expect(await desk.find({ key: 'up' })).toBeUndefined()
+  expect(await desk.find({ key: 'down' })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: ' NZT ' })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /^[▐│█─]+$/ })).toBeUndefined()
+  expect(await desk.find({ type: 'Text', text: /^líneas/ })).toBeUndefined()
+  // The app runs spaces together, so a painted line carries hard spaces.
+  expect(await desk.find({ type: 'Text', text: 'line 60' })).toBeDefined()
+  expect(await term.find({ key: 'close' })).toBeDefined()
+  expect(await term.find({ type: 'Text', text: 'líneas 1–24 de 60' })).toBeDefined()
+})
+
+test('in the app an empty turn and a clean tree say so, with no key in the hint', async ($, on) => {
+  fakeGit(on, { root: 'C:/repo', status: '', numstat: '' })
+  await openPane($)
+  const ui = await mount($, 'desktop')
+  expect(await ui.find({ type: 'Text', text: /Sin cambios contra HEAD/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'sin pasos' })).toBeDefined()
+
+  await ui.press({ key: 'view-turn' })
+
+  expect(await ui.find({ type: 'Text', text: /no editó archivos/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'HEAD muestra todo lo que cambió desde el último commit.' })).toBeDefined()
+})
+
+test('in the app the command opens the pane beside the conversation and prints nothing', async ($, on) => {
+  fakeGit(on, REPO)
+  on('session.surfaces', async () => ({ value: ['desktop'] }) as never)
+
+  const opened = await openPane($, { isFullscreen: false, columns: 160 })
+
+  expect(opened.text).toBeUndefined()
+})
+
+const wheel = (contentRows: number) => ({
+  component: 'Pane' as const,
+  requestId: 'nzt-changes',
+  offset: 1,
+  by: 1,
+  bodyRows: 10,
+  contentRows,
+  origin: { kind: 'person' as const },
+  pointer: { row: 30, column: 3 },
+})
+
+test('a wheel over a pane taller than its body goes on to the app, which scrolls it', async ($, on) => {
+  fakeGit(on, REPO)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await openPane($)
+
+  await $.ui.scroll(wheel(40))
+
+  expect(reached).toEqual([1])
+})
+
+test('a wheel over a pane as tall as its body is the pane own, as on the terminal', async ($, on) => {
+  fakeGit(on, REPO)
+  const reached: number[] = []
+  on('ui.scroll', async (_, e) => {
+    reached.push(e.offset)
+    return {} as never
+  })
+  await openPane($)
+
+  await $.ui.scroll(wheel(10))
+
+  expect(reached).toEqual([])
 })

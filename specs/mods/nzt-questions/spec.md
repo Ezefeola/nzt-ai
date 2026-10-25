@@ -8,6 +8,8 @@
 > el panel reconoce esa forma como un caso más, sin depender de ella.
 > **0.2.0 aceptado y cerrado** (usuario 2026-10-24): las preguntas contestadas fuera del panel
 > se cierran (RN-preg-contestadas-afuera). Origen: D77 de `specs/nzt-core.md`; en **Historia**.
+> **0.3.0 (unidad 365, 2026-10-25):** la app de escritorio, regla con `[modify]` hasta que el
+> usuario lo vea en la app (H-24 de `specs/mods/revision-escritorio.md`).
 > El usuario lo pidió el 2026-10-17: *"poder ver las preguntas que tiene el agente y
 > responderlas … de forma organizada como con la tool de questions que tiene pero el agente no
 > siempre la usa"*.
@@ -121,6 +123,18 @@ propia superficie; un fallo del mod nunca frena un turno ni un prompt.
 ### RN-preg-alto · origin: mismo criterio que RN-hub-alto de `nzt-hub`
 El panel tiene siempre el mismo alto. Si la lista o una pregunta no entran, se mueven con su propio
 scroll y los botones no se mueven.
+
+### RN-preg-escritorio · origin: H-24 de `specs/mods/revision-escritorio.md`, por QT-11, QT-12, H-17 y H-21 de nzt-files
+**[modify]** En la app de escritorio el panel va en su pestaña sin marco, sin la cabecera ` NZT
+Preguntas`, sin `Cerrar`, sin reglas y sin la línea de teclas, porque la pestaña de la app ya pone
+título y cierre; sus botones van sin la ficha de su tecla, y por eso sin tecla: en la app se usa el
+mouse, y no está `Ir a la lista`, que solo mueve el foco del teclado. Todo va entero y lo desplaza
+el scroll de la app (RN-preg-alto no rige ahí): arriba cuántas van contestadas, la lista entera,
+la pregunta con sus opciones y los campos de respuesta y nota, y debajo `Anterior`, `Siguiente`,
+`Saltear` y, cuando hay alguna contestada, `Revisar y llevar al prompt ›` como botón principal de
+la app (en la revisión, `Volver` y `Llevar al prompt ›`, el principal). Cada fila de la lista y
+cada opción toma el clic en todo su largo y conserva sus colores (la marca, la recomendada); la
+fila de la pregunta a la vista y la opción elegida tienen fondo. En la consola nada de esto cambia.
 
 ### RN-preg-pestaña · origin: RN-mod-pestaña de `specs/nzt-mods.md`
 La pestaña dice **Preguntas** (Questions en inglés), y la cabecera ` NZT  Preguntas`, con una línea
@@ -517,6 +531,16 @@ Modo para los detalles: **juntos**, una ronda · usuario 2026-10-17. Diagrama de
 ### QT-12 · Opción de idioma
 - abierto, detalle: `idioma` `es`/`en`, `es` por defecto, como los otros mods (RN-preg-idioma).
 - respuesta: opción `idioma`, `es` o `en`, `es` por defecto. · usuario 2026-10-17, ronda juntos por la tool de preguntas
+
+## Tests
+
+**0.3.0 (unidad 365, 2026-10-25): 33 tests**, todos pasan, más `claude plugin validate`; `tsc` no
+corrió (no hay compilador instalado). Los de la consola siguen igual; seis nuevos prueban la app:
+sin marco, alto, Cerrar, reglas, línea de teclas, `Ir a la lista` ni fichas (y la consola con
+ellos), la lista entera con el clic en el extremo derecho de la fila, la opción elegida con su
+color y la recomendada en el acento, llevar al prompt con el botón principal, y la rueda que sigue
+a la app cuando el panel es más alto que el cuerpo. **No cubierto hasta QA:** cómo pinta la app el
+fondo con transparencia y el hover de la fila sobre la región, y que la rueda le llegue de verdad.
 
 ## Historia
 

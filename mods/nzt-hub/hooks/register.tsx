@@ -124,6 +124,8 @@ export const register: Register = (on, options) => {
     await refresh($)
 
     if (!opened.isPlaced) return { text: t.paneWaiting(opened.reason) }
+    // The app seats the pane at its side: what follows speaks of a terminal, which it has not.
+    if ((await $.session.surfaces().catch(() => [])).some(surface => surface !== 'terminal')) return {}
     // Claude Code docks a pane beside the transcript only in fullscreen and from 110 columns.
     const { isFullscreen, columns } = e.presentation
     if (!isFullscreen) return { text: t.paneInlineNoFullscreen }
@@ -131,7 +133,10 @@ export const register: Register = (on, options) => {
     return { text: t.paneOpened }
   })
 
-  on('ui.scroll', { requestId: PANE }, async ($, e) => {
+  // On the terminal the card is as tall as the body and the wheel moves the list; in the app
+  // the pane is drawn whole and taller than the body: there the app scrolls it.
+  on('ui.scroll', { requestId: PANE }, async ($, e, next) => {
+    if (e.contentRows > e.bodyRows) return next(e)
     listTop = Math.max(0, Math.min(listTop + Math.sign(e.by), listLastTop))
     await update($, actions, value => ({ ...value }))
     return {}
@@ -158,6 +163,119 @@ export const register: Register = (on, options) => {
     const commandRows = (id: string) => Math.max(1, Math.ceil(command(id).length / rowWidth))
 
     const count = known.kind === 'ok' ? known.mods.filter(mod => mod.isInstalled).length : 0
+
+    if (e.surface !== 'terminal') {
+      // The app gives the pane its own tab, title and close, scrolls it, and lays it out in a
+      // proportional font: there the pane goes unframed, drawn whole, its Buttons with no hotkey,
+      // which the app would draw as a chip on each.
+      const top = (
+        <Box key="top" flexDirection="column" gap="xs">
+          <Box flexDirection="column">
+            {BANNER.map(line => (
+              <Text key={line} bold color={ACCENT}>
+                {line}
+              </Text>
+            ))}
+          </Box>
+          <Box flexDirection="row" flexWrap="wrap" justifyContent="space-between" gap="xs">
+            <Text dimColor italic wrap="wrap">
+              {t.subtitle}
+            </Text>
+            {known.kind === 'ok' && (
+              <Text>
+                {CATALOG.map((mod, i) => (
+                  <Text key={mod.id} color={i < count ? ACCENT : 'gray'}>
+                    {i === 0 ? '●' : ' ●'}
+                  </Text>
+                ))}
+                <Text dimColor>{` ${t.installed(count, CATALOG.length)}`}</Text>
+              </Text>
+            )}
+          </Box>
+        </Box>
+      )
+      if (known.kind === 'loading') {
+        void refresh($)
+        return (
+          <Box flexDirection="column" gap="sm" paddingY="xs">
+            {top}
+            <Text dimColor>{t.searching}</Text>
+          </Box>
+        )
+      }
+      const groups = groupsOf(known.mods).map(group => (
+        <Box key={`group:${group.kind}`} flexDirection="column" gap="sm">
+          <Text dimColor bold wrap="wrap">
+            {t.groups[group.kind]}
+          </Text>
+          {group.mods.map(mod => {
+            const spec = CATALOG.find(one => one.id === mod.id)!
+            const words = t.mods[spec.id]
+            const action = pending[mod.id]
+            // The app does not color text inside a Button: the mod's color is in its bar and its icon.
+            const right = !mod.isInstalled ? (
+              <Button key={`copy:${mod.id}`} label={`⧉ ${t.copy}`} variant="secondary" onPress={press => copyInstall($, mod.id, press.surface)} />
+            ) : action?.kind === 'waiting' ? (
+              <Text color="yellow" wrap="wrap">
+                {t.waiting}
+              </Text>
+            ) : (
+              <Button key={`open:${mod.id}`} label={t.open} variant="secondary" onPress={() => openMod($, mod.id)} />
+            )
+            return (
+              <Box key={mod.id} flexDirection="row" gap="sm">
+                {/* The bar: a strip of the mod's color as tall as the mod, whatever its text wraps to. */}
+                <Box key="bar" width={1} flexShrink={0} backgroundColor={mod.isInstalled ? spec.color : 'gray'}>
+                  <Text> </Text>
+                </Box>
+                <Box flexDirection="column" flexGrow={1} flexShrink={1} gap="xs">
+                  <Box flexDirection="row" justifyContent="space-between" alignItems="center" gap="sm">
+                    <Box flexDirection="row" flexShrink={1} overflow="hidden">
+                      <Text bold color={mod.isInstalled ? spec.color : undefined} dimColor={!mod.isInstalled}>
+                        {`${spec.icon} `}
+                      </Text>
+                      <Text bold dimColor={!mod.isInstalled}>
+                        {words.title}
+                      </Text>
+                      <Text dimColor wrap="truncate-end">
+                        {` ${mod.isInstalled ? (mod.version === undefined ? '' : `v${mod.version}`) : t.notInstalled}`}
+                      </Text>
+                    </Box>
+                    <Box flexShrink={0}>{right}</Box>
+                  </Box>
+                  <Text dimColor={!mod.isInstalled} wrap="wrap">
+                    {words.desc}
+                  </Text>
+                  {action?.kind === 'copied' && <Text color="green">{t.copied}</Text>}
+                  {action?.kind === 'failed' && (
+                    <Text color="red" wrap="wrap">
+                      {t.openFailed(action.message)}
+                    </Text>
+                  )}
+                  {action?.kind === 'copyFailed' && (
+                    <Box flexDirection="column">
+                      <Text color="red" wrap="wrap">
+                        {t.copyFailed}
+                      </Text>
+                      <Text color="cyan" wrap="wrap">
+                        {command(mod.id)}
+                      </Text>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            )
+          })}
+        </Box>
+      ))
+      return (
+        <Box flexDirection="column" gap="md" paddingY="xs">
+          {top}
+          {groups}
+        </Box>
+      )
+    }
+
     const heading = (
       <Box flexDirection="column">
         {BANNER.map(line => (

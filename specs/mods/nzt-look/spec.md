@@ -20,7 +20,12 @@
 > lleva NZT oscuro y claro a `/theme` · **0.6.0 (300 a 303, 2026-10-20):** tema `default`, el
 > dibujo de Claude Code, por defecto y primero en TEMA · **0.7.0 (D80, 2026-10-24):** las
 > marcas siguen al kernel, que pasó a 30/40: dos marcas, amarillo desde el 30 y rojo desde el 40,
-> sin naranja; reglas con `[modify]` hasta probarlo en vivo ·
+> sin naranja; reglas con `[modify]` hasta probarlo en vivo · **0.8.0 (unidad 362,
+> 2026-10-24):** la app de escritorio: tablas en grilla de cajas (QT-07), código en una sola
+> fuente, en la app la variante elegida (QT-09 de la revisión de escritorio, que corrige la opción A
+> de su QT-08) y los temas copiados solos a `/theme` (su QT-08),
+> reglas con `[modify]` hasta que el usuario lo vea en la app; la banda, sin botón limpiar
+> (`[remove]`, usuario 2026-10-25) ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
@@ -52,7 +57,7 @@ siguen estando, como en `nzt-context`.
   prompt, el spinner propio y los textos de Claude Code también lleven la marca.
 - **La banda de uso** sobre el prompt, con sus partes prendidas o apagadas una por una: contexto con
   las marcas 30/40, límite de 5 horas, límite semanal, costo de la sesión, **modelo y effort de
-  la sesión** y botón para limpiar la sesión (`/clear`).
+  la sesión**. El botón para limpiar la sesión (`/clear`) se sacó el 2026-10-25 (RN-skin-limpiar).
 - **El panel de opciones** (`/nzt-look`): elegir tema con vista previa, prender y apagar partes,
   repintar un color.
 - **La conversación redibujada:** filas de herramientas, diff de las ediciones, consola, tablas,
@@ -110,6 +115,13 @@ sin avisarle al mod, así que el mod vuelve a leer lo guardado cuando ve que la 
 #### RN-skin-variante · origin: alcance del usuario 2026-10-17 y su pedido de ese día
 Cada tema tiene variante oscura y clara, y la variante sigue al tema de Claude Code: con `auto`,
 sigue a la terminal o al sistema. Se puede forzar una de las dos con una opción del mod.
+**[modify] En la app de escritorio (usuario 2026-10-24, QT-09 de `specs/mods/revision-escritorio.md`, A + B):** la variante sale igual
+que en la terminal: manda la elegida en el panel, y con `auto` el tema de Claude Code o el sistema.
+La API no le dice al mod si la app está en claro u oscuro, y la app puede estar distinta del
+sistema (Windows en claro con la app en oscuro, H-13 de `specs/mods/revision-escritorio.md`), así
+que solo la elección de la persona la iguala. El porcentaje del contexto en la banda, mientras no
+avisa, va sin color propio, en el de texto de la app. Reemplaza la opción A de su QT-08 (la variante
+del sistema en la app), que suponía que la app se ve como el sistema.
 
 #### RN-skin-tema-nzt · origin: usuario 2026-10-17, `specs/nzt-brand.md`
 El tema `nzt` usa la paleta y los roles de `specs/nzt-brand.md`, y ese documento manda sobre él.
@@ -120,6 +132,9 @@ la 222). Qué rol toma cada color está en *Diseño · tema nzt*.
 NZT oscuro y NZT claro llegan a `/theme` de Claude Code con la paleta de `nzt`. El mod no puede
 elegir el tema de Claude Code (observado con 2.1.303: la opción `theme` solo acepta sus 7 temas),
 así que el panel tiene un botón que copia los dos a la carpeta de temas de la persona
+**[modify] y además los copia solo al empezar cada sesión, sin decir nada** (usuario 2026-10-24,
+QT-08: "que los themes se copien solos a /theme"; observado de nuevo con 2.1.310 que el mod no
+puede elegirlos)
 (`~/.claude/themes/`, o la de `CLAUDE_CONFIG_DIR`), y ella elige uno en `/theme`. Un archivo que ya
 está ahí y es distinto no se pisa: el panel lo dice. Elegir NZT oscuro o claro en `/theme` pone el
 mod en `nzt` (en la carpeta fijada, si la hay), sin prender ni apagar el dibujo; elegir otro tema de
@@ -153,9 +168,9 @@ RN-skin-al-agente).
 ### Banda de uso
 
 #### RN-skin-banda-partes · origin: usuario 2026-10-17 ("banda de uso configurable"); modelo, usuario 2026-10-18
-La banda tiene seis partes, y cada una se prende o se apaga sola: **contexto**, **límite de 5
-horas**, **límite semanal**, **costo**, **modelo** y **botón limpiar**. Por defecto están todas
-prendidas. Con todas apagadas, la banda no se dibuja.
+La banda tiene cinco partes, y cada una se prende o se apaga sola: **contexto**, **límite de 5
+horas**, **límite semanal**, **costo** y **modelo**. Por defecto están todas
+prendidas. La sexta, **botón limpiar**, se sacó (RN-skin-limpiar). Con todas apagadas, la banda no se dibuja.
 
 #### RN-skin-modelo · origin: usuario 2026-10-18 ("el modelo que esta corriendo actualmente y su effort")
 La parte modelo muestra el modelo con el que corre la sesión y, al lado, su effort: `Opus 5.5 ·
@@ -172,11 +187,10 @@ high`. Es el de la conversación principal, no el de un subagente.
   (RN-skin-no-interrumpe).
 
 #### RN-skin-banda-rotulos · origin: usuario 2026-10-18 ("modelo y effort deben estar al inicio"; después de verlo en dos filas: "debe ir todo en una sola linea y quedar legible")
-La banda es una sola línea. El orden es modelo, contexto, límite de 5 horas, límite semanal, costo y,
-contra el borde derecho, el botón limpiar. Cada parte lleva su rótulo **a la izquierda** de su
+La banda es una sola línea. El orden es modelo, contexto, límite de 5 horas, límite semanal, costo. Cada parte lleva su rótulo **a la izquierda** de su
 medidor: `Contexto`, `Límite 5h`, `Límite semanal`, `Costo` (en inglés `Context`, `5h limit`,
 `Weekly limit`, `Cost`). El modelo no lleva rótulo: *"se entiende"*. Ejemplo:
-`◇ Opus 5.5 · high  Contexto ▰▰▰▱… 34% 68k/200k  Límite 5h ▰▰▰▱▱▱▱▱ 41% · 2h15  Límite semanal ▰▱▱▱▱▱▱▱ 12% · 4d3h  Costo $1.84  0: /clear`.
+`◇ Opus 5.5 · high  Contexto ▰▰▰▱… 34% 68k/200k  Límite 5h ▰▰▰▱▱▱▱▱ 41% · 2h15  Límite semanal ▰▱▱▱▱▱▱▱ 12% · 4d3h  Costo $1.84`.
 - **Sin palabra del tramo** (`mejor limpiar`): el color, el `%` y las marcas dicen el tramo, y el
   agente también lo dice (usuario 2026-10-18). Reemplaza a la palabra de 0.1.0 a 0.3.0.
 - **Todo va arriba del prompt.** Debajo, Claude Code le deja a un mod solo sumar texto tenue al final
@@ -201,11 +215,13 @@ porcentaje y lo que falta para que se renueve. No hay límite diario. Si la cuen
 El costo es el de la sesión en dólares, como lo da Claude Code.
 
 #### RN-skin-limpiar · origin: usuario 2026-10-17 ("en vez de tener boton compactar quiero tener boton 'clear' para limpiar la sesion"); reemplaza a RN-skin-compactar
+**[remove] Sin botón limpiar (usuario 2026-10-25: *"el boton para limpiar el contexto quitemoslo del mod nzt-look, queda feo no va mas"*).** La persona limpia con `/clear` cuando el kernel lo recomienda; lo que sigue queda hasta el cierre de la feature.
 El botón limpiar corre `/clear`. Se resalta desde la marca 30 [modify], que es donde el kernel empieza a
 recomendar limpiar. El mod nunca limpia solo: muestra, y la persona decide (kernel, Context). La
 banda no tiene botón para compactar.
 
 #### RN-skin-limpiar-confirma · origin: propuesta del agente (Q-07)
+**[remove]** con RN-skin-limpiar (usuario 2026-10-25).
 Apretar limpiar no limpia enseguida: el botón pasa a pedir confirmación, y solo una segunda
 pulsación corre `/clear`. Si no llega en 5 segundos, o la persona escribe, el botón vuelve a como
 estaba. Limpiar borra la conversación de la sesión y no se deshace.
@@ -221,11 +237,14 @@ marca que titila al cruzarla, el latido pasado el 40%— y se apagan con el modo
 
 #### RN-skin-banda-ancho · origin: RN-ctx-ancho de `nzt-context`; modelo, propuesta del agente 2026-10-18
 Si la banda no entra en el ancho, se sacan partes en este orden: los tokens del contexto, las
-cuentas regresivas, costo, effort, modelo, límite semanal, límite de 5 horas, botón limpiar y, al
+cuentas regresivas, costo, effort, modelo, límite semanal, límite de 5 horas y, al
 final, los rótulos. El contexto con sus marcas y su `%` queda siempre. En una línea, a 120
-columnas se van tokens, cuentas regresivas y costo, y queda el modelo (medido 2026-10-18; la línea
-entera pide unas 145). *Que las cuentas regresivas se vayan antes que el costo es propuesta del
-agente.*
+columnas se van tokens y cuentas regresivas, y quedan costo y modelo (test del 2026-10-25, sin el
+botón limpiar; con él, medido el 2026-10-18, se iba también el costo). *Que las cuentas regresivas se vayan antes que el costo es propuesta del
+agente.* **[modify] En la app de escritorio (usuario 2026-10-25, QT-10 de
+`specs/mods/revision-escritorio.md`):** no se saca nada: van los tokens, la cuenta regresiva al lado
+de cada límite (`43% · 2h05`, como en la terminal) y el costo, y si la ventana es angosta la banda
+baja a una segunda línea. Recortar por caracteres de terminal escondía en la app lo que entraba (H-14).
 
 #### RN-skin-cede-la-banda · origin: RN-ctx-cede-la-banda de `nzt-context`
 Mientras Claude Code muestra una encuesta sobre el prompt, la banda no se dibuja.
@@ -468,7 +487,7 @@ fija en el README.*
 4. **Vista previa**: un turno dibujado con el tema elegido (prompt, comando, edición, lecturas
    agrupadas, tabla, pie) y la banda debajo. *La referencia no muestra la banda en la vista previa;
    sumarla es propuesta.*
-5. **Banda**: contexto, 5h, semanal, costo, modelo, limpiar y **línea al agente**
+5. **Banda**: contexto, 5h, semanal, costo, modelo y **línea al agente**
    (RN-skin-banda-partes, RN-skin-al-agente).
 6. **Conversación**: una parte por regla de RN-skin-partes, más solo lectura plegada (apagada por
    defecto), desplegar lecturas (apagada), copiar, calmo (RN-skin-calmo) y **palabras**, un selector `claude · mod` como el de la variante, en `claude` por defecto
@@ -795,7 +814,7 @@ que `register.tsx` obtiene de `$.ui.resolve(e)` y les pasa.** Por eso se pueden 
 | `config.set` (`theme`) | recalcular la variante cuando cambia el tema de Claude Code | RN-skin-variante |
 | `command.run` (`nzt-look`) | abrir el panel, o `off`, `on`, `<tema>`, `copy`, `copy code` | RN-skin-apagado, -copiar |
 | `ui.render` `Pane` | el panel de opciones | sección *Panel de opciones* |
-| `ui.render` `AbovePrompt` | la banda; debajo, `next(e)` | RN-skin-banda-*, -limpiar, -cede-la-banda |
+| `ui.render` `AbovePrompt` | la banda; debajo, `next(e)` | RN-skin-banda-*, -cede-la-banda |
 | `session.measure`, `turn.start`, `turn.complete` | refrescar las cifras y los tiempos del turno | RN-skin-banda-refresco |
 | `turn.step`, `classic.PostModelSwitch` | el modelo y el effort de la sesión | RN-skin-modelo |
 | `prompt.submit`, `tool.call` | la línea al agente y el aviso de cruce | RN-skin-al-agente |
@@ -840,7 +859,7 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
 4. **La línea al agente.** Como `nzt-context` 0.2.0 (QT-10): en `prompt.submit`, la línea con el
    contexto, los tokens y el tramo. En `tool.call`, si el tramo de ahora es mayor que el último que
    recibió el agente, un aviso una vez. El último tramo avisado queda en `$.state`.
-5. **Limpiar.**
+5. **[remove] Limpiar** (usuario 2026-10-25, RN-skin-limpiar).
    1. La primera pulsación (o `0` con el prompt vacío) pone `confirmando` en `$.state`, con la
       hora. La banda muestra `0 otra vez: limpiar`.
    2. Una segunda pulsación dentro de 5 segundos corre `$.command.run({ command: 'clear' })` desde
@@ -871,7 +890,7 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
 | RN-skin-marcas-kernel | `kernel.ts` (cortes fijos, no configurables) y `band.tsx` |
 | RN-skin-banda-refresco | flujo 3.1; las animaciones, en `band.tsx` con `$.clock` desde `register.tsx` |
 | RN-skin-cede-la-banda | flujo 3.2 (`hasSurvey`) |
-| RN-skin-limpiar, -limpiar-confirma | flujo 5 |
+| RN-skin-limpiar, -limpiar-confirma | [remove] flujo 5 |
 | RN-skin-al-agente | flujo 4, `kernel.ts` (inglés, menos de 40 tokens) |
 | RN-skin-pista-diagramas | hook `prompt.compose`, solo con diagramas prendidos y con interfaz |
 | RN-skin-partes | una opción por parte en `prefs`, mirada al comienzo de su hook |
@@ -893,7 +912,7 @@ puede dibujar fielmente, devuelve `next(e)` y queda el dibujo de Claude Code (RN
   - `folders`: carpeta → tema;
   - `custom`: los temas propios (`mi-<tema>` y los diseñados), cada uno con sus dos paletas.
 - **`$.state` y átomos, de la sesión:** las cifras de uso, el último tramo que recibió el agente,
-  `confirmando` de limpiar y lo abierto o plegado de cada fila.
+  lo abierto o plegado de cada fila.
 - **Lo que se calcula y no se guarda:** la paleta resuelta. Si se guardara la ajustada, un cambio
   de la regla de ajuste no les llegaría a los temas ya guardados.
 

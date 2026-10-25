@@ -1,6 +1,6 @@
 # nzt-questions
 
-> Versión **0.2.0** · spec en [`specs/mods/nzt-questions/spec.md`](../../specs/mods/nzt-questions/spec.md)
+> Versión **0.3.0** · spec en [`specs/mods/nzt-questions/spec.md`](../../specs/mods/nzt-questions/spec.md)
 
 Un panel lateral de Claude Code para **contestar las preguntas que el agente escribió como
 texto**: de a una, con sus opciones y la recomendada primero, y con un botón que deja todas las
@@ -76,6 +76,11 @@ un mensaje: **cualquier mensaje que mandes cierra las preguntas que había**, po
 respuesta, y las que contestaste en la ventana de preguntas del agente no quedan esperando. Lo
 que el agente vuelva a preguntar aparece de nuevo. Si el mensaje no
 se manda, **Llevar otra vez ›** lo vuelve a poner.
+
+En la **app de escritorio** el panel va en su pestaña, sin marco ni Cerrar, y lo desplaza el
+scroll de la app: la lista entera, la pregunta y, debajo, los botones; un clic en cualquier parte
+de una fila o de una opción la elige, y la acción principal es el botón principal de la app. En la
+app los botones no tienen tecla: se usa el mouse.
 
 ## Idioma
 

@@ -1,8 +1,9 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register, RenderSurface, Timer } from 'claude-code'
+import type { ElementTable, EngineInterface, Register, RenderSurface, Timer } from 'claude-code'
 
 import type { BarMark, Doing, Explorer, GitOp, Listing, Mark, Marks, Opened, Size } from '../types'
 import { FADE_MS, foundOf, isShown, shellReadOf, touchOf } from './activity'
+import { APP_ICONS, appIconOf } from './app-icons'
 import {
   allAddedOf,
   branchOf,
@@ -22,6 +23,7 @@ import type { DiffLine } from './git'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { iconOf } from './icons'
+import type { RowPress, RowProps } from './row-live'
 import { isPictureFile, kindOf } from './kinds'
 import { blocksOf, blockWindow, hasHugeBlock, isMarkdownFile } from './markdown'
 import type { Block } from './markdown'
@@ -35,6 +37,7 @@ import {
   ancestorsOf,
   contentOf,
   fit,
+  fittingCount,
   folderOf,
   isBinaryText,
   marksOf,
@@ -51,6 +54,10 @@ import {
 import type { Row } from './tree'
 
 const PANE = 'nzt-files'
+// In the app the chosen file goes in a pane of its own, beside the tree's tab.
+const FILE_PANE = 'nzt-files-file'
+// The engine draws 100000 characters in one drawing; the rest is the file pane's own lines.
+const DRAWN_CHARS = 95_000
 const POLL_MS = 3000
 // The card's rows besides the tree and the file: its border, heading, search, rule, path,
 // detail, the file's tools, the blank row under them, position line, git line and button.
@@ -77,7 +84,12 @@ const ACCENT = 'claude'
 const CURRENT = 'cyan'
 const CHOSEN_BG = '#263a42'
 const CURSOR_BG = '#1f2c31'
-
+// In the app, whose theme the mod does not know: a gray seen through, on a light and a dark one.
+const APP_CHOSEN_BG = '#8b949e38'
+const APP_HOVER_BG = '#8b949e1f'
+const ICON_PX = 14
+// A changed line in the app, as Visual Studio paints it: added green, removed red, both faint.
+const DIFF_BG = { '+': '#2ea04333', '-': '#f8514933' } as const
 const MARK_COLOR = { M: 'yellow', U: 'green', A: 'green', D: 'red' } as const satisfies Record<Mark, string>
 // The change map beside the scroll bar: anything removed in a stretch paints it red, as the diff does.
 const CHANGE_COLOR = { add: 'green', change: 'red', delete: 'red' } as const satisfies Record<BarMark, string>
@@ -115,6 +127,7 @@ let content:
   | { path: string; mtimeMs: number; lines: string[]; isWhole: boolean; blocks?: Block[]; changesKey: string; diff?: DiffLine[] }
   | undefined
 let isShowing = false
+let isFileShowing = false
 let isOpenedAtStart = false
 let running: Promise<void> | undefined
 let isAgain = false
@@ -158,6 +171,35 @@ const kindLabel = (path: string) => {
   if (kind === undefined) return undefined
   return kind.kind === 'named' ? kind.name : kind.kind === 'image' ? t.image(kind.format) : t.text
 }
+
+/** What the detail line says of the chosen file: its kind, its size, its lines and how many of them show. */
+const factsOf = (path: string, opened: Opened | null, drawn = Infinity) => {
+  const parts = [kindLabel(path), opened !== null && 'size' in opened ? t.size(opened.size) : undefined]
+  if (opened?.kind === 'text') {
+    const shown = Math.min(opened.shown, drawn)
+    parts.push(t.lineCount(opened.lines) + (shown < opened.lines ? t.shownOf(shown) : ''))
+  }
+  return parts.filter(part => part !== undefined).join(' · ')
+}
+
+/** The lines that stand in for a file with no text to show, each in its color. */
+const standInOf = (opened: Exclude<Opened, { kind: 'text' | 'loading' }>): { text: string; color?: string }[] => {
+  if (opened.kind === 'deleted') return [{ text: t.deleted }, { text: t.deletedHint }]
+  if (opened.kind === 'gone') return [{ text: t.gone, color: 'red' }]
+  if (opened.kind === 'error') return [{ text: t.unreadable, color: 'red' }, { text: printable(opened.message) }]
+  return [{ text: t[opened.kind] }]
+}
+
+/**
+ * A tool of the app: its native button, which draws the label and not what a Button holds.
+ * Being on shows as the app's primary button, since the app does not color text inside one.
+ */
+const appTool = (
+  { Button }: Pick<ElementTable, 'Button'>,
+  tool: { key: string; name: string; isOn?: boolean; onPress: (press: { surface: RenderSurface }) => unknown },
+) => (
+  <Button key={tool.key} label={tool.name} variant={tool.isOn === true ? 'primary' : 'secondary'} onPress={press => void tool.onPress(press)} />
+)
 
 const isWindows = () => root !== undefined && /^[A-Za-z]:/.test(root)
 
@@ -329,6 +371,37 @@ function refresh($: EngineInterface): Promise<void> {
 function csharpStatesOf(lines: string[]) {
   if (csharpStates?.lines !== lines) csharpStates = { lines, states: statesOf(lines) }
   return csharpStates.states
+}
+
+// The app lays text out as a page does and runs spaces together: a hard space keeps the indent.
+const hardSpaced = (text: string) => text.replace(/ /g, ' ')
+
+/**
+ * The first `count` lines of a C# file in the app, colored as Visual Studio colors them: in the
+ * code font, one row a line, cut at the width, its number before it.
+ */
+function csharpRows({ Box, Text }: Pick<ElementTable, 'Box' | 'Text'>, lines: string[], count: number) {
+  const states = csharpStatesOf(lines)
+  const digits = String(lines.length).length
+  return lines.slice(0, count).map((line, number) => {
+    const { tokens } = tokensOf(line.replace(/\r$/, '').replace(/\t/g, '    '), states[number] ?? 'code')
+    return (
+      <Box key={`l:${number}`} flexDirection="row">
+        <Text dimColor mono>{hardSpaced(`${String(number + 1).padStart(digits)} `)}</Text>
+        <Box flexShrink={1} overflow="hidden">
+          <Text mono wrap="truncate-end">
+            {tokens.length === 0
+              ? ' '
+              : tokens.map((token, which) => (
+                  <Text key={String(which)} color={token.kind === 'plain' ? undefined : CSHARP_COLORS[token.kind]}>
+                    {hardSpaced(printable(token.text))}
+                  </Text>
+                ))}
+          </Text>
+        </Box>
+      </Box>
+    )
+  })
 }
 
 /** Every file and folder of the project the search looks at, walked once per search. */
@@ -541,8 +614,17 @@ async function toggle($: EngineInterface, folder: string) {
   await update($, listings, value => ({ ...value, [folder]: listing }))
 }
 
-/** Shows a file in the viewer from its top; pressed twice in a row, opens it with its app. */
-async function choose($: EngineInterface, path: string) {
+/** Opens the chosen file's own pane, titled with its name, or retitles the one open. */
+async function openFilePane($: EngineInterface, path: string) {
+  isFileShowing = true
+  await $.ui.open({ id: FILE_PANE, title: nameOf(path), focus: true, closeOnEscape: true })
+}
+
+/**
+ * Shows a file in the viewer from its top, in the app in a pane of its own; pressed twice in
+ * a row, opens it with its app.
+ */
+async function choose($: EngineInterface, path: string, surface: RenderSurface) {
   const at = await $.clock.now()
   const isDouble = lastPress?.path === path && at - lastPress.at < DOUBLE_PRESS_MS
   lastPress = { path, at }
@@ -552,6 +634,7 @@ async function choose($: EngineInterface, path: string) {
     return
   }
   followed = null
+  if (surface !== 'terminal') await openFilePane($, path)
   const now = explorerOf(await read($, explorer))
   if (now.selected === path && now.opened !== null && now.opened.kind !== 'loading') {
     await update($, explorer, value => ({ ...explorerOf(value), cursor: path }))
@@ -638,14 +721,7 @@ async function closeAll($: EngineInterface) {
   })
 }
 
-/** The row the file's tools act on: the cursor's, else the chosen file. */
-async function targetOf($: EngineInterface) {
-  const now = explorerOf(await read($, explorer))
-  return now.cursor ?? now.selected
-}
-
-async function copyPath($: EngineInterface, surface: RenderSurface) {
-  const path = await targetOf($)
+async function copyPath($: EngineInterface, path: string | null, surface: RenderSurface) {
   if (path === null) return
   const copied = await $.ui.copy({ text: path, surface }).catch(() => undefined)
   await say($, copied?.isCopied === true ? t.copied(path) : t.copyFailed)
@@ -699,7 +775,7 @@ async function searchFor($: EngineInterface, query: string) {
 }
 
 /** Enter in the search: shows the first match, empties the search and leaves its folders open. */
-async function chooseFirst($: EngineInterface, query: string) {
+async function chooseFirst($: EngineInterface, query: string, surface: RenderSurface) {
   const found = matchesOf(index ?? (await indexOf($)), query)[0]
   await update($, explorer, value => ({ ...explorerOf(value), search: '' }))
   index = undefined
@@ -711,11 +787,13 @@ async function chooseFirst($: EngineInterface, query: string) {
     return
   }
   lastPress = undefined
-  await choose($, found.path)
+  await choose($, found.path, surface)
 }
 
+/** Closes the explorer, and the file's own pane with it: alone it would stop following the disk. */
 async function closePane($: EngineInterface) {
   isShowing = false
+  if (isFileShowing) await $.ui.close({ id: FILE_PANE }).catch(() => undefined)
   await $.ui.close({ id: PANE }).catch(() => undefined)
 }
 
@@ -767,6 +845,8 @@ export const register: Register = (on, options) => {
     }
     const opened = await openPane($)
     if (!opened.isPlaced) return { text: t.paneWaiting(opened.reason) }
+    // The app seats the pane at its side: what follows speaks of a terminal, which it has not.
+    if ((await $.session.surfaces().catch(() => [])).some(surface => surface !== 'terminal')) return {}
     // Claude Code docks a pane beside the transcript only in fullscreen and from 110 columns.
     const { isFullscreen, columns } = e.presentation
     if (!isFullscreen) return { text: t.paneInlineNoFullscreen }
@@ -774,10 +854,12 @@ export const register: Register = (on, options) => {
     return {}
   })
 
-  // The tree is exactly as tall as the body, so the engine has nothing to scroll: the wheel
-  // moves the tree when it is over the tree, and the file anywhere else; an arrow walks the
-  // tree's rows, a page key turns the file's page, Home and End go to its ends.
-  on('ui.scroll', { requestId: PANE }, async ($, e) => {
+  // On the terminal the tree is exactly as tall as the body, so the engine has nothing to
+  // scroll: the wheel moves the tree when it is over the tree, and the file anywhere else; an
+  // arrow walks the tree's rows, a page key turns the file's page, Home and End go to its ends.
+  // In the app the tree is drawn whole and taller than the body: there the app scrolls it.
+  on('ui.scroll', { requestId: PANE }, async ($, e, next) => {
+    if (e.contentRows > e.bodyRows) return next(e)
     const row = e.pointer?.row
     if (row === undefined) {
       if (Math.abs(e.by) === 1) await moveCursor($, e.by)
@@ -794,6 +876,18 @@ export const register: Register = (on, options) => {
     return {}
   })
 
+  // A click or Enter on a row of the app's tree: as its Button does on the terminal.
+  on('ui.message', { requestId: PANE }, async ($, e) => {
+    const pressed = e.data as Partial<RowPress> | null
+    if (typeof pressed?.press !== 'string') return {}
+    const now = explorerOf(await read($, explorer))
+    const files = await read($, marks)
+    const isChangesOnly = now.changesOnly && files.kind === 'ok'
+    if (pressed.isDir !== true) await choose($, pressed.press, e.surface)
+    else if (!isChangesOnly || now.search.trim() !== '') await toggle($, pressed.press)
+    return {}
+  })
+
   // Tab onto a row makes it the one the keys act on.
   on('ui.focus', { requestId: PANE }, async ($, e, next) => {
     if (e.origin.kind === 'person' && e.element?.startsWith('n:')) {
@@ -805,6 +899,13 @@ export const register: Register = (on, options) => {
 
   // Escape empties the search first, then leaves the expanded file, and only then closes.
   on('ui.close', async ($, e, next) => {
+    // The file's pane closed: the tree no longer marks a file as the one shown.
+    if (e.id === FILE_PANE) {
+      isFileShowing = false
+      content = undefined
+      await update($, explorer, value => ({ ...explorerOf(value), selected: null, opened: null, viewTop: 0 }))
+      return next(e)
+    }
     if (e.id !== PANE) return next(e)
     if (e.origin.kind === 'person') {
       const now = explorerOf(await read($, explorer))
@@ -819,7 +920,9 @@ export const register: Register = (on, options) => {
       }
     }
     isShowing = false
-    return next(e)
+    const closed = await next(e)
+    if (isFileShowing && e.origin.kind !== 'unload') await $.ui.close({ id: FILE_PANE }).catch(() => undefined)
+    return closed
   })
 
   // A message naming @path of a project file brings it into view; the message goes on as it came.
@@ -911,6 +1014,10 @@ export const register: Register = (on, options) => {
     const { Box, Text, Button, Code, Markdown } = elements
     // The mobile app draws no field yet: there the search is left out.
     const Input = 'Input' in elements ? elements.Input : undefined
+    // The terminal draws no Svg: its icons are characters.
+    const Svg = 'Svg' in elements ? elements.Svg : undefined
+    // A row of the app's tree is a region of its own, which takes a click along its whole width.
+    const Client = e.surface !== 'terminal' && 'Client' in elements ? elements.Client : undefined
     const now = explorerOf(await read($, explorer))
     const known = await read($, listings)
     const git = await read($, marks)
@@ -921,16 +1028,25 @@ export const register: Register = (on, options) => {
     const clock = await $.clock.now()
     const files = git.kind === 'ok' ? git.files : {}
     const lineCounts = git.kind === 'ok' ? git.lines : {}
+    // The terminal is a grid the card frames. The app gives the pane its own tab, title and close,
+    // and lays it out in a proportional font: there the pane goes unframed, and its Buttons carry
+    // no hotkey, which the app would draw as a chip on each.
+    const isGrid = e.surface === 'terminal'
+    // In the app the file is in its own pane, and the tree has nothing to give way to.
+    const isExpanded = isGrid && now.expanded
+    const keyed = (hotkey: string) => (isGrid ? hotkey : undefined)
     // Inside the card's border and padding.
-    const width = Math.max(30, e.props.bodyColumns - 4)
+    const width = Math.max(30, e.props.bodyColumns - (isGrid ? 4 : 0))
     const isWide = width >= WIDE_COLUMNS
     // One row less than the body: the blank row above the card keeps it off the pane's tabs.
-    const height = e.props.scroll.bodyRows - 1
+    const height = e.props.scroll.bodyRows - (isGrid ? 1 : 0)
+    // Unframed, the border's two rows and the close button's are the view's.
+    const chromeRows = CARD_ROWS - (isGrid ? 0 : 3)
     const showsHint = git.kind === 'norepo' && settings.notices
-    const treeSpace = now.expanded ? 0 : Math.min(TREE_ROWS[e.props.placement], Math.max(3, height - CARD_ROWS - MIN_VIEW_ROWS))
+    const treeSpace = isExpanded ? 0 : Math.min(TREE_ROWS[e.props.placement], Math.max(3, height - chromeRows - MIN_VIEW_ROWS))
     const treeRows = Math.max(1, treeSpace - (showsHint ? 1 : 0))
     // Expanded, the search and the rule go with the tree.
-    const viewRows = Math.max(MIN_VIEW_ROWS, height - CARD_ROWS - treeSpace + (now.expanded ? 2 : 0))
+    const viewRows = Math.max(MIN_VIEW_ROWS, height - chromeRows - treeSpace + (isExpanded ? 2 : 0))
     const isSized = now.sized ?? settings.column === 'size'
     const column: 'date' | 'age' | 'size' = isSized ? 'size' : settings.column === 'size' ? 'date' : settings.column
 
@@ -978,8 +1094,7 @@ export const register: Register = (on, options) => {
       return { from, to: Math.max(from + 1, Math.floor(((row + 1) * total) / viewRows)) }
     }
 
-    // C# the mod colors itself: a line's number, then its tokens, what does not fit wrapping
-    // under the code.
+    // C# the mod colors itself: a line's number, then its tokens, what does not fit wrapped under the code.
     const csharpLines = (lines: string[], first: number, count: number) => {
       const states = csharpStatesOf(lines)
       const digits = String(lines.length).length
@@ -1009,10 +1124,12 @@ export const register: Register = (on, options) => {
     const branch = git.kind === 'ok' ? git.branch : undefined
     const heading = (
       <Box flexDirection="row" justifyContent="space-between">
-        <Text>
-          <Text backgroundColor={ACCENT} color="inverseText" bold> NZT </Text>{' '}
-          <Text bold color={ACCENT}>{t.title}</Text>
-        </Text>
+        {isGrid ? (
+          <Text>
+            <Text backgroundColor={ACCENT} color="inverseText" bold> NZT </Text>{' '}
+            <Text bold color={ACCENT}>{t.title}</Text>
+          </Text>
+        ) : null}
         <Box flexDirection="row" flexShrink={1} overflow="hidden">
           <Text dimColor wrap="truncate-end">
             {root === undefined ? '' : nameOf(root)}
@@ -1023,24 +1140,31 @@ export const register: Register = (on, options) => {
             {branch?.kind === 'detached' ? ` · ⑂ ${branch.commit}` : ''}
             {changed > 0 ? <Text color="yellow">{' · ●'}</Text> : ''}
             {changed > 0 ? ` ${changed}` : ''}
-            {' · '}
+            {isGrid ? ' · ' : ''}
           </Text>
-          <Button key="sum" plain dimColor onPress={() => update($, explorer, value => ({ ...explorerOf(value), sized: !isSized }))}>
-            Σ
-          </Button>
+          {/* In the app the rows carry no column, so there is nothing for Σ to turn. */}
+          {isGrid && (
+            <Button key="sum" plain dimColor onPress={() => update($, explorer, value => ({ ...explorerOf(value), sized: !isSized }))}>
+              Σ
+            </Button>
+          )}
         </Box>
       </Box>
     )
-    const buttons = (
+    const buttons = isGrid ? (
       <Box flexDirection="row" gap={2}>
         <Button key="close" label={t.close} onPress={() => closePane($)} />
       </Box>
-    )
-    const card = (...children: (JSX.Element | null)[]) => (
-      <Box flexDirection="column" marginTop={1} height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
-        {children}
-      </Box>
-    )
+    ) : null
+    const card = (...children: (JSX.Element | null)[]) =>
+      isGrid ? (
+        <Box flexDirection="column" marginTop={1} height={height} borderStyle="round" borderColor={ACCENT} paddingX={1}>
+          {children}
+        </Box>
+      ) : (
+        // As tall as what it holds: the app scrolls it.
+        <Box flexDirection="column">{children}</Box>
+      )
 
     if (known[''] === undefined) {
       void refresh($)
@@ -1058,19 +1182,43 @@ export const register: Register = (on, options) => {
     // The search, and the keys that walk the tree, which a pane only takes as Buttons. Showing
     // only what changed, every folder is open, so Unfold and Fold go, and the whole tree's
     // folders wait as they were.
-    const search = now.expanded || Input === undefined ? null : (
+    // In the app, as its own explorer has it: the lens and the field across, and only what
+    // changed beside them; its folders open one by one, as there.
+    const appSearch =
+      isGrid || Input === undefined || Svg === undefined ? null : (
+        <Box flexDirection="row" alignItems="center" gap={1}>
+          <Svg key="lens" source={APP_ICONS.search} alt={t.searchApp} width={ICON_PX} height={ICON_PX} />
+          <Box flexGrow={1} flexShrink={1}>
+            <Input
+              key="search"
+              placeholder={t.searchApp}
+              value={now.search}
+              submitLabel={t.searchOpen}
+              onInput={(value: string) => searchFor($, value)}
+              onSubmit={(value, input) => chooseFirst($, value, input.surface)}
+            />
+          </Box>
+          {now.search !== '' && (
+            <Button key="clear" plain dimColor onPress={() => searchFor($, '')}>
+              ×
+            </Button>
+          )}
+          {git.kind === 'ok' && appTool(elements, { key: 'changes', name: t.appChanges, isOn: isChangesOnly, onPress: () => toggleChanges($) })}
+        </Box>
+      )
+    const search = !isGrid ? appSearch : isExpanded || Input === undefined ? null : (
       <Box flexDirection="row" justifyContent="space-between">
-        <Box flexDirection="row" gap={1} flexShrink={1} overflow="hidden">
-          <Button key="find" plain hotkey="s" dimColor onPress={() => $.ui.focus({ requestId: PANE, key: 'search' }).then(() => undefined)}>
+        <Box flexDirection="row" gap={1} flexShrink={1} flexGrow={isGrid ? 0 : 1} overflow="hidden">
+          <Button key="find" plain hotkey={keyed('s')} dimColor onPress={() => $.ui.focus({ requestId: PANE, key: 'search' }).then(() => undefined)}>
             ⌕
           </Button>
           <Input
             key="search"
-            placeholder={t.search}
+            placeholder={isGrid ? t.search : t.searchApp}
             value={now.search}
-            submitLabel=" "
+            submitLabel={isGrid ? ' ' : t.searchOpen}
             onInput={(value: string) => searchFor($, value)}
-            onSubmit={(value: string) => chooseFirst($, value)}
+            onSubmit={(value, input) => chooseFirst($, value, input.surface)}
           />
           {now.search !== '' && (
             <Button key="clear" plain dimColor onPress={() => searchFor($, '')}>
@@ -1080,17 +1228,17 @@ export const register: Register = (on, options) => {
         </Box>
         <Box flexDirection="row" gap={1} flexShrink={0}>
           {git.kind === 'ok' && (
-            <Button key="changes" plain hotkey="g" label={t.changesOnly} onPress={() => toggleChanges($)}>
+            <Button key="changes" plain hotkey={keyed('g')} label={t.changesOnly} onPress={() => toggleChanges($)}>
               <Text color={isChangesOnly ? ACCENT : undefined} bold={isChangesOnly} dimColor={!isChangesOnly}>
                 {t.changesOnly}
               </Text>
             </Button>
           )}
           {!isChangesOnly && (
-            <Button key="open-all" plain hotkey="d" dimColor onPress={() => openAll($)}>{t.openAll}</Button>
+            <Button key="open-all" plain hotkey={keyed('d')} dimColor onPress={() => openAll($)}>{t.openAll}</Button>
           )}
           {!isChangesOnly && (
-            <Button key="close-all" plain hotkey="p" dimColor onPress={() => closeAll($)}>{t.closeAll}</Button>
+            <Button key="close-all" plain hotkey={keyed('p')} dimColor onPress={() => closeAll($)}>{t.closeAll}</Button>
           )}
         </Box>
       </Box>
@@ -1111,8 +1259,10 @@ export const register: Register = (on, options) => {
     const counts = countsOf(shownTree.marks)
     const anchor = followed ?? now.cursor ?? now.selected
     const chosen = rows.findIndex(row => row.kind === 'entry' && row.path === anchor)
-    const shown = treeWindow(rows.length, treeRows, isSearching ? 0 : now.treeTop, chosen)
-    const treeStart = 3 + (showsHint ? 1 : 0)
+    // In the app the tree goes whole.
+    const shown = isGrid ? treeWindow(rows.length, treeRows, isSearching ? 0 : now.treeTop, chosen) : treeWindow(rows.length, rows.length, 0, chosen)
+    // Unframed, the blank row and the border above the heading are gone.
+    const treeStart = (isGrid ? 3 : 1) + (showsHint ? 1 : 0)
     layout = {
       tree: [treeStart, treeStart + treeRows],
       treeFrom: shown.from,
@@ -1189,6 +1339,73 @@ export const register: Register = (on, options) => {
       const used = right.reduce((sum, part) => sum + part.text.length + 1, 0)
       const room = Math.max(4, width - lead.length - used - 1)
       const nameColor = work !== undefined ? DOING_COLOR[work.kind] : isChosen ? CURRENT : row.isDeleted ? 'red' : undefined
+      const onPress = (press: { surface: RenderSurface }) =>
+        !row.isDir ? choose($, row.path, press.surface) : isChangesOnly && !isSearching ? undefined : toggle($, row.path)
+      if (!isGrid) {
+        // As the app's own explorer: a chevron on a folder, an outline icon on a file where a
+        // folder has its chevron, the name in the app's weight, and a click anywhere on the row
+        // presses it. Where the surface draws no Client, the name is a Button with the chevron
+        // inside, and what Claude does and the git mark go beside it, which the app does not
+        // color inside.
+        const aside: { key: string; text: string; color: string }[] = []
+        if (added !== undefined && row.mark === 'M') {
+          aside.push({ key: 'add', text: `+${added[0]}`, color: 'green' }, { key: 'del', text: `-${added[1]}`, color: 'red' })
+        }
+        if (row.mark !== undefined) aside.push({ key: 'mark', text: row.isDir ? '●' : row.mark, color: MARK_COLOR[row.mark] })
+        const named = [
+          ...(row.isDir ? [<Text key="chevron" dimColor>{row.isOpen ? '⌄ ' : '› '}</Text>] : []),
+          <Text key="name" strikethrough={row.isDeleted}>{printable(row.name)}</Text>,
+        ]
+        const rowProps: RowProps = {
+          path: row.path,
+          name: printable(row.name),
+          isDir: row.isDir,
+          isOpen: row.isOpen,
+          isDeleted: row.isDeleted === true,
+          doing: work === undefined ? null : { color: DOING_COLOR[work.kind], isFading: work.isFading },
+          aside,
+        }
+        const icon = row.isDir || Svg === undefined ? null : (
+          <Svg source={APP_ICONS[appIconOf(row.path)]} alt={kindLabel(row.path) ?? t.text} width={ICON_PX} height={ICON_PX} />
+        )
+        const rowBox = {
+          key: `r:${row.path}`,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingLeft: row.depth * 2,
+          paddingY: 'xs',
+          paddingRight: 'sm',
+          backgroundColor: isChosen ? APP_CHOSEN_BG : undefined,
+          hover: { backgroundColor: APP_HOVER_BG },
+        } as const
+        tree.push(
+          Client !== undefined ? (
+            <Box {...rowBox} gap={1}>
+              {icon}
+              <Client key={`n:${row.path}`} module="./row-live.tsx" props={rowProps} flexGrow={1} />
+            </Box>
+          ) : (
+            <Box {...rowBox} justifyContent="space-between">
+              <Box flexDirection="row" alignItems="center" gap={1} flexShrink={1} overflow="hidden">
+                {icon}
+                {/* No label of its own: the app draws the label, which is then what it holds, chevron included. */}
+                <Button key={`n:${row.path}`} plain onPress={onPress}>
+                  {named}
+                </Button>
+                {work === undefined ? null : (
+                  <Text key="doing" color={DOING_COLOR[work.kind]} dimColor={work.isFading}>●</Text>
+                )}
+              </Box>
+              <Box flexDirection="row" gap={1} flexShrink={0}>
+                {aside.map(part => (
+                  <Text key={part.key} color={part.color}>{part.text}</Text>
+                ))}
+              </Box>
+            </Box>
+          ),
+        )
+        continue
+      }
       // Only the name is the button: the engine inverts a button under the pointer, and a
       // whole inverted row read as noise.
       tree.push(
@@ -1203,7 +1420,7 @@ export const register: Register = (on, options) => {
             <Button
               key={`n:${row.path}`}
               plain
-              onPress={() => (!row.isDir ? choose($, row.path) : isChangesOnly && !isSearching ? undefined : toggle($, row.path))}
+              onPress={onPress}
             >
               <Text
                 bold={row.isDir || isChosen || (work !== undefined && !work.isFading)}
@@ -1226,7 +1443,34 @@ export const register: Register = (on, options) => {
         </Box>,
       )
     }
-    if (column === 'size' && isWide) void countSizes($, shownFolders)
+    if (column === 'size' && isWide && isGrid) void countSizes($, shownFolders)
+
+    const gitLine =
+      brief !== null ? (
+        <Text color={CURRENT} wrap="truncate-end">{printable(brief)}</Text>
+      ) : op === null ? (
+        <Text> </Text>
+      ) : (
+        <Text wrap="truncate-end">
+          {op.state === 'running' && <Text color="cyan">{`↻ ${t.gitRunning(op.op)}`}</Text>}
+          {op.state === 'done' && <Text color={DOING_COLOR.commit}>{`● ${t.gitDone(op.op)}`}</Text>}
+          {op.state === 'failed' && <Text color="red">{`✗ ${t.gitFailed(op.op)}`}</Text>}
+          {op.detail !== undefined && <Text dimColor>{` · ${printable(op.detail)}`}</Text>}
+        </Text>
+      )
+
+    // In the app the chosen file is in a pane of its own: this one is the tree and its line of git.
+    if (!isGrid) {
+      return card(
+        heading,
+        showsHint ? <Text key="hint" dimColor wrap="truncate-end">{t.noGitHint}</Text> : null,
+        search,
+        <Box key="tree" flexDirection="column">
+          {tree}
+        </Box>,
+        gitLine,
+      )
+    }
 
     // The chosen file: its path, its detail line, its tools and its lines, or the line that stands in for them.
     const path = now.selected
@@ -1245,10 +1489,7 @@ export const register: Register = (on, options) => {
       body = message(t.pick)
     } else {
       const mark = files[path]
-      const kind = kindLabel(path)
-      const parts = [kind, opened !== null && 'size' in opened ? t.size(opened.size) : undefined]
-      if (opened?.kind === 'text') parts.push(t.lineCount(opened.lines) + (opened.shown < opened.lines ? t.shownOf(opened.shown) : ''))
-      const facts = parts.filter(part => part !== undefined).join(' · ')
+      const facts = factsOf(path, opened)
       detail = (
         <Text dimColor wrap="truncate-end">
           {mark !== undefined && <Text color={MARK_COLOR[mark]}>{t.marks[mark]}</Text>}
@@ -1346,24 +1587,8 @@ export const register: Register = (on, options) => {
             </Box>
           )
         }
-      } else if (opened.kind === 'deleted') {
-        body = (
-          <Box flexDirection="column">
-            {message(t.deleted)}
-            {message(t.deletedHint)}
-          </Box>
-        )
-      } else if (opened.kind === 'gone') {
-        body = message(t.gone, 'red')
-      } else if (opened.kind === 'error') {
-        body = (
-          <Box flexDirection="column">
-            {message(t.unreadable, 'red')}
-            {message(printable(opened.message))}
-          </Box>
-        )
       } else {
-        body = message(t[opened.kind])
+        body = <Box flexDirection="column">{standInOf(opened).map(line => message(line.text, line.color))}</Box>
       }
     }
     const target = now.cursor ?? path
@@ -1374,51 +1599,37 @@ export const register: Register = (on, options) => {
             <Button
               key="markdown"
               plain
-              hotkey="m"
+              hotkey={keyed('m')}
               onPress={() => update($, explorer, value => ({ ...explorerOf(value), markdown: !now.markdown, viewTop: 0 }))}
             >
               {`${now.markdown ? '☑' : '☐'} ${t.markdown}`}
             </Button>
           )}
           {path !== null && (
-            <Button key="expand" plain hotkey="a" onPress={() => update($, explorer, value => ({ ...explorerOf(value), expanded: !now.expanded }))}>
+            <Button key="expand" plain hotkey={keyed('a')} onPress={() => update($, explorer, value => ({ ...explorerOf(value), expanded: !now.expanded }))}>
               {now.expanded ? t.back : t.expand}
             </Button>
           )}
-          <Button key="copy" plain hotkey="c" onPress={press => copyPath($, press.surface)}>
+          <Button key="copy" plain hotkey={keyed('c')} onPress={press => copyPath($, target, press.surface)}>
             {t.copy}
           </Button>
-          <Button key="open" plain hotkey="o" onPress={() => (target === null ? undefined : openWithApp($, target))}>
+          <Button key="open" plain hotkey={keyed('o')} onPress={() => (target === null ? undefined : openWithApp($, target))}>
             {t.open}
           </Button>
         </Box>
       )
     }
 
-    const gitLine =
-      brief !== null ? (
-        <Text color={CURRENT} wrap="truncate-end">{printable(brief)}</Text>
-      ) : op === null ? (
-        <Text> </Text>
-      ) : (
-        <Text wrap="truncate-end">
-          {op.state === 'running' && <Text color="cyan">{`↻ ${t.gitRunning(op.op)}`}</Text>}
-          {op.state === 'done' && <Text color={DOING_COLOR.commit}>{`● ${t.gitDone(op.op)}`}</Text>}
-          {op.state === 'failed' && <Text color="red">{`✗ ${t.gitFailed(op.op)}`}</Text>}
-          {op.detail !== undefined && <Text dimColor>{` · ${printable(op.detail)}`}</Text>}
-        </Text>
-      )
-
     return card(
       heading,
-      showsHint && !now.expanded ? <Text key="hint" dimColor wrap="truncate-end">{t.noGitHint}</Text> : null,
+      showsHint && !isExpanded ? <Text key="hint" dimColor wrap="truncate-end">{t.noGitHint}</Text> : null,
       search,
-      now.expanded ? null : (
+      isExpanded ? null : (
         <Box key="tree" flexDirection="column" height={treeRows} overflow="hidden">
           {tree}
         </Box>
       ),
-      now.expanded ? null : <Text key="rule" dimColor>{'─'.repeat(width)}</Text>,
+      isExpanded ? null : <Text key="rule" dimColor>{'─'.repeat(width)}</Text>,
       <Text key="path" bold color={CURRENT} wrap="truncate-start">{path === null ? ' ' : printable(path)}</Text>,
       detail ?? <Text key="detail"> </Text>,
       tools ?? <Text key="tools"> </Text>,
@@ -1443,6 +1654,137 @@ export const register: Register = (on, options) => {
       </Box>,
       gitLine,
       buttons,
+    )
+  })
+
+  // The chosen file in its own pane, opened from the app: its path, detail and tools, then the
+  // file whole, up to what one drawing holds, which the app scrolls.
+  on('ui.render', { component: 'Pane', requestId: FILE_PANE }, async ($, e) => {
+    isFileShowing = true
+    const elements = $.ui.resolve(e)
+    const { Box, Text, Code, Markdown } = elements
+    const now = explorerOf(await read($, explorer))
+    const git = await read($, marks)
+    const brief = await read($, notice)
+    const files = git.kind === 'ok' ? git.files : {}
+    const message = (text: string, color?: string) => (
+      <Text key={text} color={color} dimColor={color === undefined} wrap="wrap">{text}</Text>
+    )
+    const path = now.selected
+    if (path === null) return <Box flexDirection="column">{message(t.pick)}</Box>
+
+    const opened = now.opened
+    const isMarkdown = isMarkdownFile(path)
+    let hint: JSX.Element | null = null
+    let drawn = Infinity
+    let body: JSX.Element
+    if (opened === null || opened.kind === 'loading' || (opened.kind === 'text' && content?.path !== path)) {
+      if (opened?.kind !== 'loading') void loadFile($, path, true)
+      body = message(t.loading)
+    } else if (opened.kind === 'text') {
+      const { lines, blocks, diff } = content!
+      const isHuge = blocks !== undefined && hasHugeBlock(blocks)
+      if (lines.length === 0) body = message(t.empty)
+      else if (isMarkdown && now.markdown && blocks !== undefined && !isHuge) {
+        const count = fittingCount(blocks.map(block => block.text), DRAWN_CHARS, 2)
+        if (count < blocks.length) drawn = blocks[count - 1]!.to
+        body = <Markdown key="drawn" text={printableLines(blocks.slice(0, count).map(block => block.text).join('\n\n'))} />
+      } else {
+        if (isMarkdown && now.markdown) hint = <Text key="huge" color="yellow" wrap="wrap">{t.markdownHuge}</Text>
+        if (diff !== undefined && isCSharpFile(path)) {
+          // The app's code element paints no single line, and only C# the mod colors itself: a
+          // changed C# file is drawn as Visual Studio's diff, its colors on each line's background.
+          // Any other changed file is drawn as code, as one with no changes.
+          const count = fittingCount(diff.map(line => `${line.op}${line.text}`), DRAWN_CHARS)
+          const kept = diff.slice(0, count)
+          if (count < diff.length) drawn = kept.filter(line => line.op !== '-').pop()?.now ?? 0
+          const digits = String(diff.reduce((max, line) => Math.max(max, line.old, line.now), 1)).length
+          const states = csharpStatesOf(lines)
+          body = (
+            <Box key="diff" flexDirection="column">
+              {kept.map((line, at) => {
+                const { tokens } = tokensOf(line.text.replace(/\r$/, '').replace(/\t/g, '    '), line.op === '-' ? 'code' : (states[line.now - 1] ?? 'code'))
+                return (
+                  <Box key={`d:${at}`} flexDirection="row" backgroundColor={line.op === ' ' ? undefined : DIFF_BG[line.op]}>
+                    <Text dimColor mono>{hardSpaced(`${String(line.op === '-' ? line.old : line.now).padStart(digits)} `)}</Text>
+                    <Box flexShrink={1} overflow="hidden">
+                      <Text mono wrap="truncate-end">
+                        {tokens.length === 0
+                          ? ' '
+                          : tokens.map((token, which) => (
+                              <Text key={String(which)} color={token.kind === 'plain' ? undefined : CSHARP_COLORS[token.kind]}>
+                                {hardSpaced(printable(token.text))}
+                              </Text>
+                            ))}
+                      </Text>
+                    </Box>
+                  </Box>
+                )
+              })}
+            </Box>
+          )
+        } else if (isCSharpFile(path)) {
+          // Each line carries its number: the room it takes counts as the gap between lines.
+          const digits = String(lines.length).length
+          const count = fittingCount(lines, DRAWN_CHARS, digits + 1)
+          if (count < lines.length) drawn = count
+          body = <Box key="file" flexDirection="column">{csharpRows(elements, lines, count)}</Box>
+        } else {
+          const count = fittingCount(lines, DRAWN_CHARS)
+          if (count < lines.length) drawn = count
+          body = <Code key="file" source={lines.slice(0, count).join('\n')} path={path} startLine={1} wrap="truncate-end" />
+        }
+      }
+    } else {
+      body = <Box flexDirection="column">{standInOf(opened).map(line => message(line.text, line.color))}</Box>
+    }
+
+    const mark = files[path]
+    const counts = git.kind === 'ok' ? git.lines[path] : undefined
+    const facts = factsOf(path, opened, drawn)
+    const folders = path.split('/')
+    const name = folders.pop()!
+    // As the app's own viewer: the path as crumbs, the tools as icons at its right, the detail under it.
+    return (
+      <Box flexDirection="column">
+        <Box key="head" flexDirection="row" alignItems="center" justifyContent="space-between" gap={1}>
+          <Box flexShrink={1} overflow="hidden">
+            <Text key="crumbs" wrap="truncate-start">
+              {folders.map((folder, at) => (
+                <Text key={`c:${at}`} dimColor>{`${printable(folder)} › `}</Text>
+              ))}
+              <Text key="name" weight="medium">{printable(name)}</Text>
+            </Text>
+          </Box>
+          <Box flexDirection="row" gap={1} flexShrink={0}>
+            {isMarkdown &&
+              appTool(elements, {
+                key: 'markdown',
+                name: now.markdown ? t.showSource : t.showDrawn,
+                isOn: !now.markdown,
+                onPress: () => update($, explorer, value => ({ ...explorerOf(value), markdown: !now.markdown, viewTop: 0 })),
+              })}
+            {appTool(elements, { key: 'copy', name: t.copy, onPress: press => copyPath($, path, press.surface) })}
+            {appTool(elements, { key: 'open', name: t.openWithApp, onPress: () => openWithApp($, path) })}
+          </Box>
+        </Box>
+        <Text key="detail" dimColor size="caption" wrap="truncate-end">
+          {mark !== undefined && <Text color={MARK_COLOR[mark]}>{t.marks[mark]}</Text>}
+          {mark === 'M' && counts !== undefined && (
+            <Text>
+              {' · '}
+              <Text color="green">{`+${counts[0]}`}</Text> <Text color="red">{`-${counts[1]}`}</Text>
+            </Text>
+          )}
+          {mark !== undefined && facts !== '' ? ' · ' : ''}
+          {facts}
+        </Text>
+        {brief !== null && <Text key="notice" color={CURRENT} wrap="truncate-end">{printable(brief)}</Text>}
+        <Box key="body" flexDirection="column" marginTop={1}>
+          {hint}
+          {body}
+        </Box>
+      </Box>
     )
   })
 }

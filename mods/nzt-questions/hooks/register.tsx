@@ -6,6 +6,7 @@ import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
 import { afterDraft, messageOf } from './message'
 import { isAnswered, merge, parse, pendingOf } from './parse'
+import type { RowPress, RowProps } from './row-live'
 
 const PANE = 'nzt-questions'
 const DOCK_COLUMNS = 58
@@ -13,6 +14,9 @@ const INLINE_ROWS = 24
 // The accent of NZT's mods, a theme key, and the color of Preguntas in nzt-hub.
 const ACCENT = 'claude'
 const COLOR = '#f48fb1'
+// The app's theme is unknown to the mod: greys with transparency read on light and dark alike.
+const APP_CHOSEN_BG = '#8b949e38'
+const APP_HOVER_BG = '#8b949e1f'
 // From this many columns down, the buttons take their short labels.
 const NARROW = 46
 // The index rows beside the conversation and above the prompt.
@@ -237,7 +241,10 @@ export const register: Register = (on, options) => {
     return { text: opened.isPlaced ? t.paneOpened : t.paneWaiting(opened.reason) }
   })
 
-  on('ui.scroll', { requestId: PANE }, async ($, e) => {
+  // On the terminal the card is as tall as the body and the wheel moves the options; in the app
+  // the pane is drawn whole and taller than the body: there the app scrolls it.
+  on('ui.scroll', { requestId: PANE }, async ($, e, next) => {
+    if (e.contentRows > e.bodyRows) return next(e)
     optionTop = Math.max(0, Math.min(optionTop + Math.sign(e.by), optionLastTop))
     await update($, view, value => value)
     return {}
@@ -251,6 +258,18 @@ export const register: Register = (on, options) => {
       await update($, view, value => value)
     }
     return next(e)
+  })
+
+  // A click or Enter on a row of the app's list or on an option: as its Button does on the terminal.
+  on('ui.message', { requestId: PANE }, async ($, e) => {
+    const pressed = e.data as Partial<RowPress> | null
+    const press = typeof pressed?.press === 'string' ? pressed.press : ''
+    if (press.startsWith('go:')) await pick($, press.slice(3))
+    else if (press.startsWith('option:') && currentKey !== null) {
+      const name = press.slice(7)
+      await answer($, currentKey, was => ({ option: name, note: was.note }))
+    }
+    return {}
   })
 
   on('ui.close', async ($, e, next) => {
@@ -282,6 +301,191 @@ export const register: Register = (on, options) => {
 
     const answered = list.filter(question => question.status === 'answered').length
     const sentCount = list.filter(question => question.status === 'sent').length
+    const mark = (question: Question) =>
+      question.status === 'answered' ? '●' : question.status === 'skipped' ? '→' : question.status === 'sent' ? '✓' : '○'
+    const markColor = (question: Question) =>
+      question.status === 'skipped' ? 'yellow' : question.status === 'sent' ? 'green' : undefined
+
+    if (e.surface !== 'terminal') {
+      // The app gives the pane its own tab, title and close, scrolls it, and lays it out in a
+      // proportional font: there the pane goes unframed, drawn whole, its Buttons with no hotkey,
+      // which the app would draw as a chip on each, and with no keys line.
+      const Client = 'Client' in elements ? elements.Client : undefined
+      // A row is a region, which the app's focus ring is not moved onto.
+      firstAnswerKey = null
+      const row = (press: string, parts: RowProps['parts'], isWrapped: boolean, isChosen: boolean, onPress: () => unknown) => {
+        // A Client's props hold no undefined: a part with no color goes without the key.
+        const props: RowProps = {
+          press,
+          parts: parts.map(part => Object.fromEntries(Object.entries(part).filter(([, value]) => value !== undefined)) as RowProps['parts'][number]),
+          isWrapped,
+        }
+        const box = {
+          key: `r:${press}`,
+          flexDirection: 'row',
+          paddingY: 'xs',
+          paddingX: 'sm',
+          backgroundColor: isChosen ? APP_CHOSEN_BG : undefined,
+          hover: { backgroundColor: APP_HOVER_BG },
+        } as const
+        // Where the surface draws no Client, the row is a Button, which the app paints in its own color.
+        return Client !== undefined ? (
+          <Box {...box}>
+            <Client key={press} module="./row-live.tsx" props={props} flexGrow={1} />
+          </Box>
+        ) : (
+          <Box {...box}>
+            <Button key={press} plain onPress={onPress}>
+              {parts.map(part => part.text).join('')}
+            </Button>
+          </Box>
+        )
+      }
+      const failed = said?.kind === 'readFailed' && (
+        <Text key="failed" color="red" wrap="wrap">
+          {t.readFailed(said.message)}
+        </Text>
+      )
+
+      if (list.length === 0 || (open.length === 0 && shownView === 'question')) {
+        return (
+          <Box flexDirection="column" gap="xs" paddingY="xs">
+            {failed}
+            <Text>{t.empty}</Text>
+            <Text dimColor wrap="wrap">
+              {t.emptyWhere}
+            </Text>
+          </Box>
+        )
+      }
+
+      const index = list.map(question => {
+        const isChosen = question.key === chosen?.key && shownView === 'question'
+        return row(
+          `go:${question.key}`,
+          [
+            { key: 'mark', text: mark(question), color: isChosen ? COLOR : markColor(question) },
+            { key: 'text', text: ` ${question.id ?? question.number} · ${question.text}`, isBold: isChosen },
+          ],
+          false,
+          isChosen,
+          () => pick($, question.key),
+        )
+      })
+      const page = (body: JSX.Element, actions: JSX.Element) => (
+        <Box flexDirection="column" gap="sm" paddingY="xs">
+          <Text dimColor wrap="wrap">
+            {shownView === 'sent' ? t.sentCount(sentCount) : t.answeredOf(answered, open.length)}
+          </Text>
+          <Box flexDirection="column">{index}</Box>
+          {failed}
+          {body}
+          <Box flexDirection="row" flexWrap="wrap" gap="xs" alignItems="center">
+            {actions}
+          </Box>
+        </Box>
+      )
+
+      if (shownView === 'review' || shownView === 'sent') {
+        const isSent = shownView === 'sent'
+        const message = isSent ? await read($, sent) : messageOf(list, t.noteWord)
+        const skippedCount = open.filter(question => question.status === 'skipped').length
+        return page(
+          <Box flexDirection="column" gap="xs">
+            {isSent ? <Text color="green">{t.taken}</Text> : <Text dimColor>{t.reviewTitle}</Text>}
+            {isSent && said?.kind === 'appended' && <Text dimColor>{t.appended}</Text>}
+            {said?.kind === 'fillFailed' && <Text color="red">{t.fillFailed}</Text>}
+            <Box flexDirection="column">
+              {message.split('\n').map(line => (
+                <Text key={line} wrap="wrap">
+                  {line}
+                </Text>
+              ))}
+            </Box>
+            {skippedCount > 0 && <Text color="yellow">{t.skipped(skippedCount)}</Text>}
+          </Box>,
+          <>
+            <Button key="back" label={t.back} variant="secondary" onPress={() => show($, currentKey)} />
+            <Button
+              key={isSent ? 'again' : 'take'}
+              label={isSent ? t.takeAgain : t.take}
+              variant="primary"
+              onPress={() => (isSent ? takeAgain($) : take($))}
+            />
+          </>,
+        )
+      }
+
+      const question = chosen!
+      const options = [...question.options].sort((a, b) => Number(b.isRecommended) - Number(a.isRecommended))
+      return page(
+        <Box flexDirection="column" gap="xs">
+          <Text dimColor>{`${question.id ?? question.number} · ${t.position(Math.max(0, open.findIndex(one => one.key === question.key)) + 1, open.length)}`}</Text>
+          <Text bold wrap="wrap">
+            {question.text}
+          </Text>
+          {question.isChanged && <Text color="yellow">{t.changed}</Text>}
+          {options.length === 0 && <Text dimColor>{t.noOptions}</Text>}
+          {options.length > 0 && (
+            <Box flexDirection="column">
+              {options.map(option => {
+                const isPicked = question.answer.option === option.name
+                return row(
+                  `option:${option.name}`,
+                  [
+                    { key: 'mark', text: isPicked ? '●' : '○', color: isPicked ? COLOR : undefined },
+                    {
+                      key: 'name',
+                      text: ` ${option.letter === undefined ? '' : `${option.letter} · `}${option.name}`,
+                      color: isPicked ? COLOR : undefined,
+                      isBold: true,
+                    },
+                    ...(option.isRecommended ? [{ key: 'star', text: ` ★ ${t.recommended}`, color: ACCENT }] : []),
+                    ...(option.explain !== '' ? [{ key: 'explain', text: ` — ${option.explain}`, isDim: true }] : []),
+                  ],
+                  true,
+                  isPicked,
+                  () => answer($, question.key, was => ({ option: option.name, note: was.note })),
+                )
+              })}
+            </Box>
+          )}
+          {Input !== null && (
+            <Input
+              key={`other:${question.key}`}
+              label={t.other}
+              placeholder={options.length === 0 ? t.answerPlaceholder : t.otherPlaceholder}
+              value={question.answer.option === undefined ? (question.answer.text ?? '') : ''}
+              submitLabel={t.save}
+              onSubmit={(value: string) => answer($, question.key, was => ({ text: value, note: was.note }))}
+            />
+          )}
+          {Input !== null && (
+            <Input
+              key={`note:${question.key}`}
+              label={t.note}
+              placeholder={t.notePlaceholder}
+              value={question.answer.note ?? ''}
+              submitLabel={t.save}
+              onSubmit={(value: string) =>
+                save($, all =>
+                  all.map(one => (one.key === question.key ? { ...one, answer: { ...one.answer, note: value } } : one)),
+                )
+              }
+            />
+          )}
+        </Box>,
+        <>
+          <Button key="previous" label={t.previous} variant="secondary" onPress={() => move($, -1)} />
+          <Button key="next" label={t.next} variant="secondary" onPress={() => move($, 1)} />
+          <Button key="skip" label={t.skip} variant="secondary" onPress={() => skip($, question.key)} />
+          {answered > 0 && (
+            <Button key="review" label={t.review} variant="primary" onPress={() => update($, view, () => 'review')} />
+          )}
+        </>,
+      )
+    }
+
     const heading = (
       <Box flexDirection="row" justifyContent="space-between">
         <Text>
@@ -347,10 +551,6 @@ export const register: Register = (on, options) => {
     const listAt = Math.max(0, list.findIndex(question => question.key === chosen?.key))
     const indexTop = Math.max(0, Math.min(listAt - indexRows + 1, list.length - indexRows))
     const below = list.length - indexTop - indexRows
-    const mark = (question: Question) =>
-      question.status === 'answered' ? '●' : question.status === 'skipped' ? '→' : question.status === 'sent' ? '✓' : '○'
-    const markColor = (question: Question) =>
-      question.status === 'skipped' ? 'yellow' : question.status === 'sent' ? 'green' : undefined
     const index = (
       <Box flexDirection="column">
         {list.slice(indexTop, indexTop + indexRows - (below > 0 ? 1 : 0)).map(question => {

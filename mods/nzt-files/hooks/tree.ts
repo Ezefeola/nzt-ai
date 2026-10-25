@@ -219,6 +219,18 @@ export const contentOf = (text: string) => {
   return { lines: kept, total: all.length }
 }
 
+/** How many of `texts`, whole and from the first, fit in `limit` characters joined by `gap` characters; at least one. */
+export const fittingCount = (texts: string[], limit: number, gap = 1) => {
+  let size = 0
+  let count = 0
+  for (const text of texts) {
+    size += text.length + (count === 0 ? 0 : gap)
+    if (size > limit && count > 0) break
+    count++
+  }
+  return count
+}
+
 /**
  * The scroll bar's thumb in a track of `rows` rows: as long as the part shown is of the whole
  * (`count` of `total`), and as far down as `first` is of the last top, `lastTop`.

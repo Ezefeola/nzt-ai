@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.9.1** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.10.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -109,7 +109,9 @@ resto del archivo byte por byte; no corrige nada más.
 
 En la terminal se dibuja con celdas de color, y se ve completo en terminales de 24 bits
 (Windows Terminal, iTerm2, Ghostty, kitty, WezTerm; Terminal.app desde macOS Tahoe). En la
-app de escritorio y en VS Code se dibuja como SVG, con los mismos dibujos.
+app de escritorio y en VS Code se dibuja como SVG, con los mismos dibujos, y el panel se acomoda
+al ancho de la app en lugar de contar columnas: el avance es una barra y cada fila ocupa lo que
+queda al lado de su marca.
 
 ## Idioma
 

@@ -23,7 +23,6 @@ const es = {
   copiedCode: 'Copiado el último bloque de código.',
   nothingToCopy: 'No hay nada para copiar todavía.',
   copyFailed: 'No se pudo copiar acá.',
-  clearFailed: (reason: string) => `No se pudo limpiar: ${reason}`,
 
   // Banda
   // Each part's label, at the left of its meter; the model needs none.
@@ -34,12 +33,6 @@ const es = {
   fiveHour: 'Límite 5h',
   week: 'Límite semanal',
   cost: 'Costo',
-  clear: '/clear',
-  // The button draws its hotkey first (`0: `), so this reads `0: otra vez para limpiar`.
-  confirmClear: 'otra vez para limpiar',
-  confirmClearDesk: 'Apretá otra vez para limpiar',
-  cancel: 'Esc cancela',
-  cancelDesk: 'Cancelar',
 
   // Panel
   version: (v: string) => `nzt-look ${v}`,
@@ -59,7 +52,7 @@ const es = {
   pin: 'fijar acá',
   unpin: 'soltar',
   makeDefault: 'hacerlo el de siempre',
-  bandParts: { context: 'contexto', fiveHour: '5h', week: 'semanal', cost: 'costo', model: 'modelo', clear: 'limpiar' } satisfies Record<BandPart, string>,
+  bandParts: { context: 'contexto', fiveHour: '5h', week: 'semanal', cost: 'costo', model: 'modelo' } satisfies Record<BandPart, string>,
   agentLine: 'línea al agente',
   parts: {
     tools: 'herramientas',
@@ -146,7 +139,6 @@ const en: Texts = {
   copiedCode: 'Copied the last code block.',
   nothingToCopy: 'Nothing to copy yet.',
   copyFailed: 'Could not copy here.',
-  clearFailed: (reason: string) => `Could not clear: ${reason}`,
 
   context: 'Context',
   noReading: 'no reading yet',
@@ -154,11 +146,6 @@ const en: Texts = {
   fiveHour: '5h limit',
   week: 'Weekly limit',
   cost: 'Cost',
-  clear: '/clear',
-  confirmClear: 'again to clear',
-  confirmClearDesk: 'Press again to clear',
-  cancel: 'Esc cancels',
-  cancelDesk: 'Cancel',
 
   version: (v: string) => `nzt-look ${v}`,
   offNotice: "The drawing is off: the conversation looks as Claude Code draws it. The band and the agent line stay.",
@@ -177,7 +164,7 @@ const en: Texts = {
   pin: 'pin here',
   unpin: 'unpin',
   makeDefault: 'make it the usual one',
-  bandParts: { context: 'context', fiveHour: '5h', week: 'weekly', cost: 'cost', model: 'model', clear: 'clear' },
+  bandParts: { context: 'context', fiveHour: '5h', week: 'weekly', cost: 'cost', model: 'model' },
   agentLine: 'agent line',
   parts: {
     tools: 'tools',

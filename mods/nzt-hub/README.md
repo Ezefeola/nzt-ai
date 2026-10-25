@@ -1,6 +1,6 @@
 # nzt-hub
 
-> Versión **0.4.1** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
+> Versión **0.5.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
 
 Un panel lateral de Claude Code que **junta los mods de NZT en un lugar**: qué hay, para qué
 es cada uno, qué versión tenés y un botón que lo abre. Los que no tenés instalados también
@@ -63,6 +63,9 @@ la terminal no deja copiar, la fila lo dice y muestra el comando entero para sel
 Claude Code pone el panel **al costado de la conversación** solo en pantalla completa y con
 la terminal de 110 columnas o más; ahí lo abre de 58 columnas y con todo el alto. Si no, lo
 pone **sobre el prompt**, de 24 filas, y `/nzt-hub` dice por qué.
+
+En la **app de escritorio** el panel va en su pestaña, sin marco ni Cerrar, y lo desplaza el
+scroll de la app; cada mod lleva una franja de su color y su descripción entera.
 
 Un mod cuenta como instalado cuando esta sesión tiene su comando o sus opciones en
 `/config`. La versión sale de la lista de plugins instalados de Claude Code; un mod cargado

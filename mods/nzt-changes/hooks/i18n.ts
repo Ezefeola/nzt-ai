@@ -35,6 +35,10 @@ export const TEXTS = {
     noLines: 'Sin cambios de líneas.',
     turnEmpty: 'Claude no editó archivos en el último turno.',
     turnEmptyHint: 'h muestra todo lo que cambió contra HEAD.',
+    appTurn: 'Turno',
+    appHead: 'HEAD',
+    appTurnEmptyHint: 'HEAD muestra todo lo que cambió desde el último commit.',
+    undrawn: (n: number) => `${n} ${n === 1 ? 'línea más' : 'líneas más'} sin dibujar: la app dibuja hasta ese tamaño de una vez.`,
     turnSummary: (edits: number, files: number) =>
       `${edits} ${edits === 1 ? 'edición' : 'ediciones'} · ${files} ${files === 1 ? 'archivo' : 'archivos'}`,
     headSummary: (files: number) => `${files} ${files === 1 ? 'archivo' : 'archivos'} · `,
@@ -81,6 +85,10 @@ export const TEXTS = {
     noLines: 'No line changes.',
     turnEmpty: 'Claude edited no files in the last turn.',
     turnEmptyHint: 'h shows everything that changed against HEAD.',
+    appTurn: 'Turn',
+    appHead: 'HEAD',
+    appTurnEmptyHint: 'HEAD shows everything that changed since the last commit.',
+    undrawn: (n: number) => `${n} more ${n === 1 ? 'line' : 'lines'} not drawn: the app draws up to that size at once.`,
     turnSummary: (edits: number, files: number) =>
       `${edits} ${edits === 1 ? 'edit' : 'edits'} · ${files} ${files === 1 ? 'file' : 'files'}`,
     headSummary: (files: number) => `${files} ${files === 1 ? 'file' : 'files'} · `,

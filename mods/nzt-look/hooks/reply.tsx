@@ -82,8 +82,69 @@ export const wrapCell = (text: string, size: number): string[] => {
   return lines
 }
 
+/** Past this many characters a column asks for no more of the row: a long cell wraps instead. */
+const WIDEST_SHARE = 40
+
+/**
+ * Each column's share of the row, in percent, from the longest text it holds: a short column
+ * keeps its words on one line, a long one takes what is left and wraps.
+ */
+export const sharesOf = (sizes: readonly number[]): number[] => {
+  const asked = sizes.map(size => Math.min(Math.max(size, MIN_COLUMN), WIDEST_SHARE))
+  const total = asked.reduce((sum, size) => sum + size, 0)
+  return asked.map(size => Math.round((size / total) * 1000) / 10)
+}
+
+const JUSTIFY = { left: 'flex-start', right: 'flex-end', center: 'center' } as const
+
+/**
+ * The table on the desktop: a grid of boxes, each cell in its column's share of the row and its
+ * text wrapping inside it. A proportional font does not line up padded text, and a row that
+ * wraps as one line breaks its columns apart.
+ */
+const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment & { kind: 'table' }, index: number, ctx: ReplyContext) => {
+  const { palette, t } = ctx
+  const header = segment.header.map(plainOf)
+  const rows = segment.rows.map(row => header.map((_, i) => plainOf(row[i] ?? '')))
+  const shares = sharesOf(header.map((cell, i) => Math.max(width(cell), ...rows.map(row => width(row[i]!)))))
+  const isFolded = ctx.canFold && rows.length > TABLE_FOLD && !ctx.isUnfolded(index)
+  const shown = isFolded ? rows.slice(0, TABLE_FOLD) : rows
+  const row = (cells: string[], background: string, isHeader: boolean) => (
+    <Box flexDirection="row" backgroundColor={background}>
+      {cells.map((cell, i) => (
+        <Box
+          width={`${shares[i]}%`}
+          flexShrink={1}
+          minWidth={0}
+          paddingX={1}
+          justifyContent={JUSTIFY[segment.align[i] ?? 'left']}
+        >
+          <Text color={isHeader ? palette.user : palette.fg} bold={isHeader} wrap="wrap">
+            {cell}
+          </Text>
+        </Box>
+      ))}
+    </Box>
+  )
+  return (
+    <Box flexDirection="column" borderStyle="round" borderColor={palette.muted} overflow="hidden">
+      {row(header, palette.surface, true)}
+      {shown.map((cells, i) => row(cells, i % 2 === 1 ? palette.zebra : palette.surface, false))}
+      <Box flexDirection="row" columnGap={2} paddingX={1}>
+        {isFolded && <Button key={`${ctx.keyOf(index)}:more`} plain label={t.more(rows.length - TABLE_FOLD)} onPress={() => ctx.onToggle(index)} />}
+        {!isFolded && ctx.canFold && rows.length > TABLE_FOLD && (
+          <Button key={`${ctx.keyOf(index)}:less`} plain label={t.less} onPress={() => ctx.onToggle(index)} />
+        )}
+        {ctx.parts.copy && <Button key={`${ctx.keyOf(index)}:copy`} plain label={t.copy} onPress={() => ctx.onCopy(segment.source)} />}
+      </Box>
+    </Box>
+  )
+}
+
 /** A table as a grid with a header band and zebra rows; null when it does not fit the room. */
-export const drawTable = ({ Box, Text, Button }: ReplyElements, segment: Segment & { kind: 'table' }, index: number, ctx: ReplyContext) => {
+export const drawTable = (elements: ReplyElements, segment: Segment & { kind: 'table' }, index: number, ctx: ReplyContext) => {
+  if (ctx.surface === 'desktop') return drawDesktopTable(elements, segment, index, ctx)
+  const { Box, Text, Button } = elements
   const { palette, t } = ctx
   const header = segment.header.map(plainOf)
   const rows = segment.rows.map(row => header.map((_, i) => plainOf(row[i] ?? '')))
@@ -167,6 +228,23 @@ export const drawTasks = ({ Box, Text }: ReplyElements, segment: Segment & { kin
 export const drawPairs = ({ Box, Text }: ReplyElements, segment: Segment & { kind: 'pairs' }, ctx: ReplyContext) => {
   const { palette } = ctx
   const keyWidth = Math.max(...segment.pairs.map(([key]) => width(key)))
+  // On the desktop the keys line up as a column of boxes: padding a key with spaces does not.
+  if (ctx.surface === 'desktop') {
+    return (
+      <Box flexDirection="column" borderStyle="round" borderColor={palette.muted} overflow="hidden">
+        {segment.pairs.map(([key, value], i) => (
+          <Box flexDirection="row" columnGap={2} paddingX={1} backgroundColor={i % 2 === 1 ? palette.zebra : palette.surface}>
+            <Box width={keyWidth + 1} flexShrink={0}>
+              <Text color={palette.muted}>{key}</Text>
+            </Box>
+            <Box flexShrink={1} minWidth={0}>
+              <Text color={palette.fg} wrap="wrap">{value}</Text>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    )
+  }
   return (
     <Box flexDirection="column" borderStyle={ctx.surface === 'desktop' ? 'round' : undefined} borderColor={palette.muted}>
       {segment.pairs.map(([key, value], i) => (

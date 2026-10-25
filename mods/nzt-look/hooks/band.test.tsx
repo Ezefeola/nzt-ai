@@ -25,8 +25,8 @@ const usage = (percent: number, extra: Partial<Usage> = {}): Usage => ({
 const NO_RUNNING: Running = { model: null, effort: null }
 const OPUS: Running = { model: 'claude-opus-5-5', effort: 'high' }
 
-const model = (u: Usage, columns = 160, more: { isWorking?: boolean; isConfirming?: boolean; parts?: typeof DEFAULT_PREFS.band; running?: Running } = {}) =>
-  bandModelOf({ usage: u, running: more.running ?? NO_RUNNING, now: NOW, parts: more.parts ?? DEFAULT_PREFS.band, columns, isWorking: more.isWorking ?? false, isConfirming: more.isConfirming ?? false, t })
+const model = (u: Usage, columns = 160, more: { parts?: typeof DEFAULT_PREFS.band; running?: Running } = {}) =>
+  bandModelOf({ usage: u, running: more.running ?? NO_RUNNING, now: NOW, parts: more.parts ?? DEFAULT_PREFS.band, columns, t })
 
 test("the kernel's stretches: under 30, from 30, from 40", async () => {
   expect([20, 29, 30, 39, 40].map(levelOf)).toEqual(['low', 'low', 'warn', 'warn', 'critical'])
@@ -37,13 +37,6 @@ test('the context turns yellow from 30 and red from 40, with no word for it', as
   const colors = (['low', 'warn', 'critical'] as const).map(level => levelColor(palette, level))
   expect(colors).toEqual([palette.user, palette.warn, palette.err])
   expect(model(usage(34))?.context).toEqual({ kind: 'ok', percent: 34, level: 'warn', tokens: '68k/200k' })
-})
-
-test('the clear button is dim under 30, the main action from 30, and gone while Claude works', async () => {
-  expect(model(usage(24))?.clear).toBe('dim')
-  expect(model(usage(34))?.clear).toBe('main')
-  expect(model(usage(34), 160, { isWorking: true })?.clear).toBeNull()
-  expect(model(usage(34), 160, { isConfirming: true })?.clear).toBe('confirm')
 })
 
 test('the windows show what is used and what is left to reset', async () => {
@@ -57,30 +50,30 @@ test('the windows show what is used and what is left to reset', async () => {
   ])
 })
 
-test('with no reading yet the band says so and draws no 0%, no limits and no button', async () => {
+test('with no reading yet the band says so and draws no 0% and no limits', async () => {
   const none = model({ reading: { kind: 'none' }, limits: [], costUsd: 0 })
-  expect(none).toEqual({ context: { kind: 'none', label: 'sin lectura todavía' }, limits: [], cost: null, running: null, clear: null, hasLabels: true })
+  expect(none).toEqual({ context: { kind: 'none', label: 'sin lectura todavía' }, limits: [], cost: null, running: null, hasLabels: true })
 })
 
-test('an account with no plan limits draws the context, the cost and the button', async () => {
+test('an account with no plan limits draws the context and the cost', async () => {
   const keyed = model(usage(24, { limits: [] }))
   expect(keyed?.limits).toEqual([])
   expect(keyed?.cost).toBe('$1.84')
 })
 
 test('every part off draws no band', async () => {
-  expect(model(usage(24), 160, { parts: { context: false, fiveHour: false, week: false, cost: false, model: false, clear: false } })).toBeNull()
+  expect(model(usage(24), 160, { parts: { context: false, fiveHour: false, week: false, cost: false, model: false } })).toBeNull()
 })
 
-test('narrow, the tokens go first, then the cost, the weekly, the 5h and the button; the meter stays', async () => {
+test('narrow, the tokens go first, then the cost, the weekly and the 5h; the meter stays', async () => {
   const full = model(usage(34))!
   const steps = [widthOf(full, t) - 1, 70, 52, 34, 24]
   const shown = steps.map(columns => {
     const m = model(usage(34), columns)!
-    return [m.context?.kind === 'ok' && m.context.tokens !== null, m.cost !== null, m.limits.length, m.clear !== null]
+    return [m.context?.kind === 'ok' && m.context.tokens !== null, m.cost !== null, m.limits.length]
   })
-  expect(shown[0]).toEqual([false, true, 2, true])
-  expect(shown.at(-1)).toEqual([false, false, 0, false])
+  expect(shown[0]).toEqual([false, true, 2])
+  expect(shown.at(-1)).toEqual([false, false, 0])
   const tight = model(usage(34), 20)!
   expect(tight.context).toMatchObject({ kind: 'ok', percent: 34 })
 })
@@ -144,16 +137,47 @@ const mountBand = ($: Engine, surface: 'terminal' | 'desktop', isWorking = false
     props: { hasSurvey: false, isWorking, maxRows: 10, bodyColumns: 140, scroll: { offset: 0, bodyRows: 10 }, view: {} },
   } as never)
 
-test('the band redraws with each figure the session pushes, on the terminal and the desktop', async ($, on) => {
+test('the band redraws with each figure the session pushes and has no clear button, on the terminal and the desktop', async ($, on) => {
   world(on, { prefs: { calm: true } })
   await start($)
   await measure($, 34)
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await mountBand($, surface)
     expect(await ui.find({ type: 'Text', text: /34%/ })).toBeDefined()
-    expect(await ui.find({ key: 'clear' })).toBeDefined()
+    expect(await ui.find({ key: 'clear' })).toBeUndefined()
     await ui.unmount()
   }
+})
+
+test('on the desktop a low context figure takes the app text color, so it reads in a light or a dark app', async ($, on) => {
+  world(on, { prefs: { calm: true, variant: 'light' } })
+  await start($)
+  await measure($, 8)
+
+  const ui = await mountBand($, 'desktop')
+
+  // The figure is the bold Text inside the one that also carries the tokens.
+  expect((await ui.findAll({ type: 'Text', text: '8%' })).map(found => found.props)).toContainEqual({ bold: true, weight: 'semibold' })
+})
+
+test('on the desktop a narrow band keeps the tokens, each reset and the cost, and wraps instead', async ($, on) => {
+  world(on, { prefs: { calm: true } }, NOW)
+  await start($)
+  await $.session.measure({
+    context: { tokens: 16_000, window: 200_000, percent: 8 },
+    rateLimits: [{ kind: 'five_hour', percentUsed: 43, resetsAt: new Date(NOW + 2 * HOUR + 5 * 60_000).toISOString() }],
+    cost: { usd: 1.84 },
+    changed: [],
+  } as never)
+
+  const ui = await $.ui.mount({
+    plugin: 'nzt-look',
+    surface: 'desktop',
+    component: 'AbovePrompt',
+    props: { hasSurvey: false, isWorking: false, maxRows: 10, bodyColumns: 40, scroll: { offset: 0, bodyRows: 10 }, view: {} },
+  } as never)
+
+  for (const figure of ['16k/200k', ' · 2h05', '$1.84']) expect(await ui.find({ type: 'Text', text: figure })).toBeDefined()
 })
 
 test('each part carries its label at its left and the model none, on both surfaces', async ($, on) => {
@@ -171,13 +195,13 @@ test('each part carries its label at its left and the model none, on both surfac
   }
 })
 
-test('in one line at 120 columns the tokens, the countdowns and the cost go, and the model stays', async () => {
+test('in one line at 120 columns the tokens and the countdowns go, and the cost and the model stay', async () => {
   const fits = model(usage(34), 120, { running: OPUS })!
   const tokens = fits.context?.kind === 'ok' ? fits.context.tokens : 'none'
   expect([tokens, fits.limits.map(limit => limit.countdown), fits.cost, fits.running, fits.hasLabels]).toEqual([
     null,
     [null, null],
-    null,
+    '$1.84',
     { name: 'Opus 5.5', effort: 'high' },
     true,
   ])
@@ -240,34 +264,6 @@ test('out of calm mode the context meter moves on the terminal, beside its label
   expect(await moving.find({ type: 'Text', text: /34%/ })).toBeUndefined()
   await moving.advance(500)
   expect(await moving.find({ type: 'Text', text: /34%/, in: 'context' } as never)).toBeDefined()
-})
-
-test('a press asks to confirm and the second one runs /clear', async ($, on) => {
-  const { clock } = world(on, { prefs: { calm: true } }, NOW)
-  const ran: string[] = []
-  on('command.run', async (_, e) => {
-    ran.push((e as { command: string }).command)
-    return { text: '' }
-  })
-  await start($)
-  await measure($, 24)
-  const ui = await mountBand($, 'terminal')
-  await ui.press({ key: 'clear' })
-  expect(await ui.find({ type: 'Text', text: /otra vez para limpiar/ })).toBeDefined()
-  expect(ran).toEqual([])
-  await ui.press({ key: 'clear' })
-  await clock.advance(10)
-  expect(ran).toEqual(['clear'])
-})
-
-test('unconfirmed, the button goes back after five seconds', async ($, on) => {
-  const { clock } = world(on, { prefs: { calm: true } }, NOW)
-  await start($)
-  await measure($, 24)
-  const ui = await mountBand($, 'terminal')
-  await ui.press({ key: 'clear' })
-  await clock.advance(5001)
-  expect(await ui.find({ type: 'Text', text: /otra vez para limpiar/ })).toBeUndefined()
 })
 
 const submitted = (on: Parameters<typeof world>[0]) => {

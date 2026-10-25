@@ -38,7 +38,7 @@ test('a broken store keeps what it can read and defaults the rest', async () => 
   const prefs = parsePrefs({ theme: 'dracula', variant: 'purple', band: { cost: false, clear: 'yes' }, calm: 1 }, NAMES)
   expect(prefs.theme).toBe('dracula')
   expect(prefs.variant).toBe('auto')
-  expect(prefs.band).toEqual({ context: true, fiveHour: true, week: true, cost: false, model: true, clear: true })
+  expect(prefs.band).toEqual({ context: true, fiveHour: true, week: true, cost: false, model: true })
   expect(prefs.calm).toBe(false)
 })
 

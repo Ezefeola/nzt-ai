@@ -106,8 +106,9 @@ export const drawCode = (
         <Text color={palette.muted}>{language}</Text>
         {options.canCopy && <Button key={`${options.key}:copy`} plain label={t.copy} onPress={options.onCopy} />}
       </Box>
+      {/* On the desktop the line is set in one font, as a diagram is: the indent and the numbers line up. */}
       {shown.map((tokens, i) => (
-        <Text wrap="wrap">
+        <Text wrap="wrap" mono={options.surface === 'desktop' ? true : undefined}>
           {options.surface === 'desktop' && <Text color={palette.muted}>{`${String(i + 1).padStart(gutter)}  `}</Text>}
           {tokens.length === 0 ? ' ' : tokens.map(token => (
                 <Text color={tokenColor(palette, token.kind, options.code) ?? options.code?.plain ?? palette.fg} italic={token.kind === 'comment'}>

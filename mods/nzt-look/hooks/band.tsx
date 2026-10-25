@@ -11,7 +11,7 @@ const GAP = 2
 // What leaves first when the band does not fit, in order; the cells, the marks and the
 // percentage always stay, and say the stretch without color. The countdowns go before the cost
 // so the model stays at 120 columns, where the whole line does not fit.
-const DROPS = ['tokens', 'countdown', 'cost', 'effort', 'model', 'week', 'fiveHour', 'clear', 'labels'] as const
+const DROPS = ['tokens', 'countdown', 'cost', 'effort', 'model', 'week', 'fiveHour', 'labels'] as const
 const MODEL_ICON = '◇'
 type Drop = (typeof DROPS)[number]
 
@@ -20,8 +20,6 @@ export type ContextModel = { kind: 'none'; label: string } | { kind: 'ok'; perce
 
 export type LimitModel = { kind: 'fiveHour' | 'week'; percent: number; label: string; countdown: string | null }
 
-export type ClearModel = 'dim' | 'main' | 'confirm' | null
-
 export type RunningModel = { name: string; effort: string | null }
 
 export type BandModel = {
@@ -29,7 +27,6 @@ export type BandModel = {
   limits: LimitModel[]
   cost: string | null
   running: RunningModel | null
-  clear: ClearModel
   /** Each part's label at the left of its meter; the model goes without one. */
   hasLabels: boolean
 }
@@ -40,8 +37,6 @@ export type BandInput = {
   now: number
   parts: Record<BandPart, boolean>
   columns: number
-  isWorking: boolean
-  isConfirming: boolean
   t: Texts
 }
 
@@ -67,9 +62,6 @@ const limitText = (limit: LimitModel) => `${Math.round(limit.percent)}%${limit.c
 
 const runningText = (running: RunningModel) => `${running.name}${running.effort === null ? '' : ` · ${running.effort}`}`
 
-const clearWidth = (clear: ClearModel, t: Texts): number =>
-  clear === null ? 0 : clear === 'confirm' ? 3 + t.confirmClear.length + GAP + t.cancel.length : 3 + t.clear.length
-
 export const widthOf = (model: BandModel, t: Texts): number => {
   const labeled = (label: string, meter: number) => (model.hasLabels ? label.length + 1 : 0) + meter
   const pieces = [
@@ -77,7 +69,6 @@ export const widthOf = (model: BandModel, t: Texts): number => {
     model.context === null ? 0 : labeled(t.context, contextWidth(model.context)),
     ...model.limits.map(limit => labeled(limit.label, LIMIT_CELLS + 1 + limitText(limit).length)),
     model.cost === null ? 0 : labeled(t.cost, model.cost.length),
-    clearWidth(model.clear, t),
   ].filter(width => width > 0)
   return pieces.reduce((sum, width) => sum + width, 0) + GAP * Math.max(0, pieces.length - 1)
 }
@@ -98,8 +89,6 @@ const without = (model: BandModel, drop: Drop): BandModel => {
     case 'week':
     case 'fiveHour':
       return { ...model, limits: model.limits.filter(limit => limit.kind !== drop) }
-    case 'clear':
-      return { ...model, clear: null }
     case 'labels':
       return { ...model, hasLabels: false }
   }
@@ -123,7 +112,7 @@ export const bandModelOf = (input: BandInput): BandModel | null => {
           level: levelOf(reading.percent),
           tokens: `${abbreviate(reading.tokens)}/${abbreviate(reading.window)}`,
         }
-  // Before the first reading there are no limits nor a cost to show, and nothing to clear yet.
+  // Before the first reading there are no limits nor a cost to show.
   const hasReading = reading.kind === 'ok'
   const limits: LimitModel[] = hasReading
     ? usage.limits
@@ -136,18 +125,10 @@ export const bandModelOf = (input: BandInput): BandModel | null => {
         }))
     : []
   const cost = hasReading && parts.cost ? costOf(usage.costUsd) : null
-  const clear: ClearModel =
-    !hasReading || !parts.clear || input.isWorking
-      ? null
-      : input.isConfirming
-        ? 'confirm'
-        : levelOf(reading.percent) === 'low'
-          ? 'dim'
-          : 'main'
   // Not a usage figure: the model is known before the first reading.
   const running: RunningModel | null =
     parts.model && input.running.model !== null ? { name: modelNameOf(input.running.model), effort: input.running.effort } : null
-  let model: BandModel = { context, limits, cost, running, clear, hasLabels: true }
+  let model: BandModel = { context, limits, cost, running, hasLabels: true }
   for (const drop of DROPS) {
     if (widthOf(model, t) <= input.columns) break
     model = without(model, drop)
@@ -247,8 +228,6 @@ export const drawContextText = ({ Text }: TextOnly, context: ContextModel, frame
   )
 }
 
-type Handlers = { onClear: () => void }
-
 const drawRunning = (Text: TextOnly['Text'], running: RunningModel, palette: Palette) => (
   <Text key="running">
     <Text color={palette.user}>{MODEL_ICON}</Text>
@@ -279,59 +258,24 @@ const part = (Box: Elements['terminal']['Box'], key: string, label: unknown, met
   </Box>
 )
 
-const clearButton = (
-  { Box, Button, Text }: Pick<Elements['terminal'], 'Box' | 'Button' | 'Text'>,
-  clear: ClearModel,
-  palette: Palette,
-  t: Texts,
-  handlers: Handlers,
-) => {
-  if (clear === null) return null
-  if (clear === 'confirm') {
-    return (
-      <Box flexDirection="row" gap={GAP}>
-        <Button key="clear" plain hotkey="0" onPress={handlers.onClear}>
-          <Text color={palette.err} bold>
-            {t.confirmClear}
-          </Text>
-        </Button>
-        <Text color={palette.muted}>{t.cancel}</Text>
-      </Box>
-    )
-  }
-  return (
-    <Button key="clear" plain hotkey="0" dimColor={clear === 'dim'} onPress={handlers.onClear}>
-      <Text color={clear === 'main' ? palette.user : palette.muted} bold={clear === 'main'}>
-        {t.clear}
-      </Text>
-    </Button>
-  )
-}
-
 /**
  * The band on the terminal, in one line: the model, then each part with its label at its left —
- * the context (given, still or live), the plan's windows and the cost — and the clear button
- * against the right edge.
+ * the context (given, still or live), the plan's windows and the cost.
  */
 export const drawTerminalBand = (
-  elements: Pick<Elements['terminal'], 'Box' | 'Text' | 'Button'>,
+  { Box, Text }: Pick<Elements['terminal'], 'Box' | 'Text'>,
   model: BandModel,
   palette: Palette,
   t: Texts,
-  handlers: Handlers,
   contextNode: unknown,
 ) => {
-  const { Box, Text } = elements
   const label = (text: string) => (model.hasLabels ? <Text color={palette.muted}>{text}</Text> : null)
   return (
-    <Box flexDirection="row" justifyContent="space-between">
-      <Box flexDirection="row" gap={GAP}>
-        {model.running !== null && drawRunning(Text, model.running, palette)}
-        {model.context !== null && part(Box, 'context-part', label(t.context), contextNode)}
-        {model.limits.map(limit => part(Box, limit.kind, label(limit.label), limitCells(Text, limit, palette)))}
-        {model.cost !== null && part(Box, 'cost', label(t.cost), <Text color={palette.muted}>{model.cost}</Text>)}
-      </Box>
-      {clearButton(elements, model.clear, palette, t, handlers)}
+    <Box flexDirection="row" gap={GAP}>
+      {model.running !== null && drawRunning(Text, model.running, palette)}
+      {model.context !== null && part(Box, 'context-part', label(t.context), contextNode)}
+      {model.limits.map(limit => part(Box, limit.kind, label(limit.label), limitCells(Text, limit, palette)))}
+      {model.cost !== null && part(Box, 'cost', label(t.cost), <Text color={palette.muted}>{model.cost}</Text>)}
     </Box>
   )
 }
@@ -357,15 +301,17 @@ export const ringSvg = (percent: number, color: string, track: string, marks: re
   )
 }
 
-/** The band on the desktop, in one line: the model, a labeled ring per figure, the cost, and the clear button. */
+/**
+ * The band on the desktop, in one line: the model, a labeled ring per figure and the cost.
+ * The figures with nothing to warn of take the app's own text color, which reads whether the app is
+ * light or dark; a palette color reads only when the variant matches the app.
+ */
 export const drawDesktopBand = (
-  elements: Pick<Elements['desktop'], 'Box' | 'Text' | 'Button' | 'Svg'>,
+  { Box, Text, Svg }: Pick<Elements['desktop'], 'Box' | 'Text' | 'Svg'>,
   model: BandModel,
   palette: Palette,
   t: Texts,
-  handlers: Handlers & { onCancel: () => void },
 ) => {
-  const { Box, Text, Button, Svg } = elements
   const context = model.context
   const contextRing =
     context === null ? null : context.kind === 'none' ? (
@@ -387,22 +333,10 @@ export const drawDesktopBand = (
           alt={`${t.context} ${Math.round(context.percent)}%`}
         />
         <Text>
-          <Text color={context.level === 'low' ? palette.fg : levelColor(palette, context.level)} bold>{`${Math.round(context.percent)}%`}</Text>
+          <Text color={context.level === 'low' ? undefined : levelColor(palette, context.level)} bold>{`${Math.round(context.percent)}%`}</Text>
           {context.tokens !== null && <Text color={palette.muted}>{` ${context.tokens}`}</Text>}
         </Text>
       </Box>
-    )
-  const clear =
-    model.clear === null ? null : model.clear === 'confirm' ? (
-      <Box flexDirection="row" gap={1} alignItems="center">
-        <Text color={palette.err} bold>
-          {t.confirmClearDesk}
-        </Text>
-        <Button key="clear" variant="primary" label={t.clear} onPress={handlers.onClear} />
-        <Button key="cancel" label={t.cancelDesk} onPress={handlers.onCancel} />
-      </Box>
-    ) : (
-      <Button key="clear" variant={model.clear === 'main' ? 'primary' : 'secondary'} dimColor={model.clear === 'dim'} label={t.clear} onPress={handlers.onClear} />
     )
   const label = (text: string) => (model.hasLabels ? <Text color={palette.muted}>{text}</Text> : null)
   const part = (key: string, left: unknown, meter: unknown) => (
@@ -412,26 +346,23 @@ export const drawDesktopBand = (
     </Box>
   )
   return (
-    <Box flexDirection="row" justifyContent="space-between" alignItems="center">
-      <Box flexDirection="row" gap={2} alignItems="center">
-        {model.running !== null && drawRunning(Text, model.running, palette)}
-        {context !== null && part('context-part', label(t.context), contextRing)}
-        {model.limits.map(limit =>
-          part(
-            limit.kind,
-            label(limit.label),
-            <Box flexDirection="row" gap={1} alignItems="center">
-              <Svg source={ringSvg(limit.percent, limitColor(palette, limit.percent), palette.muted, [])} alt={`${limit.label} ${Math.round(limit.percent)}%`} />
-              <Text>
-                <Text bold>{`${Math.round(limit.percent)}%`}</Text>
-                {limit.countdown !== null && <Text color={palette.muted}>{` · ${limit.countdown}`}</Text>}
-              </Text>
-            </Box>,
-          ),
-        )}
-        {model.cost !== null && part('cost', label(t.cost), <Text color={palette.muted}>{model.cost}</Text>)}
-      </Box>
-      {clear}
+    <Box flexDirection="row" flexWrap="wrap" gap={2} alignItems="center">
+      {model.running !== null && drawRunning(Text, model.running, palette)}
+      {context !== null && part('context-part', label(t.context), contextRing)}
+      {model.limits.map(limit =>
+        part(
+          limit.kind,
+          label(limit.label),
+          <Box flexDirection="row" gap={1} alignItems="center">
+            <Svg source={ringSvg(limit.percent, limitColor(palette, limit.percent), palette.muted, [])} alt={`${limit.label} ${Math.round(limit.percent)}%`} />
+            <Text>
+              <Text bold>{`${Math.round(limit.percent)}%`}</Text>
+              {limit.countdown !== null && <Text color={palette.muted}>{` · ${limit.countdown}`}</Text>}
+            </Text>
+          </Box>,
+        ),
+      )}
+      {model.cost !== null && part('cost', label(t.cost), <Text color={palette.muted}>{model.cost}</Text>)}
     </Box>
   )
 }

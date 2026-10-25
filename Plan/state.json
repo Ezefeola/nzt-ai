@@ -1,22 +1,47 @@
 {
-  "version": 1,
-  "updated": "2026-10-25T00:30:00Z",
-  "goal": "Publicar NZT v2.1.0 desde main tras el merge del PR #8 (menos ceremonia, D78-D82)",
-  "phases": [
+  "version": 2,
+  "updated": "2026-10-25T15:35:36Z",
+  "goal": "Un mod que muestre todos los mods instalados, los active o desactive y abra cada uno, y se vea perfecto en la app de escritorio y en la consola",
+  "cadence": "delivery",
+  "slices": [
     {
-      "name": "ship",
-      "status": "done",
-      "units": [
-        { "id": 359, "do": "Release v2.1.0: subir la versión en main, tag v2.1.0 y workflow de release", "status": "done", "detail": "fc252bc bump 2.1.0 en main; tag v2.1.0, workflow release success (gates, 6 binarios, notify-landing), 13 assets; instalación desde el release no probada" }
+      "id": "S1",
+      "name": "Descubrimiento del mod de mods",
+      "status": "dropped",
+      "phases": [
+        {
+          "name": "analysis",
+          "status": "dropped",
+          "units": [
+            {
+              "id": 368,
+              "do": "La spec del mod y sus historias; primero QT: mod nuevo o ampliar nzt-hub",
+              "status": "dropped",
+              "detail": "Descartado por el usuario el 2026-10-25 antes de aprobar: no se hace el mod de mods"
+            }
+          ]
+        },
+        {
+          "name": "architecture",
+          "status": "dropped",
+          "units": [
+            {
+              "id": 369,
+              "do": "Prueba técnica: desde un mod, listar plugins, activarlos/desactivarlos con claude plugin y recargar con /reload-plugins, en consola y en la app",
+              "status": "dropped",
+              "detail": "Descartado por el usuario el 2026-10-25 antes de aprobar: no se hace el mod de mods"
+            }
+          ]
+        }
       ]
     }
   ],
-  "approved": true,
+  "approved": false,
   "delegation": "ask",
-  "waiting_on": "Usuario: decir con qué sigue",
+  "waiting_on": null,
   "notes": [
-    "Sin probar en vivo: freno de tanda al 40%, nzt-look 0.7.0 y nzt-hub 0.4.1 (reglas con [modify] en sus specs)",
-    "Evals pendientes: re-juzgar size-standard con sonnet; accompanied-default necesita una fixture con código real",
-    "Pendiente aparte: fixtures de evals con el formato de estado viejo y sin glosario"
+    "Run anterior (361-367) cerrada el 2026-10-25: el usuario dio por perfectos los 6 mods en la app; la 367 descartada. Todo sin commitear en main",
+    "API verificada en los tipos de 2.1.308: no hay $.plugin.enable; claude plugin enable/disable/list --json existen (CLI); $.command.run corre comandos built-in como si se tipearan. Sin probar en vivo",
+    "Pendiente de antes: probar en vivo freno al 40%, evals size-standard y accompanied-default, fixtures con formato viejo"
   ]
 }

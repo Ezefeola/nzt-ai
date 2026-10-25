@@ -49,6 +49,19 @@ test('a code block is framed with its language, highlighted, and numbered on the
   expect(await desk.find({ type: 'Text', text: '1  ' })).toBeDefined()
 })
 
+test('on the desktop each line of code is set in one font, so its indent and numbers line up', async ($, on) => {
+  world(on)
+  await start($)
+  const text = '```ts\nif (a) {\n    return 1\n}\n```'
+
+  const desk = await mountReply($, 'desktop', text, 'c5')
+  const term = await mountReply($, 'terminal', text, 'c6')
+
+  // The line is the outermost Text holding the code; its tokens sit inside it.
+  expect((await desk.find({ type: 'Text', text: /return 1/ }))?.props).toMatchObject({ mono: true })
+  expect((await term.find({ type: 'Text', text: /return 1/ }))?.props?.mono).toBeUndefined()
+})
+
 test('code past 24 lines folds with how many are left', async ($, on) => {
   world(on)
   await start($)

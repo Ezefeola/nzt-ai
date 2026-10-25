@@ -1,7 +1,9 @@
 # Mod · nzt-changes — panel de los cambios del proyecto
 
 > Estado: **aceptado** por el usuario en 0.5.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
-> queda todo aprobado") y cerrado (unidad 190); código en `mods/nzt-changes/`. Cómo llegó
+> queda todo aprobado") y cerrado (unidad 190). **0.6.0 (unidad 364, 2026-10-25):** la app de
+> escritorio, reglas con `[modify]` hasta que el usuario lo vea en la app (H-23, QT-22 y QT-23
+> de `specs/mods/revision-escritorio.md`). Código en `mods/nzt-changes/`. Cómo llegó
 > hasta acá, en **Historia** al final. · Depende de: `specs/nzt-mods.md` (reglas de todo mod).
 > El usuario pidió el mod el 2026-10-14 ("ver los cambios a los archivos realizados", "que no
 > sirva solo para código", "debe verse ordenado"), y para la 0.2.0 que se vea "tal cual
@@ -233,6 +235,31 @@ conversación; el alto lo fija RN-cambios-alto. Claude Code lo pone al
 costado solo en pantalla completa y con 110 columnas o más; cuando lo pone sobre el prompt,
 la respuesta de `/nzt-changes` lo dice con el motivo (no está en pantalla completa, o el ancho
 que tiene la terminal).
+**[modify] En la app de escritorio (P-02 de `specs/mods/revision-escritorio.md`, usuario
+2026-10-24):** la app pone el panel a su costado y `/nzt-changes` no imprime nada: el aviso habla
+de una terminal en pantalla completa, que la app no tiene.
+
+### RN-cambios-escritorio · origin: usuario 2026-10-25 (QT-22 y QT-23 de `specs/mods/revision-escritorio.md`); lo demás, por QT-11, QT-12 y H-17 de nzt-files
+**[modify]** En la app de escritorio el panel va en su pestaña sin marco, sin la etiqueta ` NZT `,
+sin título propio y sin `Cerrar`, porque la pestaña de la app ya los pone; sus botones van sin la
+ficha de su tecla, y por eso sin tecla: en la app se usa el mouse. Todo va entero y lo desplaza el
+scroll de la app: sin alto fijo (RN-cambios-alto), sin ventanas del índice ni del diff, sin ▲ ▼,
+sin fila de posición (RN-cambios-diff-alto) y sin regla de cambios (RN-cambios-regla); la rueda
+le llega a la app (usuario 2026-10-25 en nzt-files: *"es todo por scroll"*).
+En una sola pestaña (QT-22), de arriba abajo: **Turno** y **HEAD**, la vista actual como botón
+principal porque la app no colorea el texto de un botón, con el resumen al lado; `paso k de n`
+con **Anterior** y **Siguiente** a su derecha (en la app arriba y no al final, RN-cambios-botones,
+para no tener que bajar hasta el final del diff); el índice entero, cada fila tomando el clic en
+todo su largo, el título de un grupo con su flecha fija y la fila del paso actual con fondo; y el
+paso: el nombre del archivo en negrita y su carpeta debajo, para que una ruta larga no esconda el
+nombre, el detalle, y el diff.
+El diff va pintado como el de Visual Studio (QT-23): en mono, cada línea con su número (el del
+archivo nuevo, o el del viejo en una borrada), la agregada sobre verde y la borrada sobre rojo,
+sin `@@` ni `+` `−`; entre dos tramos, una fila `⋯`. El C# lleva los colores de Visual Studio,
+los mismos de nzt-files; los demás lenguajes van sin colores de sintaxis, porque el elemento de
+código de la app no pinta líneas sueltas. Si el diff pasa lo que la app dibuja de una vez
+(100.000 caracteres), muestra sus primeras líneas y dice cuántas quedaron sin dibujar.
+En la consola nada de esto cambia.
 
 ### RN-cambios-sin-repo · origin: propuesta del agente (unidad 118)
 Fuera de un repositorio git, o sin git instalado, la vista HEAD lo dice con el motivo. La
@@ -404,6 +431,18 @@ web; en el mod son `k` y `j`.)
   ventana puede quedar cortada (el alto del panel no cambia). Se mira en vivo.
 
 ## Tests
+
+**0.6.0 (unidad 364, 2026-10-25): 95 tests**, todos pasan, más `claude plugin validate`; `tsc` no
+corrió (no hay compilador instalado). Los tres que recorrían las dos superficies con lo de la
+consola (el diff en `Code` con `@@`, la ruta entera, la pista con la tecla `h`) quedan en la
+consola, y diez nuevos prueban la app: el diff pintado sin `Code` ni `@@` con sus fondos verde y
+rojo, el nombre en negrita y la carpeta debajo, el C# con sus colores en mono, el índice entero
+con el clic en el extremo derecho de la fila que abre grupos y salta al paso, la vista actual como
+botón principal, sin marco, alto, Cerrar, ▲ ▼, regla, fila de posición ni fichas (y la consola
+con ellos), el vacío sin tecla en la pista, el comando que no imprime nada y la rueda que sigue a
+la app cuando el panel es más alto que el cuerpo. **No cubierto hasta QA:** cómo pinta la app los
+fondos con transparencia y la fila `⋯`, si respeta el espacio duro de la sangría, el hover de la
+fila del índice sobre la región, y que la rueda le llegue de verdad (el kit no lo prueba).
 
 `claude plugin test mods/nzt-changes` corre 85 tests (0.5.0, unidades 177 y 178; antes 74).
 Lo que sumó la 0.5.0: en `turn.test.ts`, el árbol del índice (un título por estado, la raíz y
