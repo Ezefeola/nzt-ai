@@ -39,8 +39,8 @@ qué skill cargar está *instruido en una tabla*, no librado a que el modelo adi
 descripción.
 
 **2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
-(`nzt`), el de investigación (`nzt-research`) y el de delegar lecturas a un subagente
-(`nzt-delegate`). No hacen el trabajo:
+(`nzt`), el de investigación (`nzt-research`) y el de delegar en un subagente —lecturas, o
+unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`). No hacen el trabajo:
 leen el pedido y el documento de stack, y dicen qué referencia leer.
 
 **3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
@@ -219,8 +219,11 @@ Cómo se arma un mod y qué tiene que traer está en [`specs/nzt-mods.md`](specs
 Es tan importante como lo otro:
 
 - **No restringe lo que el modelo sabe** ni lo que puede hacer. Define cómo trabaja.
-- **No usa agentes, subagentes ni MCP.** Una conversación, un contexto, limpio porque frena
-  en los bordes de cada unidad.
+- **No delega decisiones ni usa MCP.** Una conversación que es dueña del plan, el estado y
+  cada decisión, y que frena en los bordes de cada unidad. Puede mandar a dos subagentes
+  propios: uno lee por ella y el otro hace las unidades que el plan aprobado marcó en
+  paralelo. Sin subagentes, o con `delegation` en `off`, todo corre en esta conversación,
+  una unidad tras otra.
 - **No garantiza que el modelo elija siempre la skill correcta.** Por eso el ruteo está
   instruido y por eso hay una suite de evals que lo mide.
 - **No decide por vos.** Prescribe el procedimiento, no el criterio técnico: NZT dice *cómo

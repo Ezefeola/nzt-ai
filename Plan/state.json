@@ -1,47 +1,76 @@
 {
-  "version": 2,
-  "updated": "2026-10-25T15:35:36Z",
-  "goal": "Un mod que muestre todos los mods instalados, los active o desactive y abra cada uno, y se vea perfecto en la app de escritorio y en la consola",
-  "cadence": "delivery",
-  "slices": [
+  "version": 1,
+  "updated": "2026-10-25T19:15:00Z",
+  "goal": "Un solo subagente nzt-worker que ejecute unidades aprobadas e independientes en paralelo, sin perder el funcionamiento actual",
+  "phases": [
     {
-      "id": "S1",
-      "name": "Descubrimiento del mod de mods",
-      "status": "dropped",
-      "phases": [
+      "name": "architecture",
+      "status": "done",
+      "units": [
         {
-          "name": "analysis",
-          "status": "dropped",
-          "units": [
-            {
-              "id": 368,
-              "do": "La spec del mod y sus historias; primero QT: mod nuevo o ampliar nzt-hub",
-              "status": "dropped",
-              "detail": "Descartado por el usuario el 2026-10-25 antes de aprobar: no se hace el mod de mods"
-            }
-          ]
+          "id": 370,
+          "do": "Verificar en las docs de Claude Code y Codex: worktree, segundo plano, anidamiento, agentes que escriben, AGENTS.md en subagente Codex",
+          "status": "done",
+          "detail": "Hecho en D84 'Lo verificado': worktree CC parte de origin/main (no ve lo sin commitear), subagentes sin AskUserQuestion, Codex sin aislamiento; AGENTS.md en subagente Codex sigue unverified"
         },
         {
-          "name": "architecture",
+          "id": 371,
+          "do": "Decisión D84 en specs/nzt-core.md con QT-36+: un agente o varios, aislamiento, archivos compartidos, modo delegation",
+          "status": "done",
+          "detail": "D84 con QT-36 a QT-46 respondidas por el usuario; 'Lo que esto pide a las unidades 372-376' dice qué hace cada una"
+        }
+      ]
+    },
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        {
+          "id": 372,
+          "do": "Crear nzt-worker (.md y .toml), sumarlo al instalador y a sus docs (installer/README, nzt-installer.md)",
+          "status": "done",
+          "detail": "Hecho: agents/nzt-worker.*, instalador sin cambios (ya embebe agents/), 164 checks; arranca con git reset --hard <commit> en vez de baseRef (en D84); Codex observado: subagente carga AGENTS.md; sin instalar en la máquina"
+        },
+        {
+          "id": 373,
+          "do": "Extender nzt-delegate con la delegación de unidades; partir en referencias si pasa de 200 líneas",
+          "status": "done",
+          "detail": "Hecho: router + references/reading.md y units.md; units.md remite a nzt-plan la forma del estado de un grupo en paralelo (la 374 la escribe); gates pasan"
+        },
+        {
+          "id": 374,
+          "do": "nzt-plan marca grupos en paralelo: campo en el estado, proposal.md y nzt-ai state check",
+          "status": "done",
+          "detail": "Hecho: plan/references/parallel.md, proposal.md, §7 de la spec; state check con group/model/work_branch, 171 checks; panel nzt-state sin cambios"
+        },
+        {
+          "id": 375,
+          "do": "Cambiar la hard rule de delegación en core/kernel.md y la línea 'no usa subagentes' del README",
+          "status": "done",
+          "detail": "Hecho: hard rule en 2 líneas (kernel 150, CLAUDE/AGENTS 164), README, §2 y regla 6; 171 checks, lint 0"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "status": "dropped",
+      "units": [
+        {
+          "id": 376,
+          "do": "Evals: un caso que paraleliza dos historias independientes y uno que no debe por archivos compartidos",
           "status": "dropped",
-          "units": [
-            {
-              "id": 369,
-              "do": "Prueba técnica: desde un mod, listar plugins, activarlos/desactivarlos con claude plugin y recargar con /reload-plugins, en consola y en la app",
-              "status": "dropped",
-              "detail": "Descartado por el usuario el 2026-10-25 antes de aprobar: no se hace el mod de mods"
-            }
-          ]
+          "detail": "Descartada por el usuario el 2026-10-25: no se hacen evals; lo prueba en local antes del release"
         }
       ]
     }
   ],
-  "approved": false,
+  "approved": true,
   "delegation": "ask",
+  "autonomy": { "units": [370, 371], "keep_stops": [] },
   "waiting_on": null,
   "notes": [
-    "Run anterior (361-367) cerrada el 2026-10-25: el usuario dio por perfectos los 6 mods en la app; la 367 descartada. Todo sin commitear en main",
-    "API verificada en los tipos de 2.1.308: no hay $.plugin.enable; claude plugin enable/disable/list --json existen (CLI); $.command.run corre comandos built-in como si se tipearan. Sin probar en vivo",
+    "D83 (2026-10-25): reglas de autoría 17-19 en §10 de nzt-core.md (genéricas, sin redundancia, pasos simples); el set existente no se revisó contra ellas",
+    "Run 370-376 cerrada el 2026-10-25 (376 descartada): D84 hecha y commiteada en la rama nzt-worker, sin release; el usuario la prueba en local. Sin probar en vivo: que Claude Code y Codex carguen nzt-worker y que un plan arme un grupo",
     "Pendiente de antes: probar en vivo freno al 40%, evals size-standard y accompanied-default, fixtures con formato viejo"
   ]
 }

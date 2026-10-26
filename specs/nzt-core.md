@@ -29,6 +29,8 @@ Metáfora operativa que guía todas las decisiones de diseño:
 Un set de **skills instalables** que, al instalarse en un proyecto o en la máquina, hace
 que Claude Code y Codex CLI trabajen con una conducta estructurada estilo Spec Driven
 Development, **sin agentes ni subagentes**, aumentando agilidad, calidad y consistencia.
+*(Así fue v1. D70/D71 sumaron un explorador de solo lectura, y D84 un worker para las
+unidades que el plan aprobado marca en paralelo; las decisiones siguen en el hilo principal.)*
 
 El set tiene dos modos: **construir** software con método (secciones 4 a 8) y **enseñar**
 una habilidad a la persona en lugar de reemplazarla (sección 4.6).
@@ -544,6 +546,11 @@ o escribirlo carga `nzt-plan` (D74).
 - `delegation` es el modo de delegación del proyecto: `auto`, `ask` u `off` (D71). Ausente
   significa `ask`. Es la única clave que una corrida nueva conserva, y solo la cambia el
   usuario.
+- **Grupos en paralelo (D84):** una unidad puede llevar `group` (el id de su grupo, `P1`…) y
+  `model` (`small` o `main`; ausente es `main`, y sin `group` no va). Un grupo vive en una
+  fase; varias unidades en `doing` solo si son del mismo grupo; con algún grupo, la raíz
+  lleva `work_branch`. El método está en `nzt-plan` (`references/parallel.md`), y `state
+  check` lo valida.
 - Al retomar, el estado se reconcilia con las decisiones actuales del usuario y con lo que
   hay en disco. **La evidencia manda sobre los hechos; no sobre los acuerdos**: el disco
   corrige qué se hizo, no qué se había acordado hacer (13.9 #25).
@@ -820,7 +827,9 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 5. **Frontmatter portable** (C1): solo `name` y `description`.
 6. **Sin dependencias de agentes**: ninguna skill puede asumir subagentes ni forks. La
    única que los nombra es `nzt-delegate` (D71), y sin subagentes o sin `nzt-explorer`
-   instalado manda a leer en la conversación principal: el trabajo es el mismo.
+   instalado manda a leer en la conversación principal: el trabajo es el mismo. **Desde
+   D84** también los nombra la referencia de grupos de `nzt-plan`, y sin subagentes o sin
+   `nzt-worker` el plan corre igual, una unidad tras otra.
 7. **Grados de libertad**: prescribir el procedimiento, no el criterio técnico. NZT dice
    *cómo trabajar*, el modelo decide *qué construir*.
 8. **El nombre lo dicta el path** (9.1). Todo cuelga de `skills/nzt/`, así que el prefijo
@@ -870,6 +879,18 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    de `nzt` cuando la petición entra por el punto de entrada, y la fila de la tabla del
    router que lleva a la referencia; si falta, se amplía el texto de esos eslabones. La descripción del
    router no se agranda para cubrirlo.
+17. **Lo más genérica posible (D83).** Una skill o referencia se escribe para cualquier
+   proyecto, stack y proveedor. Lo que solo vale para una tecnología, un host o un caso baja
+   a la capa de stack, al adaptador o a un ejemplo marcado como tal; nunca al cuerpo de la
+   regla. Antes de escribir algo específico, preguntarse si la versión genérica alcanza.
+18. **Sin contenido redundante (D83).** Cada regla, formato o paso se dice en un solo
+   archivo; los demás lo nombran por su ruta o su nombre, no lo copian ni lo parafrasean.
+   Generaliza la regla 15 (entre niveles) y D65 (dentro del kernel) a todo el set. Si dos
+   archivos necesitan lo mismo, se elige el dueño y el otro apunta.
+19. **Fácil de mantener, con pasos simples (D83).** Un procedimiento son pasos numerados
+   cortos, una acción verificable por paso, en el orden en que se hacen; sin pasos que
+   escondan dos decisiones. Cambiar una regla debe tocar un solo archivo, y quien la lea por
+   primera vez debe poder seguirla sin leer otra cosa que lo que su fila de ruteo carga.
 
 ## 11. Roadmap
 
@@ -2606,6 +2627,163 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     `project.sh` tiene código de muestra sin comportamiento, el agente frena con una pregunta y
     el freno del kernel queda sin medir. La oferta de tanda (*"por defecto paro después de cada
     paso; si preferís, …de corrido"*) apareció en los tres planes. El freno del 40% no se midió.
+- **D83.** **Tres reglas de autoría nuevas: genéricas, sin redundancia, mantenibles con pasos
+  simples.** Pedido del usuario, 2026-10-25. Quedan como reglas 17, 18 y 19 de §10. Valen
+  para lo que se escriba o se toque desde ahora; **no se aplicaron todavía al set existente**:
+  revisarlo contra ellas es trabajo aparte, y lo decide el usuario.
+- **D84.** **Un solo subagente que escribe, `nzt-worker`, para unidades aprobadas e
+  independientes en paralelo.** Abre D70 QT-27. Lo que la forzó: el pedido del usuario
+  (2026-10-25) de ganar agilidad sin perder calidad delegando construir, verificar o preparar
+  un release, sin una lista larga de agentes. Un agente genérico y no uno por fase: el método
+  vive en las skills y la fase va en el prompt (reglas 17 y 18).
+  - **Lo verificado (unidad 370, leído el 2026-10-25; Claude Code 2.1.310, Codex 0.164.0
+    instalados).** Fuentes: [sub-agents](https://code.claude.com/docs/en/sub-agents) y
+    [worktrees](https://code.claude.com/docs/en/worktrees) de Claude Code;
+    [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents),
+    [AGENTS.md](https://learn.chatgpt.com/codex/guides/agents-md) y
+    [worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees) de Codex.
+    - documented (CC): `isolation: worktree` corre el subagente en un worktree temporal bajo
+      `.claude/worktrees/`. **Parte de la rama por defecto del remoto** (`worktree.baseRef:
+      "fresh"`), no del `HEAD`; con `"head"` parte del `HEAD` local. Sin cambios se borra;
+      con cambios queda en disco con su rama, **y nada se mergea solo**. Las ediciones y los
+      comandos hacia el checkout principal se bloquean, pero un `cp` o una redirección del
+      shell no.
+    - inferred (CC, de lo anterior y de git): un worktree **no lleva el trabajo sin commitear**
+      del checkout principal. Un worker que necesita lo que hicieron unidades anteriores sin
+      commit no lo ve: o se commitea antes de repartir, o el worker trabaja sin worktree.
+    - documented (CC): sin configurar, los subagentes corren **en segundo plano** y su resultado
+      llega como notificación; tope de **20 concurrentes** por defecto
+      (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`); **anidan hasta tres niveles**, y se corta
+      quitando `Agent` de `tools`. Los permisos que piden se muestran en la sesión principal.
+    - documented (CC): **`AskUserQuestion` se quita a todo subagente**, aunque esté en `tools`.
+      Los de segundo plano tienen `Edit`, `Write`, `Bash`, `PowerShell` y `Skill`, entre otros.
+      `skills` precarga hasta 32; sin precarga puede invocarlas. `omitClaudeMd` (2.1.271+)
+      sigue disponible. Devuelve solo su resumen final, marcado como salida sin autoridad.
+    - documented (CC): un **fork** hereda toda la conversación y comparte la caché del
+      principal, y también acepta `isolation: "worktree"`.
+    - documented (Codex): los subagentes **heredan el sandbox y las herramientas del padre**:
+      pueden escribir y no hay solo lectura por configuración. El tope es
+      `agents.max_concurrent_threads_per_session`, sin número documentado. Local delega
+      **solo si se pide**, o si lo pide un `AGENTS.md` o una skill. Las aprobaciones aparecen
+      desde el hilo que las pide, y en modo no interactivo fallan.
+    - documented (Codex): **no hay aislamiento por subagente**. La doc avisa que agentes
+      editando código a la vez generan conflictos. Los worktrees de Codex son por chat
+      (`$CODEX_HOME/worktrees`, HEAD separado), y en la CLI son experimentales.
+    - unverified (Codex): si un subagente carga el `AGENTS.md` global. Ninguna de las dos
+      páginas lo dice, igual que en D71. Se resolvería con una prueba: un subagente que cite
+      una línea del bloque de NZT.
+    - inferred: en Codex dos workers en paralelo comparten el checkout, así que solo son
+      seguros con archivos disjuntos declarados; si no, todo es secuencial. En Claude Code el
+      worktree protege los archivos, pero el merge es del principal.
+  - **Las preguntas (unidad 371).** Derivadas de lo verificado y de las reglas que ya rigen
+    (una unidad por spec, un solo escritor del estado, freno acompañado, D70 QT-28).
+    - **QT-36 · Cuántos agentes:** uno genérico, `nzt-worker`, más `nzt-explorer`; la fase
+      va en el prompt. *Usuario, 2026-10-25*, al aprobar el plan que lo proponía.
+    - **QT-37 · Qué fases delega:** build y verify ejecutan; ship solo prepara (pipeline,
+      borrador de changelog), sin push, tag ni deploy; análisis, arquitectura y UX no, porque
+      son preguntas y decisiones. *Usuario, 2026-10-25*, al aprobar el mismo plan.
+    - **QT-38 · Cómo se aíslan dos workers. Usuario, 2026-10-25: worktree más rama.** En
+      Claude Code cada worker va en su worktree. Antes de repartir, el principal commitea el
+      punto de partida en una rama de trabajo que el plan declara, porque el worktree no ve lo
+      que no está commiteado y parte de `HEAD` con `worktree.baseRef: "head"`. Cada worker
+      compila y testea en su worktree, y el principal mergea. En Codex, o sin git: archivos
+      disjuntos declarados y sin builds en paralelo. Descartadas: el mismo checkout para los
+      dos proveedores (el worker entrega sin verificarse) y paralelizar solo lo que no compila.
+    - **QT-39 · Quién toca los archivos compartidos. Usuario, 2026-10-25: solo el
+      principal.** El worker no los edita: anota en su reporte el cambio que haría falta y el
+      principal lo aplica después del merge. Una unidad que necesita una migración nueva no va
+      en paralelo. Descartada: sacar del paralelo a toda unidad que toque uno de esos archivos.
+    - **QT-40 · Cómo se autoriza. Usuario, 2026-10-25: la aprueba el plan.** El plan marca los
+      grupos en paralelo y aprobarlo los autoriza (D70 QT-28). `delegation` sigue siendo el
+      interruptor general: con `off` no se delega nada; con `ask` y `auto`, la lectura se
+      comporta como en D71 y la escritura sale del plan. Descartadas: preguntar además antes de
+      cada grupo, y un campo `parallel` aparte.
+    - **Detalles dentro del alcance. Modo elegido por el usuario el 2026-10-25: juntos**, en
+      una ronda: el modelo del worker; si puede anidar subagentes; qué skills precarga; la
+      forma de su reporte; cuántos en paralelo como máximo; y su nombre en Codex.
+      - **QT-41 · Modelo.** Se ofreció `inherit` o Sonnet fijo. **El usuario reabrió QT-34**
+        (2026-10-25): que el principal elija el modelo de cada unidad según su dificultad.
+        documented (CC, [sub-agents](https://code.claude.com/docs/en/sub-agents), historial
+        2.1.251): el modelo **por invocación** gana sobre el `model` del frontmatter, así que
+        el principal puede elegirlo en cada llamada. unverified (Codex): la doc muestra
+        `model` por archivo de agente y `agents.default_subagent_model`, pero no un modelo
+        por llamada. **Usuario, 2026-10-25: tabla más plan.** Una tabla corta en
+        `nzt-delegate`: lo mecánico y con criterios cerrados (docs, tests de escenarios ya
+        escritos, un renombre) va a un modelo chico; una historia normal, al del principal; lo
+        ambiguo o transversal no se delega. El plan muestra el modelo de cada unidad delegada y
+        se aprueba con él (QT-40). En Codex, mientras no se verifique, el del principal. La
+        eval de la 376 mide si el modelo chico sostiene la calidad. **Cierra QT-34** con esta
+        regla. Descartadas: que el principal decida libre caso por caso, y `inherit` siempre.
+      - **QT-42 · Si anida subagentes. Usuario, 2026-10-25: no.** Sin `Agent` en `tools`.
+      - **QT-43 · Qué skills precarga. Usuario, 2026-10-25: ninguna.** Invoca la de la fase
+        que nombra el prompt y lee sus referencias, como el principal.
+      - **QT-44 · Tope. Usuario, 2026-10-25: tres a la vez.** Es una estimación del agente
+        (el cuello pasa a ser el merge del principal), no una medición.
+      - **QT-45 · Forma del reporte. Usuario, 2026-10-25: fija.** Los cuatro campos del
+        reporte de unidad (`nzt-plan`), la rama y el worktree, los archivos tocados, los
+        chequeos corridos con su resultado, los cambios a archivos compartidos que propone y lo
+        que no pudo resolver. El principal rechaza una respuesta fuera de esa forma, como con
+        `nzt-explorer`.
+      - **QT-46 · Nombre en Codex. Usuario, 2026-10-25: `nzt_worker`**, por el mismo criterio
+        que `nzt_explorer` (D71). El archivo es `nzt-worker.toml`.
+  - **Lo que esto pide a las unidades 372–376.** 372: `nzt-worker` sin `Agent`, sin skills
+    precargadas, `omitClaudeMd`, `isolation: worktree`; su texto dice que no corre el bucle y
+    no toca los archivos compartidos; y la prueba de si Codex le carga el `AGENTS.md`. 373:
+    `nzt-delegate` suma repartir unidades (requisitos de independencia, commit del punto de
+    partida en la rama de trabajo, prompt, reporte de QT-45, merge y re-verificación del
+    principal) y la tabla de modelos de QT-41. 374: el plan marca los grupos en paralelo y el
+    modelo de cada unidad delegada; `state check` los valida. 375: la hard rule. 376: casos
+    para el grupo en paralelo, para la unidad que no debe ir en paralelo, y para el modelo chico.
+  - **Sin cambio de comportamiento sin subagentes:** con `off`, sin subagentes en el host o
+    sin `nzt-worker` instalado, las mismas unidades corren una tras otra, como hasta D83
+    (regla 6 de §10).
+  - **Hecho (unidad 372, 2026-10-25).** `agents/nzt-worker.md` y `agents/nzt-worker.toml`;
+    el instalador ya embebía todo `agents/` y no cambió (*"embebe los 4 agentes del repo"*,
+    164 comprobaciones). Tablas de `installer/README.md` y `specs/nzt-installer.md` al día.
+    - **Se apartó de QT-38 en el mecanismo, no en la decisión** (propuesta del agente):
+      `worktree.baseRef: "head"` es un ajuste del usuario en `settings.json`, y cambiarlo es
+      configuración persistente. En su lugar el worker arranca con `git reset --hard <commit>`
+      sobre el commit que nombra el prompt (el worktree comparte el `.git`, así que lo tiene)
+      y comprueba `HEAD`. Commitea en la rama de su worktree; el principal mergea.
+    - **observed (Codex 0.164.0, 2026-10-25):** un `nzt_explorer` lanzado con `codex exec`
+      respondió que en su contexto está el `# NZT` del bloque global, que identificó como
+      *inherited user instructions*. Lo dice el propio subagente, no hay un log que lo
+      muestre. Por eso el `.toml` del worker dice que no corre el bucle *aunque NZT esté
+      cargado*. Cierra el unverified de D71.
+    - **En Codex el worker comparte el checkout:** solo toca sus archivos declarados, no
+      compila ni testea salvo que el prompt diga que es el único, y no commitea.
+    - **Sin probar:** que Claude Code y Codex carguen los dos archivos nuevos. No se instaló
+      en la máquina para no subir al resto del set sin commit.
+  - **Hecho (unidad 373, 2026-10-25).** `nzt-delegate` pasa a router (61 líneas, description
+    de 172 caracteres): el modo con una columna para lecturas y otra para unidades, lo que
+    queda siempre en el principal, y la tabla que lleva a `references/reading.md` (77 líneas,
+    el texto de lectura sin cambios de fondo) o a `references/units.md` (116 líneas: qué
+    unidad puede ir, la tabla de modelos de QT-41, los archivos compartidos, el commit de
+    partida, el prompt, el caso sin worktree, el merge con re-verificación y los frenos).
+    `units.md` nombra la forma del estado para un grupo en paralelo como de `nzt-plan`, que la
+    escribe la 374. Puertas: build sin avisos, `check-references` *0 moved*, 164
+    comprobaciones, lint 0 problemas.
+  - **Hecho (unidad 374, 2026-10-25).** `nzt-plan` suma `references/parallel.md` (53 líneas:
+    cuándo se ofrece un grupo, `group`, `model`, `work_branch`, el grupo frena una vez al
+    final, y cómo se ve en el estado) y lo nombra en su esquema; el `SKILL.md` sigue en 199.
+    `proposal.md` muestra el grupo, el modelo de cada unidad y la rama, que se aprueban con
+    el plan. §7 al día. `state check` acepta varias `doing` de un mismo grupo y rechaza dos
+    grupos a la vez, `group` vacío, `model` fuera de `small`/`main` o sin `group`, un grupo
+    en dos fases y grupos sin `work_branch`: 7 comprobaciones nuevas, 171 en total. El panel
+    `nzt-state` ya filtraba todas las `doing`, así que no se rompe; mostrar los grupos queda
+    fuera, como dijo el plan. Puertas: build sin avisos, lint 0 problemas.
+  - **Hecho (unidad 375, 2026-10-25).** La hard rule del kernel pasa a *"Delegate only
+    reading, and the units an approved plan marked parallel, per `nzt-delegate`; the plan,
+    the state and decisions stay yours"*, en dos líneas: kernel en 150, `CLAUDE.md` y
+    `AGENTS.md` en 164 (C3: 200). README: la fila de `nzt-delegate` y *"No usa agentes,
+    subagentes ni MCP"*, que ya era falso desde D71, pasa a decir qué delega y que sin
+    subagentes todo corre en la conversación. §2 y la regla 6 de §10 al día. 171
+    comprobaciones, lint 0 problemas. **Sin probar en vivo:** que un plan real arme un grupo
+    y lo reparta.
+  - **La 376 (evals) la descartó el usuario** el 2026-10-25: lo prueba en local antes del
+    release. Ningún caso de `evals/` mide los grupos en paralelo ni el modelo chico de QT-41.
+    - **Hecho comprobable sin resolver:** si un subagente de Codex carga el `AGENTS.md`
+      global (unverified arriba). No se pregunta: se prueba en la unidad 372.
 
 ## 13. Revisión contra Temper v3
 

@@ -1,28 +1,30 @@
 ---
 name: nzt-delegate
-description: Use before handing a reading task to a subagent: whether the project's mode allows it, how the prompt is written, and what to do with what comes back.
+description: Use before handing work to a subagent - a reading, or a unit the approved plan marked parallel: whether the mode allows it, the prompt, and what to do with what comes back.
 ---
 
-# Delegating a reading to `nzt-explorer`
+# Delegating to a subagent
 
-Produces an answer to one question, gathered by a subagent so the reading does not fill your
-window, and checked by you before anything rests on it. Any phase can need it, and no router
-owns it: the kernel's rule on subagents is what sends you here.
+Produces work done by a subagent so it does not fill your window — an answer to one
+question, or approved units run at the same time — checked by you before anything rests on
+it. Any phase can need it, and no router owns it: the kernel's rule on subagents is what
+sends you here.
 
-> **A subagent reads for you; it never decides for you.**
+> **A subagent works for you; it never decides for you.**
 
 Delegating does not save tokens: the subagent reads what you would have read, and you read
-again what it cites. It saves your window. Spend it on that and nothing else.
+again what it cites or changed. It saves your window, and running units at once saves time.
+Spend it on that and nothing else.
 
 ## Read the mode
 
 The mode is `delegation` in `Plan/state.json`:
 
-| Mode | What you do |
-|---|---|
-| `auto` | Delegate the situations below without asking |
-| `ask` | Before each delegation, ask: what you will explore and why. No yes, no delegation |
-| `off` | Never delegate. Do the reading yourself |
+| Mode | Readings | Units the approved plan marked parallel |
+|---|---|---|
+| `auto` | Delegated without asking | Delegated |
+| `ask` | Before each one, ask: what you will explore and why. No yes, no delegation | Delegated: approving the plan was the yes |
+| `off` | Never. Do the reading yourself | Never. They run one after another |
 
 - **No field, no state file, or a value that is not one of the three → `ask`.**
 - Only the user changes the mode. You never write it on your own; when they ask you to,
@@ -30,76 +32,30 @@ The mode is `delegation` in `Plan/state.json`:
 - The `ask` question is a permission, not a project decision: one question through the
   host's question tool — delegate, or read it yourself — with no `QT` id and no log entry.
 
-## What can be delegated
+## What stays yours, whatever the mode
 
-Only reading, and only in these three situations:
+- The plan, the state, every question to the user, every decision and every approval.
+- Accepting what comes back. What a subagent reports is its evidence, not yours: it is
+  checked before it is stated, built on or marked done.
+- Anything that leaves the working copy: a push, a tag, a deploy, a message.
 
-| Situation | Example |
-|---|---|
-| Surveying code nobody has described yet | *Which modules touch an order's status, and where?* |
-| Searching the whole repository without knowing where | *Where is the tax rate read, in any form?* |
-| Researching on the web | *What does the provider's webhook carry in its current version?* |
+## Choose the reference
 
-Never delegated, whatever the mode:
+Paths are relative to this skill's folder. **Read the file before acting on the row** — the
+row is not the guidance, the file is.
 
-- Writing anything: code, a spec, a document, the state.
-- A question to the user, a decision, a plan, an approval.
-- The unit itself. The subagent serves the unit; you own it from start to stop.
-- **A reading you will need whole anyway.** If you are going to change the file, read it
-  yourself; a summary of it is a second copy you would have to reconcile.
-- A search one command answers. The subagent costs more than the search.
+| The delegation is | Read | Read with |
+|---|---|---|
+| A reading: surveying code, searching the repository, researching on the web | `references/reading.md` | — |
+| Units the approved plan marked parallel | `references/units.md` | — |
 
-The subagent is `nzt-explorer` in Claude Code and `nzt_explorer` in Codex. If the host has
-no subagents, or it is not installed, do the reading yourself
-and say nothing about it: the work is the same, only the window pays.
-
-## Write the prompt
-
-The subagent saw none of this conversation. What is not in the prompt, it does not know.
-
-1. **The question, and the decision it feeds.** *"Which modules write `Order.Status` — I
-   have to decide where the cancellation rule lives."* The decision bounds the search.
-2. **Where to look and where not to.** Folders, file kinds, the version in use, sources to
-   prefer. Exclusions save as much as inclusions.
-3. **What is already known.** The files you already read, the answer you suspect. It is
-   told to confirm or refute, not to start over.
-4. **The shape of the answer.** The format below, with a limit on the number of pointers.
-5. **When to stop.** The question answered, or a stated budget of files or pages spent.
-
-For a web question, name the provider, the version, and the claim to check; the subagent
-labels what it finds as `nzt-research` does.
-
-## What comes back
-
-Ask for this shape, and reject an answer that is not in it:
-
-```markdown
-**Question:** where is the tax rate read?
-
-- seen · `src/Billing/TaxCalculator.cs:42` — reads `TaxRate` from the options class.
-- seen · `src/Orders/Checkout.cs:118` — hard-codes `0.21` for one country.
-- inferred · `src/Billing/Options.cs` — bound from the `Billing` section, by its name.
-
-**Not looked at:** the `legacy/` folder; the SQL scripts.
-```
-
-- **Every line is a pointer** — `path:line` or a URL with its date read — and one claim.
-- **Seen or inferred**, never unlabelled. An inference names what it follows from.
-- **What it did not look at** is part of the answer. Silence about an area reads as
-  *nothing there*; it may only mean *not searched*.
-
-## Use what comes back
-
-- **A pointer is read before it is stated.** What the subagent says is its evidence, not
-  yours: open the line it cites before a spec, a design, the code or a reply rests on it.
-- A pointer that does not hold is dropped, and said if it would have changed the decision.
-- What it did not look at stays open. Search it yourself, delegate again, or tell the user
-  the answer covers less than the question.
-- Cite the files you read, never the subagent.
+**If the host has no subagents, or the one a row names is not installed, the work is done
+here**: a reading by you, units one after another. The result is the same; only the window
+and the clock pay.
 
 ## Done when
 
 - The mode allowed it, or the user said yes to it.
-- The prompt carried the question, the decision, the bounds and the answer's shape.
-- Every claim you made from the answer was checked against the line or page it cites.
-- What was not looked at was said, or searched.
+- The prompt carried everything its reference asks for, because the subagent saw none of
+  this conversation.
+- Nothing it returned was stated, built on or marked done before you checked it.

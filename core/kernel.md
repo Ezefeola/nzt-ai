@@ -146,4 +146,5 @@ somewhere else is read where it is and proposed for moving, never moved without 
 - Never skip the state update at the end of a unit, and after writing it run
   `nzt-ai state check` where it is installed: what it reports is fixed before the report.
 - Never write a spec for code you have not read.
-- Delegate only reading, per `nzt-delegate`; the unit, the state and decisions stay yours.
+- Delegate only reading, and the units an approved plan marked parallel, per `nzt-delegate`;
+  the plan, the state and decisions stay yours.

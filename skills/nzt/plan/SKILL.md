@@ -24,7 +24,7 @@ never a log, progress lives in the artifacts. Write it from this section, never 
 }
 ```
 
-- `status` is `todo`, `doing`, `done` or `dropped`. At most one unit is `doing`. Every entry, one line.
+- `status` is `todo`, `doing`, `done` or `dropped`. One unit `doing`, or one group's. Every entry, one line.
 - `phases` are the phases `nzt` chose, in run order, named `analysis`, `architecture`, `ux`,
   `build`, `verify` or `ship` and no other, with the same statuses and **at most one `doing`**:
   that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
@@ -39,6 +39,7 @@ never a log, progress lives in the artifacts. Write it from this section, never 
 - `autonomy` records the batch the user selected: which units run without stopping, and
   which stops are kept anyway. **Absent or empty means accompanied.** `delegation` is the
   project's subagent mode, `auto`, `ask` or `off`; absent is `ask`, and only the user sets it.
+  **Units that can run at the same time form a parallel group**: `references/parallel.md`.
 - Never write the file while you are inside a unit. Rewrite the plan when the user changes
   it. **A new run rewrites the file** with its own goal, phases and units, ids counting on
   from the last run, `delegation` kept; inside a run, nothing `done` or `dropped` is deleted.
@@ -55,10 +56,9 @@ A unit is the smallest piece that can be delivered and reviewed on its own. Cut 
 - It fits comfortably in the remaining context.
 - Its `do` line fits on one line. If it needs a paragraph, it is more than one unit.
 
-Typical units, one each: a product document, a glossary, a feature spec, a story, a
-feature's technical design, a screen, a story implemented, a story's test set, a release,
-a feature closed. Never bundle "write the 4 specs" into one unit: four specs are four
-units.
+Typical units, one each: a product document, a glossary, a feature spec, a story, a feature's
+technical design, a screen, a story implemented, a story's test set, a release, a feature
+closed. Never bundle "write the 4 specs" into one unit: four specs are four units.
 
 **A row is a step, not a file.** Which artifacts a step produces is decided when that step
 is produced: the plan says what it delivers, not which files will end up existing.

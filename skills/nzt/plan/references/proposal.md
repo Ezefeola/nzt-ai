@@ -19,6 +19,9 @@ user to keep or drop. Read it before showing a plan, new or rewritten.
   it covers beyond the minimum so the user can drop it. *"I am leaving out coupon
   administration: that is F-009 and you did not ask for it"* is what makes scope reviewable.
 - One line for each phase you skipped and why.
+- **A parallel group** shows its id beside each of its units and each unit's model, and
+  under the table the work branch and that the group stops once, at its end: approving the
+  plan approves the three.
 - **Standard work** (`nzt`'s sizes) shows one table and those declarations, and nothing else:
   no slices, no cadence. The mode is offered as `nzt-plan` says, in one line.
 

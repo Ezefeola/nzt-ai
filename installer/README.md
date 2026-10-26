@@ -64,13 +64,14 @@ mods, y el método no se pidió.
 
 ## Dónde queda instalado
 
-| Proveedor | Instrucciones | Skills | Subagente | Cómo se activa |
+| Proveedor | Instrucciones | Skills | Subagentes | Cómo se activa |
 |---|---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/SKILL.md` | `~/.claude/agents/nzt-explorer.md` | abrir `claude` en cualquier proyecto |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/SKILL.md` | `$CODEX_HOME/agents/nzt-explorer.toml` | iniciar `codex` |
+| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/SKILL.md` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` | abrir `claude` en cualquier proyecto |
+| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/SKILL.md` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` | iniciar `codex` |
 
-El subagente es el explorador de solo lectura al que `nzt-delegate` manda las lecturas
-largas. Desinstalar lo saca y deja tus otros agentes.
+Son dos, y a los dos los manda `nzt-delegate`: el explorador de solo lectura recibe las lecturas
+largas, y el worker, las unidades que el plan aprobado marcó en paralelo (D84). Desinstalar
+los saca y deja tus otros agentes.
 
 `CODEX_HOME` es `~/.codex` por defecto. Cambiarlo mueve las instrucciones, **no** las skills.
 
@@ -83,8 +84,9 @@ Dos advertencias que el CLI también imprime:
   tolerable porque el kernel se escala solo hacia abajo y un `CLAUDE.md` de proyecto se lee
   después del global.
 
-No se crea ningún plugin, ningún subagente y no se toca `config.toml`. Instalar skills no
-garantiza que el modelo siempre seleccione la correcta: eso es lo que miden los evals.
+No se crea ningún plugin ni otro subagente que los dos de la tabla, y no se toca
+`config.toml`. Instalar skills no garantiza que el modelo siempre seleccione la correcta: eso
+es lo que miden los evals.
 
 ## Convivencia
 

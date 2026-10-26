@@ -66,6 +66,8 @@ public static class Program
         StateCheckWithoutAFileIsNotAnError();
         StateCheckCatchesEveryBrokenInvariant();
         StateCheckAcceptsEachDelegationModeAndItsAbsence();
+        StateCheckAcceptsAParallelGroup();
+        StateCheckCatchesEveryBrokenParallelGroup();
         StateCheckReportsBrokenJson();
         StateCheckAcceptsASlicedState();
         StateCheckCatchesEveryBrokenSliceInvariant();
@@ -883,6 +885,41 @@ public static class Program
             Check($"delegation {mode} cumple", CheckState(home, plan + $", \"delegation\": \"{mode}\" }}").Ok);
         Check("delegation que no es texto no cumple",
             CheckState(home, plan + ", \"delegation\": true }").Problems.Any(p => p.Contains("delegation es 'true'")));
+    });
+
+    private static void StateCheckAcceptsAParallelGroup() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "approved": true, "work_branch": "nzt/run-12",
+              "phases": [{ "name": "build", "status": "doing", "units": [
+                { "id": 12, "status": "doing", "group": "P1", "model": "small" },
+                { "id": 13, "status": "doing", "group": "P1" },
+                { "id": 14, "status": "todo", "group": "P1", "model": "main" }] }] }
+            """);
+        Check("las unidades de un grupo en paralelo pueden estar en doing juntas", report.Ok);
+    });
+
+    private static void StateCheckCatchesEveryBrokenParallelGroup() => InTemp(home =>
+    {
+        var report = CheckState(home, """
+            { "approved": true,
+              "phases": [
+                { "name": "build", "status": "doing", "units": [
+                  { "id": 1, "status": "doing", "group": "P1" },
+                  { "id": 2, "status": "doing", "group": "P2" },
+                  { "id": 3, "status": "todo", "group": "", "model": "huge" },
+                  { "id": 4, "status": "todo", "model": "small" }] },
+                { "name": "verify", "status": "todo", "units": [
+                  { "id": 5, "status": "todo", "group": "P1" }] }] }
+            """);
+
+        bool Says(string text) => report.Problems.Any(p => p.Contains(text));
+        Check("dos grupos en doing a la vez", Says("hay 2 unidades en doing (1, 2); a lo sumo una, o las de un mismo grupo"));
+        Check("un group vacío", Says("la unidad 3 tiene group ''"));
+        Check("un model que no existe", Says("la unidad 3 tiene model 'huge'"));
+        Check("un model sin group", Says("la unidad 4 tiene model sin group"));
+        Check("un grupo repartido en dos fases", Says("el grupo P1 tiene unidades en 'build' y en 'verify'"));
+        Check("grupos sin rama de trabajo", Says("falta work_branch"));
     });
 
     private static void StateCheckReportsBrokenJson() => InTemp(home =>
