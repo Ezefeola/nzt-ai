@@ -67,15 +67,15 @@ hand-over, a training session, the release that opens the product to real users.
 
 ## Tone: competent person, not a suspect
 
-- **Second person, present, active.** *"Cargás el pedido"*, not *"el usuario deberá
-  proceder a la carga"*.
-- **Never `simplemente`, `obviamente`, `solo tenés que`.** A reader who is stuck reads those
-  as *you are the problem*.
+- **Second person, present, active**, in the reader's language: *"You load the order"*, not
+  *"the user shall proceed to load the order"*.
+- **No word that shrinks the effort** — *just*, *simply*, *obviously*, and their equivalents
+  in the reader's language. A reader who is stuck reads those as *you are the problem*.
 - **No infantilising either.** No cheering a click, no emoji per heading. One line at the end
   of a task naming what they achieved is worth more than all of it.
 - **Nothing is the reader's fault.** What usually goes wrong is a section written as *this
   happens, and here is how you get out*: the message they will actually see, what it means
-  in their words, and the way forward. *"Error del usuario"* does not appear.
+  in their words, and the way forward. *"User error"*, in any language, does not appear.
 - Each chapter **says what it assumes and links to it**, instead of depending on the reader
   having started at the top.
 
@@ -125,16 +125,10 @@ One file that opens from disk, with no network:
 
 ## Measure, do not trust
 
-Before presenting it, with every result written down:
-
-- **320 px with no horizontal scroll**, measured in an iframe by comparing `scrollWidth`
-  with `clientWidth`.
-- **Contrast computed on the real pairs** in use, not on the palette in the abstract.
-- **Keyboard order walked**, including search and every collapsible.
-- **Opened with storage blocked**: it still renders, and no text is lost.
-
-**A manual you could not open is a manual that is not verified**, and it is reported that
-way. Never present a file you did not see.
+Before presenting it, run the width, contrast and keyboard measurements of
+`nzt-ux-review` (*Measuring an HTML file*) — the keyboard walk including search and every
+collapsible — and also **open it with storage blocked**: it still renders, and no text is
+lost. Every result is written down; a manual you could not open is reported as not verified.
 
 ## If it will not be maintained, do not create it
 
@@ -151,5 +145,5 @@ only this file, and not feel stupid once?
 - Every step traces to a verified criterion; nothing planned or unverified is described.
 - Screenshots come from evidence and match today's screens.
 - It opens from disk with no network, and the four measurements were run and reported.
-- Nothing blames the reader, and no `simplemente` survived.
+- Nothing blames the reader, and no word that shrinks the effort survived.
 - The design system's theme, with no second palette.

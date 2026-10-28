@@ -36,9 +36,9 @@ theme cannot say: the **role**, when it is used, and **its limit**.
 - A form that failed keeps what the user typed.
 
 ## Accessibility — how it is met
-- Contrast at least 4.5:1 for text, 3:1 for controls and meaningful graphics.
-- Focus visible on every control, and never hidden behind sticky elements.
-- Tap and click targets at least 24×24, with spacing when smaller is unavoidable.
+- Level: WCAG 2.2 AA, the one the product's NFR commits to.
+- Focus is the theme's focus ring, never removed, and sticky elements leave room for it.
+- Icon-only controls carry a text label for assistive technology.
 ```
 
 *"The primary action, one per view"* is exactly what an agent cannot deduce from reading a

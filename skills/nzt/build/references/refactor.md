@@ -52,21 +52,18 @@ with a cost, so it is named, not absorbed: say what was left undone, why, and wh
 cost to do later. A shortcut nobody wrote down is a shortcut that gets discovered by
 whoever breaks on it.
 
-## Closing
+## Done when
 
-- What is affected compiles, and the checks covering the touched behavior have been run
+Rehearse it: could someone diff this change and be sure nothing the user can observe moved?
+
+- What is affected compiles, and the checks covering the touched behavior were run
   **after** the change, not just before.
+- The behavior it touched was covered before the change and passes after it.
 - **Criteria whose area was already marked `✓` and whose code you touched have their tests
   re-run**, or their mark is reported as no longer backed by evidence. A green mark that
   nobody re-checked after a restructure is worse than no mark. A `qa ✓` on touched code is
   reported for `nzt-verify` to re-run — not re-tested here.
 - The report says what moved, what it is now, and what you verified — not "cleaned up".
-
-## Done when
-
-Rehearse it: could someone diff this change and be sure nothing the user can observe moved?
-
-- The behavior it touched was covered before the change and passes after it.
 - Nothing in the diff changes what the system does.
 - Documents describing the structure you changed are current.
 - Anything left undone is written down, with its cost.

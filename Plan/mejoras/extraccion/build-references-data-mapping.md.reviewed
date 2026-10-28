@@ -1,0 +1,3 @@
+# Unit 395: the minimum-aggregate guardrail has one owner, backend-domain-ddd.md (G3)
+the guardrail of the domain model comes first here, and it has an order => data-mapping: "an invariant over a whole collection follows the domain model's guardrail (backend-domain-ddd.md, The minimum aggregate)"; the order lives there: "Two ways out, and they are not equivalent"
+gets its number from the database => data-mapping: "its number comes from the database"; backend-domain-ddd: "Compute the number in the database and pass it into the method"

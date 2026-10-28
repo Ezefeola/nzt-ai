@@ -1,17 +1,21 @@
 # Feature design
 
 ## Contents
-- When a feature earns a design, and how it is offered · Before designing · The file · The log
-- Flows · Where each rule is enforced · Data and states · When a step fails
-- Integrations · Questions · Diagrams · Done when
+- When a feature earns a design, and how it is offered
+- Before designing
+- The file
+- Flows
+- Where each rule is enforced
+- Data and states
+- When a step fails
+- Integrations
+- Questions
+- Diagrams
+- Done when
 
 Produces `Plan/specs/<feature>/tech-design/design.md` — how this feature is solved across the
 components that already exist — and `tech-design/decisions.md`, the log of the questions that
 produced it. One feature per unit.
-
-If you did not arrive here from `nzt-architecture`, load it first: it carries the protocol
-this skill runs — derive the questions, resolve each by its kind, let the user choose the
-mode, and log every answer with where it came from.
 
 ## When a feature earns a design, and how it is offered
 
@@ -33,10 +37,8 @@ re-deciding them here is how two architectures start.
 **Then derive the questions, before writing any of the document.** Each rule and each story
 is read asking what the design has to settle for it to be buildable, and every gap becomes
 an open `QT-NN` in `decisions.md`. Only then do you say how many there are and of what
-kind, and ask the mode — chosen **per feature**, recorded in the log's first line.
-
-**Design against the spec, not against the request.** If a rule is not in the spec, it is
-not a requirement — it goes back to discovery as a question, and you design the rest
+kind, and ask the mode — chosen **per feature**, recorded in the log's first line. A rule
+that is not in the spec goes back to discovery as a question, and you design the rest
 meanwhile.
 
 ## The file
@@ -80,37 +82,8 @@ follows its order and is released on cancellation (RN-cancelar-libera-cupon).
 Listed by id; they live and get answered in `decisions.md`: QT-04.
 ```
 
-No `Decided` section here: repeating an answer creates a second version that drifts.
-
-## The log
-
-```markdown
-# Decisiones de diseño — F-003 Cupones en el checkout
-
-Modo elegido: **juntos** · 2026-09-15
-
-## 2026-09-15
-
-**QT-01 · ¿Quién decide si un cupón es válido?**
-> Facturación. Checkout solo muestra lo que le devuelven. — `usuario`
-
-**QT-02 · ¿Qué avisa la pasarela cuando rechaza un pago con cupón?**
-> Webhook con estado `rejected` y su motivo. — `investigado`, <URL>, leído 2026-09-15
-
-**QT-03 · ¿Cuántos reintentos antes de avisar?**
-> Tres, con espera creciente. — `agente, dentro del alcance`
-
-**QT-04 · ¿El pedido cancelado libera el cupón en el momento o al cierre?**
-> `[TO-DEFINE]` — el usuario lo define más adelante
-
-## 2026-09-22
-
-**QT-07 · ¿Dónde queda el registro del cupón usado?**
-> En la orden, junto al descuento. — `usuario`  *(supera a QT-03)*
-```
-
-Sessions stack chronologically, so the file reads top to bottom following the numbering.
-**Nothing is edited or deleted**: a wrong answer gets a new entry naming what it supersedes.
+No `Decided` section here: the answers live in `decisions.md`, as
+`nzt-architecture-decisions-log` says.
 
 ## Flows
 
@@ -167,13 +140,6 @@ succeeded?
 - The kinds and the mode are the router's; what is specific here is that **the questions
   come out of the rules**. A rule whose enforcement row you cannot fill without guessing is
   a `QT-NN` you did not derive.
-- One that belongs to a later phase is written where that phase will read it and is left
-  alone. Deciding a build question now is deciding it with less information than whoever
-  gets there will have.
-- **Nothing is answered by assumption.** A question has two exits: an answer, or an
-  explicit `[TO-DEFINE]` that takes it out of scope and appears in every report until it is
-  resolved.
-- When an answer earned an ADR, the log's line cites it.
 - A contradiction in the spec is not resolved here. Raise it, pause what depends on it, and
   keep designing the rest.
 

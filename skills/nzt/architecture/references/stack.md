@@ -18,8 +18,6 @@ area**: how it is built, each axis, its opt-ins and its packages. **The folder i
 component's root** — its solution or manifest, `src/`, `tests/`; the repository root when it
 is the only one — **never a build project's folder**, and `architecture.md` names it.
 
-**No component gets built without one, nor without its row in `architecture.md`**: a new one when designed, an existing one from evidence before its code is touched.
-
 ## What this document is for
 
 **A technical card, read in a minute.** Every phase opens it before touching code, so it

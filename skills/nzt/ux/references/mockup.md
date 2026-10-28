@@ -64,22 +64,15 @@ mockup says so in place.
 
 ## Measure, do not trust
 
-Before presenting it, and with the result written down:
-
-- **320 px with no horizontal scroll**: render it in an iframe at that width and compare
-  `scrollWidth` with `clientWidth`. "It looks responsive" is not a measurement.
-- **Contrast computed on the real pairs** actually used — text over its surface, control
-  over its background — not on the palette in the abstract.
-- **Keyboard order walked**, checking focus is visible and nothing is left unreachable.
-
-**A mockup that could not be rendered is a mockup that is not verified**, and it is reported
-that way. Do not present a file you could not open as if you had seen it.
+Before presenting it, run the width, contrast and keyboard measurements of
+`nzt-ux-review` (*Measuring an HTML file*) and write the results down. A mockup that could
+not be rendered is reported as not verified.
 
 ## A prototype is a mockup that teaches
 
-When delivery 1 has something to learn from users (`nzt-discovery-product`, **To learn**),
-the plan offers a prototype inside the analysis slice: the same kind of file, built to
-answer that question before code exists.
+When the plan offers one — when and where is `nzt-plan`'s, in its slices — it is the same
+kind of file, built to answer what delivery 1 has to learn (`nzt-discovery-product`,
+**To learn**) before code exists.
 
 - **It starts from the question, not from a screen design.** Its header names the `Q-NN`
   it answers and who will try it. It draws the fewest screens that put the question in

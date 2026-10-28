@@ -38,10 +38,6 @@ deciding what counts as technical is the call this rule takes away from you.
 - Read the version from the project's own evidence: the lock file, the manifest, the
   central versions file, the SDK pin. **Never from what is newest and never from what
   happens to be installed on this machine.**
-- **When the stack document and the manifest disagree, the manifest wins**, and the
-  discrepancy is reported so the document gets fixed.
-- **Never raise a version to make an example compile.** That is a stack change, and it goes
-  through the stack's own door with its own decision.
 - If the project centralises versions, the new package goes there too. A version pinned in
   one project and floating in another is the bug you find at deploy time.
 

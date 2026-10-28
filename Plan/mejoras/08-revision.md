@@ -1082,3 +1082,18 @@ S1, S3 (revisar los cinco *Read with* de paginación), U4 a), U5 a), V2 a), V3 a
   agente al escribir la spec. a) Mantener la regla 14: esa parte de QT-02 sale y L6 queda
   descartado. b) Derogarla. → **a) · `usuario`**. QT-02 queda con *Done when* y checklist
   sólo en código, sin tocar los índices.
+
+**Corrección (2026-10-28, unidad 394):**
+
+- **QT-13 · QT-05 a) carga en cada unidad tablas que no usa** (supera la parte de QT-05 sobre
+  `practices-*`). El usuario notó que el router de build se lee en toda unidad: con las
+  tablas adentro (70 líneas medidas, 50 de backend y 20 de frontend), una unidad .NET pasa de
+  268 a 334 líneas (router + `code-code.md`) y una de frontend genérico de 313 a 334, y la de
+  backend genérico queda igual (337 → 334). G1 midió cuánto crecía el router, no la carga por
+  unidad. a) Volver a `practices-*`, registradas como excepción a la decisión 2: cada área
+  carga sólo lo suyo, son cortas (menos de 100 líneas, sin riesgo de lectura parcial) y la
+  cabecera repetida de G2 se escribe una vez. b) Convertirlas en skills de área genéricas
+  (`nzt-build-backend`, `nzt-build-frontend`): una sola manera de rutear, dos skills más en el
+  listado y un nombre que es prefijo del de .NET. c) Dejarlo. · `propuesta`: a).
+  → **a) · `usuario`**. La convención de comentarios queda en `code-code.md`, y A5 lleva la
+  columna de costo a las tablas de `practices-*`.

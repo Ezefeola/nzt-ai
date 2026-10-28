@@ -190,6 +190,7 @@ skills/nzt/                      nzt
 │  ├─ stack/                     nzt-architecture-stack     → documento de stack (D9)
 │  ├─ stack-axes/                nzt-architecture-stack-axes → ejes, opciones y cómo se preguntan (D59)
 │  ├─ design-feature/            nzt-architecture-design-feature
+│  ├─ decisions-log/             nzt-architecture-decisions-log → log QT append-only (D85)
 │  ├─ domain/                    nzt-architecture-domain    → domain-model.md (D26)
 │  ├─ contexts/                  nzt-architecture-contexts  → context-map.md (D26)
 │  ├─ tech-debt/                 nzt-architecture-tech-debt → tech-debt.md (D29)
@@ -206,7 +207,7 @@ skills/nzt/                      nzt
 │  ├─ manual/                    nzt-ux-manual       → manual del usuario final (D37)
 │  ├─ system/                    nzt-ux-system       → Docs/UX/ + visual (T13)
 │  └─ review/                    nzt-ux-review
-├─ build/                        nzt-build                 (convención de comentarios, T4)
+├─ build/                        nzt-build                 (leer el stack primero, D85)
 │  ├─ recon/                     nzt-build-recon           → relevamiento de impacto (D30)
 │  ├─ implement/                 nzt-build-implement
 │  ├─ refactor/                  nzt-build-refactor
@@ -857,9 +858,11 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 13. **El archivo se llama como la hoja sin el prefijo de su router**
    (`nzt-build-backend-dotnet-ef-core-queries` → `build/backend/dotnet/references/ef-core-queries.md`),
    y **toda referencia tiene una fila en la tabla de su router**. Una referencia sin fila no
-   la carga nadie. D58 permitía que la fila estuviera en una **referencia índice**
-   (`practices-backend.md`, `practices-frontend.md`); **D85 lo deroga**: esas tablas pasan al
-   router de build y no hay más referencias índice, así que toda fila está en un router. El build
+   la carga nadie. **La única excepción son las dos referencias índice de D58**
+   (`practices-backend.md`, `practices-frontend.md`), que tienen las filas de la capa
+   genérica para un stack sin router de área. D85 intentó pasarlas al router de build y lo
+   revirtió (QT-13): el router se carga en toda unidad, y así cada área carga sólo su índice.
+   Fuera de esas dos, ninguna referencia manda a leer otra. El build
    lo comprueba así (`build.sh` y `build.ps1`, vistos fallar con una referencia huérfana en
    la unidad 44).
 14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
@@ -2828,10 +2831,12 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     las tres clases, los modos y el log `QT`. Cada serie de ids la numera el log de la fase
     que responde: una pregunta de negocio que abre UX se escribe en `analysis.md` como `Q-NN`.
   - **Copias para el worker (QT-04):** regla 22.
-  - **Ruteo de la capa genérica (QT-05):** las tablas de `practices-*` pasan al router de
-    build y `practices-*` desaparecen. La columna de costo de `stack-axes.md` pasa a esas
-    tablas, y `stack-axes.md` las lee. La tabla de stacks del router se deja. Deroga la
-    referencia índice de D58 (regla 13).
+  - **Ruteo de la capa genérica (QT-05, corregida por QT-13):** `practices-*` se quedan como
+    las dos referencias índice de la regla 13, sin la cabecera y el cierre que repetían
+    (G2). La columna de costo de `stack-axes.md` pasa a sus tablas, y `stack-axes.md` las
+    lee. La tabla de stacks del router se deja. QT-05 las pasaba al router de build; en la
+    394 el usuario notó que así toda unidad carga las tablas de las dos áreas (70 líneas
+    medidas, también en .NET, que nunca las usa) y eligió volver.
   - **Etiquetas (QT-06):** regla 9. Un solo vocabulario de procedencia, el de `nzt-research`
     (`documented / observed / inferred / unverified`), que adopta el explorador.
   - **Kernel y `nzt-plan` (QT-07):** regla 23. `nzt-plan` baja del tope con
@@ -2883,6 +2888,56 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     `CA-NN` en `write-stories.md`, el ejemplo de `change.md` y `close.md` (QT-09, §8 al día).
     El ejemplo del merge lleva `qa —` (D4). `write-stories.md` y `write-spec.md` remiten la
     cadencia a `slices.md` (D3). `nzt-research` no cambia: ya era el dueño del vocabulario.
+  - **Hecho (392, 2026-10-28).** Router de arquitectura de 200 a 166 líneas: conserva las
+    tres clases de pregunta y los modos (QT-03), suma *Mandatory* con el stack obligatorio
+    (regla 23; sale de `stack.md`), *Rules* con seis reglas de toda la fase y un *Done when*
+    sin checklist (QT-01, QT-02). Nueva `references/decisions-log.md` (74): dónde vive el log,
+    su forma, cómo se agrega y las etiquetas de origen (A1). Las filas de producto, stack y
+    feature la leen junto con `questions.md` de `nzt-plan` (QT-03). Las etiquetas se fijan por
+    su significado y se escriben en el idioma del proyecto; un hecho lleva la etiqueta de
+    `nzt-research` en lugar de `investigado`, y el ejemplo queda en un solo idioma (A4,
+    QT-06). Salen las aperturas *"load it first"* de las dos de diseño (QT-04) y sus copias
+    de reglas del router: `design-product.md` 176→147, `design-feature.md` 200→166.
+    `stack-axes.md` cierra con *Done when* y deja de repetir *no se re-pregunta*.
+  - **Hecho (393, 2026-10-28).** Router de UX de 121 a 92 líneas: *Rules* con dos reglas de
+    toda la fase (mecanismo en el sistema, contenido en la historia; lo indefinido es un
+    `Q-NN` abierto en `analysis.md`) y un *Done when* que remite al de cada referencia, sin
+    checklist (U2, QT-01, QT-02). Las otras nueve reglas ya estaban en `screen.md` y
+    `system.md`. La fila de pantalla lee `questions.md` de `nzt-plan`, y `screen.md` abre el
+    `Q-NN` en `analysis.md` (U6, QT-03). Las mediciones de un HTML (320 px, contraste sobre
+    pares reales, teclado, no verificado si no se pudo abrir) viven sólo en `review.md`
+    (*Measuring an HTML file*, con índice por pasar de 100); mockup, prototipo y manual la
+    leen por *Read with*, y el ejemplo de `system.md` deja los umbrales y muestra cómo se
+    cumplen (U4). El tono del manual se fija por lo que hace la palabra, no por una lista
+    rioplatense (U3, QT-06). Cuándo se ofrece el prototipo queda en `slices.md`; `product.md`
+    y `mockup.md` dejan de decirlo (U5). U1 ya se resolvió en la 391.
+  - **Hecho (394, 2026-10-28).** Router de build de 169 a 144 líneas. Gana *Read the stack
+    first* y *Two escapes*, los bloques largos que QT-04 deja sólo acá y en el worker, y la
+    regla de que la referencia genérica dice qué vale y el stack cómo se hace, una sola vez
+    para las dos áreas. *Rules* queda con ocho reglas de toda la fase y un *Done when* que
+    remite al de cada referencia, sin checklist (B1, QT-01, QT-02). `practices-*` se quedan
+    como índices (QT-13, que corrige QT-05: las tablas estuvieron en el router y lo dejaban en
+    200 líneas cargadas en toda unidad), sin la cabecera, la línea de `code-code.md` ni el
+    cierre que repetían (G2): 69→52 y 45→25. La convención de comentarios pasa a
+    `code-code.md`, que lee todo camino que escribe código, incluido el de C# (**desvío de
+    B1**, que la dejaba en el router; propuesta del agente, hecha por el tope de 200 y que se
+    mantiene porque ése es su dueño). `implement.md` de 153 a 94: sin las copias del router,
+    marcadores en una línea (`[modify]` y `[SPEC-CONFLICT]`, los que usa quien implementa;
+    B4), sin las reglas de frontend, que ya tenían dueño (B6, G4), y un solo cierre (B3).
+    `tdd.md` remite al *Done when* de `implement.md`; `refactor.md` y `remove.md` funden
+    *Closing* en *Done when*; `tests.md` y `dependencies.md` dejan de repetir el límite con
+    verify y la regla del manifiesto. Sin pérdida: `check-extraction.sh` contra `HEAD`, con
+    lo reescrito revisado en `Plan/mejoras/extraccion/build-*.reviewed`.
+  - **Hecho (395, 2026-10-28).** La columna de costo de cada valor de eje pasa a las tablas
+    de `practices-*`, y `stack-axes.md` deja de copiar los valores: los lee de ahí, y la fila
+    de stack del router de arquitectura suma el `practices-<area>.md` del área (A5, G5). Así
+    un valor nuevo se agrega en un solo lugar y ya se ofrece al escribir el stack.
+    `stack-axes.md` de 89 a 78. La guarda del agregado mínimo tiene un dueño,
+    `backend-domain-ddd.md`; `data-mapping.md` se queda con cómo se carga y la nombra en una
+    línea (G3). Las 30 referencias de la capa ya cerraban sólo con checklist, como pide la
+    regla 21 para las de práctica de código, y las de más de 100 líneas ya tenían índice:
+    nada que cambiar (QT-02). G2 se resolvió en la 394. Sin pérdida: `check-extraction.sh`,
+    con lo reescrito en `Plan/mejoras/extraccion/*.reviewed`.
 
 ## 13. Revisión contra Temper v3
 

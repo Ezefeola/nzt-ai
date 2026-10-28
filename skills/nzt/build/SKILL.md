@@ -23,11 +23,35 @@ built in every area, before the next slice starts.
 
 ## Required guidance
 
-Before writing code, read the stack document of every area you touch, the story with its
-criteria, the feature's business rules and the glossary. Reuse what is already loaded — the
-tables below do not mean load every row. **A domain term with no glossary entry stops the
-code that names it**: the entry is written in `nzt-discovery` first, never coined here. **A small edit in an established place follows the convention
-next to it, with no guidance reloaded.**
+Before writing code, read the story with its criteria, the feature's business rules and the
+glossary. Reuse what is already loaded — the tables below do not mean load every row. **A
+domain term with no glossary entry stops the code that names it**: `nzt-discovery` writes the
+entry first.
+
+## Read the stack first
+
+`<component folder>/Docs/Architecture/<area>-stack.md` of every area you touch — the folder
+`Docs/Architecture/architecture.md` names — decides every table below. It is the operative
+memory: read it before loading anything or choosing a technology or a pattern.
+
+- **An installed folder is not an authorisation.** Every technology in this set is installed
+  in every project; what makes one apply is the stack document, and nothing else.
+- **A missing technical fact is checked in the project, not invented**: the manifest, the
+  configuration, the code already there. Never invent a different stack because a skill is
+  missing.
+- **When the stack document and the manifest disagree, the manifest wins**, and the
+  discrepancy is reported. A version is never raised to make an example compile: that is a
+  stack change, and it goes through the stack's own door.
+- **A mechanism the stack does not record is a gap in it**, not a free choice. When the
+  evidence does not settle it, ask once and write the answer in the stack.
+- Keep the stack current with the change, in the same unit that makes it true.
+
+## Two escapes, and they are not the same
+
+- **A small edit in an established place follows the convention next to it**, with no
+  guidance reloaded.
+- **Code this project does not document is written the way that code is written.** Your
+  conventions step aside there, and the difference is reported rather than applied.
 
 ## Choose the reference
 
@@ -51,26 +75,30 @@ Wherever a file names `nzt-build-<name>`, it means `references/<name>.md` in thi
 routers below, `nzt-build-backend-dotnet` and `nzt-build-frontend-blazor`, and
 `nzt-build-csharp` are skills.
 
-If the component's stack selected one of these areas, load its area router — it is
-the only thing that knows that technology's leaves:
+## The area's practices
+
+If the component's stack selected one of these technologies, load its area router after this
+one — it is the only thing that knows that technology's leaves, and it reads the generic
+references below as its own *Read with*:
 
 | The area is | Load |
 |---|---|
 | Backend on .NET | `nzt-build-backend-dotnet` |
 | Frontend on Blazor | `nzt-build-frontend-blazor` |
 
-**An installed folder is not an authorisation.** A technology the stack did not select is
-never loaded. Never impose another project's conventions on this one.
-
-If no area router applies to this component, its practices are the generic ones, chosen by the
-same stack axes:
+With no area router, the practices are the generic references, chosen by the same stack
+axes from the index of the component's area — read only that one:
 
 | The component is | Read |
 |---|---|
 | A backend with no area router | `references/practices-backend.md` |
 | A frontend with no area router | `references/practices-frontend.md` |
 
-Code this project does not document is still written the way the code next to it is written.
+**Read `references/code-code.md` before writing any code**, whatever the path: the rules of
+code in any language. **The generic reference says what holds and why; the stack document
+says how it is done in this technology**, and how the technology behaves is verified in its
+authoritative source before it enters the code (`nzt-research`). A generic reference names no
+API on purpose.
 
 ## One unit
 
@@ -90,80 +118,27 @@ the stack does not list is not setup**: the user confirms it first (`references/
   `Plan/specs/<feature>/stories/US-NNN-<slug>.md`. That is the only place progress is read
   from.
 
-## Comment conventions
-
-They apply to every unit of this phase, so they live here and not in a leaf.
-
-- A comment says **why**. What the line already says is noise, and it goes stale: the line
-  changes, the comment stays, and the file carries two answers with nothing to say which
-  one runs.
-- **What a comment usually tries to fix is a name.** A variable, a method or a type that
-  said too little. Fix the name instead.
-- Explain the non-obvious: a workaround with its cause, an externally imposed constraint, a
-  decision that looks wrong and is not. Name its source when the source is a record that
-  does not move — an ADR, a defect id, a provider's issue.
-- **The spec does not travel into the code.** No rule slug, no story id, no requirement
-  text in a comment. Traceability lives in the specs, where each rule has one original that
-  changes in one place; a rule quoted in the code is a **second original** that drifts the
-  first time the rule is edited, with nothing pointing at it to say so. The code implements
-  the rule; it does not cite it.
-- Never leave commented-out code. Version control already keeps it; a commented block is a
-  question nobody can answer.
-- No change logs, author names or dates in comments. That is the repository's job.
-- Follow the comment style and language of the code around you, even if it is not the one
-  you would choose.
-- A comment that stops being true is fixed or deleted in the same unit as the code.
-
 ## Rules
 
-- **The stack is the operative memory.** Read it before choosing a technology or a pattern.
-  A missing technical fact is checked in the manifest, the configuration or the code — you
-  never invent a different stack because a skill is missing. When the stack document and
-  the manifest disagree, **the manifest wins** and the discrepancy is reported. Do not
-  raise a version to make an example compile: that is a stack change and goes through that
-  door.
-- Keep the stack current with the change, in the same unit that makes it true.
-- **Do not write code no spec asks for** — outside authorised setup. If you find something
-  that should exist and does not, say so and let the plan decide.
-- **Change markers have fixed meaning**: `[modify]` replaces the old behavior instead of
-  adding a parallel path, `[remove]` takes it out, and `[SPEC-CONFLICT]` is what you emit
-  when the spec contradicts itself while you are building. The first two are put there by
-  the change reference of `nzt-discovery`, when the user approved the change; they survive
-  until the close of `nzt-plan` sweeps them, and whoever implements does not clean them up.
-- **Technical work you find and do not do is reported, and it becomes an entry in
-  `Docs/Architecture/tech-debt.md` when the user decides to defer it** — never a comment in the code and
-  never a silent omission.
-- A refactor changes structure and nothing else. If behavior changed, it was not a
-  refactor: it needs its own spec and its own verification. A refactor still needs the
-  existing behavior verified, and the technical documents kept current.
-- A reported bug includes investigation, fix and regression verification, in one unit.
-- **Generated artifacts are generated by their command, never by hand.** If the command
-  does not run, the artifact is not written.
-- **Foreign component escape**: in code this project does not document, write it the way
-  that code is written and move your own conventions aside.
-- Every screen that loads data has three states from its first version: loading, empty and
-  error.
-- The frontend validates shape; business rules are validated where they live.
-- Read before writing. The existing code is the specification of how this project does
+Each reference holds the rules of its own work. These hold for every unit of the phase:
+
+- **Read before writing.** The existing code is the specification of how this project does
   things.
-- Never claim it works because it compiles. Static inspection is not an executed test.
-- Report what you did not do: skipped edge cases, deferred error handling, stubs.
+- **Do not write code no spec asks for**, outside authorised setup and repairs to your own
+  change. What should exist and does not is said, and the plan decides.
+- **Technical work you find and do not do is reported, and it becomes an entry in
+  `Docs/Architecture/tech-debt.md` when the user decides to defer it** — never a comment in
+  the code and never a silent omission.
+- **A change marker is authorisation, put there by `nzt-discovery` when the user approved the
+  change.** You never add one and never clear one: the feature's close sweeps them.
+- **Generated artifacts are generated by their command, never by hand** — a migration is the
+  usual case. If the command does not run, the artifact is not written.
+- **Never claim it works because it compiles**, and report what you did not do: skipped edge
+  cases, deferred error handling, stubs.
+- **Do not commit unless the user asked** (`nzt-ship`), and deploying is never an implicit
+  step of building.
 
 ## Done when
 
-The affected code compiles, the tests the stack enables were **run**, every criterion built
-has its area marked, and what those tests cannot reach is reported as **not covered until
-QA** — never as green. Committing happens only if
-asked, and deploying is never an implicit step of implementing.
-
-## Closing checklist
-
-- [ ] Affected code compiles.
-- [ ] The tests the stack enables for this change were executed, not just written.
-- [ ] Area coverage marked on every criterion built; `qa` left to `nzt-verify`.
-- [ ] What those tests cannot reach reported as not covered until QA, with no test plan
-      or manual script written for it here.
-- [ ] Stack document current with what the change adopted.
-- [ ] No commented-out code and no comment that is no longer true.
-- [ ] Change markers left as they are, for the feature close to sweep.
-- [ ] What you did not do, said out loud.
+The unit's reference says its own *Done when*, and it holds. What the tests the stack enables
+cannot reach is reported as **not covered until QA** — never as green.

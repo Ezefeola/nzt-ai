@@ -6,10 +6,8 @@
 - Components
 - Decide for what is known
 - Reasoning is part of the document
-- Planned is not adopted
 - External systems carry an id
 - Diagrams
-- The log
 - Done when
 
 Produces `Docs/Architecture/architecture.md` — the components that exist, what each one owns, how they
@@ -23,27 +21,18 @@ aggregates are `nzt-architecture-domain`'s, and the cut into contexts is
 `nzt-architecture-contexts`'. This file says which components exist and what each one owns;
 an entity listed here is a model growing in two places.
 
-If you did not arrive here from `nzt-architecture`, load it first: it carries the protocol
-this skill runs — derive the questions, resolve each by its kind, let the user choose the
-mode, and log every answer with where it came from.
-
 **The questions come first, and at this altitude they are the expensive ones**: the stack
 of each component, how the components and the client applications talk to each other, which
 providers are used and what each one allows. Derive them from the product document, the
 specs and their technical notes, write them as open `QT-NN` in
 `Docs/Architecture/architecture-decisions.md`, and only then say how many there are and ask the mode.
-**The stack's axes go in this same log** — `nzt-architecture-stack` keeps asking them the
-way it always did; what changed is only where the answer is recorded.
+**The stack's axes go in this same log**, asked as `nzt-architecture-stack-axes` says.
 
 ## Before deciding
 
-Read `Docs/Product/product.md` — its modules, its constraints and its scope — and the feature specs
-that already exist. **Design against the spec, not against the request**: if no spec asks
-for it, it is not a requirement, and inventing one here is how a system grows a capability
-nobody bought.
-
-On an existing system, read the system itself first. The current structure is a constraint
-and a source of information, not an accident to correct in passing.
+Read `Docs/Product/product.md` — its modules, its constraints and its scope — and the feature
+specs that already exist: if no spec asks for something, inventing it here is how a system
+grows a capability nobody bought. On an existing system, read the system itself first.
 
 ## The file
 
@@ -128,11 +117,6 @@ next person add it later without re-arguing the whole design.
 - A decision that is expensive to reverse does not live only here: it gets its own record
   through `nzt-architecture-adr`, and this file names it.
 
-## Planned is not adopted
-
-Mark anything not yet in place as planned, and keep it marked until it exists. A document
-that describes a system that is half true is worse than one that admits which half.
-
 ## External systems carry an id
 
 `INT-NN` is assigned once, never reused, and it is what a feature design cites instead of
@@ -147,19 +131,6 @@ does what, and **`context`**, the perimeter, when there are third parties or mor
 kind of actor. `nzt-architecture-diagrams` decides and offers;
 `nzt-architecture-diagrams-components` draws them. A picture that repeats the component
 table in boxes is maintenance with no reader.
-
-## The log
-
-`Docs/Architecture/architecture-decisions.md` holds every `QT-NN` of this altitude, in its own series,
-**append-only**: the question, its answer, the date, and the label saying where the answer
-came from. Its shape is the one `nzt-architecture-design-feature` writes out, with the
-product in the title instead of a feature. One that belongs to a later phase is written
-where that phase will read it and is not decided early — deciding a build question during
-architecture is deciding it with less information than whoever gets there will have.
-
-**`Docs/Architecture/architecture.md` is the present and gets rewritten; the log is not touched.** A
-superseded answer stays and gets a new entry naming what replaced it. When the answer
-earned an ADR, the line cites it instead of restating it.
 
 ## Done when
 

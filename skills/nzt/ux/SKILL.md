@@ -32,10 +32,10 @@ row is not the guidance, the file is.
 
 | The unit is | Read | Read with |
 |---|---|---|
-| One screen: layout, content, states, navigation | `references/screen.md` | — |
-| An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | — |
-| A usable prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | — |
-| The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | — |
+| One screen: layout, content, states, navigation | `references/screen.md` | `../nzt-plan/references/questions.md` |
+| An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | `references/review.md` — its measurements |
+| A usable prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | `references/review.md` — its measurements |
+| The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | `references/review.md` — its measurements |
 | The design system, shared components, the visual direction, or the brand and its voice | `references/system.md` | — |
 | Judging a design, a mockup or a built screen against its task | `references/review.md` | — |
 
@@ -77,45 +77,16 @@ plan back.
 
 ## Rules
 
-- **Every element and every state carries its origin**: an acceptance criterion
-  (`US-NNN CA-NN`), a design system convention, or the documented use of a shared
-  component. A row with no origin is invented behavior: it becomes a `Q-NN`, it is listed
-  as pending, and it is not drawn as decided.
+Each reference holds the rules of its own document. These hold for every unit of the phase:
+
 - **The mechanism is cross-cutting and lives in the design system; the content is product
   and lives in the story.** The operative test: if you are writing a sentence the user will
   read on screen, you are writing a story, not a design.
-- **Start from the task**, not the layout: who arrives, what they came for, and what **the**
-  primary action is. A screen with two primary actions has not decided what it is for.
-- **Regions, not pixels.** Hierarchy, grouping and reading order are the design; sizes,
-  colors and spacing belong to the design system. Always say what changes on a narrow
-  screen — that is where designs break.
-- **The states are the design**: loading, empty, error, partial, no permission, success,
-  and extreme data (one item, hundreds, a very long name, a huge amount). Each one is
-  described, or declared *not applicable* with its reason.
-- Data and words come from the stories: the same values their examples use, and any wording
-  a criterion fixes is copied verbatim. A business promise no criterion makes stays pending.
-- **Accessibility splits in two**: the verifiable requirement is a product-level NFR; how it
-  is met belongs to the design system. Written in the same place, neither can be verified.
-- **A design made elsewhere is an input, not a screen design.** An exported prototype or a
-  set of screenshots gets converted: regions, elements and states, each with its origin.
-  What no criterion asks for is not adopted just because it was drawn.
-- What designing reveals as undefined is a question for analysis. It stays pending; it is
-  never decided by drawing it.
-- The document declares `update-when` in its frontmatter: which change forces it to be
-  updated.
+- **What designing reveals as undefined is a question for analysis**: a `Q-NN` opened in the
+  feature's `analysis.md`, cited here by that id and listed as pending. It is never decided
+  by drawing it.
 
 ## Done when
 
-Every acceptance criterion of the story has a place on a screen; every state is described
-or declared not applicable with its reason; every element has its origin; and everything
-the design could not decide is written as a pending question instead of drawn.
-
-## Closing checklist
-
-- [ ] The primary task and its single primary action are stated.
-- [ ] Every element and state has an origin.
-- [ ] Every state described or explicitly declared not applicable.
-- [ ] Narrow-screen behavior stated.
-- [ ] Navigation says where you arrive from and where each action leads, by file name.
-- [ ] No new behavior, wording or business promise that no criterion supports.
-- [ ] `update-when` written in the frontmatter.
+The unit's reference says its own *Done when*, and it holds. Nothing the unit produced
+promises a behavior no acceptance criterion supports.

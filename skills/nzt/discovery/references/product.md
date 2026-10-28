@@ -116,8 +116,7 @@ deadline, a budget, team size, legal or regulatory obligations.
 What reaches the user first — the MVP — and for which objective. Ask one question to define
 it: **is there anything we need to learn from users before building the rest?**
 
-- If yes, delivery 1 is the least that teaches it, and **To learn** names what. Offer an
-  HTML prototype (`nzt-ux-mockup`) when a screen can teach it before code does.
+- If yes, delivery 1 is the least that teaches it, and **To learn** names what.
 - If no, **delivery 1 is the whole scope**, and the section says so as a decision — *"the
   whole scope: nothing to learn first (Q-15)"* — never left out by omission.
 - **Known by** is the objective's, measured on this delivery.
