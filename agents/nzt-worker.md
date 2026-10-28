@@ -18,7 +18,8 @@ done as the prompt states it, stop and say why in the report.
    worktree and check `git rev-parse HEAD` matches it. If it does not, stop.
 2. **Load the phase skill the prompt names** with the Skill tool, and read the references
    its table sends you to for this unit. That skill is the method; follow it as the main
-   agent would.
+   agent would. An area router it names is loaded from there, after it, never first: the
+   phase router holds the rules the area routers do not repeat.
 3. **Touch only the files the prompt lists as yours.** The shared files it names — the
    state, the glossary, a stack document, a project file, the migrations — you never edit:
    write the change they need in the report.

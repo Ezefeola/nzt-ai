@@ -3,8 +3,6 @@
 Produces an answer to one question, gathered by a subagent so the reading does not fill your
 window, and checked by you before anything rests on it.
 
-> **A subagent reads for you; it never decides for you.**
-
 ## What can be delegated
 
 Only reading, and only in these three situations:
@@ -36,7 +34,8 @@ The subagent saw none of this conversation. What is not in the prompt, it does n
    prefer. Exclusions save as much as inclusions.
 3. **What is already known.** The files you already read, the answer you suspect. It is
    told to confirm or refute, not to start over.
-4. **The shape of the answer.** The format below, with a limit on the number of pointers.
+4. **A limit on the number of pointers.** The shape of the answer is fixed in the agent's
+   file; the prompt does not restate it.
 5. **When to stop.** The question answered, or a stated budget of files or pages spent.
 
 For a web question, name the provider, the version, and the claim to check; the subagent
@@ -44,22 +43,10 @@ labels what it finds as `nzt-research` does.
 
 ## What comes back
 
-Ask for this shape, and reject an answer that is not in it:
-
-```markdown
-**Question:** where is the tax rate read?
-
-- seen · `src/Billing/TaxCalculator.cs:42` — reads `TaxRate` from the options class.
-- seen · `src/Orders/Checkout.cs:118` — hard-codes `0.21` for one country.
-- inferred · `src/Billing/Options.cs` — bound from the `Billing` section, by its name.
-
-**Not looked at:** the `legacy/` folder; the SQL scripts.
-```
-
-- **Every line is a pointer** — `path:line` or a URL with its date read — and one claim.
-- **Seen or inferred**, never unlabelled. An inference names what it follows from.
-- **What it did not look at** is part of the answer. Silence about an area reads as
-  *nothing there*; it may only mean *not searched*.
+The shape of its answer is in its agent file: the question, one pointer and one claim per
+line labelled as `nzt-research` labels it, and what it did not look at. **Reject an answer
+that is not in that shape.** What it did not look at is part of the answer: silence about
+an area reads as *nothing there*, and may only mean *not searched*.
 
 ## Use what comes back
 

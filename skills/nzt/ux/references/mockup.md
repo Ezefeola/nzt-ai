@@ -78,7 +78,7 @@ that way. Do not present a file you could not open as if you had seen it.
 ## A prototype is a mockup that teaches
 
 When delivery 1 has something to learn from users (`nzt-discovery-product`, **To learn**),
-the plan offers a prototype inside the discovery slice: the same kind of file, built to
+the plan offers a prototype inside the analysis slice: the same kind of file, built to
 answer that question before code exists.
 
 - **It starts from the question, not from a screen design.** Its header names the `Q-NN`

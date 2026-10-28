@@ -488,7 +488,8 @@ Reglas del acuerdo:
 `Plan/state.json` en la raíz del proyecto. **El plan vive acá adentro**, no en un `.md`
 aparte: dos archivos que describen lo mismo se desincronizan, y el agente terminaría
 gastando trabajo en mantener la coherencia entre ambos. Un archivo, una verdad. Su esquema y
-sus reglas los dice `nzt-plan` en el cuerpo de su `SKILL.md`; el kernel solo dice que leerlo
+sus reglas los dice `nzt-plan` en `references/state.md`, que su `SKILL.md` manda leer antes de
+escribirlo (D85; hasta entonces vivían en el cuerpo); el kernel solo dice que leerlo
 o escribirlo carga `nzt-plan` (D74).
 
 ```json
@@ -684,6 +685,8 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
   de historias de `spec.md` **no lleva checkboxes**: sería una segunda fuente de verdad.
 - Un criterio pasa a completo cuando todas sus áreas están verificadas **y** el usuario
   aprueba. Las áreas del proyecto son las que declaran sus documentos de stack (T3).
+- **Cada criterio lleva un `CA-NN`** numerado dentro de su historia, que no se reusa ni se
+  renumera; pantallas, escenarios y bugs lo citan como `US-NNN CA-NN` (D85).
 - `analysis.md` es append‑only: las respuestas superadas se marcan, no se editan (13.2).
   Hay uno por altitud: el de producto en `Docs/Product/` y el de cada feature junto a su
   spec (D5).
@@ -836,7 +839,10 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    `nzt-` sale solo y no colisiona con otras skills instaladas. Ubicar una skill en el
    árbol es una decisión de diseño: define su nombre y de qué router depende.
 9. **Todo en inglés** (D2): `name`, `description`, cuerpo y referencias. Ninguna skill
-   repite la regla de idioma de respuesta; esa vive sola en el kernel.
+   repite la regla de idioma de respuesta; esa vive sola en el kernel. **Desde D85**, una
+   etiqueta que un artefacto escribe (el origen de una decisión, un modo, una regla de tono)
+   se fija por **lo que significa**, y se escribe en el idioma del proyecto. Los
+   identificadores (`[TO-DEFINE]`, `Q-NN`, `CA-NN`, los estados) no se traducen.
 10. **Anti‑patrón a evitar:** el kernel convertido en manual. Todo lo que no se necesite en
    *toda* sesión, baja a una skill.
 11. **Una hoja no lleva sección de *cuándo usarla*.** Quién decide cargarla es el ruteo —
@@ -851,8 +857,9 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 13. **El archivo se llama como la hoja sin el prefijo de su router**
    (`nzt-build-backend-dotnet-ef-core-queries` → `build/backend/dotnet/references/ef-core-queries.md`),
    y **toda referencia tiene una fila en la tabla de su router**. Una referencia sin fila no
-   la carga nadie. Desde D58 la fila puede estar en una **referencia índice** que tiene fila
-   en el router (`practices-backend.md`, `practices-frontend.md`): un nivel, no más. El build
+   la carga nadie. D58 permitía que la fila estuviera en una **referencia índice**
+   (`practices-backend.md`, `practices-frontend.md`); **D85 lo deroga**: esas tablas pasan al
+   router de build y no hay más referencias índice, así que toda fila está en un router. El build
    lo comprueba así (`build.sh` y `build.ps1`, vistos fallar con una referencia huérfana en
    la unidad 44).
 14. **Una referencia de más de 100 líneas abre con `## Contents`**, la lista de sus
@@ -891,6 +898,26 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    cortos, una acción verificable por paso, en el orden en que se hacen; sin pasos que
    escondan dos decisiones. Cambiar una regla debe tocar un solo archivo, y quien la lea por
    primera vez debe poder seguirla sin leer otra cosa que lo que su fila de ruteo carga.
+20. **El router lleva lo que vale para toda unidad de su fase (D85).** Límites, tabla de
+   referencias, dónde aterriza y las reglas transversales de la fase. Una regla que usa una
+   sola referencia vive en esa referencia, y el router no la resume ni la repite en *Rules*,
+   *Done when* o checklist. Es la regla 18 aplicada al router, que se carga en cada unidad.
+21. **Un solo cierre por archivo (D85).** Routers y referencias de documento o de
+   procedimiento cierran con *Done when*; la *Closing checklist* queda sólo en las
+   referencias de práctica de código, cuyas reglas se verifican línea por línea. Ningún router
+   lleva checklist. El índice de la regla 14 no cambia.
+22. **Las copias que protegen a quien no ve el kernel son contadas (D85).** `nzt-worker` y
+   `nzt-explorer` corren sin el kernel (`omitClaudeMd`). Por eso las dos líneas que resuelven
+   un nombre `nzt-…` a su ruta se repiten en cada router que las usa, a propósito. Los bloques
+   más largos (leer el stack primero, los dos escapes, cargar el router padre) viven en el
+   router de build y en el archivo del worker, y los routers de área no los copian.
+23. **Un dueño por regla entre el kernel y las skills (D85).** El kernel enuncia el
+   invariante en una línea y nombra a la skill que tiene el procedimiento. Las reglas de
+   parar, reconciliar el estado al reanudar, el esquema del estado y cómo preguntar viven en
+   `nzt-plan` (el kernel conserva el formato visible de la pregunta y los frenos de toda
+   tanda, que protegen el contexto); qué significa cada caso del estado al arrancar, el
+   tamaño y la clasificación, en `nzt`; los documentos obligatorios de cada fase, en su
+   router.
 
 ## 11. Roadmap
 
@@ -2784,6 +2811,78 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     release. Ningún caso de `evals/` mide los grupos en paralelo ni el modelo chico de QT-41.
     - **Hecho comprobable sin resolver:** si un subagente de Codex carga el `AGENTS.md`
       global (unverified arriba). No se pregunta: se prueba en la unidad 372.
+- **D85.** **El set se revisa contra D83, y cada regla queda con un solo dueño.** Lo que la
+  forzó: el pedido del usuario (2026-10-28) de revisar skills y references para que sean
+  genéricas, sin redundancia, mantenibles, modulares y livianas en contexto, sin perder
+  funcionamiento. Es la revisión que D83 dejó *"para que la decida el usuario"*. La revisión
+  (unidades 377-386, sólo lectura) está en `Plan/mejoras/08-revision.md`: 52 hallazgos, 13
+  errores y 7 patrones de repetición. El más grande: el router repite a sus referencias en
+  seis fases. Las decisiones son las de ese documento (su log QT-01 a QT-12, una serie
+  propia, distinta de la de esta spec). Todas las respondió el usuario el 2026-10-28 y en
+  todas eligió la opción recomendada:
+  - **Router transversal (QT-01):** regla 20 de §10.
+  - **Un solo cierre (QT-02, corregida por QT-12):** regla 21. Los índices de la regla 14
+    quedan: sacarlos contradecía esa regla, y el hallazgo que lo pedía (L6) estaba mal.
+  - **Preguntas (QT-03):** `nzt-plan` es dueño de qué se pregunta, cómo y las dos salidas, en
+    una referencia propia; el kernel conserva el formato visible. `nzt-architecture` conserva
+    las tres clases, los modos y el log `QT`. Cada serie de ids la numera el log de la fase
+    que responde: una pregunta de negocio que abre UX se escribe en `analysis.md` como `Q-NN`.
+  - **Copias para el worker (QT-04):** regla 22.
+  - **Ruteo de la capa genérica (QT-05):** las tablas de `practices-*` pasan al router de
+    build y `practices-*` desaparecen. La columna de costo de `stack-axes.md` pasa a esas
+    tablas, y `stack-axes.md` las lee. La tabla de stacks del router se deja. Deroga la
+    referencia índice de D58 (regla 13).
+  - **Etiquetas (QT-06):** regla 9. Un solo vocabulario de procedencia, el de `nzt-research`
+    (`documented / observed / inferred / unverified`), que adopta el explorador.
+  - **Kernel y `nzt-plan` (QT-07):** regla 23. `nzt-plan` baja del tope con
+    `references/state.md`, que tiene el esquema y las reglas del estado.
+  - **Clasificar (QT-08):** una sola tabla en `nzt` (tipo de pedido × terreno → tamaño y
+    fase de inicio). `slices.md` y `proposal.md` citan el tamaño en vez de redefinirlo.
+  - **Criterios con id (QT-09):** cada criterio lleva un `CA-NN` estable, que no se reusa.
+    Lo que UX, verify y bug ya citaban pasa a ser correcto. `close.md` deja de decir que los
+    criterios no tienen id.
+  - **`nzt-learn` (QT-10):** sólo `assess` da el veredicto `achieved`.
+  - **Filas de ruteo del kernel (QT-11):** sin cambio. Sin evals no se puede medir si
+    recortarlas empeora el ruteo.
+  - **Detalles dentro del alcance:** modo *propuestas*, elegido por el usuario. Son 20 (M1,
+    M4, M9, D3, D4, D5, A1, A6, B3, B4, B6, G3, S1, S3, U4, U5, V2, V3, L2, L3), resueltos como
+    los propone `08-revision.md` y marcados como del agente. M1 corrige la contradicción
+    entre el kernel y el tamaño directo de D78: el directo no escribe estado.
+  - **Dónde se aplica:** tramo S2, unidades 388-398, una por skill o capa; 399 corre las
+    puertas del repo y 400 cruza cada hallazgo con lo hecho. Cada unidad trae al día la
+    sección de esta spec que describe lo que cambia (§4.2 routers, §4.5 capa genérica, §7
+    estado, §8 criterios). **No cambia el comportamiento**: es reestructura (D83, regla 18),
+    salvo los 13 errores, que se arreglan.
+  - **Hecho (388, 2026-10-28).** Kernel: el bucle se escala por tamaño y el directo no
+    escribe estado aunque exista (M1); el cierre de unidad es una línea que remite a
+    `nzt-plan` y los frenos de tanda se quedan (151 líneas; `CLAUDE.md` y `AGENTS.md` en 165).
+    `nzt`: una tabla pedido → tamaño → dónde empieza, otra de tamaño → cómo corre, y la fase
+    se llama siempre *analysis* (M4).
+  - **Hecho (389, 2026-10-28).** `nzt-plan` baja de 200 a 149 líneas:
+    `references/state.md` (48, el esquema; revisa D74, §7 al día) y
+    `references/questions.md` (55: dónde surge, antes de preguntar, cómo, qué log numera cada
+    serie, las dos salidas). *Resuming* remite a `nzt` §1. `slices.md` y `proposal.md` citan
+    el tamaño y los obligatorios en vez de redefinirlos; *tramo de análisis* en lugar de
+    *discovery*, también en `mockup.md`. **Desvío de V3** (propuesta del agente): el dueño de
+    *verify después del tramo* es el paso 2 de *Building the plan* y no `slices.md`, porque
+    un plan estándar no lee `slices.md`. Las fases que preguntan suman `questions.md` a su
+    *Read with* en 391-393.
+  - **Hecho (390, 2026-10-28).** El explorador etiqueta con las cuatro de `nzt-research`
+    (`observed`, el proyecto lo mostró: una línea leída o un comando corrido; `documented`,
+    `inferred` y `unverified`) en lugar de `seen / inferred`, en `.md` y `.toml` (QT-06).
+    `reading.md` remite al archivo del agente para la forma de la respuesta, como `units.md`
+    con el worker, y deja de repetir el lema del router (M9). El worker, en `.md` y `.toml`,
+    carga un router de área sólo desde el de su fase (QT-04): los bloques largos quedan en el
+    de build. Ningún test ni caso de `evals/` dependía del texto viejo.
+  - **Hecho (391, 2026-10-28).** Router de discovery de 114 a 86 líneas: *Rules* queda con
+    dos reglas de toda la fase (las reglas viven en la feature con slug y `origin:`; lo no
+    sabido es un `Q-NN`) y un *Done when* que remite al de cada referencia; sin checklist.
+    Las 10 reglas y los 7 ítems que salieron ya estaban en `analysis.md`, `write-spec.md`,
+    `write-stories.md`, `product.md` y `reverse.md` (D1, QT-01, QT-02). Las filas de
+    entrevista e ingeniería inversa leen `questions.md` de `nzt-plan` (QT-03). Criterios con
+    `CA-NN` en `write-stories.md`, el ejemplo de `change.md` y `close.md` (QT-09, §8 al día).
+    El ejemplo del merge lleva `qa —` (D4). `write-stories.md` y `write-spec.md` remiten la
+    cadencia a `slices.md` (D3). `nzt-research` no cambia: ya era el dueño del vocabulario.
 
 ## 13. Revisión contra Temper v3
 

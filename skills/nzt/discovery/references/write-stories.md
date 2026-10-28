@@ -33,12 +33,12 @@ so I do not confirm an order expecting a discount.
 
 ## Criteria
 
-- [ ] **An expired coupon leaves the total untouched.** (RN-cupon-vencido)
+- [ ] **CA-01 · An expired coupon leaves the total untouched.** (RN-cupon-vencido)
   When I apply `INVIERNO20`, expired on 2026-05-01, to an order of $10.000, the total
   stays $10.000 and the coupon is reported as expired.
   backend ✓ · frontend — · qa —
 
-- [ ] **A coupon already used by me is rejected.** (RN-un-uso-por-cliente)
+- [ ] **CA-02 · A coupon already used by me is rejected.** (RN-un-uso-por-cliente)
   When I apply `VERANO25`, which I already redeemed, the total stays $10.000 and the
   coupon is reported as already used.
   backend — · frontend — · qa —
@@ -52,6 +52,10 @@ so I do not confirm an order expecting a discount.
 Each criterion is one observable outcome, and it has three parts: **the statement**, the
 **When** that produces it with concrete data, and the **coverage line**.
 
+- **It has an id, `CA-NN`, numbered within its story**, before the statement. Screens,
+  test scenarios and bugs cite it as `US-NNN CA-NN`. The number is assigned once and never
+  reused: a new criterion takes the next free one, a removed criterion's number stays
+  retired, and reordering renumbers nothing.
 - **Declarative, not imperative.** *"When I apply a valid coupon"*, never *"when I click
   Apply"*. A criterion tied to a button dies the day the button moves, and it belongs to
   the screen, not to the story.
@@ -111,10 +115,9 @@ the user first, not which matter more.
 
 ## When a story is written
 
-When the plan's cadence says (`nzt-plan`): `delivery` details the stories of the current
-delivery before its first build slice, `upfront` all of them, `just-in-time` each one in
-its own slice. Until then the story is one line in the spec's index. **Its rules are
-already in the spec either way**: a story never waits for a rule.
+When the plan's cadence says (`nzt-plan`'s slices reference). Until then the story is one
+line in the spec's index. **Its rules are already in the spec either way**: a story never
+waits for a rule.
 
 ## Changing a story
 
@@ -131,6 +134,7 @@ already in the spec either way**: a story never waits for a rule.
 Rehearse it: could someone build this story, and someone else verify it, without asking you
 anything?
 
+- Every criterion has its `CA-NN`, and no number was reused.
 - Every criterion is declarative, has one `When` and uses concrete data.
 - Every criterion carries its coverage line with all the project's areas and `qa`.
 - At least one unhappy path, or the written reason there is none.

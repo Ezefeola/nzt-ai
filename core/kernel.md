@@ -29,6 +29,9 @@ scaled to the request: `nzt` sizes the work as direct, standard or full.
 
 ## The loop
 
+**Direct** work — a reported bug, a small change, a chore — is understand, do, verify and
+report: no plan and no state. **Standard and full** work run all five steps.
+
 1. **Understand.** Work out what the user wants and what it is for. For a product or a
    feature this is functional analysis, not just parsing the request. Ask only what would
    change the result if you assumed it wrong; state every other assumption and move on. If
@@ -45,12 +48,10 @@ scaled to the request: `nzt` sizes the work as direct, standard or full.
 A **unit** is the smallest piece that can be delivered and reviewed on its own: one spec,
 one module in reverse engineering, one story, one spec's test set.
 
-Every unit ends the same way, in this order: land on a safe point — nothing half-written,
-no open question left hanging — then write `Plan/state.json`, then report in 3–5 lines what
-you did and what comes next, then **stop and wait**. Accompanied is the default: chain units
-only through a batch the user chose for this run — a closed list of units, as `nzt-plan`
-offers it. **A batch stops anyway** at a failure, a contradiction, a question that blocks,
-and **past 40% of context**, at the end of the unit in progress, units left or not.
+Every planned unit ends at a safe point, with `Plan/state.json` written before the report,
+and then **stops and waits**; `nzt-plan` has the order and the report. Units chain only
+through a batch the user chose, and **a batch stops anyway** at a failure, a contradiction,
+a question that blocks, and **past 40% of context**, at the end of the unit in progress.
 
 ## Context
 
@@ -70,9 +71,9 @@ The session is disposable; the state file is not.
 ## State
 
 `Plan/state.json` at the project root holds the plan and where the work stands. If it exists,
-read it when a session starts, before asking anything. **Reading or writing it loads
-`nzt-plan`**, which holds its schema and rules: never write it from memory. Skip the file
-only for work that is a single unit in a project that has no state yet.
+read it when a session starts, before asking anything; `nzt` says what each case means.
+**Reading or writing it loads `nzt-plan`**, which holds its schema and rules: never write it
+from memory. **Direct work never writes it**, even when the file exists.
 
 ## Routing
 
@@ -143,7 +144,7 @@ somewhere else is read where it is and proposed for moving, never moved without 
 - Never execute a plan the user has not approved.
 - Never write more than one spec in a unit.
 - Never run the whole pipeline in a single turn.
-- Never skip the state update at the end of a unit, and after writing it run
+- Never skip the state update at the end of a planned unit, and after writing it run
   `nzt-ai state check` where it is installed: what it reports is fixed before the report.
 - Never write a spec for code you have not read.
 - Delegate only reading, and the units an approved plan marked parallel, per `nzt-delegate`;

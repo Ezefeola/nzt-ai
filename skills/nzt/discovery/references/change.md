@@ -86,15 +86,15 @@ criteria and never against a proposal.
 The system calculates the discount over the products' subtotal, never over the shipping
 cost.
 
-### RN-acumulacion · [remove] · backend —
+### RN-acumulacion · [remove] · backend — · qa —
 Two coupons stop adding up.
 ```
 
 ```markdown
-- [ ] **A valid coupon discounts the subtotal only.** (RN-base-de-calculo) [modify]
+- [ ] **CA-01 · A valid coupon discounts the subtotal only.** (RN-base-de-calculo) [modify]
   When I apply a 25% coupon to an order of $10.000 with $2.000 of shipping, the total is
   $9.500.
-  backend — · frontend —
+  backend — · frontend — · qa —
 ```
 
 - **`[modify]` tells the implementer *this replaces something, do not add it alongside*.**
