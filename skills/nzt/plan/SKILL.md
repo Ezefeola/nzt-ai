@@ -69,7 +69,8 @@ is produced: the plan says what it delivers, not which files will end up existin
    product, a feature of several stories, or work to deliver early is cut into slices**:
    read `references/slices.md` in this skill's folder before cutting.
 2. Turn each phase into its units, in dependency order. **Verify's units go after the
-   slice's last build unit, never between two**, unless the user asks for it.
+   slice's last build unit, never between two**, unless the user asks for it. Units that
+   depend on none of each other: read `references/parallel.md` before marking a group.
 3. Write `goal`, `phases` or `slices` (the first `doing`) and `approved: false`.
 4. Show the plan in the reply, as `references/proposal.md` in this skill's folder says —
    the table, its declarations and the documents it lists — and ask for approval. Stop.
