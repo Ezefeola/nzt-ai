@@ -9,27 +9,10 @@ This router loads nothing by itself. It reads the component's stack document and
 axis into **the one reference** that axis selected. Paths are relative to this skill's folder.
 **Read the file before acting on the row** — the row is not the guidance, the file is.
 
-If you did not arrive here from `nzt-build`, load it first.
-
-## Read the stack first
-
-`<component folder>/Docs/Architecture/frontend-stack.md` decides every row below — the folder
-is the one `Docs/Architecture/architecture.md` names. Read it before loading anything, and
-before choosing a technology or a pattern.
-
-- **An installed folder is not an authorisation.** This whole tree is installed in every
-  project, including the ones that are not Blazor. What makes it apply is the stack document,
-  and nothing else.
-- **A missing technical fact is checked in the project, not invented**: the manifest, the
-  entry point, the components already there.
-- **Version-dependent APIs need local evidence** — `TargetFramework`, the package version, the
-  SDK pin. **When the stack document and the manifest disagree, the manifest wins** and the
-  discrepancy is reported. A version is never bumped to make an example from a skill compile:
-  that is a stack change and goes through the stack door.
-- **Component organisation is a stack axis too** — `inline` or `code-behind`. The components
-  skill applies whichever is written there. If the stack does not say and the existing
-  components clearly do, that convention wins and gets recorded; otherwise it is a question,
-  answered once and written in the stack.
+`<component folder>/Docs/Architecture/frontend-stack.md` decides every row below, under
+`nzt-build`'s *Read the stack first*. **Version-dependent APIs need local evidence** here:
+`TargetFramework`, the package version in the manifest, the SDK pin in `global.json`; a missing
+fact is read from the entry point and the components already there.
 
 ## Required guidance
 
@@ -51,6 +34,12 @@ The adopted component library comes first, as `frontend-components.md` says.
 | | `webassembly` | `references/render-webassembly.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md` |
 | | `auto` | `references/render-auto.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md` |
 | | `static` | `references/render-static.md` | `../nzt-build/references/frontend-rendering.md` — first, required; `../nzt-build/references/frontend-components.md`, `references/components.md`, and `../nzt-build/references/frontend-forms.md` with `references/forms.md` when the page posts |
+| Component organisation | `inline` | `references/components.md`, its `inline` rules | `../nzt-build/references/frontend-components.md` — first, required |
+| | `code-behind` | `references/components.md`, its `code-behind` rules | `../nzt-build/references/frontend-components.md` — first, required |
+
+**Component organisation is asked with the stack**, like every axis here: when the stack does
+not say and the existing components clearly do, that convention is the answer and gets
+recorded.
 
 **A render-mode reference is read only when the work touches rendering behaviour.** A copy
 change inside an established component does not need one.
@@ -72,14 +61,6 @@ Wherever a file names `nzt-build-frontend-blazor-<name>`, it means `references/<
 this folder (`nzt-build-frontend-blazor-render-auto` → `references/render-auto.md`): read that
 file — it is not a skill.
 
-## Two escapes, and they are not the same
-
-- **A small edit in an established place follows the convention next to it**, without reloading
-  guidance. The scale rule of the kernel applies inside a phase too.
-- **Code this project does not document is written the way that code is written.** This set is
-  installed globally and will see repositories that are not its own: **your conventions step
-  aside there**, and the difference is reported rather than applied.
-
 ## Three confusions that cost the most
 
 - **The render mode and prerendering are two things** (`frontend-rendering.md`). Interactive
@@ -90,11 +71,9 @@ file — it is not a skill.
 - **A component that holds an `HttpClient` is the boundary already broken**: every call goes
   through its feature's typed client (`frontend-components.md`).
 
-## Closing checklist
+## Done when
 
-- [ ] Every row read was selected by the stack document, not by preference.
-- [ ] No two rows of the same axis were read, and the render-mode reference was read only
-      because the work touches rendering.
-- [ ] Versions used came from the manifest, and any disagreement with the stack was reported.
-- [ ] The design system and the component inventory were read before anything visual or shared.
-- [ ] The stack document was updated in this unit if the work changed what it declares.
+Every row read was selected by the stack document, never by preference, and no two of the
+same axis; the render-mode reference was read only because the work touches rendering; the
+versions used came from the manifest, and any disagreement with the stack was reported; the
+design system and the component inventory were read before anything visual or shared.

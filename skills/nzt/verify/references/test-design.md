@@ -112,7 +112,8 @@ When time or the environment cut the run short, say what was left out and at wha
 - Preconditions you cannot reach are a data problem to solve, not a result. **A scenario
   whose data does not exist yet is designed with its two scripts — setup and teardown — and
   they are approved with the plan, not improvised while running.** The mechanism is the
-  user's decision and is asked once, with the plan: `nzt-verify-test-data`.
+  stack's *Test data* opt-in, asked with the plan only if the stack lacks it:
+  `nzt-verify-test-data`.
 
 ## The plan is approved before anything runs
 

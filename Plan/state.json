@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-10-28T12:00:00Z",
+  "updated": "2026-10-28T19:00:00Z",
   "goal": "Revisar skills y references para que sean genéricas, sin redundancia, mantenibles, modulares y livianas en contexto, sin perder funcionamiento; con el marco (clasificar, planificar, estado, fases) en pasos y reglas bien definidos",
   "cadence": "upfront",
   "slices": [
@@ -30,11 +30,11 @@
     {
       "id": "S2",
       "name": "Refactor",
-      "status": "doing",
+      "status": "done",
       "phases": [
         {
           "name": "build",
-          "status": "doing",
+          "status": "done",
           "units": [
             { "id": 387, "do": "Spec: decisiones de QT-01..QT-10 y reglas de autoría nuevas en specs/nzt-core.md", "status": "done", "detail": "D85 y reglas 20-23 de §10; regla 9 (etiquetas) y 13 (sin referencia índice) al día; QT-12: se mantiene la regla 14 y L6 queda descartado" },
             { "id": 388, "do": "Kernel y nzt: M1, M4, un dueño por regla (QT-07) y una sola tabla de clasificar (QT-08)", "status": "done", "detail": "Kernel: bucle por tamaño (M1), cierre de unidad en una línea que remite a nzt-plan (QT-07), 151 líneas; nzt: una tabla de clasificar y tamaño (QT-08), analysis como nombre de fase (M4), 107 líneas; regla 23 ajustada; build, check-references y lint limpios" },
@@ -45,17 +45,17 @@
             { "id": 393, "do": "nzt-ux: U1-U6", "status": "done", "detail": "router 121→92, 2 Rules, sin checklist (U2); mediciones HTML solo en review.md, leída por mockup y manual (U4); tono por función (U3); Q-NN en analysis.md (U6); prototipo cuándo = slices.md (U5); U1 ya en 391; gates limpios" },
             { "id": 394, "do": "Router nzt-build y método: B1, B3, B4, B6, tablas de practices al router (QT-05)", "status": "done", "detail": "router 169→144; practices-* quedan como índices sin repetir (QT-13 corrige QT-05); comentarios a code-code.md (desvío de B1, en D85); implement 153→94; un cierre en tdd, refactor, remove; check-extraction sin pérdida; gates limpios" },
             { "id": 395, "do": "Capa genérica de build: G2, G3, costo de los ejes en las tablas (A5, G5), checklists (QT-02)", "status": "done", "detail": "costo de ejes en practices-*, stack-axes los lee (89→78) y la fila de stack suma practices-<area>; guarda del agregado mínimo con dueño en domain-ddd (G3); cierres ya cumplían QT-02; G2 en 394; sin pérdida; gates limpios" },
-            { "id": 396, "do": "Capa de stack .NET, C#, Blazor y ship .NET: S1, S2, S3, S4", "status": "todo", "detail": "" },
-            { "id": 397, "do": "nzt-verify y nzt-ship: V1, V2, V3 y citas CA-NN", "status": "todo", "detail": "" },
-            { "id": 398, "do": "nzt-learn: L1-L6", "status": "todo", "detail": "" }
+            { "id": 396, "do": "Capa de stack .NET, C#, Blazor y ship .NET: S1, S2, S3, S4", "status": "done", "detail": "S1: fila Component organisation en la tabla de Blazor; S2: sin load it first, Read the stack first ni Two escapes en los 4 routers, una línea de evidencia .NET (QT-04); S3: ef-core.md fuera de cada Read with, paginación cita la fila de lectura; S4 sin cambio (QT-04); checklists a Done when salvo C# (regla 21); .NET 128→105, Blazor 100→79, C# 153→150, ship 58→54; gates y extracción limpios" },
+            { "id": 397, "do": "nzt-verify y nzt-ship: V1, V2, V3 y citas CA-NN", "status": "done", "detail": "verify 195→141 y ship 133→89: Rules a lo transversal, sin checklist, Authorisation de ship remite a release.md (V1); test-data y el router leen la opt-in Test data del stack y sólo preguntan si falta (V2); When it runs cita nzt-plan y slices.md (V3); bug.md cita US-NNN CA-NN, test-design ya lo hacía; extracción sin pérdida; gates limpios" },
+            { "id": 398, "do": "nzt-learn: L1-L6", "status": "done", "detail": "router 118→93, 3 Rules, sin checklist, el registro con dueño plan.md (L4); sólo assess escribe achieved: tutor, teach y router (L1, QT-10); repaso sin archivo, su evidencia es la línea del log (L2); veredicto nuevo entra al primer escalón y el ejemplo pasa a 2026-09-26 (L3); L5 sin cambio (QT-04), L6 descartado (QT-12); la regla probe-vs-sensación sólo estaba en el router y pasó a plan.md; extracción sin pérdida; gates limpios" }
           ]
         },
         {
           "name": "verify",
-          "status": "todo",
+          "status": "done",
           "units": [
-            { "id": 399, "do": "Gates del repo: nzt-ai lint y verify, tope de 200 líneas, ninguna cita a un archivo borrado", "status": "todo", "detail": "" },
-            { "id": 400, "do": "Cada hallazgo de 08-revision.md resuelto o descartado con razón; líneas por unidad típica antes y después", "status": "todo", "detail": "" }
+            { "id": 399, "do": "Gates del repo: nzt-ai lint y verify, tope de 200 líneas, ninguna cita a un archivo borrado", "status": "done", "detail": "lint y verify 0 problemas (verify es alias de lint, Program.cs:53); build, check-references y 171 checks del instalador pasan; ningún .md pasa de 200 (máx. stack.md 198); nada borrado desde main; 336 citas a references/*.md y 278 por nombre nzt-… resuelven, 1 falso positivo en blazor/SKILL.md:20" },
+            { "id": 400, "do": "Cada hallazgo de 08-revision.md resuelto o descartado con razón; líneas por unidad típica antes y después", "status": "done", "detail": "08-revision.md §400: 52 hallazgos, 44 resueltos y 8 descartados con razón (M7, M8, D5, B5, S4, L5, L6, A6 sin cambio de regla); stack.md sigue en 198; contra e4a0295: 7 unidades típicas bajan, 3 suben por questions.md y decisions-log.md (spec 268→294, pantalla 264→291, diseño de producto 376→442); routers 1363→1066; spec D85 al día con 396-400" }
           ]
         }
       ]

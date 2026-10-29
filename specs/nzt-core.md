@@ -2938,6 +2938,34 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     regla 21 para las de práctica de código, y las de más de 100 líneas ya tenían índice:
     nada que cambiar (QT-02). G2 se resolvió en la 394. Sin pérdida: `check-extraction.sh`,
     con lo reescrito en `Plan/mejoras/extraccion/*.reviewed`.
+  - **Hecho (396, 2026-10-28).** Los routers de .NET, Blazor y ship .NET dejan *load it
+    first*, las viñetas de *Read the stack first* y *Two escapes*: los dice el router de build
+    (QT-04, regla 22). Cada uno conserva la ruta de su stack y una línea con su evidencia de
+    versión (`TargetFramework`, el manifiesto, `global.json`) (S2). La tabla de Blazor gana el
+    eje *Component organisation* (`inline` / `code-behind`), así se pregunta al escribir el
+    stack (S1). Las filas de EF Core dejan de repetir `ef-core.md`, que el párrafo ya exige, y
+    paginar cita la fila de lectura (S3). Las fórmulas de nombre quedan (S4, QT-04). Las
+    checklists de los tres routers pasan a *Done when*; C# conserva la suya por ser práctica de
+    código (regla 21). .NET 128→105, Blazor 100→79, C# 153→150, ship .NET 58→54.
+  - **Hecho (397, 2026-10-28).** Router de verify de 195 a 141 y de ship de 133 a 89: *Rules*
+    con lo de toda la fase y *Done when* que remite al de cada referencia, sin checklist (V1);
+    *Authorisation* de ship queda en una línea que remite a `release.md`. El mecanismo de
+    datos de prueba es la opt-in *Test data* del stack: se lee, y sólo si falta se pregunta con
+    el plan (V2; router, `test-data.md`, `test-design.md`). *When it runs* cita `nzt-plan` y
+    `slices.md` (V3). `bug.md` cita lo violado como `US-NNN CA-NN`.
+  - **Hecho (398, 2026-10-28).** Router de learn de 118 a 93: la inversión, los bucles, la
+    tabla, *Where it lands* y tres reglas; el registro de `progress.md` tiene dueño en
+    `plan.md` (L4). Sólo `assess` escribe `achieved`: `tutor.md`, `teach.md` y el router lo
+    dicen (L1, QT-10). Un repaso no escribe archivo y su evidencia es su línea del log (L2). Un
+    veredicto nuevo entra al primer escalón y el ejemplo de `plan.md` pasa a 2026-09-26 (L3).
+    La regla *"How much do you know?" devuelve una sensación* sólo estaba en el router y pasó a
+    *Probe* de `plan.md`. L5 sin cambio (QT-04); L6 descartado (QT-12).
+  - **Hecho (399, 2026-10-28).** `nzt-ai lint` (y `verify`, su alias), `build.sh`,
+    `check-references.sh` y los 171 checks del instalador pasan; ningún `.md` supera 200
+    líneas; las 336 citas a `references/*.md` y las 278 por nombre resuelven.
+  - **Hecho (400, 2026-10-28).** Los 52 hallazgos, cruzados con lo hecho en
+    `08-revision.md` §400. La entrada de esta spec para 396-398 se escribió en la 400: esas
+    unidades no la habían agregado.
 
 ## 13. Revisión contra Temper v3
 

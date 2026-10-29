@@ -23,7 +23,7 @@ Ask it before you have said anything about the result, or you are measuring your
 
 | Confidence | Result | What it means | What it earns |
 |---|---|---|---|
-| high | right | Acquired. The only cell that closes clean | `achieved`, if the case was new |
+| high | right | Acquired. The only cell that closes clean | Ready for `nzt-learn-assess`, if the case was new; it stays `in progress` until then |
 | **high** | **wrong** | **The dangerous one: they are not going to check this again** | Correct it, and jump it to the front of the review queue |
 | low | right | It works but has not consolidated. **Repetitions, not more explaining** | Another case at the same step |
 | low | wrong | A plain gap | Teach it: back to `nzt-learn-teach` |
@@ -82,9 +82,10 @@ Give it. **No negotiation and no reproach** — nothing is refused to the person
 
 - The objective goes to `solved by the system` in `progress.md`, naming the exercise.
 - It jumps the queue to the shortest review interval; `nzt-learn-retain` reads that.
-- It **never becomes `achieved` by the passage of time.** It becomes `achieved` when they
-  do it alone, on a different case. That edit is the most tempting one at closing time and
-  the one that would make this branch worthless.
+- It **never becomes `achieved` by the passage of time**, nor by a correction: only
+  `nzt-learn-assess` moves it, when they do it alone on a different case. Writing
+  `achieved` here is the most tempting edit at closing time and the one that would make
+  this branch worthless.
 - The next case for that objective is a new one, at *faded*, not the same exercise back.
 
 ## What you write
@@ -101,10 +102,8 @@ After each round, in `progress.md` and nowhere else:
   rung 2 and explained it unaided. Stays `in progress` — the case was the practised one.
 ```
 
-- **The log is append-only.** A round that went badly in September stays there when October
-  goes well; the two facts together are the history the table cannot carry.
-- The state names its artifact — the exercise, the step, the date. A state with nothing
-  behind it is a state nobody can audit.
+- The log is append-only and the state names its artifact, as `nzt-learn-plan` fixes for
+  the whole file.
 - **Never edit an earlier line to be kind.** If a verdict was wrong, add a new line saying
   so, with what changed it.
 

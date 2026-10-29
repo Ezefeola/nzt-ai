@@ -8,6 +8,7 @@ about a week.
 
 **1 day → 3 days → 1 week → 3 weeks → 2 months.**
 
+- **A new verdict enters at the first step**, one day after it was written.
 - A review that goes well **advances one step**.
 - A review that goes badly **goes back to the beginning of the ladder** — not back one step.
   It failing means the interval was already too long for that objective.
@@ -60,7 +61,7 @@ At the start of a session, **say which reviews are overdue before starting new m
 
 ```markdown
 ## Objectives
-| OA-02 | achieved | reviews/2026-10-02 · new case, unaided | 2026-10-23 |
+| OA-02 | achieved | log 2026-10-02 · review, new case, unaided | 2026-10-23 |
 
 ## Log
 - 2026-10-02 · OA-02 · review at 1 week, new case. Retrieved unaided, named the cost.
@@ -69,6 +70,7 @@ At the start of a session, **say which reviews are overdue before starting new m
   confidence first. Back to 1 day.
 ```
 
+- A review writes no file of its own: **its evidence is its log line**, cited by date.
 - The **Next review** column is the only date that matters; keep exactly one per objective.
 - Every review writes a log line, including the ones that failed and the ones the person
   skipped. **The skipped ones are the record of a decision, and without them a topic looks

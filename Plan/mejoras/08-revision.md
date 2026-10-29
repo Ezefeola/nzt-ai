@@ -1097,3 +1097,85 @@ S1, S3 (revisar los cinco *Read with* de paginación), U4 a), U5 a), V2 a), V3 a
   listado y un nombre que es prefijo del de .NET. c) Dejarlo. · `propuesta`: a).
   → **a) · `usuario`**. La convención de comentarios queda en `code-code.md`, y A5 lleva la
   columna de costo a las tablas de `practices-*`.
+
+---
+
+## 400 · Cierre: cada hallazgo contra lo hecho
+
+Los 52 hallazgos están resueltos o descartados con una razón. Los errores se comprobaron en
+los archivos, no sólo en el estado: el kernel dice que el directo no escribe estado (M1), la
+fase se llama *analysis* (M4), el merge de `change.md` lleva `qa —` (D4), `write-stories.md`
+numera `CA-NN` y `close.md` ya no dice lo contrario (U1).
+
+| Hallazgo | Cómo terminó | Unidad |
+|---|---|---|
+| M1 | Resuelto: el directo no escribe estado aunque exista | 388 |
+| M2, M5 | Resueltos (QT-07): `nzt-plan` con `references/state.md`, el kernel remite | 388, 389 |
+| M3 | Resuelto (QT-08): una sola tabla de clasificar en `nzt` | 388 |
+| M4 | Resuelto: la fase es siempre *analysis* | 388 |
+| M6 | Resuelto (QT-03): `nzt-plan/references/questions.md` | 389 |
+| M7 | Descartado (QT-11): sin evals no se puede medir si recortar empeora el ruteo | — |
+| M8 | Descartado (QT-04): las fórmulas de dos líneas se quedan, protegen al worker | — |
+| M9 | Resuelto: `reading.md` remite al archivo del explorador | 390 |
+| D1 | Resuelto (QT-01): router de discovery 114→86 | 391 |
+| D2 | Resuelto (QT-08): los obligatorios en el router, `slices.md` y `proposal.md` citan | 389, 391 |
+| D3 | Resuelto: la cadencia la tiene `slices.md` | 389, 391 |
+| D4 | Resuelto: el merge lleva `qa —` | 391 |
+| D5 | Descartado (opción b): dos líneas coherentes | — |
+| D6 | Resuelto (QT-06): un vocabulario, el de `nzt-research` | 390 |
+| A1 | Resuelto: `references/decisions-log.md` | 392 |
+| A2 | Resuelto (QT-03): el router conserva clases y modos, el cómo en `questions.md` | 392 |
+| A3 | Resuelto (QT-01): router de arquitectura 200→166 | 392 |
+| A4 | Resuelto (QT-06): etiquetas por significado, en el idioma del proyecto | 392 |
+| A5, G5 | Resueltos: el costo de los ejes en `practices-*`, `stack-axes.md` los lee | 395 |
+| A6 | Sin cambio de regla, como se propuso. Tres bajaron solos (router de arquitectura 166, `design-feature` 166, `nzt-plan` 149); **`stack.md` sigue apretado en 198** | 389, 392, 399 |
+| U1 | Resuelto (QT-09): criterios con `CA-NN` | 391 |
+| U2 | Resuelto (QT-01): router de UX 121→92 | 393 |
+| U3 | Resuelto (QT-06): tono por lo que hace la palabra | 393 |
+| U4 | Resuelto: las mediciones de HTML sólo en `review.md` | 393 |
+| U5 | Resuelto: cuándo se ofrece el prototipo, en `slices.md` | 393 |
+| U6 | Resuelto (QT-03): `Q-NN` en `analysis.md` | 393 |
+| B1 | Resuelto (QT-01): router de build 169→144; comentarios a `code-code.md` (desvío en D85) | 394 |
+| B2 | Medido abajo: la historia genérica baja de 618 a 567 líneas | 394, 400 |
+| B3, B4, B6, G4 | Resueltos en `implement.md` (153→94) | 394 |
+| B5 | Descartado (opción b): la tabla cuesta una fila por stack | — |
+| G1 | Resuelto (QT-13, corrige QT-05): `practices-*` como excepción registrada | 394 |
+| G2 | Resuelto: sin cabecera ni cierre repetidos | 394 |
+| G3 | Resuelto: la guarda tiene un dueño, `backend-domain-ddd.md` | 395 |
+| G6 | Resuelto (QT-02): *Done when* en routers, checklist sólo en práctica de código | 391-398 |
+| S1 | Resuelto: eje *Component organisation* en la tabla de Blazor | 396 |
+| S2 | Resuelto (QT-04): los bloques salen de los routers de stack | 396 |
+| S3 | Medido abajo: la historia .NET paginada baja de 1.327 a 1.250; el resto es el precio aceptado | 396, 400 |
+| S4, L5 | Descartados (QT-04), como M8 | — |
+| V1 | Resuelto (QT-01): verify 195→141, ship 133→89 | 397 |
+| V2 | Resuelto: el mecanismo se lee de la opt-in del stack | 397 |
+| V3 | Resuelto: el dueño es `nzt-plan` paso 2 (desvío en D85) | 389, 397 |
+| L1 | Resuelto (QT-10): sólo `assess` escribe `achieved` | 398 |
+| L2 | Resuelto: la evidencia de un repaso es su línea del log | 398 |
+| L3 | Resuelto: un veredicto nuevo entra al primer escalón | 398 |
+| L4 | Resuelto (QT-01): router de learn 118→93 | 398 |
+| L6 | Descartado (QT-12): cumple la regla 14 | — |
+
+**Líneas que carga una unidad típica**, medidas con `wc -l` contra `e4a0295` (el último commit
+antes de S2) y el árbol actual:
+
+| Unidad | Lee | Antes | Después |
+|---|---|---|---|
+| Historia, stack genérico | build, `implement`, `tests`, `code-code` | 618 | 567 |
+| Historia .NET con paginación (S3) | los 12 archivos de S3 | 1.327 | 1.250 |
+| Set de prueba de una historia | verify, `test-design`, `test-data` | 455 | 404 |
+| Historias de una feature | discovery, `write-stories` | 252 | 228 |
+| Despliegue | ship, `release` | 283 | 239 |
+| Lección | learn, `teach`, `exercises` | 383 | 359 |
+| Estado | `nzt-plan`, `state.md` | 200 | 197 |
+| Spec de una feature | discovery, `write-spec`, `questions` | 268 | **294** |
+| Pantalla | UX, `screen`, `questions` | 264 | **291** |
+| Diseño de producto | arquitectura, `design-product`, `decisions-log`, `questions` | 376 | **442** |
+
+- Los nueve routers de fase bajan de 1.363 a 1.066 líneas; todo `skills/nzt`, de 14.926 a
+  14.602, en 154 archivos en vez de 151.
+- **Tres unidades crecieron.** Las que preguntan leen ahora `questions.md` (55 líneas), y el
+  diseño de producto lee además `decisions-log.md` (74). Es el costo de QT-03: un dueño único
+  de cómo se pregunta, que antes estaba escrito con variantes en cada fase. El plan prometía
+  que el refactor sería más liviano por unidad, y en estas tres no lo es.
+- Las líneas no son tokens: no se midieron tokens.

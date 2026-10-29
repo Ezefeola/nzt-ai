@@ -20,8 +20,9 @@ whatever came to mind, and it is measured against nothing.
 
 ## Probe before you write anything
 
-Do not ask what the person knows. Find out, in the conversation, with one or two small
-probes:
+Do not ask what the person knows. *"How much do you know about this?"* returns a feeling, and
+the gap between that feeling and reality **is the problem, not the input**. Find out, in the
+conversation, with one or two small probes:
 
 - **A question whose answer shows the edge** — the last thing they hold, the first they do
   not.
@@ -115,7 +116,7 @@ last session: 2026-09-25
 ## Objectives
 | Id | State | Evidence | Next review |
 |---|---|---|---|
-| OA-01 | achieved | assessments/2026-09-25.md, new case, material away | 2026-10-16 |
+| OA-01 | achieved | assessments/2026-09-25.md, new case, material away | 2026-09-26 |
 | OA-02 | solved by the system | exercises/EX-03 — solution requested | 2026-09-26 |
 | OA-03 | not started | — | — |
 
@@ -128,7 +129,8 @@ last session: 2026-09-25
 ## Log
 - 2026-09-18 · OA-01 · EX-01 corrected. Named the join, missed the duplicated rows. Said
   high confidence first. Back to the shortest review interval.
-- 2026-09-25 · OA-01 · new case, unaided, explained it with the material away. Achieved.
+- 2026-09-25 · OA-01 · assessment: new case, unaided, explained it with the material away.
+  Achieved.
 ```
 
 - **The three sections do different jobs**: the table is where the topic stands now, the

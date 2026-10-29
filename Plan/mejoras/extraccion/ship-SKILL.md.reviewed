@@ -1,0 +1,14 @@
+# Unit 397: ship router, Authorisation and Rules to their references (V1, QT-01), Closing checklist removed (QT-02)
+readiness declared point by point, with every gap reported as a risk => release.md Readiness, before proposing; Done when: "Every readiness point is declared"
+rollback plan written before going out, with its thresholds => release.md Readiness: "Rollback plan written"; The operating memory: Thresholds
+verified in the environment, for the whole observation window => release.md Verify in the environment; Done when: "Verification ran in the environment, for the whole window"
+docs/operations/deployment.md current; docs/operations/releases.md has this entry => release.md Done when, last point
+no secret in a diff, a log, a screenshot or a document — only key names => router Rules: "Secrets appear by key name, never by value — in a diff, a log, a screenshot or a document"
+what was deployed, where, and what changed for users, said plainly => router Rules: "Say plainly what left and where"
+local and disposable environments need no authorisation beyond the plan => release.md Authorisation names the environment: "Local and disposable environments need no extra authorisation"
+who authorises each environment => release.md The operating memory: Environments table, "Who authorises" column
+readiness is declared before proposing a release => release.md Readiness, before proposing
+a missing point is reported as a risk the user decides on, never skipped in silence => release.md: "A missing point is reported as a risk for the user to decide — never skipped quietly"
+limit the exposure => release.md Exposure, least first
+a secret that reached a commit is reported as exposed even if a later commit removes it => vcs.md Before committing: "reported as exposed even if a later commit deletes it"
+published history is not rewritten => vcs.md Never rewrite shared history

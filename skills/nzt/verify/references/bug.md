@@ -43,7 +43,7 @@ Evidence: `evidence/2026-09-16/E-02-total.png`
 
 - **Reproduction steps that actually reproduce it**, with the data used. A defect nobody can
   reproduce is a report, and it is filed as unreproduced with what you were doing.
-- **What it violates**, by criterion and rule. That is what makes it a defect and not an
+- **What it violates**, by criterion (`US-NNN CA-NN`) and rule. That is what makes it a defect and not an
   opinion.
 - Evidence, reviewed for secrets before it is saved.
 - Keep the suspected cause separate from the confirmed fact, and label it. Diagnosing is

@@ -27,8 +27,10 @@ it. *"I have no expired coupon to test with"* is not a result — it is a coupon
 
 ## Ask the mechanism once, not scenario by scenario
 
-How data gets created is the user's decision, and it is asked **in the plan**, with the
-engine and the environment named — never mid-run, and never again once it is answered.
+How data gets created is the user's decision, and it is **the *Test data* opt-in of the
+component's stack**, asked when the stack is written. **When the stack records it, read it
+and do not ask.** Only when it is missing is it a gap, asked **in the plan**, with the engine
+and the environment named — never mid-run, and never again once it is answered.
 
 | Mechanism | Cheapest when | Cannot reach | What it costs |
 |---|---|---|---|
