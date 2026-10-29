@@ -1,6 +1,7 @@
 import type { Elements } from 'claude-code'
 
 import type { Palette, Part } from '../types'
+import { contrastOf, MIN_CONTRAST, mix } from './contrast'
 import type { Texts } from './i18n'
 import { plainOf } from './markdown'
 import type { CalloutKind, Segment } from './markdown'
@@ -86,21 +87,40 @@ export const wrapCell = (text: string, size: number): string[] => {
 const WIDEST_SHARE = 40
 
 /**
- * Each column's share of the row, in percent, from the longest text it holds: a short column
- * keeps its words on one line, a long one takes what is left and wraps.
+ * Each column's share of the row, in whole percent, from the longest text it holds: a short
+ * column keeps its words on one line, a long one takes what is left and wraps. Whole, because
+ * the desktop refuses a width like `31.6%` and the whole table falls back to Claude Code's.
  */
 export const sharesOf = (sizes: readonly number[]): number[] => {
   const asked = sizes.map(size => Math.min(Math.max(size, MIN_COLUMN), WIDEST_SHARE))
   const total = asked.reduce((sum, size) => sum + size, 0)
-  return asked.map(size => Math.round((size / total) * 1000) / 10)
+  return asked.map(size => Math.round((size / total) * 100))
 }
 
 const JUSTIFY = { left: 'flex-start', right: 'flex-end', center: 'center' } as const
 
+/** How far the desktop header band moves from the surface towards the accent, at most. */
+export const BAND_TINT = 0.18
+
+/**
+ * The desktop header band: the theme's surface tinted with its accent, so no theme needs a new
+ * key. A theme whose accent sits close to its text gets less tint, down to what keeps the
+ * header's text readable; at none it is the surface, which every theme already reads on.
+ */
+export const bandOf = (palette: Palette): string => {
+  for (let tint = BAND_TINT; tint > 0; tint -= 0.02) {
+    const band = mix(palette.surface, palette.user, tint)
+    if (contrastOf(palette.fg, band) >= MIN_CONTRAST) return band
+  }
+  return palette.surface
+}
+
 /**
  * The table on the desktop: a grid of boxes, each cell in its column's share of the row and its
  * text wrapping inside it. A proportional font does not line up padded text, and a row that
- * wraps as one line breaks its columns apart.
+ * wraps as one line breaks its columns apart. The header sits on its own band with the copy
+ * button at its end; `zebra` alone is too close to `surface` to tell the rows apart, so each row
+ * also gets room above and below.
  */
 const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment & { kind: 'table' }, index: number, ctx: ReplyContext) => {
   const { palette, t } = ctx
@@ -109,6 +129,8 @@ const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment
   const shares = sharesOf(header.map((cell, i) => Math.max(width(cell), ...rows.map(row => width(row[i]!)))))
   const isFolded = ctx.canFold && rows.length > TABLE_FOLD && !ctx.isUnfolded(index)
   const shown = isFolded ? rows.slice(0, TABLE_FOLD) : rows
+  const canFoldThis = ctx.canFold && rows.length > TABLE_FOLD
+  const copy = ctx.parts.copy && <Button key={`${ctx.keyOf(index)}:copy`} plain label={t.copy} onPress={() => ctx.onCopy(segment.source)} />
   const row = (cells: string[], background: string, isHeader: boolean) => (
     <Box flexDirection="row" backgroundColor={background}>
       {cells.map((cell, i) => (
@@ -116,27 +138,31 @@ const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment
           width={`${shares[i]}%`}
           flexShrink={1}
           minWidth={0}
-          paddingX={1}
-          justifyContent={JUSTIFY[segment.align[i] ?? 'left']}
+          paddingX="md"
+          paddingY="sm"
+          flexDirection="row"
+          columnGap="sm"
+          alignItems="center"
+          justifyContent={isHeader && copy && i === cells.length - 1 ? 'space-between' : JUSTIFY[segment.align[i] ?? 'left']}
         >
-          <Text color={isHeader ? palette.user : palette.fg} bold={isHeader} wrap="wrap">
+          <Text color={palette.fg} bold={isHeader} wrap="wrap">
             {cell}
           </Text>
+          {isHeader && i === cells.length - 1 && copy}
         </Box>
       ))}
     </Box>
   )
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor={palette.muted} overflow="hidden">
-      {row(header, palette.surface, true)}
+    <Box flexDirection="column" borderStyle="round" borderColor={palette.zebra} overflow="hidden">
+      {row(header, bandOf(palette), true)}
       {shown.map((cells, i) => row(cells, i % 2 === 1 ? palette.zebra : palette.surface, false))}
-      <Box flexDirection="row" columnGap={2} paddingX={1}>
-        {isFolded && <Button key={`${ctx.keyOf(index)}:more`} plain label={t.more(rows.length - TABLE_FOLD)} onPress={() => ctx.onToggle(index)} />}
-        {!isFolded && ctx.canFold && rows.length > TABLE_FOLD && (
-          <Button key={`${ctx.keyOf(index)}:less`} plain label={t.less} onPress={() => ctx.onToggle(index)} />
-        )}
-        {ctx.parts.copy && <Button key={`${ctx.keyOf(index)}:copy`} plain label={t.copy} onPress={() => ctx.onCopy(segment.source)} />}
-      </Box>
+      {canFoldThis && (
+        <Box flexDirection="row" columnGap={2} paddingX="md">
+          {isFolded && <Button key={`${ctx.keyOf(index)}:more`} plain label={t.more(rows.length - TABLE_FOLD)} onPress={() => ctx.onToggle(index)} />}
+          {!isFolded && <Button key={`${ctx.keyOf(index)}:less`} plain label={t.less} onPress={() => ctx.onToggle(index)} />}
+        </Box>
+      )}
     </Box>
   )
 }

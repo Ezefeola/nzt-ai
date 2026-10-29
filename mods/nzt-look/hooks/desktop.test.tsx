@@ -26,6 +26,6 @@ test('in the app the variant chosen in the panel wins over a light system, as in
   const desk = await mountReply($, 'desktop', 'v1')
   const term = await mountReply($, 'terminal', 'v2')
 
-  expect(await desk.find({ type: 'Text', text: 'Ruta' })).toMatchObject({ props: { color: paletteOf('nzt', [], 'dark').user } })
+  expect(await desk.find({ type: 'Text', text: 'Ruta' })).toMatchObject({ props: { color: paletteOf('nzt', [], 'dark').fg } })
   expect(await term.find({ type: 'Text', text: / Ruta / })).toMatchObject({ props: { color: paletteOf('nzt', [], 'dark').user } })
 })

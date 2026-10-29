@@ -1,7 +1,8 @@
 import { expect, test } from 'claude-code/testing'
 
 import { segmentsOf } from './markdown'
-import { fitColumns, sharesOf, wrapCell } from './reply'
+import { paletteOf } from './prefs'
+import { bandOf, fitColumns, sharesOf, wrapCell } from './reply'
 import { start, world } from './world.test-kit'
 import type { Engine } from './world.test-kit'
 
@@ -90,9 +91,24 @@ test('on the desktop a table is a grid of boxes: one per cell, its text alone, w
   expect(await ui.find({ type: 'Text', text: 'claude-code' })).toBeUndefined()
 })
 
+test('on the desktop the header sits on a band of the accent over the surface, with the copy button at its end', async ($, on) => {
+  const seen = world(on, { prefs: { variant: 'dark' } })
+  await start($)
+  const palette = paletteOf('nzt', [], 'dark')
+  const source = '| Antes | Ahora |\n|---|---|\n| sin id | CA-NN estable |'
+
+  const ui = await mountReply($, 'desktop', source, 'g3')
+
+  expect((await ui.findAll({ type: 'Box' })).some(box => box.props.backgroundColor === bandOf(palette))).toBe(true)
+  expect(await ui.find({ type: 'Text', text: 'Antes' })).toMatchObject({ props: { bold: true, color: palette.fg } })
+  await ui.press({ key: 'block:g3:0:copy' })
+  expect(seen.copies).toEqual([source])
+})
+
 test('each column takes a share of the row by its longest text, a short one at least 6, a long one at most 40', async () => {
   expect(sharesOf([3, 70])).toEqual([13, 87])
   expect(sharesOf([10, 10])).toEqual([50, 50])
+  expect(sharesOf([6, 13])).toEqual([32, 68])
 })
 
 test('a table past 14 rows folds, and ▾ shows the rest', async ($, on) => {
