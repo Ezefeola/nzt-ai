@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-10-28T19:00:00Z",
+  "updated": "2026-10-28T19:30:00Z",
   "goal": "Revisar skills y references para que sean genéricas, sin redundancia, mantenibles, modulares y livianas en contexto, sin perder funcionamiento; con el marco (clasificar, planificar, estado, fases) en pasos y reglas bien definidos",
   "cadence": "upfront",
   "slices": [
@@ -66,8 +66,8 @@
   "autonomy": { "units": [], "keep_stops": [] },
   "waiting_on": null,
   "notes": [
-    "Decisiones de S2: Plan/mejoras/08-revision.md §386, log QT-01..QT-11 (todas a; QT-11 deja el kernel sin cambio); detalles en modo propuestas",
-    "Sin grupos en paralelo: nzt-worker no está instalado en ~/.claude/agents",
-    "Observado: la nzt-plan instalada no tiene references/parallel.md; se resuelve al instalar tras S2"
+    "Run terminado 2026-10-28: S1 y S2 done; cierre en Plan/mejoras/08-revision.md §400 (3 unidades típicas suben por questions.md y decisions-log.md; stack.md en 198)",
+    "Pendiente del usuario: push de nzt-worker e instalar con nzt-ai install; lo instalado en ~/.claude/skills es la versión anterior a S2",
+    "Siguiente sugerido: probar lo instalado en una tarea real chica; sin evals, el comportamiento del modelo no está medido"
   ]
 }
