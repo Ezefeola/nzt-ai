@@ -144,7 +144,7 @@ $manifest = @'
 {
   "name": "nzt",
   "description": "NZT: the skill set under evaluation. Built output — edit skills/ in the repo, not here.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "license": "MIT",
   "author": { "name": "NZT" }
 }
