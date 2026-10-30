@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Answering, Expanded, Snapshot, Unit } from '../types'
+import type { Expanded, Snapshot, Unit } from '../types'
 import { nextModeOf, parseState, withDelegation } from './parse'
 import { langOf, TEXTS } from './i18n'
 import type { Texts } from './i18n'
@@ -39,6 +39,8 @@ const LABEL = 9
 const GROUP_INDENT = 4
 // Usable columns from which Plan and Mode sit to the left of the character instead of below it.
 const SIDE_BY_SIDE_MIN = 40
+// The same off the terminal, where the character's pixels take more than its cells.
+const SIDE_BY_SIDE_MIN_FLOW = 72
 const SIDE_BY_SIDE_GAP = 2
 
 const snapshot = atom({ plugin: 'nzt-state', key: 'snapshot' } as const, {
@@ -51,17 +53,8 @@ const expanded = atom({ plugin: 'nzt-state', key: 'expanded' } as const, {
   notes: false,
   slices: false,
 } as Expanded)
-const answering = atom({ plugin: 'nzt-state', key: 'answering' } as const, { kind: 'idle' } as Answering)
 const glow = atom({ plugin: 'nzt-state', key: 'glow' } as const, 0)
 const delegating = atom({ plugin: 'nzt-state', key: 'delegating' } as const, null as string | null)
-// What nzt-questions publishes: how many of its questions are not sent. Undefined while it is
-// not installed or has never counted, which the pane takes as none.
-const QUESTIONS_PENDING = { plugin: 'nzt-questions', key: 'pending' } as const
-const QUESTIONS = 'nzt-questions'
-// The color of Preguntas in nzt-hub and nzt-questions.
-const QUESTIONS_COLOR = '#f48fb1'
-// A press on Contestar that has not opened nzt-questions by then is waiting for Claude's turn to end.
-const WAIT_MS = 400
 
 // The mtime last read; a reload starts over and reads the file again.
 let lastMtime = -1
@@ -104,15 +97,6 @@ const refresh = async ($: EngineInterface, force = false) => {
   await update($, snapshot, () => next)
 }
 
-/** How many questions nzt-questions has pending; a value that is not a count, or a reading refused, is none. */
-const questionsOf = async ($: EngineInterface) => {
-  const counted = await $.state
-    .get(QUESTIONS_PENDING)
-    .then(got => got.value)
-    .catch(() => undefined)
-  return typeof counted === 'number' ? counted : 0
-}
-
 const since = (iso: string, now: number, t: Texts) => {
   const at = Date.parse(iso)
   if (Number.isNaN(at)) return undefined
@@ -122,25 +106,6 @@ const since = (iso: string, now: number, t: Texts) => {
   const hours = Math.round(minutes / 60)
   if (hours < 24) return t.hoursAgo(hours)
   return t.daysAgo(Math.round(hours / 24))
-}
-
-/** Runs nzt-questions' command as if typed; while Claude's turn runs, the notice says it waits. */
-const openQuestions = async ($: EngineInterface) => {
-  let isDone = false
-  const ran = $.command.run({ command: QUESTIONS }).finally(() => {
-    isDone = true
-  })
-  void $.clock
-    .sleep(WAIT_MS)
-    .then(() => (isDone ? undefined : update($, answering, (): Answering => ({ kind: 'waiting' }))))
-    .catch(() => undefined)
-  try {
-    await ran
-    await update($, answering, (): Answering => ({ kind: 'idle' }))
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    await update($, answering, (): Answering => ({ kind: 'failed', message }))
-  }
 }
 
 /**
@@ -226,9 +191,7 @@ export const register: Register = (on, options) => {
       const state = await read($, snapshot)
       const isLit =
         state.kind === 'ok' &&
-        (state.waitingOn !== null ||
-          state.units.some(unit => unit.status === 'doing') ||
-          (await questionsOf($)) > 0)
+        (state.waitingOn !== null || state.units.some(unit => unit.status === 'doing'))
       // Only while something glows: a run with nothing in progress and nobody waited on is
       // never drawn again for this.
       if (isLit) await update($, glow, step => (step + 1) % GLOW_STEPS)
@@ -287,10 +250,8 @@ export const register: Register = (on, options) => {
     const Client = !isGrid && 'Client' in elements ? elements.Client : undefined
     const state = await read($, snapshot)
     const open = await read($, expanded)
-    const pressed = await read($, answering)
     const step = isGrid ? await read($, glow) : GLOW_STEPS / 2
     const failedDelegation = await read($, delegating)
-    const asked = await questionsOf($)
     const width = Math.max(24, e.props.bodyColumns - 1)
 
     if (state.kind === 'missing') {
@@ -391,15 +352,17 @@ export const register: Register = (on, options) => {
         )
       return (
         <Box flexDirection="column" marginLeft={indent}>
-          <Box flexDirection="row">
-            <Box width={2}>
+          {/* Mark and id keep their columns and sit on the first line: on the desktop a row
+              shrinks its fixed boxes and centres them against the text's lines. */}
+          <Box flexDirection="row" alignItems="flex-start">
+            <Box width={2} flexShrink={0}>
               {glows ? (
                 glowing('mark', { text: mark.glyph, isBold: true, wrap: 'truncate-end' })
               ) : (
                 <Text color={mark.color} bold={unit.status === 'doing'}>{mark.glyph}</Text>
               )}
             </Box>
-            <Box width={idWidth}>
+            <Box width={idWidth} flexShrink={0}>
               <Text dimColor>{unit.id}</Text>
             </Box>
             <Box {...fill(textWidth)}>
@@ -512,8 +475,8 @@ export const register: Register = (on, options) => {
     // Plan, mode and goal: the column beside the character, or under it when they are stacked.
     const summary = (columns: number) => (
       <Box flexDirection="column" {...fill(columns)}>
-        <Box flexDirection="row">
-          <Box width={LABEL}>
+        <Box flexDirection="row" alignItems="flex-start">
+          <Box width={LABEL} flexShrink={0}>
             <Text dimColor>{t.plan}</Text>
           </Box>
           {state.approved ? (
@@ -522,8 +485,8 @@ export const register: Register = (on, options) => {
             <Text color="warning">{t.notApproved}</Text>
           )}
         </Box>
-        <Box flexDirection="row">
-          <Box width={LABEL}>
+        <Box flexDirection="row" alignItems="flex-start">
+          <Box width={LABEL} flexShrink={0}>
             <Text dimColor>{t.mode}</Text>
           </Box>
           <Box {...fill(columns - LABEL)}>
@@ -550,8 +513,8 @@ export const register: Register = (on, options) => {
           </Box>
         </Box>
         {/* The one thing the pane writes: a press steps the mode, auto → ask → off. */}
-        <Box flexDirection="row">
-          <Box width={LABEL}>
+        <Box flexDirection="row" alignItems="flex-start">
+          <Box width={LABEL} flexShrink={0}>
             <Text dimColor>{t.delegate}</Text>
           </Box>
           <Box {...fill(columns - LABEL)}>
@@ -584,10 +547,12 @@ export const register: Register = (on, options) => {
     )
 
     // Narrower than this, the column beside the character is too thin to read: stack them.
-    const isSideBySide = characterPhase !== undefined && inner >= SIDE_BY_SIDE_MIN
+    // Off the terminal the character is drawn in pixels wider than its cells, so it needs more.
+    const isSideBySide =
+      characterPhase !== undefined && inner >= (isGrid ? SIDE_BY_SIDE_MIN : SIDE_BY_SIDE_MIN_FLOW)
 
     // Tu turno: what the run waits on from the person, folded to one row whose title glows.
-    const isYourTurn = state.waitingOn !== null || asked > 0
+    const isYourTurn = state.waitingOn !== null
     const yourTurn = isYourTurn && (
       <Box key="your-turn" marginTop={1} flexDirection="column">
         {/* A Button holds text only: the title and the folded text are each one, pressing alike. */}
@@ -617,36 +582,14 @@ export const register: Register = (on, options) => {
           {!open.turn && (
             <Box flexGrow={1} flexShrink={1} overflow="hidden">
               <Button key="toggle-turn-text" plain onPress={toggle('turn')}>
-                <Text wrap="truncate-end">{state.waitingOn ?? t.questionsShort(asked)}</Text>
+                <Text wrap="truncate-end">{state.waitingOn}</Text>
               </Button>
-            </Box>
-          )}
-          {!open.turn && state.waitingOn !== null && asked > 0 && (
-            <Box flexShrink={0}>
-              <Text color={QUESTIONS_COLOR} bold>? {asked}</Text>
             </Box>
           )}
         </Box>
         {open.turn && (
           <Box flexDirection="column" marginLeft={2}>
-            {state.waitingOn !== null && <Text wrap="wrap">{state.waitingOn}</Text>}
-            {asked > 0 && (
-              <Box flexDirection="row" justifyContent="space-between" gap={1}>
-                <Box flexShrink={1} overflow="hidden">
-                  <Text color={QUESTIONS_COLOR} bold wrap="truncate-end">{t.questions(asked)}</Text>
-                </Box>
-                {pressed.kind === 'waiting' ? (
-                  <Text color="warning" wrap="truncate-end">{t.answerWaiting}</Text>
-                ) : (
-                  <Button key="answer-questions" plain onPress={() => openQuestions($)}>
-                    <Text backgroundColor={QUESTIONS_COLOR} color="inverseText" bold>{` ${t.answer} `}</Text>
-                  </Button>
-                )}
-              </Box>
-            )}
-            {pressed.kind === 'failed' && (
-              <Text color="error" wrap="wrap">{t.answerFailed(pressed.message)}</Text>
-            )}
+            <Text wrap="wrap">{state.waitingOn}</Text>
           </Box>
         )}
       </Box>
@@ -763,8 +706,8 @@ export const register: Register = (on, options) => {
             long plan would push the phases off the pane. One slice needs no list. */}
         {state.slices !== null && state.slices.length > 0 && (
           <Box key="slices" marginTop={1} flexDirection="column">
-            <Box flexDirection="row">
-              <Box width={LABEL}>
+            <Box flexDirection="row" alignItems="flex-start">
+              <Box width={LABEL} flexShrink={0}>
                 <Text dimColor>{t.slice}</Text>
               </Box>
               <Box {...fill(inner - LABEL)}>
