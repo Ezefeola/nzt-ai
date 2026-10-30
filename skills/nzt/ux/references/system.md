@@ -55,19 +55,10 @@ as a decision.
 
 1. **Ask one short round** about what already exists: brand, products to resemble or to
    differ from and why, who uses it and how often, density and tone, constraints.
-2. **Anchor it in the subject.** A logistics console and a bakery's order page cannot come
-   out looking the same.
-3. **Second pass against the generic default.** These are the tells of a generated design:
-   everything in rounded cards with the same soft shadow · decorative gradients · a small
-   uppercase label above every heading · an arrow glued to every button · the big number
-   with a small caption repeated as each section's hero · motion on every hover.
-4. **Structure encodes information.** A border, a number or a label is there because the
-   content needs it. **Spend boldness in one place**, and remove one decoration before
-   presenting.
-5. **Calculate contrast before presenting.** A palette that fails contrast is not a
+2. **Plan it and run the pass of `nzt-ux-generic`**: the subject, the visual plan, its
+   review against the request, the tells, and alternatives that vary one dimension.
+3. **Calculate contrast before presenting.** A palette that fails contrast is not a
    proposal yet.
-6. Alternatives vary **one meaningful dimension** — density, typographic voice, colour
-   temperature — not three versions of the same thing.
 
 ## Brand and voice
 
@@ -84,6 +75,8 @@ screen, mockup and prototype reads it from one place instead of inventing it aga
 - **Voice of the texts**: how the product talks to the person — formal or not, how it says an
   error, how it invites an empty state to fill — with one example per case. A text a story
   fixes is copied from the story; the voice is what lets the rest be written without asking.
+- **Rejected directions**: one line each — what it was and why the user turned it down — so
+  no later pass offers it again.
 - A change to any of these is a change to the system (*Changing it*), and the screens,
   mockups and kept prototypes that show it are brought in step in the same unit.
 
@@ -128,5 +121,5 @@ without asking you which component to reuse?
   role, and the voice with its examples.
 - Accessibility says how it is met, and the verifiable requirement is in the product's NFRs.
 - Every component in the inventory has at least two users, or the decision it carries.
-- A visual direction, if it was needed, has its references, its contrast checked, and one
-  decoration already removed.
+- A visual direction, if it was needed, has its references, its contrast checked, and the
+  pass of `nzt-ux-generic` with its result in the report.

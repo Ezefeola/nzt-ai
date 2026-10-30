@@ -206,6 +206,7 @@ skills/nzt/                      nzt
 │  ├─ mockup/                    nzt-ux-mockup       → HTML, a pedido (T12)
 │  ├─ manual/                    nzt-ux-manual       → manual del usuario final (D37)
 │  ├─ system/                    nzt-ux-system       → Docs/UX/ + visual (T13)
+│  ├─ generic/                   nzt-ux-generic      → contra el aspecto por defecto (D86)
 │  └─ review/                    nzt-ux-review
 ├─ build/                        nzt-build                 (leer el stack primero, D85)
 │  ├─ recon/                     nzt-build-recon           → relevamiento de impacto (D30)
@@ -2966,6 +2967,49 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Hecho (400, 2026-10-28).** Los 52 hallazgos, cruzados con lo hecho en
     `08-revision.md` §400. La entrada de esta spec para 396-398 se escribió en la 400: esas
     unidades no la habían agregado.
+- **D86.** **Lo visual que produce NZT se revisa contra el aspecto por defecto de un modelo,
+  con una sola guía que leen UX y build.** Lo que la forzó: el pedido del usuario
+  (2026-10-29) de corregir el *AI slop* en las aplicaciones visuales. La investigación y el
+  log de preguntas (QT-01 a QT-03, serie propia de ese documento) están en
+  `Plan/mejoras/09-ai-slop.md`. Lo que sostiene la decisión:
+  - documented: sin dirección, un modelo converge en las elecciones más comunes de su
+    entrenamiento, y prohibir unas lleva a converger en las siguientes (Anthropic,
+    *Improving frontend design through Skills*, 2025-11-12). inferred: una lista de
+    prohibiciones usada para generar produce el próximo cliché; lo que lo evita es anclar
+    cada decisión en el sujeto, y la lista sirve para revisar.
+  - Lo que ya había: `system.md` hacía esa pasada con 6 señales, sólo al fijar la dirección
+    visual de un producto que no tenía. Mockup, prototipo, manual, la revisión y el front que
+    escribe build no la hacían (huecos H1 a H7 de `09-ai-slop.md`).
+  - **Alcance (QT-01, opción B):** una referencia nueva, `ux/references/generic.md`, con el
+    método (sujeto, plan visual antes de construir, revisión del plan contra el pedido,
+    audacia en un lugar, nota de lo ya probado) y el catálogo de señales. `system.md` la cita
+    en lugar de su lista; mockup, prototipo, manual y review la leen y la tienen en su *Done
+    when*. **Queda afuera un detector determinista** en `nzt-ai` (H7): el usuario no lo eligió.
+  - **Trabajo directo (QT-02):** `nzt-build` la lee siempre que escribe una pantalla de
+    front, haya pasado o no por la fase UX. Es el caso más común y antes no leía nada de esto.
+  - **Catálogo (QT-03):** nombra tipografías, paletas y patrones concretos (Inter, el
+    indigo, crema con terracota, el `→` en cada botón), **sólo como lista de revisión**,
+    nunca como prohibición al generar. Las fuentes viven en `09-ai-slop.md` y en esta
+    entrada, no en la referencia: no cambian lo que el agente hace y envejecen (corregido
+    el 2026-10-29 a pedido del usuario; ninguna otra referencia del set cita fuentes).
+  - Respondidas por el usuario el 2026-10-29: QT-01 y QT-03 con la opción recomendada; QT-02
+    con *sí, se lee siempre que se hace front, además de en UX*.
+  - **Dónde se aplica:** unidades 402-405 (la referencia, `system.md`, el router de UX y sus
+    tres referencias, `nzt-build`); 406 corre las puertas del repo y cruza cada hueco. **Cambia
+    el comportamiento** de las fases UX y build: suman una lectura y un ítem de cierre.
+  - **Hecho (402-405, 2026-10-29).** `generic.md` (98 líneas, sin sección de fuentes): plan visual de seis pasos (el
+    design system es el plan si existe), revisión del plan contra el pedido, *Tried, not
+    repeated*, la tabla de señales en 8 áreas como pregunta y la pasada en cuatro pasos.
+    `system.md` 132→125: *Visual direction* en tres pasos y *Rejected directions* en *Brand
+    and voice*. El router de UX la suma al *Read with* de system, mockup, prototipo, manual y
+    review; los tres primeros archivos la corren sobre lo renderizado y la tienen en su *Done
+    when*. Un tell del tema ya adoptado es propuesta al design system, nunca una segunda
+    paleta; en review es `construction` o `missing convention`. El router de build (144→146)
+    la lee al escribir lo que una persona ve, para todo camino, y `frontend-components.md`
+    suma el ítem a su checklist.
+  - **Hecho (406, 2026-10-29).** Puertas limpias (lint, build, 171 checks del instalador, tope
+    de 200, citas), H1-H6 cruzados en `09-ai-slop.md` §406. **No medido:** que la guía mejore
+    lo generado; no hay eval visual.
 
 ## 13. Revisión contra Temper v3
 

@@ -33,11 +33,11 @@ row is not the guidance, the file is.
 | The unit is | Read | Read with |
 |---|---|---|
 | One screen: layout, content, states, navigation | `references/screen.md` | `../nzt-plan/references/questions.md` |
-| An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | `references/review.md` — its measurements |
-| A usable prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | `references/review.md` — its measurements |
-| The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | `references/review.md` — its measurements |
-| The design system, shared components, the visual direction, or the brand and its voice | `references/system.md` | — |
-| Judging a design, a mockup or a built screen against its task | `references/review.md` | — |
+| An HTML mockup of a designed screen — only if the user asked for it | `references/mockup.md` | `references/review.md` — its measurements; `references/generic.md` |
+| A usable prototype to learn what delivery 1 has to teach — offered by the plan | `references/mockup.md` | `references/review.md` — its measurements; `references/generic.md` |
+| The end user's manual: an interactive HTML guide of the product — on request | `references/manual.md` | `references/review.md` — its measurements; `references/generic.md` |
+| The design system, shared components, the visual direction, or the brand and its voice | `references/system.md` | `references/generic.md` — when the unit sets or changes the direction |
+| Judging a design, a mockup or a built screen against its task | `references/review.md` | `references/generic.md` — its tells |
 
 Wherever a file names `nzt-ux-<name>`, it means `references/<name>.md` in this folder
 (`nzt-ux-system` → `references/system.md`): read that file — it is not a skill.

@@ -68,6 +68,10 @@ Before presenting it, run the width, contrast and keyboard measurements of
 `nzt-ux-review` (*Measuring an HTML file*) and write the results down. A mockup that could
 not be rendered is reported as not verified.
 
+Then run the pass of `nzt-ux-generic` on the rendered file. It judges the composition, not
+the theme: a tell in the palette or the typography the project adopted is a proposal to
+`Docs/UX/design-system.md`, never a local fix that becomes a second palette.
+
 ## A prototype is a mockup that teaches
 
 When the plan offers one — when and where is `nzt-plan`'s, in its slices — it is the same
@@ -118,6 +122,7 @@ nothing from it but the intent?
 - No network request, no second palette, and no business logic outside a prototype.
 - Every pending piece of content is visibly marked as pending, with its question.
 - The width, contrast and keyboard checks were **run**, and their results are in the report.
+- The pass of `nzt-ux-generic` ran on the rendered file, with its result in the report.
 - The design document and the mockup say the same thing.
 - A prototype names its `Q-NN` and the rules it implements; once the answer is in
   `analysis.md`, it is deleted or kept and maintained, as the user decided.
