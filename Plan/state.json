@@ -1,41 +1,47 @@
 {
   "version": 1,
-  "updated": "2026-10-29T20:15:00Z",
-  "goal": "Erradicar el AI slop en lo visual que produce NZT: una guía anti-genérico en nzt-ux, leída en UX y siempre que build escribe front (Plan/mejoras/09-ai-slop.md, QT-01..03)",
+  "updated": "2026-10-29T23:55:00Z",
+  "goal": "nzt-retro: una skill opcional que revisa una sesión y deja propuestas de mejora del entorno en un md para el equipo, sin modificar nada",
   "phases": [
+    {
+      "name": "architecture",
+      "status": "done",
+      "units": [
+        {
+          "id": 407,
+          "do": "Decisiones de nzt-retro: qué lee, qué destinos propone, dónde y cómo queda el md, cuándo se ofrece (QT) en Plan/mejoras/10-retro.md",
+          "status": "done",
+          "detail": "10-retro.md: QT-01..07 (md fuera del repo en la ruta que se elige cada vez; nunca se ofrece; actual o últimas N; proyecto y NZT separados; detalles del agente). Propone quitar 410: sin oferta ni fila en el kernel"
+        }
+      ]
+    },
     {
       "name": "build",
       "status": "done",
       "units": [
         {
-          "id": 401,
-          "do": "Spec: decisión D86 (QT-01 B, QT-02, QT-03) en specs/nzt-core.md",
+          "id": 408,
+          "do": "Spec: decisión D87 en specs/nzt-core.md",
           "status": "done",
-          "detail": "D86 en specs/nzt-core.md tras D85 (QT-01 B, QT-02 build siempre que escribe front, QT-03 concretas como revisión; H7 afuera); hoja nzt-ux-generic en el árbol de §4.3"
+          "detail": "D87 tras D86 (skill propia con objeción, nunca se ofrece, no modifica nada, md fuera del repo, actual o últimas N con la fuente, proyecto y NZT); nzt-retro en el árbol de §4.3"
         },
         {
-          "id": 402,
-          "do": "Nueva ux/references/generic.md: método anclado en el sujeto y catálogo de tells como revisión",
+          "id": 409,
+          "do": "La skill skills/nzt/retro/SKILL.md (y su reference si no entra en una)",
           "status": "done",
-          "detail": "generic.md, 107 líneas: plan visual de 6 pasos (el design system es el plan si existe), revisión del plan, probado no se repite, tabla de tells en 8 áreas como pregunta, la pasada en 4 pasos, fuentes; todavía nadie la lee (403-405); lint limpio"
+          "detail": "skills/nzt/retro/SKILL.md, 141 líneas, sin reference: sesiones, ruta preguntada, momentos, mecánico/criterio, destinos proyecto/NZT, plantilla del md"
         },
         {
-          "id": 403,
-          "do": "system.md: Visual direction cita generic.md en vez de su lista de 6 tells",
-          "status": "done",
-          "detail": "system.md 132→125: Visual direction en 3 pasos, el 2 cita nzt-ux-generic (sujeto, anclaje, tells, audacia, una dimensión salen de acá); Brand and voice suma Rejected directions; Done when pide la pasada; fila de system del router lee generic.md cuando fija o cambia la dirección; lint limpio"
+          "id": 410,
+          "do": "Ruteo y oferta: fila en core/kernel.md y la oferta opcional al cerrar una run y al recomendar limpiar",
+          "status": "dropped",
+          "detail": "Quitada por el usuario 2026-10-29: QT-02 = nunca se ofrece y la tabla del kernel es de fases; la descripción de la skill es su único disparo (409)"
         },
         {
-          "id": 404,
-          "do": "Router nzt-ux, mockup, review y manual: generic.md en Read with y en Done when (H1, H3)",
+          "id": 411,
+          "do": "Presupuesto del listado, build, README y un caso de disparo en evals/",
           "status": "done",
-          "detail": "Router: generic.md en Read with de mockup, prototipo, manual (con las mediciones) y review (sus tells). mockup y manual corren la pasada sobre el archivo renderizado (un tell del tema adoptado es propuesta al design system, no segunda paleta); review gana Then the generic default (tell de la pantalla = construction, del sistema = missing convention); los tres en Done when; lint limpio"
-        },
-        {
-          "id": 405,
-          "do": "nzt-build: leer generic.md al escribir una pantalla de front, con o sin fase UX (QT-02)",
-          "status": "done",
-          "detail": "Router de build 144→146: escribir lo que una persona ve lee ../nzt-ux/references/generic.md, con o sin fase UX (plan antes, pasada después), junto a code-code y para todo camino, también Blazor; frontend-components suma el ítem de la pasada a su checklist; lint y build limpios, la ruta resuelve en dist"
+          "detail": "build: 16 skills, ~2898 chars (antes ~2684), sin avisos; README y evals/README al día; caso evals/routing/retro sin correr"
         }
       ]
     },
@@ -44,10 +50,10 @@
       "status": "done",
       "units": [
         {
-          "id": 406,
-          "do": "Gates del repo: lint, build, check-references, tope de 200 líneas; cada hueco H1-H6 de 09-ai-slop.md resuelto",
+          "id": 412,
+          "do": "Gates del repo y una retro real sobre esta sesión que deje su md, sin tocar nada más",
           "status": "done",
-          "detail": "lint/verify 0, build ok y la ruta resuelve en dist, 171 checks del instalador, tope 200, 356 citas (1 falso positivo conocido); H1-H6 cruzados en 09-ai-slop.md §406; D86 Hecho; README 131→140 referencias (ya desactualizado en main); no medido si mejora lo generado"
+          "detail": "Puertas: build, 171 checks, tope 200 OK; citas sin correr. Retro en C:/Users/ezefe/OneDrive/Escritorio/retro-2026-10-29-nzt-retro.md (R-01..R-05)"
         }
       ]
     }
@@ -60,8 +66,8 @@
   },
   "waiting_on": null,
   "notes": [
-    "Run cerrada 2026-10-29: guía anti AI slop (D86), ids 401-406, sin commit",
-    "Investigación, log QT-01..03 y cruce de huecos en Plan/mejoras/09-ai-slop.md; H7 (detector) fuera por QT-01 = B",
-    "Sin eval visual: la mejora de lo generado no está medida"
+    "Rama nzt-retro sale de anti-ai-slop (D86, ids 401-406) para que D87 la siga; mods-estado-preguntas va aparte",
+    "Usuario 2026-10-29: skill propia (opción B, objeción del agente por el listado dicha una vez), opcional, ofrecida al final, nunca modifica skills ni nada: deja propuestas en un md para el equipo",
+    "Run terminada 2026-10-29, sin commit; falta la aceptación del usuario y correr evals/routing/retro"
   ]
 }
