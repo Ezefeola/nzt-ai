@@ -7,7 +7,8 @@
 > en la unidad 239 (2026-10-18), sin aceptar: la tarjeta Aspecto de `nzt-look`, que sale con su
 > publicación (aprobado el 2026-10-17, unidades 218 y 225). **0.5.0 (unidad 366, 2026-10-25):** la
 > app de escritorio (H-25 de `specs/mods/revision-escritorio.md`), con `[modify]` hasta que el
-> usuario lo vea en la app.
+> usuario lo vea en la app. **0.6.0 (2026-10-29):** sin la tarjeta Preguntas, porque `nzt-questions`
+> se retira (M5 de `specs/nzt-mods.md`); la portada cuenta `n de 4 instalados`.
 > Marcas `[add]`, `[modify]` y `[remove]` hasta cerrar cada una; código en `mods/nzt-hub/`; Historia al final · mockup en
 > `specs/mods/nzt-hub/mockup.html` (unidades 153 y 158, dirección C) · Depende de: `specs/nzt-mods.md` (reglas de todo mod y catálogo de la sección 5).
 > El usuario pidió el mod el 2026-10-14: "un panel principal que tenga botones por cada MOD de
@@ -18,7 +19,7 @@
 
 ## Qué resuelve
 
-Los mods de NZT son varios (`nzt-state`, `nzt-changes`, `nzt-files`, `nzt-questions` y, desde 0.4.0, `nzt-look`) y cada uno
+Los mods de NZT son varios (`nzt-state`, `nzt-changes`, `nzt-files` y, desde 0.4.0, `nzt-look`) y cada uno
 se abre con su propio comando. Para usarlos hay que recordar que existen, cómo se llaman y para
 qué sirve cada uno. El panel los junta en un lugar: qué hay, para qué es cada uno, y un botón
 que lleva a cada uno.
@@ -177,7 +178,7 @@ sigue valiendo.
   Cambios, Archivos, Preguntas). Una fila en blanco antes del segundo título (RN-hub-grupos).
 - **Preguntas**: glifo `?` en rosa; *Las preguntas del agente, de a una y con opciones, al prompt
   en un mensaje.* El glifo, el color y el texto, propuesta del agente (Q-08 de
-  `specs/mods/nzt-questions/spec.md`).
+  `specs/mods/nzt-questions/spec.md`, borrada con el mod en 0.6.0).
 - **Contexto** dice *con las marcas 30/40 de NZT* (RN-hub-capa-nzt; 0.4.1, D80) [modify].
 - La portada cuenta `n de 5 instalados`, con un punto por mod.
 - **Arreglo del mockup de 0.1.0:** a 320 px, `se abre al terminar el turno` se salía de la tarjeta
@@ -391,6 +392,13 @@ al alto de la tarjeta.
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba (va acá, como en `nzt-changes`,
 porque este repo guarda sus documentos en `specs/`).
+
+### 2026-10-29 · Sin nzt-questions — 0.6.0
+Type:     remove
+Change:   la tarjeta Preguntas sale del grupo *Para cualquier proyecto*; el catálogo queda en cuatro mods.
+Reason:   el usuario retira `nzt-questions` (M5 de `specs/nzt-mods.md`): "ya no nos sirve ya que se usa la tool generalmente de preguntas".
+Impact:   RN-hub-catalogo sin cambio de regla: sigue al catálogo de `specs/nzt-mods.md`, que pierde la fila
+Decision: pedido del usuario.
 
 ### 2026-10-17 · Grupos por tipo y nzt-questions — 0.2.0
 Type:     modify

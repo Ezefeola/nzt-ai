@@ -1,6 +1,6 @@
 {
   "name": "nzt-hub",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "One pane with every NZT mod: what each is for, its version, a button that opens it, and the install command for the missing ones",
   "author": { "name": "Ezefeola" },
   "types": "./types/index.d.ts",

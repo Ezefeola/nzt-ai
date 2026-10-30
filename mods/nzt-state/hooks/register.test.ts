@@ -756,8 +756,36 @@ test('a narrow pane stacks the character above Plan and Mode', async ($, on) => 
 })
 
 test('the desktop pane puts Plan and Mode beside the character too', async ($, on) => {
-  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 60)
+  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 75)
   expect(rowWithCharacterAndPlan(await ui.drawn())).toBeDefined()
+  await ui.unmount()
+})
+
+test('a narrow desktop pane stacks the character, where the terminal would not', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 60)
+  expect(rowWithCharacterAndPlan(await ui.drawn())).toBeUndefined()
+  await ui.unmount()
+})
+
+/** Every Box in the tree whose props match. */
+const boxesWith = (node: unknown, props: Record<string, unknown>): Drawn[] => {
+  if (node === null || typeof node !== 'object') return []
+  const el = node as Drawn
+  const matches = el.type === 'Box' && Object.entries(props).every(([k, v]) => el.props?.[k] === v)
+  return [...(matches ? [el] : []), ...(el.children ?? []).flatMap(child => boxesWith(child, props))]
+}
+
+test('on the desktop the labels, marks and ids keep their columns and sit on the first line', async ($, on) => {
+  const ui = await mountPane($, on, JSON.parse(STATE), 'desktop', 50)
+  const drawn = await ui.drawn()
+  // Plan, Modo and Delegar: their label never shrinks into the value beside it.
+  for (const label of boxesWith(drawn, { width: 9 })) expect(label.props?.flexShrink).toBe(0)
+  // Every unit row: the mark's two columns are fixed, and its row aligns to the top.
+  const marks = boxesWith(drawn, { width: 2 })
+  expect(marks.length).toBeGreaterThan(0)
+  for (const mark of marks) expect(mark.props?.flexShrink).toBe(0)
+  const rows = boxesWith(drawn, { flexDirection: 'row', alignItems: 'flex-start' })
+  expect(rows.length).toBeGreaterThanOrEqual(marks.length)
   await ui.unmount()
 })
 
@@ -956,70 +984,6 @@ test('an autonomous batch reads as a range with its progress and kept stops', as
   expect(await ui.find({ type: 'Text', text: /^A$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^[▾▸] / })).toBeUndefined()
   await ui.unmount()
-})
-
-/** A session with the state file, a pane that seats, and nzt-questions counting `pending`, or not installed. */
-const questionsSession = (on: Parameters<TestBody>[1], pending?: number) => {
-  on('fs.stat', async () => ({
-    value: { kind: 'file', size: STATE.length, mtimeMs: 1, isLink: false },
-  }))
-  on('fs.read', async () => ({ value: STATE }))
-  on('ui.open', async () => ({ value: { isPlaced: true } }))
-  on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
-  if (pending !== undefined) {
-    on('state.get', { plugin: 'nzt-questions', key: 'pending' }, async () => ({ value: { value: pending, version: 1 } }) as never)
-  }
-  const ran: string[] = []
-  on('command.run', { command: 'nzt-questions' }, async () => {
-    ran.push('nzt-questions')
-    return { text: 'Panel de preguntas abierto.' }
-  })
-  return ran
-}
-
-const mountState = async ($: Parameters<TestBody>[0]) => {
-  await $.command.run({
-    command: 'nzt-state',
-    args: '',
-    origin: { kind: 'composer' },
-    presentation: { isFullscreen: false, columns: 120 },
-  })
-  return $.ui.mount({
-    plugin: 'nzt-state',
-    surface: 'terminal',
-    component: 'Pane',
-    requestId: 'nzt-state',
-    viewport: { columns: 80, rows: 40 },
-    props: {
-      title: 'Estado',
-      isFocused: false,
-      bodyColumns: 76,
-      placement: 'dock',
-      scroll: { offset: 0, bodyRows: 36 },
-      view: {},
-    },
-  })
-}
-
-test('with questions pending in nzt-questions, the pane says how many and Contestar opens it', async ($, on) => {
-  const ran = questionsSession(on, 3)
-  const ui = await mountState($)
-  // Folded, Tu turno says how many; unfolded, the notice and Contestar.
-  expect(await ui.find({ type: 'Text', text: /⏸ {2}Tu turno/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '3 preguntas para contestar' })).toBeDefined()
-  expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
-  await ui.press({ key: 'toggle-turn' })
-  expect(await ui.find({ type: 'Text', text: '? 3 preguntas para contestar' })).toBeDefined()
-  await ui.press({ key: 'answer-questions' })
-  expect(ran).toEqual(['nzt-questions'])
-})
-
-test('without nzt-questions, or with nothing pending, the pane says nothing about questions', async ($, on) => {
-  questionsSession(on)
-  const ui = await mountState($)
-  expect(await ui.find({ type: 'Text', text: /para contestar|Tu turno/ })).toBeUndefined()
-  expect(await ui.find({ key: 'answer-questions' })).toBeUndefined()
-  expect(await ui.find({ type: 'Text', text: /Draw the pane/ })).toBeDefined()
 })
 
 describe('delegation', () => {
