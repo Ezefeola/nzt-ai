@@ -7,7 +7,6 @@ export const CATALOG = [
   { id: 'nzt-state', kind: 'nzt', icon: '◆', color: 'claude' },
   { id: 'nzt-changes', kind: 'generic', icon: '±', color: '#c792ea' },
   { id: 'nzt-files', kind: 'generic', icon: '▤', color: '#6cc070' },
-  { id: 'nzt-questions', kind: 'generic', icon: '?', color: '#f48fb1' },
   { id: 'nzt-look', kind: 'generic', icon: '◐', color: '#82aaff' },
 ] as const
 

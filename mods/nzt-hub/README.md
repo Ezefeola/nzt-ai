@@ -1,6 +1,6 @@
 # nzt-hub
 
-> Versión **0.5.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
+> Versión **0.6.0** · spec en [`specs/mods/nzt-hub/spec.md`](../../specs/mods/nzt-hub/spec.md)
 
 Un panel lateral de Claude Code que **junta los mods de NZT en un lugar**: qué hay, para qué
 es cada uno, qué versión tenés y un botón que lo abre. Los que no tenés instalados también
@@ -29,7 +29,7 @@ aparecen, con un botón que copia el comando para instalarlos.
 ```
 
 Las tarjetas van en dos grupos: arriba los mods que necesitan el método NZT para mostrar algo
-(Estado) y abajo los que sirven en cualquier proyecto (Cambios, Archivos, Preguntas, Aspecto). Cada mod lleva una barra y un glifo de su color. El mockup completo, con todos sus estados,
+(Estado) y abajo los que sirven en cualquier proyecto (Cambios, Archivos, Aspecto). Cada mod lleva una barra y un glifo de su color. El mockup completo, con todos sus estados,
 está en [`specs/mods/nzt-hub/mockup.html`](../../specs/mods/nzt-hub/mockup.html).
 
 **Es opcional.** NZT funciona completo sin el panel, y cada mod se sigue abriendo con su

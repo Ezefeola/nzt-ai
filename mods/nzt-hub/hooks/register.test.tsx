@@ -56,7 +56,7 @@ test('the pane lists every NZT mod with what it is for, and a button on the inst
   expect(await ui.find({ key: 'open:nzt-state' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /Plan\/state\.json/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'Archivos' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: / 2 de 5 instalados$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: / 2 de 4 instalados$/ })).toBeDefined()
 })
 
 test('Aspecto is the last of the generic mods, and without nzt-look it copies its install', async ($, on) => {
@@ -99,9 +99,9 @@ test('when the terminal refuses the copy, the command shows whole to select', as
   fakeSession(on, { copy: false })
   await openPane($)
   const ui = await mount($)
-  await ui.press({ key: 'copy:nzt-questions' })
+  await ui.press({ key: 'copy:nzt-files' })
   expect(await ui.find({ type: 'Text', text: /No se pudo copiar/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: '/plugin install nzt-questions --marketplace Ezefeola/nzt-ai' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: '/plugin install nzt-files --marketplace Ezefeola/nzt-ai' })).toBeDefined()
 })
 
 test('Abrir runs the mod command and the hub gives up its place', async ($, on) => {
@@ -113,14 +113,14 @@ test('Abrir runs the mod command and the hub gives up its place', async ($, on) 
   expect(closed).toBe(true)
 })
 
-test('the cards go under two group titles, and Preguntas is among the generic ones with its install button', async ($, on) => {
+test('the cards go under two group titles, and Archivos is among the generic ones with its install button', async ($, on) => {
   fakeSession(on)
   await openPane($)
   const ui = await mount($)
   expect(await ui.find({ type: 'Text', text: 'CON EL MÉTODO NZT' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'PARA CUALQUIER PROYECTO' })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: 'Preguntas' })).toBeDefined()
-  expect(await ui.find({ key: 'copy:nzt-questions' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Archivos' })).toBeDefined()
+  expect(await ui.find({ key: 'copy:nzt-files' })).toBeDefined()
 })
 
 test('a narrow pane keeps the names and shortens the copy button', async ($, on) => {
