@@ -25,7 +25,9 @@
 > fuente, en la app la variante elegida (QT-09 de la revisión de escritorio, que corrige la opción A
 > de su QT-08) y los temas copiados solos a `/theme` (su QT-08),
 > reglas con `[modify]` hasta que el usuario lo vea en la app; la banda, sin botón limpiar
-> (`[remove]`, usuario 2026-10-25) ·
+> (`[remove]`, usuario 2026-10-25) · **0.8.1 (2026-10-28):** tablas del escritorio con el encabezado
+> en una banda de acento con Copiar al final, y anchos de columna enteros (uno decimal hacía
+> volver la tabla al dibujo de Claude Code) ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag

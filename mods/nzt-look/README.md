@@ -1,6 +1,6 @@
 # nzt-look
 
-> Versión **0.8.0** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
+> Versión **0.8.1** · spec en [`specs/mods/nzt-look/spec.md`](../../specs/mods/nzt-look/spec.md)
 
 Cambia **cómo se ve una sesión de Claude Code**: un tema de colores, una banda sobre el prompt
 con lo que llevás gastado, y la conversación redibujada para leerla de un vistazo. Reemplaza a
