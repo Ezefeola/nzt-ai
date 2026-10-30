@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-10-28T20:00:00Z",
+  "updated": "2026-10-29T12:00:00Z",
   "goal": "Revisar skills y references para que sean genéricas, sin redundancia, mantenibles, modulares y livianas en contexto, sin perder funcionamiento; con el marco (clasificar, planificar, estado, fases) en pasos y reglas bien definidos",
   "cadence": "upfront",
   "slices": [
@@ -67,7 +67,7 @@
   "waiting_on": null,
   "notes": [
     "Run terminado 2026-10-28: S1 y S2 done, cierre en Plan/mejoras/08-revision.md §400; después, tablas del escritorio de nzt-look (opción A, commit 42e9f01)",
-    "Pendiente del usuario: probar lo nuevo, push de nzt-worker, merge a main e instalar",
+    "Probado e instalado por el usuario el 2026-10-29; nzt-worker pusheado, el merge del PR a main queda del usuario",
     "El release se saca cuando el usuario avise (nzt-ship); la versión de nzt-look sigue en 0.8.0"
   ]
 }
