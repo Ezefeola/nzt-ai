@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-29T23:55:00Z",
+  "updated": "2026-10-30T01:00:00Z",
   "goal": "nzt-retro: una skill opcional que revisa una sesión y deja propuestas de mejora del entorno en un md para el equipo, sin modificar nada",
   "phases": [
     {
@@ -66,8 +66,8 @@
   },
   "waiting_on": null,
   "notes": [
-    "Rama nzt-retro sale de anti-ai-slop (D86, ids 401-406) para que D87 la siga; mods-estado-preguntas va aparte",
-    "Usuario 2026-10-29: skill propia (opción B, objeción del agente por el listado dicha una vez), opcional, ofrecida al final, nunca modifica skills ni nada: deja propuestas en un md para el equipo",
-    "Run terminada 2026-10-29, sin commit; falta la aceptación del usuario y correr evals/routing/retro"
+    "PR #10 (D86, D87 y mods M5) mergeado a main por el usuario; ramas viejas borradas, sólo queda main",
+    "v3.1.0 publicada (menor por QT-01 del usuario): workflow de release en verde, 6 binarios, 6 instaladores y SHA256SUMS",
+    "Falta correr evals/routing/retro"
   ]
 }
