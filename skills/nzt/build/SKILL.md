@@ -95,7 +95,9 @@ axes from the index of the component's area — read only that one:
 | A frontend with no area router | `references/practices-frontend.md` |
 
 **Read `references/code-code.md` before writing any code**, whatever the path: the rules of
-code in any language. **The generic reference says what holds and why; the stack document
+code in any language. **Writing what a person sees — a new screen, a page, a component's
+look — also reads `../nzt-ux/references/generic.md` first**, with or without a UX phase
+before it: its visual plan before the markup, its pass on the rendered result after. **The generic reference says what holds and why; the stack document
 says how it is done in this technology**, and how the technology behaves is verified in its
 authoritative source before it enters the code (`nzt-research`). A generic reference names no
 API on purpose.

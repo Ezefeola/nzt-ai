@@ -19,6 +19,8 @@
 > cajas flex en lugar de columnas contadas (sección **Escritorio**); en la terminal no cambia
 > nada. Revisión que lo pidió: `specs/mods/revision-escritorio.md`. Visto andar en la app por el
 > usuario el 2026-10-24 ("funciono bien ahora el mod").
+> **0.11.0 construido** (2026-10-29): panel angosto legible en el escritorio y sin
+> `nzt-questions`, que se quitó del repo (**Historia**). Falta verlo en la app.
 
 ## Qué resuelve
 
@@ -53,8 +55,7 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
   La única excepción es el modo de delegación (RN-panel-delegar).
 - **Codex.** Un mod es solo de Claude Code (D63).
 - **Otros artefactos**, como specs, historias o el glosario. El panel lee únicamente
-  `Plan/state.json`. Las preguntas abiertas no las busca en los documentos: toma la
-  cuenta que da `nzt-questions` (RN-panel-preguntas), que es el mod que las lee.
+  `Plan/state.json`.
 - **Historial de corridas.** Una corrida nueva reescribe el estado (D62), y el panel
   muestra solo la corrida actual.
 - **Buscar el estado en carpetas de más arriba.** El usuario decidió que lea solo la
@@ -184,16 +185,15 @@ curso, o la fase en curso no tiene pendientes, ninguna lleva ▷.
 no entra. Un clic en la unidad lo despliega entero y otro lo vuelve a un renglón; dura lo que
 la sesión. Las demás unidades no muestran su detalle.
 
-### RN-panel-espera · origin: usuario 2026-10-20 ("cuando esta esperando algo de nosotros se ve siempre en pantalla, en nzt-state estaria bueno que eso se vea mas lindo"); la forma, Q-01 y Q-04; el nombre, usuario ("en vez de que diga 'Te toca' que diga 'Tu turno'")Mientras el estado trae `waiting_on` o `nzt-questions` tiene preguntas pendientes, el panel
+### RN-panel-espera · origin: usuario 2026-10-20 ("cuando esta esperando algo de nosotros se ve siempre en pantalla, en nzt-state estaria bueno que eso se vea mas lindo"); la forma, Q-01 y Q-04; el nombre, usuario ("en vez de que diga 'Te toca' que diga 'Tu turno'")Mientras el estado trae `waiting_on`, el panel
 muestra **Tu turno** ("Your turn") en el primer renglón debajo del título, arriba de todo lo
 demás. **Plegado**, es un solo renglón: `▸ ⏸ Tu turno`, el texto de `waiting_on` cortado con «…»
-y, si además hay preguntas, `? n` al final; sin `waiting_on`, el texto es *n preguntas para
-contestar*. **Mientras está a la vista, el título brilla suave**: va de un amarillo apagado al
+. **Mientras está a la vista, el título brilla suave**: va de un amarillo apagado al
 amarillo entero y vuelve, en una onda de unos 2 segundos, sin saltos (usuario en la prueba en
 vivo, H-03: *"es como que se prende y apaga de forma brusca … que este en un amarillo apagado y
 se vaya iluminando y desiluminando"*). Un clic lo **despliega** (`▾`): el texto entero
-tal como viene, y debajo el aviso de preguntas con Contestar (RN-panel-preguntas); otro clic lo
-pliega. Arranca plegado y lo elegido dura lo que la sesión. Sin `waiting_on` y sin preguntas,
+tal como viene; otro clic lo
+pliega. Arranca plegado y lo elegido dura lo que la sesión. Sin `waiting_on`,
 no aparece ni deja lugar vacío.
 
 ### RN-panel-formatos-viejos · origin: D61 y D62 (unidades 71 y 76)Un estado de D61, con `units` arriba, se muestra como una lista sin grupos, en el orden del
@@ -254,17 +254,6 @@ usuario (no hay ningún dato de idioma ni región en los tipos del motor, versi�
 adivinarlo del texto del estado puede fallar con un objetivo corto o mezclado. `es` por
 defecto porque es lo que el panel hace hoy. **Se reabre** si el motor empieza a exponer el
 idioma, o si el usuario prefiere que se adivine del estado.
-
-### RN-panel-preguntas · origin: usuario 2026-10-17 ("me gusta lo de que nzt-state avise lo de las preguntas"); la forma, propuesta del agente
-Si `nzt-questions` está instalado y tiene preguntas pendientes, el panel muestra, debajo de lo
-que se está esperando, **`? n preguntas para contestar`** con un botón **Contestar ›** que abre
-`nzt-questions`, igual que si la persona escribiera su comando. Las ya llevadas al prompt no
-cuentan. Sin preguntas pendientes, o sin `nzt-questions` instalado, no muestra nada: el panel no
-le pide a nadie que instale otro mod.
-
-### RN-panel-preguntas-espera · origin: mismo criterio que RN-hub-espera de `nzt-hub`
-Si Claude está trabajando en un turno cuando se aprieta Contestar, el aviso dice que
-`nzt-questions` se abre al terminar el turno, y se abre entonces.
 
 ### RN-panel-fases-plegables · origin: usuario 2026-10-14; en la lista, usuario 2026-10-20En la lista, cada fase es un grupo con su encabezado: el sombrero en miniatura, el nombre en
 su color y cuántas unidades lleva hechas de cuántas, sin contar las descartadas (`Build · 1
@@ -362,6 +351,10 @@ ancho contado en columnas no coincide con lo que se ve (H-02 y H-05 de
   los tramos y las notas crecen al lado de su marca o su etiqueta en lugar de un ancho fijo; las
   marcas, los ids y las etiquetas sí conservan su ancho.
 - **El personaje toma su tamaño** al lado de Plan y Modo, y se centra en la fila cuando va arriba.
+  Va al lado sólo desde 72 columnas útiles, contra 40 en la terminal: dibujado en píxeles ocupa
+  más que sus celdas, y por debajo la columna de Plan quedaba de unos 22 caracteres (0.11.0).
+- **Cada fila arranca arriba**: la marca, el id y la etiqueta quedan en el primer renglón del
+  texto que acompañan, y no a la mitad de su alto (0.11.0).
 - **El brillo late por su cuenta.** Tu turno y la unidad en curso se dibujan en una región propia
   (`hooks/glow-live.tsx`) con su reloj. La app dibuja cada botón con su estilo nativo y no toma
   el color del texto de adentro (H-09), así que lo que brilla no es un botón: en Tu turno,
@@ -481,17 +474,6 @@ propuestas, de las que eligió la 1 (Q-04).
   Tampoco está probado si la animación CSS del SVG corre dibujado como imagen o necesita
   `isInteractive`; los tipos del motor solo lo afirman de la animación SMIL.
 - **Terminal de 256 colores:** no se probó cómo se ve el personaje.
-- **Cómo sabe `nzt-state` cuántas preguntas tiene `nzt-questions`** (RN-panel-preguntas, unidad
-  202): el motor deja que un mod lea el estado de sesión de otro que declara como dependencia,
-  pero no está verificado si declararlo obliga a tener instalado `nzt-questions`, lo que
-  rompería *sin `nzt-questions` instalado, no muestra nada*. Se decide en el diseño técnico de
-  `nzt-questions` (unidad 205). **Probado en la unidad 209:** `nzt-state` no declara la
-  dependencia y declara en su propio contrato la única clave que lee (`nzt-questions.pending`).
-  `claude plugin validate` lo acepta y avisa que la clave de otro plugin no la puede comprobar.
-  En el test, sin `nzt-questions`, la lectura se rechaza, el panel la toma como cero y no muestra
-  nada. **Verificado en vivo en la unidad 210** (usuario, 2026-10-17): con los dos mods cargados
-  el aviso aparece, Contestar abre `nzt-questions` y no hay quejas por los dos contratos.
-
 ## Tests
 
 `hooks/register.test.ts` corre con `claude plugin test mods/nzt-state`. Cubre la línea de
@@ -505,9 +487,9 @@ inválido (B-02), varias unidades en curso (B-03), varias fases en curso y una s
 aviso, una fase que NZT no conoce con su aviso, la tanda con ids que no existen (B-04) y el panel en inglés; los grupos por fase que
 se pliegan, los cuadros y sombreros de cada personaje, las celdas, el personaje y los mini
 sombreros en la terminal, y el SVG en el escritorio; Plan y Modo al lado del personaje
-desde 40 columnas útiles (terminal y escritorio) y apilados por debajo; el objetivo con su
-etiqueta, arriba de las fases; el aviso de preguntas pendientes en Tu turno con Contestar, y su
-ausencia sin `nzt-questions` o sin preguntas; la onda del brillo (sube y baja sin saltos, entera
+desde 40 columnas útiles en la terminal y 72 en el escritorio, y apilados por debajo; en el
+escritorio, etiquetas, marcas e ids de ancho fijo en filas alineadas arriba (0.11.0); el
+objetivo con su etiqueta, arriba de las fases; la onda del brillo (sube y baja sin saltos, entera
 arriba y mezclada con gris abajo) y Tu turno y la unidad en curso dibujados en su brillo; el
 estado leído de la carpeta en que empezó la sesión; el modo de delegación (por defecto,
 válido, inválido), el ciclo, la escritura en su lugar o al lado de `approved` sin tocar otro
@@ -530,6 +512,15 @@ pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueb
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. Empieza en 0.7.0: lo anterior está
 en el encabezado y en **Hallazgos resueltos**.
+
+### 2026-10-29 · Panel angosto en el escritorio y sin preguntas — 0.11.0
+Type:     modify · remove
+Change:   en la app de escritorio, las marcas, los ids y las etiquetas conservan su ancho y quedan en el primer renglón, y el personaje va arriba por debajo de 72 columnas; Tu turno ya no cuenta ni abre preguntas de `nzt-questions`.
+Reason:   el usuario, con el panel angosto: "la parte de Ahora se ve super mal como que la flecha se sale de su lugar", y lo mismo arriba con Plan y Modo; y "eliminar el Mod Preguntas, ya no nos sirve ya que se usa la tool generalmente de preguntas".
+Before:   la marca y el id se achicaban y se centraban contra el texto partido, la etiqueta Modo se pegaba al valor, y la columna de Plan al lado del personaje quedaba de unos 22 caracteres; Tu turno sumaba las preguntas pendientes con un botón Contestar.
+Now:      columnas fijas y alineadas arriba, el personaje apilado en paneles angostos; Tu turno muestra sólo `waiting_on`.
+Impact:   sección Escritorio · RN-panel-espera cambiada · RN-panel-preguntas y -preguntas-espera quitadas
+Decision: pedido del usuario; el umbral de 72 columnas es propuesta del agente, a confirmar en vivo.
 
 ### 2026-10-24 · Delegar y los tramos — 0.8.0 a 0.9.1
 Type:     add

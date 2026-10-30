@@ -40,12 +40,14 @@ descripción.
 
 **2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
 (`nzt`), el de investigación (`nzt-research`) y el de delegar en un subagente —lecturas, o
-unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`). No hacen el trabajo:
+unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`) y, sólo cuando lo pedís, el de
+retro (`nzt-retro`): revisa la sesión y deja propuestas de mejora en un md fuera del repo, sin
+cambiar nada. No hacen el trabajo:
 leen el pedido y el documento de stack, y dicen qué referencia leer.
 
 **3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
 `references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
-listado de skills**, que el proveedor carga en toda sesión: el set entero son 15 entradas.
+listado de skills**, que el proveedor carga en toda sesión: el set entero son 16 entradas.
 
 ```
 pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
@@ -177,7 +179,6 @@ artefacto del método para mostrar algo.
 | [`nzt-changes`](mods/nzt-changes/README.md) | Genérico | Panel lateral al estilo Replay Theater: recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
 | [`nzt-files`](mods/nzt-files/README.md) | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: carpetas que se abren y cierran, marcas de git, lo que Claude lee y escribe, y el archivo elegido debajo, solo para leer y sin ocupar contexto | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
 | [`nzt-hub`](mods/nzt-hub/README.md) | Genérico | Panel lateral que junta los mods de NZT: para qué es cada uno, su versión, un botón que lo abre y, para los que faltan, uno que copia el comando para instalarlos | `/plugin install nzt-hub --marketplace Ezefeola/nzt-ai` |
-| [`nzt-questions`](mods/nzt-questions/README.md) | Genérico | Panel lateral para contestar de a una, con opciones, las preguntas que el agente escribió en el chat; deja las respuestas en un solo mensaje en el prompt, sin mandarlo | `/plugin install nzt-questions --marketplace Ezefeola/nzt-ai` |
 | [`nzt-look`](mods/nzt-look/README.md) | Genérico, con capa NZT | Temas (NZT y quince más, oscuros y claros), una banda sobre el prompt con el contexto y sus marcas 30/40, los límites del plan, el costo, el modelo con su effort y `/clear`, y la conversación redibujada: herramientas, consola, diffs, tablas, código, fórmulas y diagramas | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
 
 ### Instalarlos
@@ -241,7 +242,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**15 skills y 131 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
+**16 skills y 140 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.

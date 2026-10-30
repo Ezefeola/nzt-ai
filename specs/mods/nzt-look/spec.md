@@ -360,7 +360,7 @@ Lo que ve el usuario va en español o en inglés según la opción **idioma**, `
 recibe el agente va en inglés.
 
 #### RN-skin-comando · origin: propuesta del agente (unidad 216)
-El comando es `/nzt-look`, como el nombre del mod (igual que `/nzt-questions`), y no `/skin`: así
+El comando es `/nzt-look`, como el nombre del mod, y no `/skin`: así
 convive con la referencia si la persona también lo tiene instalado.
 
 ## Qué se redibuja

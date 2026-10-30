@@ -1,73 +1,73 @@
 {
-  "version": 2,
-  "updated": "2026-10-29T15:00:00Z",
-  "goal": "Revisar skills y references para que sean genéricas, sin redundancia, mantenibles, modulares y livianas en contexto, sin perder funcionamiento; con el marco (clasificar, planificar, estado, fases) en pasos y reglas bien definidos",
-  "cadence": "upfront",
-  "slices": [
+  "version": 1,
+  "updated": "2026-10-29T23:55:00Z",
+  "goal": "nzt-retro: una skill opcional que revisa una sesión y deja propuestas de mejora del entorno en un md para el equipo, sin modificar nada",
+  "phases": [
     {
-      "id": "S1",
-      "name": "Revisión",
+      "name": "architecture",
       "status": "done",
-      "phases": [
+      "units": [
         {
-          "name": "architecture",
+          "id": 407,
+          "do": "Decisiones de nzt-retro: qué lee, qué destinos propone, dónde y cómo queda el md, cuándo se ofrece (QT) en Plan/mejoras/10-retro.md",
           "status": "done",
-          "units": [
-            { "id": 377, "do": "Revisar el marco: kernel, nzt, nzt-plan y sus references, nzt-delegate y los agentes", "status": "done", "detail": "M1-M9 en Plan/mejoras/08-revision.md; M1 es error: el kernel contradice al tamaño directo de D78 (sin plan ni estado)" },
-            { "id": 378, "do": "Revisar nzt-discovery y nzt-research", "status": "done", "detail": "D1-D6 en 08-revision.md; D4 es error: el ejemplo del merge en change.md tiene coberturas sin qa" },
-            { "id": 379, "do": "Revisar nzt-architecture y sus references", "status": "done", "detail": "A1-A6 en 08-revision.md; A1 es error: design-product.md manda a leer design-feature.md para el formato del log" },
-            { "id": 380, "do": "Revisar nzt-ux y sus references", "status": "done", "detail": "U1-U6 en 08-revision.md; U1 es error: UX y verify citan CA-NN pero los criterios no tienen id (close.md lo dice)" },
-            { "id": 381, "do": "Revisar el router nzt-build y sus references de método (implement, tests, tdd, recon, refactor, remove, dependencies, secrets)", "status": "done", "detail": "B1-B6 en 08-revision.md; B1: 11 de 15 Rules del router repiten implement.md; B2: una historia carga ~520 lineas de metodo" },
-            { "id": 382, "do": "Revisar la capa genérica de práctica de nzt-build (backend-*, data-*, frontend-*, code-*, practices-*)", "status": "done", "detail": "G1-G6 en 08-revision.md; capa sin rastros de .NET; G1: practices-* es un segundo nivel de ruteo que choca con la decision 2" },
-            { "id": 383, "do": "Revisar la capa de stack: build .NET, C#, Blazor y ship .NET, buscando lo que repite la capa genérica", "status": "done", "detail": "S1-S4 en 08-revision.md; S1 es error: el eje organizacion de componentes de Blazor no esta en la tabla de ejes y no se pregunta al escribir el stack" },
-            { "id": 384, "do": "Revisar nzt-verify y nzt-ship y sus references", "status": "done", "detail": "V1-V3 en 08-revision.md; leido por estructura al cruzar 30% de contexto; V2: stack y verify preguntan los dos el mecanismo de datos" },
-            { "id": 385, "do": "Revisar nzt-learn y sus references", "status": "done", "detail": "L1-L6 en 08-revision.md; L1 es error: tutor da achieved y train/plan dicen que solo assess da veredictos; L2 es error: retain cita reviews/ que no existe" },
-            { "id": 386, "do": "Síntesis: hallazgos transversales y propuesta de refactor con decisiones QT; reescribir el plan con S2", "status": "done", "detail": "T1-T7 y log QT-01..QT-11 en 08-revision.md §386; el usuario eligió la a) en las 11 y el modo propuestas para los 20 detalles" }
-          ]
+          "detail": "10-retro.md: QT-01..07 (md fuera del repo en la ruta que se elige cada vez; nunca se ofrece; actual o últimas N; proyecto y NZT separados; detalles del agente). Propone quitar 410: sin oferta ni fila en el kernel"
         }
       ]
     },
     {
-      "id": "S2",
-      "name": "Refactor",
+      "name": "build",
       "status": "done",
-      "phases": [
+      "units": [
         {
-          "name": "build",
+          "id": 408,
+          "do": "Spec: decisión D87 en specs/nzt-core.md",
           "status": "done",
-          "units": [
-            { "id": 387, "do": "Spec: decisiones de QT-01..QT-10 y reglas de autoría nuevas en specs/nzt-core.md", "status": "done", "detail": "D85 y reglas 20-23 de §10; regla 9 (etiquetas) y 13 (sin referencia índice) al día; QT-12: se mantiene la regla 14 y L6 queda descartado" },
-            { "id": 388, "do": "Kernel y nzt: M1, M4, un dueño por regla (QT-07) y una sola tabla de clasificar (QT-08)", "status": "done", "detail": "Kernel: bucle por tamaño (M1), cierre de unidad en una línea que remite a nzt-plan (QT-07), 151 líneas; nzt: una tabla de clasificar y tamaño (QT-08), analysis como nombre de fase (M4), 107 líneas; regla 23 ajustada; build, check-references y lint limpios" },
-            { "id": 389, "do": "nzt-plan: references/state.md, reference de preguntas (QT-03), dueño de cadencia y tramo (D3, U5, V3)", "status": "done", "detail": "nzt-plan 200→149: references/state.md y questions.md (QT-03); Resuming remite a nzt §1; slices y proposal citan tamaño y obligatorios; tramo de analysis (M4); dueño de verify-tras-tramo = paso 2 (desvío de V3, en D85); §7 al día" },
-            { "id": 390, "do": "nzt-delegate y agentes: M9, bloques del worker (QT-04), vocabulario de procedencia (QT-06)", "status": "done", "detail": "explorer con las 4 etiquetas de nzt-research (QT-06); reading.md remite al archivo del agente (M9); worker carga el router de area solo desde el de fase (QT-04); md y toml; gates limpios" },
-            { "id": 391, "do": "nzt-discovery y nzt-research: D1, D2, D4, criterios CA-NN (QT-09), etiquetas (QT-06)", "status": "done", "detail": "router 114→86, Rules transversales y sin checklist (D1); questions.md en Read with (QT-03); CA-NN en stories, change y close (QT-09); qa en el merge (D4); cadencia citada (D3); research sin cambio" },
-            { "id": 392, "do": "nzt-architecture: A1-A4, log por fase (QT-03), router transversal (QT-01, QT-02)", "status": "done", "detail": "router 200→166 con Mandatory y 6 Rules, sin checklist; references/decisions-log.md (A1, A4: etiquetas por significado, hechos con las de research); filas de diseño y stack leen questions.md; design-product 147, design-feature 166; gates limpios" },
-            { "id": 393, "do": "nzt-ux: U1-U6", "status": "done", "detail": "router 121→92, 2 Rules, sin checklist (U2); mediciones HTML solo en review.md, leída por mockup y manual (U4); tono por función (U3); Q-NN en analysis.md (U6); prototipo cuándo = slices.md (U5); U1 ya en 391; gates limpios" },
-            { "id": 394, "do": "Router nzt-build y método: B1, B3, B4, B6, tablas de practices al router (QT-05)", "status": "done", "detail": "router 169→144; practices-* quedan como índices sin repetir (QT-13 corrige QT-05); comentarios a code-code.md (desvío de B1, en D85); implement 153→94; un cierre en tdd, refactor, remove; check-extraction sin pérdida; gates limpios" },
-            { "id": 395, "do": "Capa genérica de build: G2, G3, costo de los ejes en las tablas (A5, G5), checklists (QT-02)", "status": "done", "detail": "costo de ejes en practices-*, stack-axes los lee (89→78) y la fila de stack suma practices-<area>; guarda del agregado mínimo con dueño en domain-ddd (G3); cierres ya cumplían QT-02; G2 en 394; sin pérdida; gates limpios" },
-            { "id": 396, "do": "Capa de stack .NET, C#, Blazor y ship .NET: S1, S2, S3, S4", "status": "done", "detail": "S1: fila Component organisation en la tabla de Blazor; S2: sin load it first, Read the stack first ni Two escapes en los 4 routers, una línea de evidencia .NET (QT-04); S3: ef-core.md fuera de cada Read with, paginación cita la fila de lectura; S4 sin cambio (QT-04); checklists a Done when salvo C# (regla 21); .NET 128→105, Blazor 100→79, C# 153→150, ship 58→54; gates y extracción limpios" },
-            { "id": 397, "do": "nzt-verify y nzt-ship: V1, V2, V3 y citas CA-NN", "status": "done", "detail": "verify 195→141 y ship 133→89: Rules a lo transversal, sin checklist, Authorisation de ship remite a release.md (V1); test-data y el router leen la opt-in Test data del stack y sólo preguntan si falta (V2); When it runs cita nzt-plan y slices.md (V3); bug.md cita US-NNN CA-NN, test-design ya lo hacía; extracción sin pérdida; gates limpios" },
-            { "id": 398, "do": "nzt-learn: L1-L6", "status": "done", "detail": "router 118→93, 3 Rules, sin checklist, el registro con dueño plan.md (L4); sólo assess escribe achieved: tutor, teach y router (L1, QT-10); repaso sin archivo, su evidencia es la línea del log (L2); veredicto nuevo entra al primer escalón y el ejemplo pasa a 2026-09-26 (L3); L5 sin cambio (QT-04), L6 descartado (QT-12); la regla probe-vs-sensación sólo estaba en el router y pasó a plan.md; extracción sin pérdida; gates limpios" }
-          ]
+          "detail": "D87 tras D86 (skill propia con objeción, nunca se ofrece, no modifica nada, md fuera del repo, actual o últimas N con la fuente, proyecto y NZT); nzt-retro en el árbol de §4.3"
         },
         {
-          "name": "verify",
+          "id": 409,
+          "do": "La skill skills/nzt/retro/SKILL.md (y su reference si no entra en una)",
           "status": "done",
-          "units": [
-            { "id": 399, "do": "Gates del repo: nzt-ai lint y verify, tope de 200 líneas, ninguna cita a un archivo borrado", "status": "done", "detail": "lint y verify 0 problemas (verify es alias de lint, Program.cs:53); build, check-references y 171 checks del instalador pasan; ningún .md pasa de 200 (máx. stack.md 198); nada borrado desde main; 336 citas a references/*.md y 278 por nombre nzt-… resuelven, 1 falso positivo en blazor/SKILL.md:20" },
-            { "id": 400, "do": "Cada hallazgo de 08-revision.md resuelto o descartado con razón; líneas por unidad típica antes y después", "status": "done", "detail": "08-revision.md §400: 52 hallazgos, 44 resueltos y 8 descartados con razón (M7, M8, D5, B5, S4, L5, L6, A6 sin cambio de regla); stack.md sigue en 198; contra e4a0295: 7 unidades típicas bajan, 3 suben por questions.md y decisions-log.md (spec 268→294, pantalla 264→291, diseño de producto 376→442); routers 1363→1066; spec D85 al día con 396-400" }
-          ]
+          "detail": "skills/nzt/retro/SKILL.md, 141 líneas, sin reference: sesiones, ruta preguntada, momentos, mecánico/criterio, destinos proyecto/NZT, plantilla del md"
+        },
+        {
+          "id": 410,
+          "do": "Ruteo y oferta: fila en core/kernel.md y la oferta opcional al cerrar una run y al recomendar limpiar",
+          "status": "dropped",
+          "detail": "Quitada por el usuario 2026-10-29: QT-02 = nunca se ofrece y la tabla del kernel es de fases; la descripción de la skill es su único disparo (409)"
+        },
+        {
+          "id": 411,
+          "do": "Presupuesto del listado, build, README y un caso de disparo en evals/",
+          "status": "done",
+          "detail": "build: 16 skills, ~2898 chars (antes ~2684), sin avisos; README y evals/README al día; caso evals/routing/retro sin correr"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "status": "done",
+      "units": [
+        {
+          "id": 412,
+          "do": "Gates del repo y una retro real sobre esta sesión que deje su md, sin tocar nada más",
+          "status": "done",
+          "detail": "Puertas: build, 171 checks, tope 200 OK; citas sin correr. Retro en C:/Users/ezefe/OneDrive/Escritorio/retro-2026-10-29-nzt-retro.md (R-01..R-05)"
         }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [], "keep_stops": [] },
+  "autonomy": {
+    "units": [],
+    "keep_stops": []
+  },
   "waiting_on": null,
   "notes": [
-    "Run terminado 2026-10-28: S1 y S2 done, cierre en Plan/mejoras/08-revision.md §400; después, tablas del escritorio de nzt-look (opción A, commit 42e9f01)",
-    "PR #9 mergeado a main por el usuario el 2026-10-29",
-    "v3.0.0 publicada el 2026-10-29 (mayor por QT-01 del usuario), con nzt-look 0.8.1; workflow de release en verde y simulación de instalación sin cambios"
+    "Rama nzt-retro sale de anti-ai-slop (D86, ids 401-406) para que D87 la siga; mods-estado-preguntas va aparte",
+    "Usuario 2026-10-29: skill propia (opción B, objeción del agente por el listado dicha una vez), opcional, ofrecida al final, nunca modifica skills ni nada: deja propuestas en un md para el equipo",
+    "Run terminada 2026-10-29, sin commit; falta la aceptación del usuario y correr evals/routing/retro"
   ]
 }

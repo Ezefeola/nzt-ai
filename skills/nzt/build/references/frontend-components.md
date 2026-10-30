@@ -112,6 +112,8 @@ destinations and backend resources are protected on the server; browser input is
 
 - [ ] The design system and the component inventory were read, and the adopted library reused
       before writing a custom component.
+- [ ] A new screen or a changed look passed the pass of `nzt-ux-generic` on the rendered
+      result, or the report says it could not be rendered.
 - [ ] The code organisation follows the stack, and nothing was reorganised outside the scope.
 - [ ] Everything in through declared inputs, everything out through awaited events, and no
       parameter mutated by its receiver.

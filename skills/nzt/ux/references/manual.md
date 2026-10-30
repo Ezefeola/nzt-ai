@@ -129,6 +129,8 @@ Before presenting it, run the width, contrast and keyboard measurements of
 `nzt-ux-review` (*Measuring an HTML file*) — the keyboard walk including search and every
 collapsible — and also **open it with storage blocked**: it still renders, and no text is
 lost. Every result is written down; a manual you could not open is reported as not verified.
+Then run the pass of `nzt-ux-generic` on the rendered file: a manual dressed in template
+chrome — cards, eyebrow labels, arrows — reads as a template, not as the product.
 
 ## If it will not be maintained, do not create it
 
@@ -146,4 +148,4 @@ only this file, and not feel stupid once?
 - Screenshots come from evidence and match today's screens.
 - It opens from disk with no network, and the four measurements were run and reported.
 - Nothing blames the reader, and no word that shrinks the effort survived.
-- The design system's theme, with no second palette.
+- The design system's theme, with no second palette, and the pass of `nzt-ux-generic` reported.

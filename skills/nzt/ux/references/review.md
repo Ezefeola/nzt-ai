@@ -5,6 +5,7 @@
 - Walk the tasks first
 - Then sweep the heuristics
 - Then accessibility
+- Then the generic default
 - Measuring an HTML file
 - The finding
 - Done when
@@ -66,6 +67,12 @@ WCAG 2.2 AA, with the concrete checks:
 **The level the product commits to is a product requirement.** If none is declared, review
 against AA and ask whether it is adopted.
 
+## Then the generic default
+
+Run the pass of `nzt-ux-generic` on what you can see rendered; on a screen design alone,
+only its plan. Each tell with no reason from the subject is a finding: **construction** when
+it lives in this screen, **a missing convention** when the design system itself carries it.
+
 ## Measuring an HTML file
 
 A mockup, a prototype or the manual is measured before it is presented, and every result is
@@ -114,5 +121,6 @@ Rehearse it: could the user act on every finding without asking you what to do w
 - The tasks were walked before any element was inspected.
 - Every finding has its severity, its type and its evidence.
 - Accessibility was checked against concrete criteria, not asserted.
+- The pass of `nzt-ux-generic` ran, and each tell kept carries its reason from the subject.
 - Anything that could not be run is named as not run.
 - The report says plainly that this is an expert review, not a user test.

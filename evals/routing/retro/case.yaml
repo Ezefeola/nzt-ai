@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: route-retro-asks-path
+description: >
+  "Hagamos una retro" in an NZT project. nzt-retro has no row in the kernel's routing table
+  (D87): its description is its only trigger, so this case measures that the description
+  is enough. Write and Bash are not granted; what is measured is that it fires, asks where
+  to write the file before writing it, and suggests a place outside the repository.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-retro and, before any file is written, asks for the path of the retro file
+  with a suggestion outside the repository, without proposing to change any skill,
+  document or code.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Hagamos una retro de esta sesión.
+  max_turns: 20
+  timeout_seconds: 480
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: retro-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-retro"'
+  - name: asks-path-changes-nothing
+    type: llm
+    criteria: |
+      The reply is in Spanish.
+      PASS if it asks where to write the retro file, or proposes a path and waits for a
+      yes, and the suggested path is outside the project's repository; and if it does not
+      claim to have changed, or offer to change now, any skill, document, code or
+      Plan/state.json.
+      FAIL if it reports a file as written without asking for the path, suggests a path
+      inside the repository without warning that it would be committed, or starts applying
+      improvements instead of proposing them.

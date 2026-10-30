@@ -177,6 +177,7 @@ skills/nzt/                      nzt
 │  └─ close/                     nzt-plan-close             → cierre de feature (D25)
 ├─ research/                     nzt-research               → evidencia externa (D31)
 ├─ delegate/                     nzt-delegate               → lectura en nzt-explorer (D71)
+├─ retro/                        nzt-retro                  → propuestas sobre el entorno, a pedido (D87)
 ├─ discovery/                    nzt-discovery          (análisis funcional)
 │  ├─ analysis/                  nzt-discovery-analysis     → análisis append-only (T2)
 │  ├─ product/                   nzt-discovery-product      → Docs/Product/ (D57)
@@ -206,6 +207,7 @@ skills/nzt/                      nzt
 │  ├─ mockup/                    nzt-ux-mockup       → HTML, a pedido (T12)
 │  ├─ manual/                    nzt-ux-manual       → manual del usuario final (D37)
 │  ├─ system/                    nzt-ux-system       → Docs/UX/ + visual (T13)
+│  ├─ generic/                   nzt-ux-generic      → contra el aspecto por defecto (D86)
 │  └─ review/                    nzt-ux-review
 ├─ build/                        nzt-build                 (leer el stack primero, D85)
 │  ├─ recon/                     nzt-build-recon           → relevamiento de impacto (D30)
@@ -2966,6 +2968,90 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Hecho (400, 2026-10-28).** Los 52 hallazgos, cruzados con lo hecho en
     `08-revision.md` §400. La entrada de esta spec para 396-398 se escribió en la 400: esas
     unidades no la habían agregado.
+- **D86.** **Lo visual que produce NZT se revisa contra el aspecto por defecto de un modelo,
+  con una sola guía que leen UX y build.** Lo que la forzó: el pedido del usuario
+  (2026-10-29) de corregir el *AI slop* en las aplicaciones visuales. La investigación y el
+  log de preguntas (QT-01 a QT-03, serie propia de ese documento) están en
+  `Plan/mejoras/09-ai-slop.md`. Lo que sostiene la decisión:
+  - documented: sin dirección, un modelo converge en las elecciones más comunes de su
+    entrenamiento, y prohibir unas lleva a converger en las siguientes (Anthropic,
+    *Improving frontend design through Skills*, 2025-11-12). inferred: una lista de
+    prohibiciones usada para generar produce el próximo cliché; lo que lo evita es anclar
+    cada decisión en el sujeto, y la lista sirve para revisar.
+  - Lo que ya había: `system.md` hacía esa pasada con 6 señales, sólo al fijar la dirección
+    visual de un producto que no tenía. Mockup, prototipo, manual, la revisión y el front que
+    escribe build no la hacían (huecos H1 a H7 de `09-ai-slop.md`).
+  - **Alcance (QT-01, opción B):** una referencia nueva, `ux/references/generic.md`, con el
+    método (sujeto, plan visual antes de construir, revisión del plan contra el pedido,
+    audacia en un lugar, nota de lo ya probado) y el catálogo de señales. `system.md` la cita
+    en lugar de su lista; mockup, prototipo, manual y review la leen y la tienen en su *Done
+    when*. **Queda afuera un detector determinista** en `nzt-ai` (H7): el usuario no lo eligió.
+  - **Trabajo directo (QT-02):** `nzt-build` la lee siempre que escribe una pantalla de
+    front, haya pasado o no por la fase UX. Es el caso más común y antes no leía nada de esto.
+  - **Catálogo (QT-03):** nombra tipografías, paletas y patrones concretos (Inter, el
+    indigo, crema con terracota, el `→` en cada botón), **sólo como lista de revisión**,
+    nunca como prohibición al generar. Las fuentes viven en `09-ai-slop.md` y en esta
+    entrada, no en la referencia: no cambian lo que el agente hace y envejecen (corregido
+    el 2026-10-29 a pedido del usuario; ninguna otra referencia del set cita fuentes).
+  - Respondidas por el usuario el 2026-10-29: QT-01 y QT-03 con la opción recomendada; QT-02
+    con *sí, se lee siempre que se hace front, además de en UX*.
+  - **Dónde se aplica:** unidades 402-405 (la referencia, `system.md`, el router de UX y sus
+    tres referencias, `nzt-build`); 406 corre las puertas del repo y cruza cada hueco. **Cambia
+    el comportamiento** de las fases UX y build: suman una lectura y un ítem de cierre.
+  - **Hecho (402-405, 2026-10-29).** `generic.md` (98 líneas, sin sección de fuentes): plan visual de seis pasos (el
+    design system es el plan si existe), revisión del plan contra el pedido, *Tried, not
+    repeated*, la tabla de señales en 8 áreas como pregunta y la pasada en cuatro pasos.
+    `system.md` 132→125: *Visual direction* en tres pasos y *Rejected directions* en *Brand
+    and voice*. El router de UX la suma al *Read with* de system, mockup, prototipo, manual y
+    review; los tres primeros archivos la corren sobre lo renderizado y la tienen en su *Done
+    when*. Un tell del tema ya adoptado es propuesta al design system, nunca una segunda
+    paleta; en review es `construction` o `missing convention`. El router de build (144→146)
+    la lee al escribir lo que una persona ve, para todo camino, y `frontend-components.md`
+    suma el ítem a su checklist.
+  - **Hecho (406, 2026-10-29).** Puertas limpias (lint, build, 171 checks del instalador, tope
+    de 200, citas), H1-H6 cruzados en `09-ai-slop.md` §406. **No medido:** que la guía mejore
+    lo generado; no hay eval visual.
+- **D87.** **`nzt-retro`: una skill a pedido que revisa sesiones y deja propuestas sobre el
+  entorno en un md fuera del repo, sin cambiar nada.** Lo que la forzó: el pedido del usuario
+  (2026-10-29) de analizar la skill `retro` de Matt Pocock y tener algo así en NZT, pensado
+  para revisarlo en equipo. Nada en NZT convertía los tropiezos de una sesión en mejoras: las
+  lecturas de `nzt-verify` miran el código y los documentos, no la sesión. Decisiones y log
+  (QT-01 a QT-07, serie propia) en `Plan/mejoras/10-retro.md`:
+  - **Skill propia** y no una referencia de `nzt-verify` (la recomendada por el agente). Su
+    objeción, dicha una vez: suma una entrada al listado de skills y el frontmatter no puede
+    llevar `disable-model-invocation` (C1), así que **la descripción es el único freno** y dice
+    que corre sólo cuando el usuario pide una retro.
+  - **Nunca se ofrece (QT-02)**: ni al cerrar una run ni al recomendar limpiar. Por eso no
+    tiene fila en la tabla de ruteo del kernel, que es de fases (como `nzt-research` y
+    `nzt-delegate`), y la unidad 410 se quitó.
+  - **No modifica nada**: ni skills, ni referencias, ni código, ni documentos, ni el estado. Su
+    único producto es el md. Aplicar una propuesta es otro pedido, con su propio tamaño.
+  - **El md no va al repo (QT-01, QT-05)**: se escribe en la ruta que el usuario elige cada vez,
+    con una sugerencia fuera del repo; si la ruta cae dentro de uno, lo avisa antes.
+  - **Qué lee (QT-06)**: la sesión actual, o las últimas N si se pide. documented: Claude Code
+    guarda cada sesión en `~/.claude/projects/<proyecto>/<id>.jsonl`, en un formato interno que
+    cambia entre versiones, la borra a los 30 días y **guarda lo que una herramienta leyó o
+    imprimió, credenciales incluidas** (https://code.claude.com/docs/en/claude-directory,
+    leído 2026-10-29). Por eso varias sesiones son sólo de Claude Code, se leen de a una por
+    subagente, y el md nunca copia un valor de la sesión. unverified: cómo guarda Codex sus
+    sesiones; ahí, sólo la actual.
+  - **Sobre qué propone (QT-07)**: el proyecto y NZT, en secciones separadas. Cada propuesta
+    se ata a un momento de la sesión (lo genérico se descarta), dice si el error es mecánico
+    (destino: un chequeo) o de criterio (destino: una regla), y queda en `estado: propuesta`
+    para que el equipo la mueva. De Pocock vienen el atado al momento, chequeo antes que regla y
+    que un repo sin chequeos sea un hallazgo; los destinos son los de NZT.
+  - **Detalles (QT-04)**: propuestas del agente, en `10-retro.md` §Detalles.
+  - **Dónde se aplica:** 409 la skill, 411 listado, build, README y eval de disparo, 412 las
+    puertas y una retro real sobre la sesión que la diseñó.
+  - **Hecho (409, 411, 2026-10-29).** `skills/nzt/retro/SKILL.md`, 141 líneas y sin referencia;
+    description de 183 caracteres que dice que corre sólo a pedido. El listado pasa de ~2684 a
+    ~2898 caracteres y de 15 a 16 skills (README al día). Caso `evals/routing/retro`: dispara
+    por la descripción y pregunta la ruta antes de escribir. **No corrido**: que la descripción
+    alcance para dispararla, y que no dispare sola, no está medido.
+  - **Hecho (412, 2026-10-29).** Build sin avisos, 171 checks del instalador, ningún `.md` pasa
+    de 200 líneas. **No corrido**: el chequeo de citas (no se encontró su comando). Retro real de
+    esta sesión siguiendo la skill del repo: el md quedó en el escritorio del usuario, fuera de
+    todo repo, con cinco propuestas (R-01 a R-05) y dos descartes; no se tocó nada más.
 
 ## 13. Revisión contra Temper v3
 
