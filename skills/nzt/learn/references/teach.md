@@ -122,9 +122,10 @@ End every lesson with a question the person answers **with the material out of s
 
 ## What closes the objective
 
-**Not a good lesson.** The objective closes when the person **produced** something at
-*alone* **and** explained it in their own words without the material. Until both have
-happened, `progress.md` says `in progress` and names where they stopped.
+**Not a good lesson.** The practice closes when the person **produced** something at
+*alone* **and** explained it in their own words without the material. The objective stays
+`in progress` either way — naming where they stopped, or that it is ready to be assessed:
+the verdict is `nzt-learn-assess`'s, on a case nobody practised.
 
 Write into `progress.md` when the lesson's practice ends, not when the lesson is written:
 

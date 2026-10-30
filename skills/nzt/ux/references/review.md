@@ -1,5 +1,14 @@
 # Usability review
 
+## Contents
+- What your input can and cannot prove
+- Walk the tasks first
+- Then sweep the heuristics
+- Then accessibility
+- Measuring an HTML file
+- The finding
+- Done when
+
 Produces a report of findings about one screen, each with its severity and its **type** —
 and the type is what says where the finding goes next.
 
@@ -56,6 +65,20 @@ WCAG 2.2 AA, with the concrete checks:
 
 **The level the product commits to is a product requirement.** If none is declared, review
 against AA and ask whether it is adopted.
+
+## Measuring an HTML file
+
+A mockup, a prototype or the manual is measured before it is presented, and every result is
+written down:
+
+- **320 px with no horizontal scroll**: render it in an iframe at that width and compare
+  `scrollWidth` with `clientWidth`. "It looks responsive" is not a measurement.
+- **Contrast computed on the real pairs** actually used — text over its surface, control
+  over its background — against the thresholds above, not on the palette in the abstract.
+- **Keyboard order walked**, checking focus is visible and nothing is left unreachable.
+
+**A file that could not be rendered is not verified**, and it is reported that way. Never
+present a file you did not see.
 
 ## The finding
 

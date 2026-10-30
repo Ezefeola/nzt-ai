@@ -1,5 +1,17 @@
 # Code — the rules that hold in any language
 
+## Contents
+- Everything you write is in English
+- Files and types
+- Members in one order, and each group together
+- Absence is handled, never asserted away
+- Async
+- Control flow
+- No magic strings, and no magic numbers
+- Reflection is exceptional
+- Comments say why
+- Closing checklist
+
 These are **project rules written as prohibitions on purpose**: a prohibition is verifiable
 and a preference is not. They hold in every component, backend or frontend, whatever the
 language.
@@ -83,6 +95,27 @@ The cases where reflection is genuinely right are rare, and **you do not decide 
 you are not sure yours is one, ask before writing it.** Reflection a package does for you is
 not yours.
 
+## Comments say why
+
+- What the line already says is noise, and it goes stale: the line changes, the comment
+  stays, and the file carries two answers with nothing to say which one runs.
+- **What a comment usually tries to fix is a name.** A variable, a method or a type that
+  said too little. Fix the name instead.
+- Explain the non-obvious: a workaround with its cause, an externally imposed constraint, a
+  decision that looks wrong and is not. Name its source when the source is a record that
+  does not move — an ADR, a defect id, a provider's issue.
+- **The spec does not travel into the code.** No rule slug, no story id, no requirement
+  text in a comment. Traceability lives in the specs, where each rule has one original that
+  changes in one place; a rule quoted in the code is a **second original** that drifts the
+  first time the rule is edited, with nothing pointing at it to say so. The code implements
+  the rule; it does not cite it.
+- Never leave commented-out code. Version control already keeps it; a commented block is a
+  question nobody can answer.
+- No change logs, author names or dates in comments. That is the repository's job.
+- Follow the comment style of the code around you, even if it is not the one you would
+  choose.
+- A comment that stops being true is fixed or deleted in the same unit as the code.
+
 ## Closing checklist
 
 - [ ] Every identifier, file, folder and comment in English, with domain terms taking the
@@ -97,3 +130,5 @@ not yours.
       propagated.
 - [ ] No nested if/else, no meaningful literal left unnamed.
 - [ ] No hand-written reflection, and a doubtful case was asked rather than decided alone.
+- [ ] Every comment says why; none is commented-out code, a change log, a spec citation, or
+      no longer true.

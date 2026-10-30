@@ -178,9 +178,7 @@ reported as not verified, and the criterion's area stays unmarked.
   an opt-in of the stack: `nzt-build-tdd`.
 - **How this stack does it** — framework, runner, project layout, doubles, the real engine it
   runs against — is the area leaf of the component.
-- **The application-level test plan**, its scenarios and its evidence are `nzt-verify`'s. The
-  boundary: the tests that travel with the code are this phase's; the ones derived from an
-  approved test-plan scenario are not.
+- **The application-level test plan** is `nzt-verify`'s, as `nzt-build`'s boundaries say.
 
 ## Done when
 

@@ -27,12 +27,15 @@ Answer in this shape and nothing else:
 ```markdown
 **Question:** <the question, as you understood it>
 
-- seen · `path/to/file.ext:42` — <one claim>
+- observed · `path/to/file.ext:42` — <one claim>
 - inferred · `path/to/other.ext` — <one claim>, from <what it follows from>
-- seen · <url> (read <date>) — <one claim>
+- documented · <url> (read <date>) — <one claim>
+- unverified · <what you looked for> — <what would settle it>
 
 **Not looked at:** <the areas you did not search, or "nothing left in the bounds">
 ```
 
-Every line is one pointer and one claim, labelled `seen` or `inferred`. Never summarize a file
-you did not open, and never fill a gap with what you remember.
+Every line is one pointer and one claim, labelled as `nzt-research` labels it: `observed`
+(the project showed it: a line you read, a command you ran), `documented` (a source page),
+`inferred` (with what it follows from) or `unverified`. Never summarize a file you did not
+open, and never fill a gap with what you remember.

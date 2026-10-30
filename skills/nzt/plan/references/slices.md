@@ -2,13 +2,12 @@
 
 Produces a plan cut into **slices**: pieces walked end to end, each with its own phases, so
 value reaches the user — and a defect reaches you — before the whole scope is built. The
-state format is in *The state file* of `nzt-plan`; this file says how to cut and run it.
+state format is in `references/state.md`; this file says how to cut and run it.
 
 ## When
 
-- Full-size work (`nzt`'s sizes), or work the user wants delivered early.
-- Not direct or standard work — a bug, a small change, one or two stories: those stay a
-  plan with `phases`, which is a plan of one slice.
+Full work as `nzt` sizes it, or work the user wants delivered early. Standard work stays a
+plan with `phases`, which is a plan of one slice.
 
 ## What a slice is
 
@@ -20,11 +19,11 @@ cut is a plan line the user approves: a bigger slice is their call, never the de
 - Work that belongs to the whole run — the product definition, a final release — is its own
   slice. There are no phases outside slices.
 
-## Discovery comes first
+## Analysis comes first
 
-Slices come out of discovery; you cannot cut what you do not know yet.
+Slices come out of analysis; you cannot cut what you do not know yet.
 
-1. A new product or feature starts with a plan that knows **only the discovery slice**, and
+1. A new product or feature starts with a plan that knows **only the analysis slice**, and
    draws the shape of the rest in one line.
 2. When that slice closes, **rewrite the plan with the concrete slices** — which, in what
    order, how big, with which cadence — set `approved: false`, and ask again. That approval
@@ -35,7 +34,7 @@ Slices come out of discovery; you cannot cut what you do not know yet.
 The product's delivery 1 (`nzt-discovery`'s `product.md`) says what reaches the user first
 and for which objective. Its slices are planned; later deliveries stay as one line in the
 plan's shape, never as units. When delivery 1 has something to learn from users, **offer an
-HTML prototype** (`nzt-ux`) inside the discovery slice: usable, deleted or kept as the user
+HTML prototype** (`nzt-ux`) inside the analysis slice: usable, deleted or kept as the user
 decides, never turned into production code. In a new product, the first build slice is the **walking skeleton**: the
 whole path end to end in its thinnest form, real code the next slices grow.
 
@@ -65,8 +64,8 @@ ordinary step of the approved plan, not a change to it: it asks for no new appro
 ## Inside a slice
 
 The phase rules of the state file hold inside each slice: in order, no name repeated, at
-most one `doing`. **Verify runs once the slice is built in every area**, never between two
-build units of it: build never designs or runs application tests.
+most one `doing`, and verify after the slice's last build unit (step 2 of *Building the
+plan*).
 
 - **Who tests.** The AI's QA chains inside the batch. A person's QA unit goes in
   `autonomy.keep_stops`: the batch waits for them there.
@@ -95,6 +94,6 @@ a slice column, which leaves blank cells. Under the tables, the declarations of 
 ## Done when
 
 - Every slice can be tried on its own, says which phases it needs, and is its own table.
-- The discovery slice comes first when the scope is not known yet, with re-approval after it.
+- The analysis slice comes first when the scope is not known yet, with re-approval after it.
 - `cadence` is written; no feature is built without its scope, rules and a step for its stories.
 - No verify unit sits between two build units of the same slice.

@@ -1,0 +1,201 @@
+<!doctype html>
+<!--
+  Mock de tablas de nzt-look en la app de escritorio · 2026-10-28
+  Fuente: mods/nzt-look/hooks/reply.tsx (drawDesktopTable) y la captura del usuario.
+  Colores: paleta "NZT" de mods/nzt-look/hooks/palette.ts (oscura y clara); el fondo de
+  página es composerSidebarBackground de themes/nzt-dark.json. La banda de la opción A usa
+  userMessageBackgroundHover del mismo tema. Ningún color inventado.
+  Cada opción usa sólo lo que Box y Text ofrecen: backgroundColor, borderStyle/borderColor,
+  padding, gap, bold, color. Es una referencia para mirar, no código para copiar.
+  Elegida: opción A (usuario, 2026-10-28), implementada en hooks/reply.tsx. En el mod la banda
+  no es userMessageBackgroundHover: es mix(surface, user, 0.18), con menos tinte en los temas
+  donde el texto del header no llegaría a 4,5:1.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablas de nzt-look</title>
+<style>
+  :root {
+    --page: #07100f;      /* themes/nzt-dark.json composerSidebarBackground */
+    --user: #5ccaa9;      /* palette.ts NZT dark · user */
+    --fg: #d3dfdb;        /* fg */
+    --muted: #7f9893;     /* muted */
+    --surface: #0c1918;   /* surface */
+    --zebra: #102221;     /* zebra */
+    --band: #163a35;      /* themes/nzt-dark.json userMessageBackgroundHover */
+  }
+  :root[data-theme="light"] {
+    --page: #f4f8f6;
+    --user: #0b6b55;      /* palette.ts NZT light */
+    --fg: #07100f;
+    --muted: #4d6662;
+    --surface: #ffffff;
+    --zebra: #e8f2ee;
+    --band: #d3e8e1;      /* provisional: no hay equivalente claro de la banda en el tema */
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--fg);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .controls {
+    position: sticky; top: 0; z-index: 1; display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 10px 16px; background: var(--page); border-bottom: 1px solid var(--zebra);
+  }
+  .controls button {
+    font: inherit; color: var(--fg); background: var(--surface); cursor: pointer;
+    border: 1px solid var(--muted); border-radius: 6px; padding: 4px 10px;
+  }
+  .controls button[aria-pressed="true"] { border-color: var(--user); color: var(--user); }
+  main { max-width: 780px; margin: 0 auto; padding: 16px; display: grid; gap: 28px; }
+  section h2 { margin: 0 0 4px; font-size: 15px; color: var(--user); }
+  section p.how { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+  section p.how code { color: var(--fg); }
+  .frame { border-radius: 10px; padding: 12px; background: var(--page); outline: 1px dashed color-mix(in srgb, var(--muted) 40%, transparent); }
+  .lead { margin: 0 0 8px; }
+  .tbl { width: 100%; }
+  .row { display: flex; }
+  .cell { flex: 0 0 50%; min-width: 0; overflow-wrap: anywhere; }
+  .cell:first-child { flex-basis: 52%; } .cell:last-child { flex-basis: 48%; }
+  .copy { font: inherit; font-size: 13px; background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 4px; }
+  .copy:hover, .copy:focus-visible { color: var(--user); }
+
+  /* Actual: lo que hace drawDesktopTable hoy */
+  .now { border: 1px solid var(--muted); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .now .cell { padding: 0 8px; }
+  .now .head { background: var(--surface); color: var(--user); font-weight: 700; }
+  .now .row:nth-child(odd):not(.head) { background: var(--zebra); }
+  .now .foot { padding: 0 8px; }
+
+  /* A · Banda de encabezado */
+  .a { border: 1px solid var(--zebra); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .a .cell { padding: 8px 12px; }
+  .a .head { background: var(--band); color: var(--fg); font-weight: 700; }
+  .a .head .cell:last-child { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .a .row:not(.head):nth-child(odd) { background: var(--zebra); }
+  .a .head .copy { color: var(--user); }
+
+  /* B · Líneas, sin zebra */
+  .b { border: 1px solid var(--zebra); border-radius: 10px; overflow: hidden; background: var(--zebra); display: grid; gap: 1px; }
+  .b .row { background: var(--surface); }
+  .b .cell { padding: 8px 12px; }
+  .b .head { background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+  .b .head .cell:last-child { display: flex; justify-content: space-between; align-items: center; }
+
+  /* C · Filas como tarjetas */
+  .c { display: grid; gap: 6px; }
+  .c .head { color: var(--muted); font-weight: 700; padding: 0 2px; }
+  .c .head .cell { padding: 0 12px; }
+  .c .head .cell:last-child { display: flex; justify-content: space-between; align-items: center; }
+  .c .row:not(.head) { background: var(--surface); border: 1px solid var(--zebra); border-radius: 8px; }
+  .c .row:not(.head) .cell { padding: 8px 12px; }
+  .c .row:not(.head) .cell:first-child { color: var(--muted); }
+  .c .row:not(.head) .cell:last-child { color: var(--fg); font-weight: 600; }
+
+  .narrow main { max-width: 360px; }
+  .narrow .c .row:not(.head) { flex-direction: column; }
+  .narrow .c .row:not(.head) .cell { flex-basis: auto; }
+  .narrow .c .row:not(.head) .cell:first-child { padding-bottom: 0; }
+  @media (max-width: 480px) {
+    .c .row:not(.head) { flex-direction: column; }
+    .c .row:not(.head) .cell { flex-basis: auto; }
+    .c .row:not(.head) .cell:first-child { padding-bottom: 0; }
+  }
+  .notes { color: var(--muted); font-size: 13px; margin: 8px 0 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+<div class="controls" role="toolbar" aria-label="Opciones del mock">
+  <button type="button" data-set="theme" data-value="dark" aria-pressed="true">Oscuro</button>
+  <button type="button" data-set="theme" data-value="light" aria-pressed="false">Claro</button>
+  <button type="button" data-set="width" data-value="wide" aria-pressed="true">Ancho normal</button>
+  <button type="button" data-set="width" data-value="narrow" aria-pressed="false">Panel angosto</button>
+</div>
+<main id="main"></main>
+
+<script>
+  const header = ['Antes', 'Ahora'];
+  const rows = [
+    ['El trabajo directo podía escribir state.json', 'No lo escribe nunca (M1)'],
+    ['Una corrección bien hecha en learn podía dar achieved', 'Sólo una evaluación lo da, así que hay un paso más (L1)'],
+    ['Verify volvía a preguntar el mecanismo de datos aunque el stack lo dijera', 'Lo lee del stack y sólo pregunta si falta (V2)'],
+    ['En Blazor, inline / code-behind se preguntaba en medio de una historia', 'Se pregunta al escribir el stack (S1)'],
+    ['Los criterios se citaban como CA-NN sin tener id', 'Tienen CA-NN estable (U1)'],
+  ];
+  const options = [
+    {
+      id: 'now', title: 'Actual', copyIn: 'foot',
+      how: 'Hoy: el header usa <code>surface</code> igual que las filas, <code>zebra</code> casi no se distingue, sin padding vertical, y Copiar queda suelto abajo.',
+      notes: [],
+    },
+    {
+      id: 'a', title: 'A · Banda de encabezado', copyIn: 'head',
+      how: 'Header en una banda (<code>backgroundColor</code> del tema), filas con <code>paddingY={1}</code>, borde en <code>zebra</code> y Copiar dentro del header.',
+      notes: ['El cambio más chico: sigue siendo la tabla de hoy, con jerarquía.', 'El zebra sigue siendo sutil; la banda y el aire separan las filas.'],
+    },
+    {
+      id: 'b', title: 'B · Líneas, sin zebra', copyIn: 'head',
+      how: 'Contenedor en <code>zebra</code> con <code>rowGap</code> de 1: el hueco entre filas se ve como línea. Header en <code>muted</code>, como etiqueta.',
+      notes: ['La más sobria; lee bien con muchas filas.', 'No verificado: que el escritorio dibuje un gap de 1 como 1 px, sin el cual no hay línea.'],
+    },
+    {
+      id: 'c', title: 'C · Filas como tarjetas', copyIn: 'head',
+      how: 'Sin borde exterior: cada fila es un <code>Box</code> con <code>borderStyle="round"</code> y <code>gap</code> entre filas; la columna de resultado va en bold.',
+      notes: ['La mejor para comparar dos columnas, y en angosto apila las celdas.', 'Ocupa más alto; con muchas filas conviene el pliegue de 14 que ya existe.'],
+    },
+  ];
+
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const copyButton = () => el('button', 'copy', 'Copiar');
+
+  const draw = () => {
+    const main = document.getElementById('main');
+    main.replaceChildren();
+    for (const o of options) {
+      const s = el('section'); s.id = o.id;
+      s.append(el('h2', null, o.title));
+      const how = el('p', 'how'); how.innerHTML = o.how; s.append(how);
+      const frame = el('div', 'frame');
+      frame.append(el('p', 'lead', 'Con eso el comportamiento cambia en estos puntos:'));
+      const t = el('div', `tbl ${o.id}`);
+      const head = el('div', 'row head');
+      header.forEach((h, i) => {
+        const c = el('div', 'cell', o.id === 'b' ? h.toUpperCase() : h);
+        if (i === header.length - 1 && o.copyIn === 'head') {
+          const label = el('span', null, c.textContent); c.textContent = ''; c.append(label, copyButton());
+        }
+        head.append(c);
+      });
+      t.append(head);
+      for (const r of rows) {
+        const row = el('div', 'row');
+        r.forEach(v => row.append(el('div', 'cell', v)));
+        t.append(row);
+      }
+      if (o.copyIn === 'foot') { const f = el('div', 'foot'); f.append(copyButton()); t.append(f); }
+      frame.append(t);
+      s.append(frame);
+      if (o.notes.length) { const ul = el('ul', 'notes'); o.notes.forEach(n => ul.append(el('li', null, n))); s.append(ul); }
+      main.append(s);
+    }
+  };
+
+  const state = { theme: 'dark', width: 'wide' };
+  const apply = () => {
+    document.documentElement.dataset.theme = state.theme;
+    document.body.classList.toggle('narrow', state.width === 'narrow');
+    document.querySelectorAll('[data-set]').forEach(b => b.setAttribute('aria-pressed', String(state[b.dataset.set] === b.dataset.value)));
+    history.replaceState(null, '', `#tema=${state.theme}&ancho=${state.width}`);
+  };
+  const fromHash = () => {
+    const p = new URLSearchParams(location.hash.slice(1));
+    if (p.get('tema') === 'light') state.theme = 'light';
+    if (p.get('ancho') === 'narrow') state.width = 'narrow';
+  };
+  document.querySelectorAll('[data-set]').forEach(b => b.addEventListener('click', () => { state[b.dataset.set] = b.dataset.value; apply(); }));
+  fromHash(); draw(); apply();
+</script>
+</body>
+</html>

@@ -57,16 +57,10 @@ exists for, and they all pass at the end without any of them having been watched
 - A test you cannot make fail first — because the behavior already exists — is not a
   test-first test. Keep it as a covering test and say so.
 
-## Closing
-
-The same close as any build unit: what is affected compiles, the tests have been **run**,
-the area is marked only on criteria whose tests pass, and what they cannot reach is named
-as not covered until QA.
-
 ## Done when
 
 Rehearse it: for every behavior you added, was there a moment when its test failed for the
-right reason?
+right reason? And the *Done when* of `nzt-build-implement` holds too.
 
 - Every criterion you covered has a test that was watched failing first.
 - No test asserts more than one behavior.

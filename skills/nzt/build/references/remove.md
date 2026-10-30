@@ -58,18 +58,16 @@ When something outside this project depends on it, removal is staged, and both s
 written down: what keeps working, for how long, and who is told. **A deprecation with no
 removal date is not a plan**, it is the same code with an apology attached.
 
-## Closing
-
-- What is affected compiles and the checks around what you removed have been run.
-- **Say what you searched for and where.** "Nothing else uses it" is a claim; the list of
-  names, routes and keys you searched is the evidence for it.
-- Everything you deliberately left — shared code, data, a deprecated path — is in the
-  report, with why.
-
 ## Done when
 
 Rehearse it: could someone read the codebase tomorrow and find no trace that suggests this
 still works?
+
+- What is affected compiles and the checks around what you removed have been run.
+- **The report says what you searched for and where.** "Nothing else uses it" is a claim;
+  the list of names, routes and keys you searched is the evidence for it.
+- Everything you deliberately left — shared code, data, a deprecated path — is in the
+  report, with why.
 
 - No entry point reaches it, at any layer.
 - Nothing is registered, scheduled, translated or configured for it.

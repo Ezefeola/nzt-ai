@@ -19,7 +19,10 @@ user to keep or drop. Read it before showing a plan, new or rewritten.
   it covers beyond the minimum so the user can drop it. *"I am leaving out coupon
   administration: that is F-009 and you did not ask for it"* is what makes scope reviewable.
 - One line for each phase you skipped and why.
-- **Standard work** (`nzt`'s sizes) shows one table and those declarations, and nothing else:
+- **A parallel group** shows its id beside each of its units and each unit's model, and
+  under the table the work branch and that the group stops once, at its end: approving the
+  plan approves the three.
+- **Standard work** (as `nzt` sizes it) shows one table and those declarations, and nothing else:
   no slices, no cadence. The mode is offered as `nzt-plan` says, in one line.
 
 ## The documents the plan produces
@@ -35,10 +38,10 @@ line. Three categories:
 
 - Offering one, say what dropping it loses: not *"do you want the ADR?"* but *"without it,
   this decision gets re-argued in three months with no record of what was weighed"*.
-- **Mandatory:** the stack per component and area, designed with it or read from evidence
-  before its code is touched, with `architecture.md` naming its root; the product definition
-  — its first version in standard work or an existing product — and the glossary, from
-  Analysis on, the glossary updated by every unit that adds or changes a term.
+- **Mandatory** is what the plan's phases declare mandatory in their routers, named in the
+  plan by its name: the product definition and the glossary (`nzt-discovery`), the stack
+  per component and area (`nzt-architecture`). When and in what form each is due is the
+  router's, not repeated here.
   **Offered: feature design** in full work, and in standard work only when it touches a
   contract or the data model;
   and, when the plan chooses UX for a product with screens and it has none yet, the design
@@ -49,9 +52,8 @@ line. Three categories:
 - **The size sets the ceremony, not the list of documents.** In standard work, offer a
   document only when this work earns it, and say what in the work does: a new screen in a
   product with no design system earns it; a filter on a screen that exists does not.
-- Do not ask what you can verify — a version, a capability, a package's maintenance state.
-  Ask the user about tradeoffs and material changes, and never re-ask what the project
-  already decided: if the stack answers it, read it.
+- Ask the user about tradeoffs and material changes only, the way `nzt-plan`'s questions
+  reference says.
 
 ## Done when
 

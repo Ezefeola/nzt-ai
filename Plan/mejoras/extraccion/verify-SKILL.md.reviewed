@@ -1,0 +1,26 @@
+# Unit 397: verify router, Rules and Closing checklist cut to the phase-wide rules (V1, QT-01, QT-02); When it runs cites nzt-plan (V3); data mechanism read from the stack (V2)
+run after the slice was built, or interleaved because the user asked => router When it runs; nzt-plan Building the plan step 2: "unless the user asks for it"
+plan written and approved before execution, naming each scenario's target => router The stop that comes first; test-design The plan is approved before anything runs
+qa ✓ only where every built area's scenarios passed on their latest run => test-run Marking qa on the story: "qa ✓ when the latest run of every scenario covering that criterion passed, for every area marked ✓"
+data mechanism agreed with the user and recorded in the stack document => test-data Done when: "The mechanism was agreed with the user and is recorded in the stack document"
+every scenario that needed data has its setup and teardown scripts, and every teardown that did not run is recorded as data debt => test-data Done when (first and fifth points)
+what this session can drive was checked, and no screen scenario was resolved with api evidence => router Which component, and with what: "Then check what this session can actually drive"; "A UI scenario is never marked passed on API evidence"
+every scenario has a status from the closed vocabulary => test-run Recording the run: "Closed vocabulary"; Done when: "Every scenario has a dated run with its state"
+every blocked carries a cause you genuinely could not resolve => test-data The data is yours to create: "blocked is for what you cannot resolve"; test-run Done when: "or is blocked with its cause"
+criteria with no scenario listed in the index => test-design Traceability: "A criterion with no scenario appears as no scenario"; router Where it lands: index lists "criteria with no scenario"
+evidence saved per run and referenced from the results table => test-run Evidence: "One folder per run, referenced from the results table"
+bugs filed with their state, and none of them silently fixed here => router Done when: "every failure has its bug file"; bug.md Three states; test-run Done when: "Nothing was repaired mid-run"
+index updated: last run, result, open bugs, what is automated, data left behind => router Where it lands, index line
+a failure stops the batch => plan slices.md When QA fails inside the batch; test-run Do not fix while testing: "a run with a failure also stops the batch"
+how its data is obtained => test-design The scenario: Data and Setup / cleanup lines
+the data mechanism is agreed there too, once => router: "The data mechanism is the stack's Test data opt-in"; test-data Ask the mechanism once (V2)
+design the cases before running anything => test-design opening: "written and approved before anything is executed"; router Rules: "The expected result comes from the requirement"
+closed status vocabulary => test-design The scenario and test-run Recording the run: "Closed vocabulary"
+you generate the test data, with the mechanism the user chose => test-data The data is yours to create
+every scenario that needs data gets two scripts, written before the run: one that prepares it and one that deletes exactly what the first one created => test-data Two scripts per scenario, written together
+blocked is for what you cannot resolve, not for what you did not think to create => test-data The data is yours to create: "blocked is for what you cannot resolve, never for what you did not think to create"
+run through the real entry point => test-run Through the real entry point; Success is not persistence
+coverage runs both ways => test-design Traceability, both ways
+a re-run adds a dated execution; it never overwrites the previous one => test-run Recording the run: "A retest adds a dated run; it never overwrites the previous one"
+the bug has three states => bug.md Three states, not two
+do not fix a defect while testing => router Rules: "Finding a defect and repairing it are different units"; test-run Do not fix while testing

@@ -1,24 +1,20 @@
 # Backend practices — selection by stack axis
 
-For a backend component whose stack has **no area router** in `nzt-build`'s table. A component
-that has one goes there instead: that router reads these same generic references as its
-*Read with*, so going through both reads them twice.
-
-`<component folder>/Docs/Architecture/backend-stack.md` decides every row below. Read it first.
-Paths are relative to `nzt-build`'s folder. **Read the file before acting on the row** — the
-row is not the guidance, the file is.
+For a backend component with no area router, as `nzt-build` sends it here. `backend-stack.md`
+decides every row; paths are relative to `nzt-build`'s folder, and the file is read before
+acting on its row.
 
 ## Exclusive axes — read only what the stack selected
 
-| Axis | The stack says | Read |
-|---|---|---|
-| Architecture | `vertical-slice` | `references/backend-architecture-vertical-slice.md` |
-| | `clean-architecture` | `references/backend-architecture-clean.md` |
-| | `hexagonal-architecture` | `references/backend-architecture-hexagonal.md` |
-| Domain model | `ddd` | `references/backend-domain-ddd.md` |
-| | `anemic` | `references/backend-domain-anemic.md` |
-| Persistence | `repositories` | `references/backend-persistence-repositories.md` |
-| | `direct` | `references/backend-persistence-direct.md` |
+| Axis | The stack says | Read | What it costs, when it is chosen |
+|---|---|---|---|
+| Architecture | `vertical-slice` | `references/backend-architecture-vertical-slice.md` | one folder per feature, and removing it is deleting the folder; a duplicate between slices is accepted as the cheap problem |
+| | `clean-architecture` | `references/backend-architecture-clean.md` | four layers in separate units, every reference pointing inward; one feature touches several units |
+| | `hexagonal-architecture` | `references/backend-architecture-hexagonal.md` | a core with every contract, and one unit per adapter, one external system each; more units, every outside dependency isolated |
+| Domain model | `ddd` | `references/backend-domain-ddd.md` | entities and aggregates protect their own rules; more modelling up front |
+| | `anemic` | `references/backend-domain-anemic.md` | entities carry data, use cases carry the rules; cheap, and a rule two use cases need is duplicated |
+| Persistence | `repositories` | `references/backend-persistence-repositories.md` | one per aggregate root with its interface, plus a unit of work; a seam for tests, and a layer on every query |
+| | `direct` | `references/backend-persistence-direct.md` | use cases use the data access handle itself; less code, tied to that library |
 
 **Domain model and persistence are independent.** DDD does not imply repositories, and an
 anemic model does not imply direct access.
@@ -27,8 +23,6 @@ A stack that names none of these is a gap in the stack document: say so and fill
 not pick one here.
 
 ## Rows the task selects
-
-**Read `references/code-code.md` before writing any code**: the rules of code in any language.
 
 | The work touches | Read | Read with |
 |---|---|---|
@@ -56,14 +50,3 @@ for every operation, and no row below repeats it.
 | The handle's configuration, entity mapping, relationships, mapping an aggregate or a value object | `references/data-mapping.md` | — |
 | A schema change that needs a migration | `references/data-migrations.md` | — |
 | An index, or a uniqueness rule to enforce | `references/data-indexes.md` | — |
-
-## Applying a generic reference to a technology
-
-- **The generic reference says what holds and why; the stack document says how it is done in
-  this technology.** Where the reference leaves a mechanism to the stack — the boundary
-  between layers, the entry point, how a registration is written — read it there.
-- **A mechanism the stack document does not record is a gap in it**, not a free choice. Check
-  the project's evidence first — the manifest, the code already there — and when the evidence
-  does not settle it, ask once and write the answer in the stack.
-- **How the technology behaves is verified in its authoritative source** before it enters the
-  code (`nzt-research`). A generic reference names no API on purpose.

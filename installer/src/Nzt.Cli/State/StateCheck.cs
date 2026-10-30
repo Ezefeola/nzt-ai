@@ -25,6 +25,8 @@ public static class StateCheck
 
     private static readonly string[] Cadences = ["delivery", "upfront", "just-in-time"];
 
+    private static readonly string[] Models = ["small", "main"];
+
     public static StateReport Run(string projectDirectory)
     {
         var path = Path.Combine(projectDirectory, RelativePath);
@@ -61,7 +63,8 @@ public static class StateCheck
             problems.Add($"delegation es {Shown(Raw(delegation))}: son {string.Join(", ", DelegationModes)}");
 
         var ids = new HashSet<string>();
-        var unitsDoing = new List<string>();
+        var unitsDoing = new List<(string Id, string? Group)>();
+        var groupPhase = new Dictionary<string, string>();
 
         var hasPhases = root.TryGetProperty("phases", out var phases);
         var hasSlices = root.TryGetProperty("slices", out var slices);
@@ -79,7 +82,7 @@ public static class StateCheck
             // diciendo que no lo entiende, en vez de leerlo a medias (D73).
             if (version != "2")
                 problems.Add($"slices pide version 2, y version es {Shown(version)}");
-            CheckSlices(root, slices, ids, unitsDoing, problems);
+            CheckSlices(root, slices, ids, unitsDoing, groupPhase, problems);
         }
         else if (version == "2")
         {
@@ -93,13 +96,19 @@ public static class StateCheck
         }
         else
         {
-            var phasesDoing = CheckPhases(phases, "", ids, unitsDoing, problems);
+            var phasesDoing = CheckPhases(phases, "", ids, unitsDoing, groupPhase, problems);
             if (phasesDoing.Count > 1)
                 problems.Add($"hay {phasesDoing.Count} fases en doing ({string.Join(", ", phasesDoing)}); a lo sumo una");
         }
 
-        if (unitsDoing.Count > 1)
-            problems.Add($"hay {unitsDoing.Count} unidades en doing ({string.Join(", ", unitsDoing)}); a lo sumo una");
+        // Varias en doing solo si son todas de un mismo grupo en paralelo (D84).
+        var doingGroups = unitsDoing.Select(u => u.Group).Distinct().ToList();
+        if (unitsDoing.Count > 1 && (doingGroups.Count > 1 || doingGroups[0] is null))
+            problems.Add($"hay {unitsDoing.Count} unidades en doing ({string.Join(", ", unitsDoing.Select(u => u.Id))}); " +
+                "a lo sumo una, o las de un mismo grupo en paralelo");
+
+        if (groupPhase.Count > 0 && Text(root, "work_branch") is not { Length: > 0 })
+            problems.Add("hay grupos en paralelo y falta work_branch, la rama de trabajo");
 
         if (root.TryGetProperty("autonomy", out var autonomy) && autonomy.ValueKind == JsonValueKind.Object)
             foreach (var list in new[] { "units", "keep_stops" })
@@ -112,7 +121,7 @@ public static class StateCheck
     }
 
     private static void CheckSlices(JsonElement root, JsonElement slices, HashSet<string> ids,
-        List<string> unitsDoing, List<string> problems)
+        List<(string Id, string? Group)> unitsDoing, Dictionary<string, string> groupPhase, List<string> problems)
     {
         // Ausente es `upfront` (D73), como lo hacía NZT antes de los tramos.
         if (root.TryGetProperty("cadence", out var cadence) && !Cadences.Contains(Text(root, "cadence")))
@@ -148,7 +157,7 @@ public static class StateCheck
                 continue;
             }
 
-            var phasesDoing = CheckPhases(phases, $" del tramo {name}", ids, unitsDoing, problems);
+            var phasesDoing = CheckPhases(phases, $" del tramo {name}", ids, unitsDoing, groupPhase, problems);
             if (phasesDoing.Count > 1)
                 problems.Add($"hay {phasesDoing.Count} fases en doing en el tramo {name} ({string.Join(", ", phasesDoing)}); a lo sumo una");
             if (phasesDoing.Count > 0 && sliceStatus != "doing")
@@ -173,7 +182,7 @@ public static class StateCheck
     /// <summary>Las reglas de una lista de fases, la de un v1 o la de cada tramo de un v2.</summary>
     /// <returns>Los nombres de las fases en doing.</returns>
     private static List<string> CheckPhases(JsonElement phases, string where, HashSet<string> ids,
-        List<string> unitsDoing, List<string> problems)
+        List<(string Id, string? Group)> unitsDoing, Dictionary<string, string> groupPhase, List<string> problems)
     {
         var phasesDoing = new List<string>();
 
@@ -206,9 +215,23 @@ public static class StateCheck
                 if (!Statuses.Contains(unitStatus))
                     problems.Add($"{label} tiene status {Shown(unitStatus)}");
 
+                var group = Text(unit, "group");
+                if (unit.TryGetProperty("group", out var groupValue) && group is not { Length: > 0 })
+                    problems.Add($"{label} tiene group {Shown(Raw(groupValue))}: es el id de texto de su grupo en paralelo");
+                else if (group is not null && !groupPhase.TryAdd(group, name + where) && groupPhase[group] != name + where)
+                    problems.Add($"el grupo {group} tiene unidades en '{groupPhase[group]}' y en '{name}'{where}; un grupo vive en una fase");
+
+                if (unit.TryGetProperty("model", out var model))
+                {
+                    if (!Models.Contains(Text(unit, "model")))
+                        problems.Add($"{label} tiene model {Shown(Raw(model))}: son {string.Join(", ", Models)}");
+                    else if (group is null)
+                        problems.Add($"{label} tiene model sin group: el modelo es de una unidad en paralelo");
+                }
+
                 if (unitStatus == "doing")
                 {
-                    unitsDoing.Add(id ?? "?");
+                    unitsDoing.Add((id ?? "?", group));
                     if (phaseStatus != "doing")
                         problems.Add($"{label} está en doing, pero su fase '{name}'{where} está en {Shown(phaseStatus)}");
                 }

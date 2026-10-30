@@ -14,9 +14,6 @@ These are **project rules written as prohibitions on purpose**. They hold in eve
 Blazor adds only what differs, in its own guidance. **In a foreign component these rules step
 aside**, as `code-code.md` says.
 
-Load this before any area skill applies. If you did not arrive here from an area router,
-load that router too.
-
 | When the code touches | Read, in this skill's folder, before writing it | Read with |
 |---|---|---|
 | A DTO or its mapping extensions: what a use case returns, what a typed client sends | `references/dtos.md` | `../nzt-build/references/code-dtos.md` — first, required |

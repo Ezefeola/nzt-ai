@@ -1,0 +1,5 @@
+# Unit 396: Blazor router, organisation axis in the table (S1), copied blocks out (S2, QT-04), Closing merged into Done when (QT-02)
+every row read was selected by the stack document, not by preference => Done when: "Every row read was selected by the stack document, never by preference"
+no two rows of the same axis were read, and the render-mode reference was read only because the work touches rendering => Done when: "no two of the same axis; the render-mode reference was read only because the work touches rendering"
+the stack document was updated in this unit if the work changed what it declares => nzt-build router Read the stack first: "Keep the stack current with the change"
+component organisation is a stack axis too => Exclusive axes table, rows "Component organisation"; "Component organisation is asked with the stack"

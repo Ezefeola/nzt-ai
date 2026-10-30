@@ -43,7 +43,9 @@ Then resolve each one **by its kind**, and the kind is not the user's to pick:
 | Tradeoff or material change | validating the licence online or with a signed token | **asked**, with the options, their consequences and a recommendation — in every mode |
 
 A finding that contradicts an agreed rule does not bend the design: it goes back to
-discovery as a question or a change proposal.
+discovery as a question or a change proposal. How any question is asked, written and closed
+is `nzt-plan`'s (`../nzt-plan/references/questions.md`); this phase adds the kinds above and
+the modes below.
 
 ## How they get resolved is the user's choice
 
@@ -65,26 +67,9 @@ mode; a tradeoff is always asked in every one. It is chosen per document, and lo
 spec and the stack, and a contradiction is raised before it is written — otherwise it is
 found in build, by someone with less information than you have now.
 
-## The decisions log
-
-Every `QT-NN` lives in an **append-only log**, beside the document it serves:
-`Docs/Architecture/architecture-decisions.md` for the product — the stack's axes included — and
-`Plan/specs/<feature>/tech-design/decisions.md` for a feature. One series each.
-
-**The design is the present and gets rewritten; the log is the conversation that produced
-it and is never overwritten.** That is why they are two files: a document rewritten whole
-that also has to be append-only in half its body is a contradiction. A superseded answer is
-marked with what superseded it, never edited away.
-
-Every entry says **where it came from**, and one is never dressed as another:
-
-| Label | What it means |
-|---|---|
-| `usuario` | the user answered it |
-| `agente, dentro del alcance` | the agent decided it; the user can still object |
-| `investigado` | a fact, with its source and the date it was read |
-| `propuesta` | offered, not answered yet |
-| `[TO-DEFINE]` | explicitly out of scope, and it appears in every report until it is resolved |
+Every `QT-NN`, and the mode chosen, lives in the document's **append-only decisions log**:
+`references/decisions-log.md` has its shape and the labels that say where each answer came
+from.
 
 ## Choose the reference
 
@@ -93,9 +78,9 @@ row is not the guidance, the file is.
 
 | The unit is | Read | Read with |
 |---|---|---|
-| The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/diagrams.md` |
-| One component's adopted technologies, versions and areas | `references/stack.md` | `references/stack-axes.md` — its axes, options and how they are asked |
-| One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/diagrams.md` |
+| The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/decisions-log.md`, `references/diagrams.md`, `../nzt-plan/references/questions.md` |
+| One component's adopted technologies, versions and areas | `references/stack.md` | `references/stack-axes.md` — its axes, options and how they are asked —, the area's `../nzt-build/references/practices-<area>.md` — the values and their cost —, `references/decisions-log.md`, `../nzt-plan/references/questions.md` |
+| One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/decisions-log.md`, `references/diagrams.md`, `../nzt-plan/references/questions.md` |
 | The entities of the business, their fields and their aggregates | `references/domain.md` | — |
 | More than one context, or meaning shared with a third party | `references/contexts.md` | — |
 | A consequential decision with alternatives and consequences | `references/adr.md` | — |
@@ -125,6 +110,13 @@ skipped it and why; do not design a system that already exists.
 
 One document: the product design, one feature's design, one stack, or one decision record.
 
+## Mandatory
+
+**The stack document is mandatory and this phase writes it.** No component gets built
+without one, nor without its row in `Docs/Architecture/architecture.md`: a new component
+gets both when it is designed, an existing one gets them from evidence before its code is
+touched.
+
 ## Where it lands
 
 `Docs/` has one folder per subject, whichever phase writes it: `Product/` (product, interview,
@@ -148,53 +140,27 @@ history), `Domain/`, `Architecture/`, `UX/`, `Operations/` (deployment, releases
 
 ## Rules
 
-- **The stack document is mandatory and this phase writes it.** No component gets built
-  without one: a new component gets it when it is designed, an existing one gets it from
-  evidence before its code is touched.
-- **The stack records the adopted concept, never the name of a skill.**
-  `Architecture: vertical-slice`, not the skill that implements it. The concept survives a
-  rename and can be read without opening anything.
-- **The stack declares which areas exist** in this project. That list is closed, and it is
-  the same list acceptance criteria use to mark coverage (`backend ✓ · frontend — · qa —`,
-  where `qa` is verify's mark and never an area).
-- Distinguish what is planned from what is adopted, until it is adopted.
-- Design against the spec, not against the request. If the spec does not say it, it is not
-  a requirement — go back to discovery instead of inventing one.
-- Decide for what is known. Architecture invented for a load, a tenant or an integration
-  nobody asked for is cost with no buyer.
-- A decision that is expensive to reverse gets an ADR: the alternatives considered, what
+Each reference holds the rules of its own document. These hold for every unit of the phase:
+
+- **Design against the spec, not against the request.** If the spec does not say it, it is
+  not a requirement — go back to discovery instead of inventing one.
+- **Respect what exists.** In an existing system the current structure is a constraint and a
+  source of information, not an accident to correct in passing.
+- **Distinguish what is planned from what is adopted**, until it is adopted.
+- **A decision that is expensive to reverse gets an ADR**: the alternatives considered, what
   was chosen, what it costs. A decision nobody can reconstruct gets relitigated every
   quarter. **One that also has to be agreed by people outside this conversation goes through
   an RFC first**, and nothing is built while that RFC is open.
-- Respect what exists. In an existing system the current structure is a constraint and a
-  source of information, not an accident to correct in passing.
-- A technical question that belongs to this phase is written in its log with a stable
-  `QT-NN` (`QT-01`, `QT-02`…) **before** it is asked or decided, and every reply names it by
-  that id. One that belongs to a later phase goes where that phase reads it, undecided.
-- **An answered `QT-NN` is never deleted and never edited**: the log is append-only, and a
-  superseded answer stays with a line saying what superseded it. A question that disappears
-  once it is answered leaves the next reader deciding it again, with nothing saying it was
-  ever asked.
+- **A question that belongs to a later phase goes where that phase reads it**, undecided:
+  deciding a build question now is deciding it with less information than whoever gets there
+  will have.
 - A version or a capability is verified in the project's own evidence — the manifest, the
   configuration, the SDK pin — not inferred from what compiles or from what is newest. How
   an external system behaves is verified in its own documentation: `nzt-research`.
 
 ## Done when
 
-Build can start without an open technical decision in its way: every component you touch
-has its stack document with its areas declared, every consequential decision has its
-record, and every technical question still open has a `QT-NN` written where it will be
-read.
-
-## Closing checklist
-
-- [ ] The questions were derived from the rules and logged before anything was proposed.
-- [ ] Each one was resolved by its kind, and the user chose the mode for the ones that
-      admit one.
-- [ ] Every entry in the log says where it came from, and none is dressed as another.
-- [ ] Every component touched has a stack document, and it names its areas.
-- [ ] The stack names concepts, not skills.
-- [ ] Every expensive-to-reverse decision has its record with the discarded alternative.
-- [ ] Nothing in the design contradicts a business rule; contradictions went back to the spec.
-- [ ] Open technical questions are written as `QT-NN`, not resolved by assumption.
-- [ ] No requirement was invented that no spec asked for.
+The unit's reference says its own *Done when*, and it holds. Build can start without an open
+technical decision in its way: every component you touch has its stack document with its
+areas declared, every consequential decision has its record, and every technical question
+still open has a `QT-NN` written where it will be read.

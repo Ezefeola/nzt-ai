@@ -9,23 +9,9 @@ This router loads nothing by itself. It reads the component's stack document and
 axis into **the one reference** that axis selected. Paths are relative to this skill's folder.
 **Read the file before acting on the row** — the row is not the guidance, the file is.
 
-If you did not arrive here from `nzt-build`, load it first.
-
-## Read the stack first
-
-`<component folder>/Docs/Architecture/backend-stack.md` decides every row below — the folder
-is the one `Docs/Architecture/architecture.md` names. Read it before loading anything, and
-before choosing a technology or a pattern.
-
-- **An installed folder is not an authorisation.** This whole tree is installed in every
-  project, including the ones that are not .NET. What makes it apply is the stack document,
-  and nothing else.
-- **A missing technical fact is checked in the project, not invented**: the manifest, the
-  configuration, the code. Never a different stack because a skill was missing.
-- **Version-dependent APIs need local evidence** — `TargetFramework`, the package version in
-  the manifest, the SDK pin. **When the stack document and the manifest disagree, the
-  manifest wins** and the discrepancy is reported. A version is never bumped to make an
-  example from a skill compile: that is a stack change and goes through the stack door.
+`<component folder>/Docs/Architecture/backend-stack.md` decides every row below, under
+`nzt-build`'s *Read the stack first*. **Version-dependent APIs need local evidence** here:
+`TargetFramework`, the package version in the manifest, the SDK pin in `global.json`.
 
 ## Required guidance
 
@@ -90,22 +76,14 @@ half the guidance.
 
 | The operation | Read | Read with — also required |
 |---|---|---|
-| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `../nzt-build/references/data-queries.md` — first; `references/ef-core.md` |
-| Returning a page of results | `references/ef-core-pagination.md` | `../nzt-build/references/data-pagination.md` — first; `references/ef-core.md`, `references/ef-core-queries.md`, `../nzt-build/references/data-queries.md` |
-| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `../nzt-build/references/data-writes.md` — first; `references/ef-core.md` |
-| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `../nzt-build/references/data-bulk.md` — first; `references/ef-core.md` |
-| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `../nzt-build/references/data-mapping.md` — first; `references/ef-core.md` |
-| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `../nzt-build/references/data-mapping.md` — first; `references/ef-core.md` |
-| A schema change that needs a migration | `references/ef-core-migrations.md` | `../nzt-build/references/data-migrations.md` — first; `references/ef-core.md` |
-| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `../nzt-build/references/data-indexes.md` — first; `references/ef-core.md` |
-
-## Two escapes, and they are not the same
-
-- **A small edit in an established place follows the convention next to it**, without
-  reloading guidance. The scale rule of the kernel applies inside a phase too.
-- **Code this project does not document is written the way that code is written.** This set
-  is installed globally and will see repositories that are not its own: **your conventions
-  step aside there**, and the difference is reported rather than applied.
+| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `../nzt-build/references/data-queries.md` — first |
+| Returning a page of results — a page is a query | `references/ef-core-pagination.md` | `../nzt-build/references/data-pagination.md` — first; the *Reading data* row |
+| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `../nzt-build/references/data-writes.md` — first |
+| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `../nzt-build/references/data-bulk.md` — first |
+| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `../nzt-build/references/data-mapping.md` — first |
+| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `../nzt-build/references/data-mapping.md` — first |
+| A schema change that needs a migration | `references/ef-core-migrations.md` | `../nzt-build/references/data-migrations.md` — first |
+| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `../nzt-build/references/data-indexes.md` — first |
 
 ## Independent axes
 
@@ -120,9 +98,8 @@ Getting these wrong reads references that contradict each other:
   case; an invariant lives in the model. A rule pushed to the wrong one of the two is
   enforced twice or never.
 
-## Closing checklist
+## Done when
 
-- [ ] Every row read was selected by the stack document, not by preference.
-- [ ] No two rows of the same axis were read.
-- [ ] Versions used came from the manifest, and any disagreement with the stack was reported.
-- [ ] The stack document was updated in this unit if the work changed what it declares.
+Every row read was selected by the stack document, never by preference, and no two of the
+same axis; the versions used came from the manifest, and any disagreement with the stack was
+reported.

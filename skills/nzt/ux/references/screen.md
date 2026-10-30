@@ -84,7 +84,8 @@ without scrolling back up.
 
 Every row names where it comes from: a criterion (`US-NNN CA-NN`), a design system
 convention, or the documented use of a shared component. **A row with no origin is invented
-behavior** — turn it into a `Q-NN`, list it as pending, and do not draw it as decided.
+behavior** — open it as a `Q-NN` in the feature's `analysis.md`, list that id as pending
+here, and do not draw it as decided.
 
 - If you are writing a sentence the user will read on screen and no criterion fixes it, you
   are writing a story. Leave it pending and say so.

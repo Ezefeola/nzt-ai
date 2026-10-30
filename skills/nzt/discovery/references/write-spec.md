@@ -124,9 +124,8 @@ One line per story, saying what it covers.
   one per unit by `nzt-discovery-write-stories`.
 - **The index is the backlog**; there is no other list. A story waiting for a later
   delivery stays one line *As… I want… so that…* until its turn, as US-003 above.
-- **Scope, rules and the whole index are written before the feature's first slice is
-  built**, whatever the plan's cadence (`nzt-plan`). What waits is a story's criteria,
-  never a rule: a rule crosses stories, and defined late it gets defined three ways.
+- **Scope, rules and the whole index come before the feature's first slice is built**;
+  when each story's criteria follow is the cadence's (`nzt-plan`'s slices reference).
 
 ## The spec describes the present
 

@@ -8,12 +8,8 @@ description: Use when the component being shipped is .NET, before packaging it, 
 This router loads nothing by itself. It turns the release-facing unit into **the one reference**
 that unit needs, on top of the generic practice it belongs to.
 
-If you did not arrive here from `nzt-ship`, load it first.
-
 ## Read the project first
 
-- **An installed folder is not an authorisation.** This tree is installed in every project. What
-  makes it apply is the component's stack document, and nothing else.
 - **The SDK is the one the repository pins** in `global.json`. Without a pin, the version
   matching the highest `TargetFramework` — and proposing the pin is part of the unit.
 - **Nothing is upgraded to make something pass.** Raising the SDK, the target framework or a
@@ -51,8 +47,8 @@ carries a schema change is two rows, and that is the one combination that happen
 - **What the pipeline's gates are.** `../nzt-ship/references/pipeline.md` decides that; these references give the
   .NET commands and what each one needs to work.
 
-## Closing checklist
+## Done when
 
-- [ ] The reference read matches the unit, together with its generic practice.
-- [ ] The SDK used is the pinned one, and nothing was upgraded to get a pass.
-- [ ] The stack or deployment document was updated in this unit if what it declares changed.
+The reference read matches the unit, together with its generic practice; the SDK used is the
+pinned one, and nothing was upgraded to get a pass; the stack or deployment document was
+updated in this unit if what it declares changed.

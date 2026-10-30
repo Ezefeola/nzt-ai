@@ -97,15 +97,11 @@ What that means for a query:
 - **A read-only read does not load the aggregate at all**: it projects to its DTO like any
   other query.
 
-**The guardrail of the domain model comes first here, and it has an order**: an invariant over
-an entire collection **gets its number from the database** — a count, a sum, a max — passed
-into the method as a parameter. Loading the collection whole is the fallback, for when there is
-no more performant way to answer.
-
-The reason the order matters: **a filtered load leaves the navigation partially populated, and
-anything counted or summed in memory over it is wrong** — with no error to show for it. Pulling
-the whole collection back to avoid that is the same mistake in the other direction, and it is
-the one that survives testing and dies in production.
+**A filtered load leaves the navigation partially populated, and anything counted or summed in
+memory over it is wrong** — with no error to show for it. So an invariant over a whole
+collection follows the domain model's guardrail (`backend-domain-ddd.md`, *The minimum
+aggregate*): its number comes from the database, and loading the collection whole is the
+fallback, never the habit.
 
 ## Closing checklist
 

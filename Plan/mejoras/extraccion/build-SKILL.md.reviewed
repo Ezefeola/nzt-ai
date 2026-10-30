@@ -1,0 +1,12 @@
+# Unit 394: nzt-build router, Rules and Closing checklist cut to the phase-wide rules (B1, QT-01, QT-02)
+affected code compiles => each reference's Done when (implement: "What is affected compiles")
+the tests the stack enables for this change were executed, not just written => implement Done when: "the tests the stack enables were run"
+area coverage marked on every criterion built; qa left to nzt-verify => implement Done when and Marking coverage; router One unit
+what those tests cannot reach reported as not covered until qa, with no test plan or manual script written for it here => router Done when and Boundaries; implement Done when
+stack document current with what the change adopted => router Read the stack first: "Keep the stack current with the change"
+no commented-out code and no comment that is no longer true => code-code.md, Comments say why, and its checklist
+change markers left as they are, for the feature close to sweep => router Rules: "You never add one and never clear one"; implement Done when
+what you did not do, said out loud => router Rules: "report what you did not do"
+the stack is the operative memory => router Read the stack first: "It is the operative memory"
+change markers have fixed meaning => change.md owns the meanings (B4); implement keeps [modify] and [SPEC-CONFLICT]
+foreign component escape => router Two escapes: "Code this project does not document is written the way that code is written"

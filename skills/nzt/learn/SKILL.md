@@ -68,51 +68,26 @@ A topic lives **entirely** in `Learn/<topic>/`:
   continuation state of a topic, and there is no entry in `Plan/state.json`**: a topic's
   state is per objective and carries dates, not work units.
 - `curriculum.md` — objectives `OA-NN`, the starting point, what was agreed.
-- `lessons/`, `exercises/`, `solutions/`, `assessments/`.
-- **The solution of an exercise lives in a different file and is written after delivery.**
-  Not collapsed, not further down, not behind "do not scroll". A solution that exists is a
-  solution that gets read, and at that moment the exercise stopped measuring.
+- `lessons/`, `exercises/`, `assessments/`, and `solutions/`, each written only after its
+  delivery (`references/exercises.md`).
+
+The shape of `progress.md` and the rules of its record — the closed states, the evidence each
+one names, the append-only log — are `references/plan.md`'s; every other reference writes
+into it as that file says.
 
 ## Rules
 
-- **Measure before teaching.** Do not ask what they know — find out with one or two small
-  probes. *"How much do you know about this?"* returns a feeling, and the gap between that
-  feeling and reality **is the problem, not the input**.
-- **Ask the person only what only they can answer**: how much time they have, whether they
-  want depth or working knowledge, whether there is a deadline. What a probe can establish
-  is not a question.
-- **An objective is something observable they will be able to do unaided.** Never
-  *"understands"* or *"is familiar with"*: an objective nobody can measure produces a
-  verdict nobody can defend.
-- **Ask for their confidence before correcting.** Confidence × result is the most valuable
-  measurement in this branch, and **high confidence with a wrong result is the dangerous
-  cell**: they are not going to check that again.
-- **Hints climb a ladder, one step per request** — reframe · name the missing piece · the
-  next step only · the solution with its reasoning. Jumping to the last one because the
-  exchange is getting long is exactly the failure this mode exists to prevent.
-- **If the person asks for the solution, give it** — no negotiation and no reproach — **and
-  record the objective as not acquired, back into review.** Nothing is refused to the
-  person, and nothing is credited that they did not do: the discipline is enforced in the
-  record, not by withholding.
-- **Retrieval, not rereading.** Rereading produces fluency, which feels like knowing;
-  retrieval produces retention and, when it fails, tells the truth immediately.
-- **Assessment uses a new case.** Solving the practised example proves nothing.
-- **You do not declare the topic learned.** Report what was measured; whether that is
-  enough is the person's call — the same rule as never accepting a story on their behalf.
-- **Never edit the record to be kind.** `solved by the system` becomes `achieved` only when
-  the person does it alone, on a different case. That edit is the most tempting one at
-  closing time and the one that would make this whole branch worthless.
+Each reference holds the rules of its own work. These hold for every unit of this mode:
+
+- **The person produces; you get them there.** Nothing is refused to them — a solution they
+  ask for is given — and **nothing is credited that they did not do**: the discipline is
+  enforced in the record, not by withholding.
+- **Only `references/assess.md` writes `achieved`.** A lesson, a training series or a
+  correction that went well leaves the objective `in progress`, ready to be assessed.
+- **A different case each time.** The case already practised measures the memory of that
+  case, not the ability.
 
 ## Done when
 
-The person can do the objective unaided, on a case they have not seen, and can say why it
-works with the material out of sight — and the record says exactly that, with the artifact
-that shows it.
-
-## Closing checklist
-
-- [ ] Every objective's state names the evidence that produced it.
-- [ ] Nothing the system solved is recorded as acquired.
-- [ ] Confidence was asked before each correction, and recorded.
-- [ ] Reviews are scheduled per objective, with dates.
-- [ ] The closing report says what they can do now **and what they still cannot**.
+The unit's reference says its own *Done when*, and it holds — and `progress.md` says exactly
+what happened, with the artifact that shows it.

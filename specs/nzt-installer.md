@@ -27,13 +27,13 @@ no copia sus archivos (sección 11).
 
 Instalación **global** (nivel usuario), que es el caso de uso pedido:
 
-| Proveedor | Instrucciones | Skills | Subagente (D71) |
+| Proveedor | Instrucciones | Skills | Subagentes (D71, D84) |
 |---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md` |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml` |
+| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` |
+| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` |
 
-El subagente sale de `agents/` del repo, y cada proveedor recibe el de su formato (`.md` o
-`.toml`). Es un archivo más del manifiesto: las mismas reglas de conflicto, edición local,
+Los subagentes salen de `agents/` del repo, y cada proveedor recibe los de su formato (`.md` o
+`.toml`). Cada uno es un archivo más del manifiesto: las mismas reglas de conflicto, edición local,
 huérfanos y desinstalación que una skill. Desinstalar saca el archivo y deja la carpeta
 `agents/`, que puede tener agentes del usuario.
 
@@ -121,7 +121,7 @@ nzt-ai state check
    contenido queda abajo; si no existe, se crea.
 5. **Aplana y copia las skills**: cada carpeta con `SKILL.md` va a una carpeta plana cuyo
    nombre es el path relativo con `/` → `-`. Su carpeta `references/` viaja adentro, sin
-   aplanar (D50): los routers la nombran por ruta relativa. Copia también el subagente del
+   aplanar (D50): los routers la nombran por ruta relativa. Copia también los subagentes del
    proveedor a su carpeta de agentes (sección 2).
 6. **Retira los huérfanos**: lo que el manifiesto anterior instaló y ya no está en el set.
 7. **Escribe el manifiesto** y **reporta**: creados, actualizados, sin cambios, eliminados,

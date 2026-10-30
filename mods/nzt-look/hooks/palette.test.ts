@@ -5,6 +5,7 @@ import { contrastOf, legible, MIN_CONTRAST } from './contrast'
 import { variantOf } from './light'
 import { KEYS, missingOf, paletteFrom, TEXT_KEYS, THEMES } from './palette'
 import { paletteOf, rawPaletteOf } from './prefs'
+import { bandOf } from './reply'
 
 const VARIANTS: readonly Variant[] = ['dark', 'light']
 
@@ -19,6 +20,17 @@ describe('every theme, in both variants, writes text that reads on its surfaces'
             .filter(pair => pair.ratio < MIN_CONTRAST),
         )
         expect(below).toEqual([])
+      })
+    }
+  }
+})
+
+describe('every theme, in both variants, writes the desktop table header on its band', () => {
+  for (const theme of THEMES) {
+    for (const variant of VARIANTS) {
+      test(`${theme.name} ${variant}`, async () => {
+        const palette = paletteOf(theme.name, [], variant)
+        expect(contrastOf(palette.fg, bandOf(palette))).toBeGreaterThanOrEqual(MIN_CONTRAST)
       })
     }
   }

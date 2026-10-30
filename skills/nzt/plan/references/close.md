@@ -113,8 +113,8 @@ Impact:   US-008 new · US-014 new · Coupon added to the domain model
 - **`Before:` and `Now:` are mandatory in `modify` and `remove`, and absent in an `add`.**
   This is structure, not style: step 1 deleted the removed rule from the spec, so these two
   lines are the only surviving record that it ever existed.
-- **`Impact:` cites rules by slug and stories by id**, never a criterion — criteria have no
-  stable identifier, so pointing at one creates a dead reference that looks valid.
+- **`Impact:` cites rules by slug and stories by id**, and a single criterion as
+  `US-NNN CA-NN` when only that one changed.
 - **`Decision:` is one line and cites its record**, the `QT-NN` of the design or its ADR. It
   never restates it. If a `[SPEC-CONFLICT]` changed the outcome, this is where the decision
   taken in that conversation is recorded.

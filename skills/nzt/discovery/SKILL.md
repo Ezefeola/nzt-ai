@@ -31,13 +31,13 @@ row is not the guidance, the file is.
 
 | The unit is | Read | Read with |
 |---|---|---|
-| Interviewing the user and recording answers under stable `Q-NN` | `references/analysis.md` | — |
+| Interviewing the user and recording answers under stable `Q-NN` | `references/analysis.md` | `../nzt-plan/references/questions.md` |
 | Product objectives, users, modules, scope | `references/product.md` | — |
 | Domain vocabulary and what each term means here | `references/glossary.md` | — |
 | A feature: scope, business rules, non-functional requirements | `references/write-spec.md` | — |
 | One story: acceptance criteria with area coverage | `references/write-stories.md` | — |
 | A functional change to a feature that already exists | `references/change.md` | `references/write-spec.md`, `references/write-stories.md` |
-| Behavior that exists only as code | `references/reverse.md` | `references/analysis.md` |
+| Behavior that exists only as code | `references/reverse.md` | `references/analysis.md`, `../nzt-plan/references/questions.md` |
 
 Wherever a file names `nzt-discovery-<name>`, it means `references/<name>.md` in this
 folder (`nzt-discovery-change` → `references/change.md`): read that file — it is not a skill.
@@ -73,42 +73,14 @@ needs and the glossary lacks comes back here as an entry, never as a name coined
 
 ## Rules
 
-- **Two altitudes, and both have to close.** Product analysis is not written by reading the
-  repository; feature analysis can be. Features emerge from the conversation, and the
-  product document is the minutes of what the phase established — not the other way round.
-- **The analysis file is append-only.** A superseded answer is marked (`replaced by Q-07`),
-  never rewritten and never deleted. Questions go into the file with an empty answer as
-  soon as they accumulate, not when the user answers them.
-- **Ask in behavior.** If you cannot phrase the question without naming a table, a package
-  or a vendor, it is not functional. Ask the edges question early: does anything else need
-  to know about this, or does this depend on something another system knows?
-- **Technical notes get no identifier here.** Write down what they will decide and leave
-  them for architecture. Do not investigate them in this phase.
-- Business rules live in the feature; stories cite them and never copy them. A rule carries
-  a slug that never changes and an `origin:`.
-- Write scope in both directions. What is excluded is worth as much as what is included.
-- A non-functional requirement states an expected result, never a mechanism.
-- An objection the user dismissed is part of the answer: what you warned, what you
-  proposed, and that the user is keeping it. It is not reopened without a new argument.
-- **Reverse engineering never declares a business rule.** Describe the behavior; the user
-  decides whether it is a rule, a bug or an accident. Report the silent areas of the slice
-  as well: silence reads as "there was nothing there" and hides "I did not look".
-- Playback before closing, in three blocks: **agreed · proposed by me · pending**. Nothing
-  you proposed counts as agreed until the user confirms it.
+Each reference holds the rules of its own document. These hold for every unit of the phase:
+
+- **Business rules live in the feature**, each with a slug that never changes and an
+  `origin:`. Stories, changes and screens cite them by slug and never copy them.
+- **What is not known is a question, never an invention**: it goes into `analysis.md` with
+  its `Q-NN`, and the unit that needs it says it is open.
 
 ## Done when
 
-You could write the artifact this feeds — the product definition with its delivery 1, or
-the feature's scope, all its rules, its story index and the stories the plan's cadence
-details now — without asking anything else. If you cannot, the gaps are written down as
-open questions. They are never invented.
-
-## Closing checklist
-
-- [ ] Every question is in the file, with its `Q-NN`, written before it was asked.
-- [ ] Every rule has its slug and its `origin:` (`Q-NN`, `PRD` or `reverse`).
-- [ ] Scope written in both directions.
-- [ ] Every story has at least one unhappy path, or the stated reason it does not apply.
-- [ ] Every criterion is declarative, has one *When*, and uses concrete example data.
-- [ ] No criterion names a technology.
-- [ ] Playback delivered, and everything pending left in the file.
+The unit's reference says its own *Done when*, and it holds. Every term the unit introduced
+or changed is in the glossary.
