@@ -81,6 +81,10 @@ with D37, `entity-shape` and `result-inline` with D38 and D39, `design-mode` and
 `design-unasked` with D41, `test-levels-unasked` with D42, `qa-unasked` with D43, and `package-unasked` with D44. They are calibrated the way the others were **after** their first
 run, not before it. Expect the first run of each to be a calibration run.
 
+**`routing/retro` has not been run either** (D87). `nzt-retro` has no row in the kernel's
+routing table, so its description is its only trigger: this case is what says whether that
+is enough.
+
 **`test-levels-unasked` has no pair yet.** It measures only the restraint half of D42 —
 that no level gets built without its opt-in. That a stack being written *asks* for the
 levels is not measured, and a set that passes this case has not been shown to do it.

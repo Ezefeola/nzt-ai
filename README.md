@@ -40,12 +40,14 @@ descripción.
 
 **2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
 (`nzt`), el de investigación (`nzt-research`) y el de delegar en un subagente —lecturas, o
-unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`). No hacen el trabajo:
+unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`) y, sólo cuando lo pedís, el de
+retro (`nzt-retro`): revisa la sesión y deja propuestas de mejora en un md fuera del repo, sin
+cambiar nada. No hacen el trabajo:
 leen el pedido y el documento de stack, y dicen qué referencia leer.
 
 **3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
 `references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
-listado de skills**, que el proveedor carga en toda sesión: el set entero son 15 entradas.
+listado de skills**, que el proveedor carga en toda sesión: el set entero son 16 entradas.
 
 ```
 pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
@@ -241,7 +243,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**15 skills y 140 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
+**16 skills y 140 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.
