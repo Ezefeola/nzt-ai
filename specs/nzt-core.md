@@ -292,7 +292,8 @@ Reglas de esta capa:
   listado. **Lo que impide que se carguen no es la instalación sino el documento de stack**:
   las áreas que un proyecto tiene son las que declara su stack (T3, D9), y *una carpeta
   instalada no es una autorización*. Esa línea ya vive en `nzt-build` y `nzt-ship`, y con
-  instalación global pasa a ser el único filtro que hay.
+  instalación global pasa a ser el único filtro que hay. **[modify] 2026-10-31:** D88 suma la
+  instalación por proyecto, con el set entero: el filtro sigue siendo el documento de stack.
 - **El costo lo paga R1, no el ruteo**, y por eso el **tamaño de esta capa es una decisión de
   presupuesto** y no solo de cohesión: cada skill acá se paga en cada proyecto, incluso en
   los que nunca la van a usar. **Desde D50 un área cuesta una sola entrada** —su router—, y
@@ -806,6 +807,7 @@ y mantiene la cohesión. El instalador aplana:
 
    Los destinos por proyecto (`.claude/skills/`, `.agents/skills/`) existen en las dos
    plataformas y NZT **no los usa**: no hay instalación parcial ni capa opcional.
+   **[modify] 2026-10-31:** los usa con `--scope project` (D88), siempre con el set entero.
 3. Escribe/parchea el archivo de instrucciones **global** de cada proveedor
    (`~/.claude/CLAUDE.md`, `$CODEX_HOME/AGENTS.md`), respetando el contenido previo: el
    bloque delimitado por `<!-- nzt:start -->` / `<!-- nzt:end -->` es lo único que NZT toca.
@@ -966,6 +968,8 @@ que se tira.
   instala: **la densidad de D17** y **la cantidad de skills de la capa de stack**. El piso de
   8.000 aplica cuando Codex no conoce el tamaño del contexto; con contexto conocido el
   presupuesto es 2% y da más aire, pero eso **hay que medirlo, no asumirlo**, y es la fase 9.
+  **[modify] 2026-10-31:** D88 instala también por proyecto, pero con el set entero: el listado
+  pesa lo mismo donde esté instalado, y las dos palancas siguen siendo las únicas.
 
   **El modo de falla, verificado (C2), baja bastante el riesgo:** Codex no falla ni corta
   seco — acorta descriptions y después omite skills del listado con un warning. Como el
@@ -1101,7 +1105,8 @@ que se tira.
   su mitigación de diseño y las únicas palancas son la densidad (D17) y **cuántas skills
   tiene la capa de stack**; **(3)** cada skill de stack se paga en todos los proyectos,
   también en los que no son .NET, así que partir una skill por cohesión ahora tiene un costo
-  que antes no tenía.
+  que antes no tenía. **[modify] 2026-10-31:** reabierta por D88, que suma el alcance de
+  proyecto.
 - **D19.** **La forma del árbol de backend .NET**, decidida al escribir su router de área.
   **27 hojas más el router**, y aparte **tres hojas compartidas de C#**, con cuatro cambios
   respecto de Temper y sus razones:
@@ -3052,6 +3057,22 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     de 200 líneas. **No corrido**: el chequeo de citas (no se encontró su comando). Retro real de
     esta sesión siguiendo la skill del repo: el md quedó en el escritorio del usuario, fuera de
     todo repo, con cinco propuestas (R-01 a R-05) y dos descartes; no se tocó nada más.
+- **D88.** **NZT también se instala por proyecto, y global y proyecto no conviven por
+  proveedor.** Reabre D18. Lo que la forzó: el usuario (2026-10-31) no puede usar un agente sin
+  NZT sin desinstalarlo, ni probar NZT aislado en un solo repo. Lo pedido es opt-in, no
+  compartirlo con el equipo (QP-01 de `specs/nzt-installer.md`). Diseño en la sección 13 de esa
+  spec:
+  - **El alcance global sigue siendo el defecto** y no cambia para quien ya lo tiene.
+  - **Se instala el set entero** también en el proyecto. Elegir capas por proyecto, la capa
+    .NET solo en un repo .NET, queda fuera.
+  - **Excluyentes por proveedor (QP-02)**, porque los proveedores no resuelven el choque.
+    documented: en Claude Code, a igual nombre, la skill de usuario le gana a la de proyecto, y
+    en Codex aparecen las dos (https://code.claude.com/docs/en/skills,
+    https://learn.chatgpt.com/docs/build-skills, leídos 2026-10-31).
+  - **Dos modos**: *Solo para mí*, el defecto, que no deja nada en el diff, y *Compartido*.
+  - Qué sostiene de D18 y qué no: *una carpeta instalada no es una autorización* sigue siendo
+    el filtro dentro de un proyecto con NZT. Lo que cambia es la consecuencia (3): una skill de
+    stack se paga solo donde se instaló, global o en el proyecto.
 
 ## 13. Revisión contra Temper v3
 

@@ -2,6 +2,8 @@
 
 > Estado: **construido** (v1.1.0) · `installer/src/Nzt.Cli` · Runbook en
 > `installer/README.md` · Depende de: `specs/nzt-core.md` (secciones 3, 9.1 y 9.2)
+> **[modify]** La sección 13, instalación por proyecto y menú contextual, está especificada
+> y sin construir (2026-10-31).
 
 ## 1. Propósito
 
@@ -26,6 +28,9 @@ no copia sus archivos (sección 11).
 ## 2. Destinos de instalación
 
 Instalación **global** (nivel usuario), que es el caso de uso pedido:
+
+**[modify] 2026-10-31:** global es el alcance por defecto, ya no el único. El de proyecto, sus
+destinos y por qué no conviven con la global están en la sección 13.
 
 | Proveedor | Instrucciones | Skills | Subagentes (D71, D84) |
 |---|---|---|---|
@@ -97,6 +102,10 @@ nzt-ai state check
 
 **[modify]** El comando se llama `nzt-ai` (RN-cli-nombre) y suma `state check`
 (RN-cli-state-check), sección 12.
+
+**[modify] 2026-10-31:** el menú suma un encabezado con la carpeta y lo instalado, y muestra
+solo lo que se puede hacer ahí; los comandos suman `--scope`, `--mode`, `init`, `update`,
+`uninstall --all` y `--version`. Sección 13.5 y 13.6.
 
 - `--dry-run` imprime exactamente lo que haría, sin tocar el disco.
 - `--mods` es la elección de la sección 11 para Claude Code: `all` el método y los mods,
@@ -215,6 +224,8 @@ installer/
 
 - ~~**I1. Alcance de la capa de stack.**~~ **Cerrada por D18**: todo se instala global,
   incluida la capa de stack. No hay `--project` ni instalación parcial.
+  **[modify] 2026-10-31:** reabierta por D88: hay `--scope project`, con el set entero
+  (sección 13). La instalación parcial sigue sin existir.
 - **I2. Duplicación con `install/build.*`.** **Resuelta en la práctica, no eliminada.** Los
   scripts siguen siendo el loop de desarrollo —además arman `dist/` y el plugin de evals, que
   al instalador no le incumben— y el CLI es lo que instala. Lo que evita que diverjan es una
@@ -456,10 +467,14 @@ dice.
 
 #### RN-cli-actualizar · [add] · origin: sección 6 ("reinstalar es actualizar")
 Reinstalar reemplaza el `nzt-ai` instalado por el de la versión que se está instalando.
+**[modify] 2026-10-31:** además, `nzt-ai update` se actualiza solo desde el último release
+(RN-cli-update).
 
 #### RN-cli-desinstalar · [add] · origin: QT-26
 `nzt-ai` y su entrada en el PATH se van cuando, después de desinstalar, no queda ningún
 proveedor ni mod instalado por el CLI. Si queda alguno, se queda, porque el agente lo usa.
+**[modify] 2026-10-31:** tampoco se va mientras quede un proyecto registrado
+(RN-proy-registro).
 
 ### 12.2 `nzt-ai state check`
 
@@ -516,6 +531,253 @@ roto es un problema, con su posición.
 #### QT-26 · Al desinstalar de un proveedor, ¿se va `nzt-ai`?
 - opciones: A, cuando no queda nada instalado; B, siempre; C, nunca. El agente recomendó A.
 - respuesta: **A** · 2026-10-21
+
+## 13. Instalación por proyecto y menú contextual
+
+> Estado: **especificado, sin construir** (2026-10-31). Reabre D18 (D88 de `specs/nzt-core.md`).
+
+Lo trae el usuario el 2026-10-31. Hoy NZT es global o nada: *"si queres usar un agente solo sin
+nzt no podes hacerlo sin desinstalarlo"*, y *"si queres probarlo quizas quieras hacerlo en algo
+aislado no en todo"*. Lo pedido es **opt-in**: NZT donde se elige y en ningún otro lado. Pedido
+en la misma conversación: que escribir `nzt-ai` abra un menú navegable con estas opciones.
+
+Lo que dice cada proveedor, leído el 2026-10-31, y que decide el diseño:
+
+| | Claude Code | Codex |
+|---|---|---|
+| Skills de proyecto | `.claude/skills/<nombre>/` | `.agents/skills/<nombre>/`, de la carpeta actual a la raíz del repo |
+| Subagentes de proyecto | `.claude/agents/` | `.codex/agents/` |
+| Mismo nombre en usuario y proyecto | **gana la de usuario** | no se fusionan: **aparecen las dos** |
+| Instrucciones solo del usuario en el proyecto | `CLAUDE.local.md`, leído después de `CLAUDE.md` | no hay: `AGENTS.override.md` **reemplaza** al `AGENTS.md` |
+| `AGENTS.md` | lo lee **solo si no hay** `CLAUDE.md` ni `CLAUDE.local.md` | es su archivo |
+
+documented: https://code.claude.com/docs/en/skills, https://code.claude.com/docs/en/memory,
+https://learn.chatgpt.com/docs/build-skills,
+https://learn.chatgpt.com/docs/agent-configuration/subagents. unverified: si Codex pide
+confiar en el proyecto antes de cargar `.codex/agents/`.
+
+### 13.1 Alcance
+
+#### RN-proy-alcance · [add] · origin: usuario 2026-10-31, QP-01
+Hay dos alcances: **usuario**, el de las secciones 2 a 12 y el de siempre por defecto, y
+**proyecto**. Quien ya instaló global no ve ningún cambio.
+
+#### RN-proy-raiz · [add] · origin: propuesta del agente, aceptada 2026-10-31
+El proyecto es la raíz del repo git que contiene la carpeta actual: la primera carpeta hacia
+arriba con `.git`, sea carpeta o archivo (un worktree). Fuera de un repo es la carpeta actual,
+y el reporte lo dice. **Si la raíz es la carpeta del usuario, se rechaza**: ahí `.claude/` y
+`.agents/` son los destinos globales, y el alcance de proyecto pisaría el de usuario.
+
+#### RN-proy-destinos · [add] · origin: tabla de esta sección
+En el proyecto, cada proveedor escribe lo mismo que en la sección 2, con otra raíz:
+
+| Proveedor | Instrucciones, *Solo para mí* | Instrucciones, *Compartido* | Skills | Subagentes |
+|---|---|---|---|---|
+| Claude Code | `CLAUDE.local.md` | `CLAUDE.md` | `.claude/skills/<nombre>/` | `.claude/agents/` |
+| Codex | `AGENTS.md` | `AGENTS.md` | `.agents/skills/<nombre>/` | `.codex/agents/` |
+
+El bloque, los marcadores, el aplanado, los conflictos, las ediciones locales y los huérfanos
+son los de las secciones 4, 6 y 7, sin cambios. Los adapters ya nombran las dos rutas de
+skills: el kernel no cambia.
+
+#### RN-proy-exclusivo · [add] · origin: QP-02
+**Un proveedor está instalado global o en proyectos, nunca de las dos formas a la vez.** En
+Claude Code la global taparía la del proyecto, y en Codex cada skill aparecería dos veces.
+
+- Instalar en un proyecto con la global de ese proveedor presente: el menú ofrece
+  *Desinstalar la global y seguir* o *Volver*, y la desinstalación entra en la misma
+  simulación. Por comando, `install --scope project` corta sin escribir y dice que primero hay
+  que desinstalar la global. **Nunca se desinstala la global sin preguntar.**
+- Instalar global con proyectos registrados de ese proveedor: los lista, avisa que la global
+  los taparía y pregunta *Seguir* o *Volver*.
+- Un repo *Compartido* abierto por alguien con la global instalada no se puede impedir: el
+  menú y `status`, abiertos en ese repo, dicen que la global tapa el proyecto.
+
+#### RN-proy-mods · [add] · origin: propuesta del agente, aceptada 2026-10-31
+**Los mods siguen siendo globales.** Instalar en un proyecto no pregunta *Todo NZT / método /
+mods*, y `--mods` con `--scope project` es un error que no toca nada. En un proyecto sin NZT un
+mod no tiene qué mostrar, así que no hace falta sacarlo.
+
+### 13.2 Los dos modos
+
+#### RN-proy-modos · [add] · origin: propuesta del agente, aceptada 2026-10-31
+Instalar en un proyecto elige el modo, y **el defecto es *Solo para mí***, porque el motivo
+del pedido es personal:
+
+- **Solo para mí.** Nada aparece en el diff del repo. Lo que el CLI crea —skills, subagentes,
+  `CLAUDE.local.md`, `.nzt/`— se anota en el `info/exclude` del repo, el ignore local que git
+  no versiona, dentro de un bloque `# nzt:start` / `# nzt:end` que es lo único que el CLI toca
+  de ese archivo. No se toca el `.gitignore`.
+- **Compartido.** Para commitear: quien clona el repo tiene NZT sin instalar nada, en la
+  versión del proyecto. Nada se excluye.
+
+Fuera de un repo no hay qué excluir: el modo no se pregunta y el reporte lo dice.
+
+#### RN-proy-codex-personal · [add] · origin: tabla de esta sección
+Codex no tiene instrucciones solo del usuario. En *Solo para mí*, si `AGENTS.md` no existe se
+crea y se excluye; si existe y git lo versiona, **el bloque va a aparecer en el diff**: el menú
+lo dice antes de simular y ofrece *Seguir igual* o *Volver*. Por comando se escribe, y el
+reporte lo dice.
+
+#### RN-proy-agents-md · [add] · origin: tabla de esta sección
+Crear el archivo de Claude Code en un repo que solo tiene `AGENTS.md` haría que Claude deje de
+leer ese `AGENTS.md`, sin aviso. En ese caso el archivo que se crea lleva `@AGENTS.md` fuera del
+bloque, y el reporte lo dice. **Si ese `AGENTS.md` tiene un bloque de NZT** —Codex instalado en
+el proyecto—, no se importa: traería el kernel dos veces, con el adapter de Codex. Si además
+tiene contenido fuera del bloque, el reporte avisa que Claude Code no lo va a leer (QP-04).
+
+#### RN-proy-worktree · [add] · origin: documentación de `CLAUDE.local.md`
+*Solo para mí* existe solo en el worktree donde se instaló, como cualquier archivo excluido.
+El `info/exclude` es el del repo, común a todos sus worktrees. El reporte no lo repite: lo
+dice el runbook.
+
+### 13.3 Manifiesto y registro
+
+#### RN-proy-manifiesto · [add] · origin: propuesta del agente, aceptada 2026-10-31
+El manifiesto de un proyecto vive en el proyecto, en `.nzt/manifests/<proveedor>.json`, con el
+formato de la sección 5, el modo, y **rutas relativas a la raíz**: viaja con los archivos, y un
+repo *Compartido* clonado en otra carpeta sigue siendo administrable. El de usuario no cambia
+de lugar.
+
+#### RN-proy-backup · [add] · origin: sección 7 (backup del archivo de instrucciones)
+En un proyecto el backup del archivo de instrucciones va a `.nzt/backup/`, que se excluye en
+los dos modos: es del usuario, no del repo.
+
+#### RN-proy-registro · [add] · origin: propuesta del agente, aceptada 2026-10-31
+El CLI anota cada proyecto donde instala en `projects.json`, junto a los manifiestos de
+usuario: ruta, proveedores, modo y versión. Es un índice, no la verdad: la verdad es el
+manifiesto del proyecto. Una entrada cuya carpeta ya no existe, o sin manifiesto, se descarta
+al leerlo. Lo usan el menú, `status`, `update` y RN-cli-desinstalar.
+
+#### RN-proy-version · [add] · origin: propuesta del agente, aceptada 2026-10-31
+**Instalar nunca baja de versión sin decirlo.** Si el manifiesto de un proyecto es de una
+versión más nueva que el CLI —un repo *Compartido* que actualizó otro—, instalar y desinstalar
+cortan, y el menú ofrece *Actualizar* primero.
+
+### 13.4 Actualizar
+
+#### RN-cli-update · [add] · origin: propuesta del agente, aceptada 2026-10-31
+`nzt-ai update` baja el binario de la plataforma del último release, verifica su SHA256
+contra `SHA256SUMS` —lo mismo que el script de la sección 10.2, y con las mismas
+`NZT_VERSION` y `NZT_DOWNLOAD_BASE`—, se reemplaza y **corre el binario nuevo** para reinstalar
+cada proveedor global y actualizar los mods que instaló, porque el contenido viaja embebido en
+el binario. Ya al día, lo dice y sale con 0. Corrido con `dotnet run` no actualiza y lo dice,
+como RN-cli-queda-instalado.
+
+#### RN-cli-update-windows · [add] · origin: `CliCommand.Install` (un `nzt-ai` corriendo no se pisa)
+En Windows el ejecutable que corre no se puede pisar: se renombra a `nzt-ai.old`, se escribe
+el nuevo y el viejo se borra en la siguiente ejecución.
+
+#### RN-cli-update-proyectos · [add] · origin: RN-proy-modos
+Los proyectos no se actualizan solos: en *Compartido*, actualizar genera un diff que nadie
+pidió. Después de la global, `update` lista los proyectos registrados con su versión y modo, y
+pregunta *Todos*, *Elegir* o *Ninguno*. Por comando, `--projects all|none`, y sin la opción es
+`none`. Dentro de un proyecto, reinstalar es actualizarlo (sección 6).
+
+### 13.5 El menú
+
+#### RN-menu-contexto · [add] · origin: usuario 2026-10-31, QP-03
+`nzt-ai` sin argumentos abre el menú de la sección 3, ahora con **un encabezado que dice dónde
+se está y qué hay**:
+
+```
+NZT 3.2.0
+  Carpeta   C:\...\mi-repo  (repo git)
+  Acá       sin NZT
+  Global    Claude Code 3.1.0 · Codex no
+  Mods      2 instalados
+
+  ¿Qué querés hacer?
+  > Instalar en este proyecto
+    Instalar global
+    Desinstalar
+    Actualizar            hay una versión nueva: 3.2.1
+    Ver estado
+    Verificar el contenido
+    Salir
+```
+
+#### RN-menu-solo-posible · [add] · origin: sección 3 ("no existe una opción inválida")
+**El menú muestra solo lo que se puede hacer ahí.** Es la regla de la sección 3, que no haya
+una opción inválida, aplicada al contexto:
+
+- Sin nada instalado no aparece *Desinstalar*.
+- Con NZT en el proyecto, *Instalar en este proyecto* pasa a ser *Reinstalar en este
+  proyecto*.
+- En la carpeta del usuario no aparece *Instalar en este proyecto* (RN-proy-raiz).
+- *Actualizar* aparece solo cuando hay una versión nueva, y lo dice en la misma línea. El
+  menú la busca al abrir, con un límite de dos segundos; si falla o no llega a tiempo, no
+  dice nada y *Actualizar* no aparece (QP-05). `nzt-ai update` funciona igual.
+
+#### RN-menu-flujos · [add] · origin: propuesta del agente, aceptada 2026-10-31
+Cada acción es una serie corta de listas, y la última es siempre la simulación con `No`
+primero:
+
+- **Instalar en este proyecto**: proveedor (marcado de antemano el que el repo ya usa: `.claude/`
+  o `CLAUDE.md` es Claude Code, y `AGENTS.md`, `.agents/` o `.codex/` es Codex) → *Solo para
+  mí* o *Compartido* → si hay una global de ese proveedor, RN-proy-exclusivo → simulación.
+- **Instalar global**: el flujo de siempre (proveedor → *Todo NZT / método / mods*), más el
+  aviso de RN-proy-exclusivo.
+- **Desinstalar**: solo lo que existe, entre *De este proyecto*, *Global* y *Todo* —global,
+  proyectos registrados, los mods que instaló el CLI y el CLI—.
+- **Actualizar**: el CLI y la global, y después los proyectos (RN-cli-update-proyectos).
+- **Ver estado**: el encabezado en detalle, y cada proyecto registrado con su versión y modo.
+
+#### RN-menu-init · [add] · origin: propuesta del agente, aceptada 2026-10-31
+`nzt-ai init` abre el menú directo en *Instalar en este proyecto*. Sin terminal no abre y
+remite a `install --scope project`, como el menú.
+
+### 13.6 Comandos
+
+```
+nzt-ai                      el menú
+nzt-ai init                 el menú, en "Instalar en este proyecto"
+nzt-ai install   --provider <id> [--scope user|project] [--mode personal|shared] [--mods all|none|only] [--dry-run]
+nzt-ai uninstall --provider <id> [--scope user|project] [--dry-run]
+nzt-ai uninstall --all [--dry-run]
+nzt-ai update [--projects all|none] [--dry-run]
+nzt-ai status
+nzt-ai verify | lint
+nzt-ai state check
+nzt-ai --version
+```
+
+- `--scope` es `user` por defecto; `--mode`, `personal` por defecto, y solo vale con
+  `--scope project`. `--scope project` actúa sobre el proyecto de la carpeta actual.
+- `uninstall --all` es *Todo* del menú.
+- Las comprobaciones siguen sin tocar la máquina real: suman una raíz de proyecto temporal, un
+  `--registry-dir` como el `--manifest-dir`, y un release falso por `NZT_DOWNLOAD_BASE`.
+
+### 13.7 Preguntas
+
+#### QP-01 · ¿Para qué es la instalación por proyecto?
+- opciones: A, opt-in: NZT donde se elige, para usar el agente sin NZT o probarlo aislado; B,
+  para el equipo: commitearlo en el repo. El agente preguntó sin recomendar.
+- respuesta: **A** · 2026-10-31. *Compartido* queda como segundo modo (RN-proy-modos).
+
+#### QP-02 · Global y proyecto del mismo proveedor, ¿pueden convivir?
+- opciones: A, no: excluyentes, y el CLI ofrece desinstalar la global; B, sí, con aviso. El
+  agente recomendó A: en Claude Code gana la de usuario y en Codex se duplican.
+- respuesta: **A** · 2026-10-31
+
+#### QP-03 · ¿Cómo se usa el CLI sin acordarse de los comandos?
+- respuesta: el usuario, 2026-10-31: *"estaria bueno que escribir nzt-ai abra un menu de
+  opciones como una consola digamos navegable con estas opciones"*. Se extiende el menú que ya
+  existe (RN-menu-contexto).
+
+#### QP-04 · Claude Code en un proyecto cuyo `AGENTS.md` tiene un bloque de NZT (Codex instalado ahí)
+Importar `@AGENTS.md` traería el kernel dos veces, con el adapter de Codex. No importarlo
+deja a Claude sin el resto de ese archivo.
+- opciones: A, no importar, y si `AGENTS.md` tiene contenido fuera del bloque, el reporte lo
+  dice; B, importar igual; C, no permitir Claude Code en el proyecto en ese caso. El agente
+  recomendó A: si el `AGENTS.md` lo creó NZT, no se pierde nada.
+- respuesta: **A** · 2026-10-31
+
+#### QP-05 · ¿Cuándo busca el menú una versión nueva?
+- opciones: A, al abrir, con un límite de dos segundos y sin decir nada si falla; B, solo al
+  elegir *Actualizar*. El agente recomendó A: si no, *Actualizar* tendría que aparecer
+  siempre.
+- respuesta: **A** · 2026-10-31
 
 ## Historia
 
