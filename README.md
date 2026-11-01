@@ -103,6 +103,12 @@ con sus decisiones, sus opt-ins, sus dependencias y **los packs que lo guían**.
 **ejes** de cada pack —arquitectura, modelo de dominio, persistencia, endpoints, modo de
 render…— se preguntan una vez, con lo que cuesta cada opción.
 
+**Antes de trabajar, el agente prepara el trabajo con vos**, como a alguien que no sabe nada:
+qué va a hacer y qué necesita (packs, MCP, herramientas), de dónde lo sacó —el catálogo y una
+investigación, con fuente y fecha—, lo que tenés que hacer vos a mano, paso a paso, lo que él
+no puede hacer y qué tener en cuenta. Con tu sí instala, te guía en lo tuyo y comprueba que
+cada herramienta responda.
+
 **Un pack se aplica solo si `tech.md` lo lista.** Instalado y no listado no se carga, y en un
 repositorio con convenciones propias las de NZT se corren a un costado y la diferencia se
 reporta en vez de aplicarse.
@@ -255,7 +261,8 @@ Es tan importante como lo otro:
   cada decisión, y que frena en los bordes de cada unidad. Puede mandar a dos subagentes
   propios: uno lee por ella y el otro hace las unidades que el plan aprobado marcó en
   paralelo. Sin subagentes, o con `delegation` en `off`, todo corre en esta conversación,
-  una unidad tras otra. Los únicos MCP son los que trae un pack, en el proyecto que lo eligió.
+  una unidad tras otra. No instala MCP globales: los de un pack van al proyecto que lo
+  eligió, y otro que haga falta, al archivo de MCP del proyecto, que viaja con git.
 - **No garantiza que el modelo elija siempre la skill correcta.** Por eso el ruteo está
   instruido y por eso hay una suite de evals que lo mide.
 - **No decide por vos.** Prescribe el procedimiento, no el criterio técnico: NZT dice *cómo

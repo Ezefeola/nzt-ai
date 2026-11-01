@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-02T02:00:00Z",
+  "updated": "2026-11-02T03:00:00Z",
   "goal": "Preparación para trabajar: el agente propone y explica lo que necesita para el trabajo, como a alguien que no sabe; además Docs/Design/ (QT-07) y la versión 4.0.0 (QT-05)",
   "phases": [
     {
@@ -21,9 +21,9 @@
     },
     {
       "name": "ship",
-      "status": "doing",
+      "status": "done",
       "units": [
-        { "id": 436, "do": "Versión 4.0.0 en el CLI y los builds, README e installer/README con sus cifras, y la decisión en specs/nzt-core.md (QT-05)", "status": "todo" }
+        { "id": 436, "do": "Versión 4.0.0 en el CLI y los builds, README e installer/README con sus cifras, y la decisión en specs/nzt-core.md (QT-05)", "status": "done", "detail": "4.0.0 en Nzt.Cli.csproj e install/build.sh y .ps1 (el CLI dice 'NZT installer 4.0.0'). README: párrafo de la preparación para trabajar y MCP fuera de un pack en el archivo del proyecto (QT-06); installer/README: versión y 235 checks. nzt-core.md: D89 (432-436, QT-05/06/07), [modify] en D47, D57, D76 y D88, sección 8 con Docs/Design/ y design/, y el estado actual de la sección 14. Sin tag ni release por decisión del usuario: lo prueba en local antes. Build 0 avisos, 235 checks, lint 0, state check ok" }
       ]
     }
   ],
@@ -34,6 +34,7 @@
   "notes": [
     "Rama refactor-marco-generico. El run anterior (marco genérico, 413-431 y 424) terminó en d1fb199; su detalle está en git y en Plan/mejoras/11-marco-generico.md",
     "Pedido del usuario (2026-11-01): que el agente ofrezca y explique todo lo necesario para trabajar —packs, MCP, herramientas, lo que hace el usuario, lo que no puede hacer, qué tener en cuenta— como hizo Claude solo con el juego de Unity, escrito en términos de 'el trabajo' y no de 'el componente' (DB-04). QT-06 cerrada en A: el MCP queda en el archivo del proyecto y viaja con git",
-    "Abiertos en Plan/mejoras/12-debate-marco.md: DB-01 (ceremonia) y DB-04 (protocolo y flujos), para conversar después de este run"
+    "Abiertos en Plan/mejoras/12-debate-marco.md: DB-01 (ceremonia) y DB-04 (protocolo y flujos), para conversar después de este run",
+    "Run terminado (436 hecha). La rama se pushea sin tag: el usuario prueba 4.0.0 en local antes del merge y del release (git tag v4.0.0 && git push origin v4.0.0)"
   ]
 }

@@ -1,6 +1,6 @@
 # Instalador de NZT — .NET 10
 
-Versión 3.1.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
+Versión 4.0.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
 bloque en el archivo de instrucciones que el proveedor ya lee en toda sesión, y las 12
 skills, con sus referencias, aplanadas en su carpeta de skills de usuario. Los **packs** se
 instalan aparte, **en cada proyecto** (sección *Packs por proyecto*). En Claude Code
@@ -184,7 +184,7 @@ Claude Code, versión vieja, falla parcial, mods instalados a mano, actualizar, 
 estado; y `project`: requires, agregar, sacar y sincronizar, archivo ajeno, pack desconocido,
 ediciones, simulación, MCP del usuario en `.mcp.json` y en `config.toml`, comando por
 plataforma, cambio de proveedor y el lint de packs. La validación de esta versión da
-`PASS: 230 installer checks`.
+`PASS: 235 installer checks`.
 
 Las comprobaciones no ejecutan conversaciones en los CLIs ni miden selección de skills. Eso
 es la suite de `evals/`.

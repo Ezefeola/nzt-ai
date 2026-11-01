@@ -644,8 +644,8 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │  │  ├─ adr/ADR-NNN-<slug>.md # una decisión por archivo
 │  │  ├─ rfc/RFC-NNN-<slug>.md # propuesta en discusión, a pedido (D35)
 │  │  └─ tech-debt.md          # trabajo técnico diferido, con su impacto (D29)
-│  ├─ UX/
-│  │  ├─ design-system.md · ui-components.md   # de nzt-ux-system (D11); marca y voz (D76)
+│  ├─ Design/                  # antes UX/: un proyecto que ya la tiene la sigue usando (D89)
+│  │  ├─ design-system.md · ui-components.md   # de nzt-design (D11, D89); marca y voz (D76)
 │  │  └─ prototype/<slug>.html                 # prototipo conservado y mantenido, si el usuario lo eligió (D76)
 │  ├─ Operations/
 │  │  ├─ deployment.md         # entornos con su autorizador, pipeline, rollback (T16)
@@ -660,7 +660,7 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
 │     └─ <área>-stack.md       # backend-stack.md, frontend-stack.md: obligatorio (6.1, D57)
 └─ Plan/
    ├─ state.json               # plan + estado, actualizado por unidad
-   ├─ prototype/<slug>.html    # prototipo de la entrega 1: al registrar lo aprendido, se borra o pasa a Docs/UX/prototype/ (D72, D76)
+   ├─ prototype/<slug>.html    # prototipo de la entrega 1: al registrar lo aprendido, se borra o pasa a Docs/Design/prototype/ (D72, D76, D89)
    └─ specs/
       └─ F-NNN-<slug>/       # "<feature>" en el resto del documento (D6)
          ├─ spec.md            # transversal: alcance, reglas, NFR, índice de historias
@@ -671,7 +671,7 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
          ├─ tech-design/       # diseño técnico de esta feature, ofrecido (D41, D47)
          │  ├─ design.md       # el presente: flujos, datos, fallos, contratos
          │  └─ decisions.md    # log append-only de sus QT-NN (D41)
-         ├─ ux-ui/             # diseños de pantalla de esta feature (D47)
+         ├─ design/            # diseños de pantalla de esta feature; antes ux-ui/ (D47, D89)
          │  ├─ screen-<slug>.md    # una pantalla por archivo
          │  └─ screen-<slug>.html  # su mockup, a pedido
          └─ testing/
@@ -703,14 +703,14 @@ componente; lo que es de una feature vive con su spec en `Plan/` (D57).
   reensayo **agrega** una ejecución fechada; nunca pisa la anterior (13.5 #17).
 - El bug lo abre y lo cierra verify aunque lo arregle build, con tres estados: `pendiente`,
   `corregido pendiente de verificación`, `verificado` (T10).
-- `tech-design/` es **ofrecido** por feature, con el criterio de D41; `ux-ui/` se crea con
+- `tech-design/` es **ofrecido** por feature, con el criterio de D41; `design/` se crea con
   la primera pantalla que se diseña; `testing/` se crea cuando aporta. **Diseño técnico y
   diseño de pantalla nunca comparten carpeta** (D47). `README.md` de `testing/` es obligatorio desde la segunda historia con pruebas
   (T9).
 - El inventario exacto de `Docs/` (nombres de archivo y cuándo se crea cada uno) lo define
   el router `nzt-architecture` en la fase 4, no el kernel. **Excepción: los documentos de
-  UX** — design system e inventario de componentes compartidos — los define y mantiene
-  `nzt-ux-system` (T13). **Las carpetas las fija D57 y valen para todas las fases**: cada
+  diseño** — design system e inventario de componentes compartidos — los define y mantiene
+  `nzt-design` (T13, D89). **Las carpetas las fija D57 y valen para todas las fases**: cada
   documento va en la carpeta de su tema, sin importar qué fase lo escribe.
 - **El stack vive dentro de su componente**: `<carpeta>/Docs/Architecture/<área>-stack.md`,
   donde `<carpeta>` es la que `Docs/Architecture/architecture.md` declara para ese
@@ -1647,6 +1647,8 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   Los documentos de producto no se mueven: `Docs/architecture.md`, `Docs/design-system.md` y
   `Docs/ui-components.md` siguen donde estaban. **No migra proyectos existentes**: uno que
   ya tiene `design/` lo renombra a mano o en su próxima corrida.
+  **[modify] 2026-11-01: D89.** `ux-ui/` pasa a `design/`, ahora que `tech-design/` dice qué
+  contiene la otra; un proyecto con `ux-ui/` la sigue usando hasta que la mueva.
 
 - **D48.** **Las excepciones que escapan de un caso de uso terminan en un único
   `GlobalExceptionHandler`, reconocidas solo por tipo.** Salió de leer FarmaPedia: cinco
@@ -1799,6 +1801,8 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   aplica el mapa de rutas a la hoja de `main` antes de comparar, así una ruta movida no
   cuenta como pérdida y una mal movida sí (visto fallar con `glossary.md` en `Product/`).
   Decidido por el usuario el 2026-10-08.
+  **[modify] 2026-11-01: D89.** `Docs/UX/` pasa a `Docs/Design/`; un proyecto que ya la tiene
+  la sigue usando hasta que el usuario la mueva.
 - **D58.** **La capa genérica es el principio, la de área es cómo se hace en esa tecnología,
   y lo genérico se extrae de las referencias de área.** Reemplaza a D51. Lo que la forzó: fuera
   de .NET y Blazor el agente recibía método pero ninguna práctica, mientras que las
@@ -2545,6 +2549,8 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     `ux/SKILL.md`, `proposal.md`, `slices.md` y el árbol de §7. **Puertas:** build sin avisos,
     `check-references` sin movidas, 164 comprobaciones, lint 0 problemas, marketplace válido.
     **Sin evals** (usuario); ningún caso nombra el prototipo.
+  **[modify] 2026-11-01: D89.** El prototipo conservado y el design system van en
+  `Docs/Design/`.
 - **D77.** **El plan muestra una tabla por tramo, bajo su título, y la palabra es *tramo*;
   el panel de preguntas cierra lo contestado fuera de él. D72–D74 quedan aceptadas.** Lo que
   la forzó: la prueba en `Systems/TodoList` (usuario, 2026-10-24). El plan de construcción
@@ -3097,6 +3103,38 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     que el relay de Unity acepte la ruta absoluta de `{home}` en Windows.
   - **Pendiente:** la unidad 424 (puertas y smoke de `project` en una carpeta temporal) y la
     versión: 4.0.0 propuesta, porque cambian nombres de skills y el documento técnico.
+    **[modify] 2026-11-01:** la 424 se hizo; la versión la cierra D89.
+- **D89.** **Antes de trabajar, el agente prepara el trabajo con el usuario como con alguien
+  que no sabe nada; los MCP que no trae un pack van en el archivo del proyecto; el diseño
+  vive en `Docs/Design/`; y la versión es 4.0.0.** Lo que la forzó: al explicarle QT-06, el
+  usuario dijo lo que quería de verdad (2026-11-01): que el agente ofrezca y explique todo lo
+  necesario para trabajar —packs, MCP, herramientas, lo que hace el usuario a mano, lo que el
+  agente no puede, qué tener en cuenta—, como hizo Claude solo con un juego de Unity, escrito
+  en términos de *el trabajo* y no de *el componente*. Run de las unidades 432–436; el debate
+  en `Plan/mejoras/12-debate-marco.md`.
+  - **Preparación para trabajar (432):** `nzt-architecture`'s `references/tech.md`, paso 4
+    *Prepare the work*. En una ronda: qué hará el agente y qué necesita, cómo se cubre
+    —catálogo e investigación siempre, con fuente y fecha, y la contradicción con un pack
+    dicha—, lo que el usuario hace a mano paso a paso, lo que el agente no puede y qué tener en
+    cuenta. Con el sí instala en el proyecto y guía; el paso 7 comprueba que cada herramienta
+    responde (un MCP, en la sesión nueva). `tech.md` anota en *Agent tools* quién instaló cada
+    cosa, en pocas palabras, nunca los pasos: el cómo vive en el pack o en la fuente citada.
+    El eval `routing/tool-research` suma el grader `explained-for-a-newcomer` (433).
+  - **QT-06, MCP que no vienen de un pack: A.** Queda en el archivo de MCP del proyecto
+    (`.mcp.json` o `.codex/config.toml`) y viaja con git; `nzt-ai` no lo registra en
+    `.nzt/project.json` ni lo toca.
+  - **QT-07, carpetas de diseño (434):** `Docs/UX/` pasa a `Docs/Design/` y
+    `Plan/specs/<feature>/ux-ui/` a `design/`, en `nzt-design`, `nzt-architecture`,
+    `plan/close`, el pack `frontend` y el eval `design-mockup`. **Un proyecto que ya tiene las
+    carpetas viejas se sigue leyendo y escribiendo ahí** hasta que el usuario las mueva, nunca
+    en las dos. Modifica D47, D57 y D76.
+  - **QT-05, versión 4.0.0 (436):** mayor, porque se van las skills de stack globales, llegan
+    los packs por proyecto y se renombran fases y carpetas (`ux` → `design`, `analysis` →
+    `discovery`, `Docs/UX/` → `Docs/Design/`). En `Nzt.Cli.csproj`, `install/build.*`, `README.md`
+    e `installer/README.md`. **Sin tag ni release**: el usuario lo prueba en local antes.
+  - **Verificación (435):** build sin avisos, 235 comprobaciones, lint 0 en 12 skills y 8
+    packs, los 36 scaffolds de evals corren, `state check` ok. **Ningún eval corrido.**
+  - **Abiertos:** DB-01 (ceremonia) y DB-04 (protocolo y flujos) en el debate, para después.
 
 ## 13. Revisión contra Temper v3
 
@@ -4472,8 +4510,10 @@ curiosidad.
 > **Estado actual (2026-11-01), rama `refactor-marco-generico`.** D88: global queda solo el
 > marco —12 skills, 60 referencias—, y lo de una tecnología o una arquitectura son 8 packs
 > por proyecto (77 referencias) que instala `nzt-ai project`, con sus MCP. El documento
-> técnico es `Docs/Architecture/tech.md`. El bloque de abajo, del 2026-10-11, es historia:
-> sus cuentas y su capa de stack ya no valen.
+> técnico es `Docs/Architecture/tech.md`. D89: antes de trabajar el agente prepara el
+> trabajo con el usuario (`references/tech.md`, paso 4), el diseño vive en `Docs/Design/` y la
+> versión es **4.0.0, sin tag ni release** hasta que el usuario la pruebe en local. El bloque
+> de abajo, del 2026-10-11, es historia: sus cuentas y su capa de stack ya no valen.
 
 > **Estado al 2026-10-11, rama `capa-generica`.** Lo que sigue a este bloque es la
 > historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
