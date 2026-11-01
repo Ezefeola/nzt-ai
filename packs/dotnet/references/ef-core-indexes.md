@@ -1,21 +1,17 @@
 # EF Core indexes
 
-**Read `../nzt-backend/references/data-indexes.md` first.** It holds which columns earn an index,
-the order in a composite, the unique index with its pre-check and matching scope, how to verify
-the race, filtered indexes and what an index costs. This file holds only what is EF Core.
+Builds on `../nzt-backend/references/data-indexes.md` — read it first.
 
-An index is **declared in the entity configuration file** (`IEntityTypeConfiguration<T>`) and
-reaches the database **through a generated migration**.
+## Rules
 
-- **EF indexes FK columns by convention**: a `Join` or a foreign key is **already** indexed.
-- The pre-check is **the `AnyAsync` pre-check before writing**. The race's exception reaches
-  `nzt-dotnet-exceptions`.
-- **Verify it with two independent contexts on the real relational provider.** **The in-memory
-  provider cannot prove relational constraint behaviour.**
+1. Declared in the entity's `IEntityTypeConfiguration<T>`, reaching the database through a
+   generated migration.
+2. **EF indexes foreign key columns by convention**: they already have one.
+3. The pre-check is `AnyAsync` before writing; the race reaches `exceptions.md`.
+4. **Verify uniqueness with two independent contexts on the real relational provider** — never
+   the in-memory one.
 
-## Closing checklist
+## Done when
 
-- [ ] Concurrency was verified with two contexts on the real provider, or the verification is
-      reported as pending.
-- [ ] It was declared in the entity configuration file and reached the database through a
-      generated migration.
+Each index is in its entity's configuration, and uniqueness was verified with two contexts on
+the real provider or reported pending.

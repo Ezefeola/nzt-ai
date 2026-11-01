@@ -1,25 +1,6 @@
 # Exceptions on .NET — one global handler
 
-## Contents
-- What is .NET in it
-- The handler
-- Registration
-- Closing checklist
-
-**Read `../nzt-backend/references/errors.md` first.** It holds what reaches the handler
-and what never does, recognising by type, the order of the arms, the response's shape and
-what a user never sees. This file holds only what is .NET.
-
-## What is .NET in it
-
-- **The handler is a single `GlobalExceptionHandler`.** No exception filter, no middleware
-  with its own `try/catch`.
-- The pre-checks are `AnyAsync` on the same scope as the unique index, and on the dependants
-  before deleting (`references/use-cases.md`). **No `catch … when`.**
-- The handler distinguishes failures **only by the .NET type of the exception**: no
-  `SqlException.Number`, **no matching on `Message`**.
-
-## The handler
+Builds on `../nzt-backend/references/errors.md` — read it first.
 
 ```csharp
 public sealed class GlobalExceptionHandler : IExceptionHandler
@@ -74,39 +55,32 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 }
 ```
 
-- **One class.** One `switch` over the type, read top to bottom.
-- **The most specific type first**: `DbUpdateConcurrencyException` derives from
-  `DbUpdateException`, so the order of the arms is part of the rule.
-- **The shape follows the *Result to HTTP* axis.** The code above is `result-extensions`: the
-  fixed `Title`, the message in `Extensions["errors"]`. Under `result-filter` the handler
-  writes a failed `Result` with `WriteAsJsonAsync` instead, and the Development detail goes as
-  a second entry in `Errors`.
-- The detail field is `exception`, **only in Development**.
-- **The messages above are the base, not the final text.**
+## Rules
 
-## Registration
+1. **One `GlobalExceptionHandler`** — no exception filter, no middleware with its own
+   `try/catch`. Pre-checks are `AnyAsync` (`use-cases.md`); no `catch … when`.
+2. **By .NET type only** — no `SqlException.Number`, no matching on `Message`.
+   `DbUpdateConcurrencyException` derives from `DbUpdateException`, so it comes first.
+3. **The shape follows the Result to HTTP axis**: the code above is `result-extensions`. Under
+   `result-filter` the handler writes a failed `Result` with `WriteAsJsonAsync`, and the
+   Development detail is a second entry in `Errors`.
+4. The `exception` detail only in Development; the messages are placeholders for the project's
+   agreed wording.
+5. **Registration**, with diagnostics not suppressed — from .NET 10 the middleware stops logging
+   handled exceptions without it; with it, the exception is logged once and the handler does
+   not log. Before .NET 10 the option does not exist (check `TargetFramework`):
 
-```csharp
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+   ```csharp
+   builder.Services.AddProblemDetails();
+   builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-app.UseExceptionHandler(new ExceptionHandlerOptions
-{
-    SuppressDiagnosticsCallback = _ => false
-});
-```
+   app.UseExceptionHandler(new ExceptionHandlerOptions
+   {
+       SuppressDiagnosticsCallback = _ => false
+   });
+   ```
 
-**`SuppressDiagnosticsCallback = _ => false` is required.** From .NET 10 the middleware stops
-logging exceptions a handler marked as handled; without this line every race and every bug
-this handler answers disappears from the log. With it, the middleware logs the whole
-exception once — **the handler does not log a second time.**
+## Done when
 
-On a target framework older than .NET 10 the option does not exist and the middleware
-already logs: check `TargetFramework` before writing the line.
-
-## Closing checklist
-
-- [ ] One `GlobalExceptionHandler`, recognising failures by type only, most specific first.
-- [ ] `AddProblemDetails`, `AddExceptionHandler` and `UseExceptionHandler` registered, with
-      diagnostics not suppressed on .NET 10 or later.
-- [ ] The message texts are the project's agreed ones, not the base ones from here.
+One handler dispatching by type with the most specific first, registered with diagnostics on
+from .NET 10, answering in the axis's shape with the project's messages.

@@ -1,7 +1,7 @@
 # Backend architecture — what holds in every style
 
-Read before the style's file (`architecture-vertical-slice.md`, `-clean.md`,
-`-hexagonal.md`). The style decides units and folders, and nothing else does; what a file
+Read before the style's file (`architecture-vertical-slice.md`, `architecture-clean.md`,
+`architecture-hexagonal.md`). The style decides units and folders, and nothing else does; what a file
 *is* and what it is called comes from its own reference.
 
 ## Rules

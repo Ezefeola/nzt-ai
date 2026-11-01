@@ -1,12 +1,13 @@
 # Resource authorisation on .NET
 
-**Read `../nzt-backend/references/security.md` first.** It holds the whole practice:
-where the rule comes from, trusted authority, enforcement, rejection and verification. This
-file holds only the .NET names.
+Builds on `../nzt-backend/references/security.md` — read it first; it holds the whole practice.
 
-- **The use case does not read `HttpContext`.** The caller arrives through the project's
-  caller abstraction, injected.
-- **`[Authorize]` on the endpoint does not establish permission over a particular resource**
-  — it answers *who are you*, not *is this yours*. **No new framework, role model or named
-  policy is introduced to satisfy this skill.**
-- An application failure is the agreed `Result` with the status the use case chooses.
+- The caller arrives through the project's injected caller abstraction — the use case never reads
+  `HttpContext`.
+- `[Authorize]` answers *who are you*, not *is this yours*; no new policy or role model is added
+  for this.
+- A rejection is the agreed `Result` with the use case's status.
+
+## Done when
+
+No use case reads `HttpContext`, and resource access is decided in the use case.

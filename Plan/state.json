@@ -18,11 +18,11 @@
         { "id": 415, "do": "CLI: catálogo de packs, .nzt/project.json, merge de MCP, nzt-ai project y menú, lint de packs", "status": "done", "detail": "Compila; smoke manual de add/remove ok antes de reescribir contenido" },
         { "id": 416, "do": "Kernel y skills globales reescritas cortas y genéricas (nzt, plan, delegate, architecture, build, discovery, verify, ship, ux)", "status": "done", "detail": "architecture/references/tech.md nueva; stack.md y stack-axes.md borradas; agentes y retro re-apuntados" },
         { "id": 418, "do": "SKILL.md de cada pack con Axes y Opt-ins, y ddd/references/aggregates.md", "status": "done", "detail": "7 SKILL.md (code, backend, frontend, ddd, csharp, dotnet, blazor) con Axes, Opt-ins y costos; ddd/references/aggregates.md; kernel: un pack carga primero los que pide. Lint 0 problemas" },
-        { "id": 419, "do": "Reescribir las referencias de los packs sin redundancia (ya re-apuntadas por script)", "status": "todo" },
+        { "id": 419, "do": "Reescribir las referencias de los packs sin redundancia (ya re-apuntadas por script)", "status": "done", "detail": "6177 → ~3000 líneas; backend/references/architecture.md nueva (lo común de las 3 arquitecturas); dotnet domain-ddd-behaviour.md fusionada en domain-ddd.md; listas de cierre → Done when; lint 0" },
         { "id": 417, "do": "Pasada de nzt-learn (referencias), nzt-research y nzt-retro con el mismo criterio", "status": "todo" },
         { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "todo" },
         { "id": 421, "do": "build.sh y build.ps1 validan packs; decidir check-extraction y check-references", "status": "todo" },
-        { "id": 422, "do": "evals: fixtures y casos a tech.md y nombres de packs, más un caso de setup", "status": "todo" },
+        { "id": 422, "do": "evals: fixtures y casos a tech.md y nombres de packs, más un caso de setup", "status": "todo", "detail": "evals/stack/entity-shape/case.yaml espera leer domain-ddd-behaviour.md, que ya no existe: pasar a nzt-dotnet/references/domain-ddd.md" },
         { "id": 423, "do": "README, installer/README, specs/nzt-installer.md y D88 en specs/nzt-core.md", "status": "todo" }
       ]
     },
@@ -39,7 +39,7 @@
   "autonomy": { "units": [], "keep_stops": [] },
   "waiting_on": null,
   "notes": [
-    "Rama refactor-marco-generico desde main; avance commiteado en 060f691, la unidad 418 sin commitear",
+    "Rama refactor-marco-generico desde main; 418 en dc6f6e2, 419 en 98f0570, a662ea3 y el commit siguiente",
     "Traspaso completo (decisiones, mapeos de nombres, pendiente en orden): Plan/mejoras/11-marco-generico.md",
     "Contenido viejo de los routers de packs: git show a31db74:skills/nzt/build/... (HEAD ya no lo tiene)"
   ]

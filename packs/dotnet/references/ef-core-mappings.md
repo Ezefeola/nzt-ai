@@ -1,17 +1,18 @@
 # EF Core mappings — the context and its entities
 
-**Read `../nzt-backend/references/data-mapping.md` first.** It holds the handle that exposes only
-its entities, one configuration per entity, the concerns that are never left to convention, and
-the foreign key as a property. This file holds only what is EF Core.
+Builds on `../nzt-backend/references/data-mapping.md` — read it first.
 
-## The `DbContext`
+## Rules
 
-**One `DbContext` per component, named after the component** and ending in `DbContext` — the
-component `Billing` gets `BillingDbContext`. It exposes **a `DbSet<T>` per entity and nothing
-else**. **A `DbContext` that grows methods becomes the place where use cases hide their
-decisions.**
-
-`OnModelCreating` has **one job**:
+1. **One `<Component>DbContext`** (`BillingDbContext`) with a `DbSet<T>` per entity and nothing
+   else; `OnModelCreating` only applies the configurations. Registered scoped.
+2. **One `<Entity>Configuration : IEntityTypeConfiguration<T>` per entity, in its own file. No
+   data annotations.**
+3. Explicit `decimal` precision; lengths cite the entity's constant; a stated column name comes
+   from `nameof`; indexes per `ef-core-indexes.md`.
+4. **Every relationship declares the FK property and the navigation** (`CustomerId`, `Customer`) —
+   except across aggregates (`ef-core-domain.md`) — with optionality in the type (`int` required,
+   `int?` optional) and explicit delete behaviour.
 
 ```csharp
 protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,29 +21,7 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
 }
 ```
 
-The lifetime is the default **scoped**.
+## Done when
 
-## Entity configuration
-
-**One `IEntityTypeConfiguration<T>` per entity**, in its own file, named `<Entity>Configuration`.
-
-**Data annotations are not used** — not even the easy ones.
-
-- `decimal` precision is explicit.
-- **The length is the entity's, cited — never a literal or a local `const`.**
-- A column name, if one must be stated, comes from `nameof`. Indexes: which ones, in
-  `nzt-dotnet-ef-core-indexes`.
-- **Every relationship declares both the FK property and the navigation** — `CustomerId` and
-  `Customer` — except across aggregates (`nzt-dotnet-ef-core-domain`).
-- **Optionality is expressed in the type**: `int` means required, `int?` means optional. Setting
-  an `int` does not need a round trip.
-
-## Closing checklist
-
-- [ ] One `DbContext` per component, named after it, carrying `DbSet`s and
-      `ApplyConfigurationsFromAssembly` and nothing else.
-- [ ] Registered scoped in the composition root, with provider and connection string from
-      configuration.
-- [ ] One `IEntityTypeConfiguration<T>` per entity, in its own file, with no data annotations.
-- [ ] Every relationship declares its FK property, its optionality in the type and its delete
-      behaviour; collection navigations are initialised.
+One context per component exposing only `DbSet`s, and one configuration file per entity with no
+data annotations.

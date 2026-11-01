@@ -1,12 +1,7 @@
 # Result to HTTP — the extension
 
-**Read `../nzt-backend/references/api.md` first** — what holds for every way a Result
-reaches HTTP. This file holds the extension.
-
-**The `Result` never leaves the process.** What goes out is the payload on success and a
-`ProblemDetails` on failure.
-
-## The extension
+Builds on `../nzt-backend/references/api.md`, *Result to HTTP* — read it first. **The `Result`
+never leaves the process**: the payload goes out on success, a `ProblemDetails` on failure.
 
 ```csharp
 public static class ResultExtensions
@@ -37,30 +32,14 @@ public static class ResultExtensions
 }
 ```
 
-Under minimal APIs the same extension returns `IResult` and is named `ToHttpResult`. **Same
-body, same output** — only the framework type changes.
+## Rules
 
-## What goes out
+1. Under minimal APIs the same body returns `IResult` as `ToHttpResult` — same output.
+2. **`Status` is the `Result`'s** on both branches; **`Title` is the fixed sentence**; the errors
+   go as they came in `Extensions["errors"]`; **no `Detail`**; success carries the bare payload.
+3. **It is the only translation of use-case Results**; host failures and the global handler
+   (`exceptions.md`) keep their own `ProblemDetails`.
 
-| | Body | Status |
-|---|---|---|
-| Success | The payload, bare | `result.HttpStatusCode` |
-| Failure | `ProblemDetails`, errors in `Extensions["errors"]` | `result.HttpStatusCode` |
+## Done when
 
-- **`Status` is the `Result`'s**, on both branches, never one chosen here.
-- **`Title` is the fixed sentence.** It is not a place to describe the failure.
-- **`Extensions["errors"]` carries the errors as they came.**
-- **No `Detail`.** The `Result` has no free-text description to put there.
-
-**This extension owns the translation of failed use-case Results.** Host-level failures and
-the global handler (`nzt-dotnet-exceptions`) keep their own `ProblemDetails`.
-
-## Closing checklist
-
-- [ ] This extension is the single translation of use-case Results into HTTP, with host-level
-      handling kept separate.
-- [ ] `Status` comes from the `Result` on both branches.
-- [ ] `Title` is the fixed sentence, the specifics are in `Extensions["errors"]`, and no
-      `Detail` was added.
-- [ ] Success returns the payload with no envelope.
-- [ ] Every endpoint translates through this extension — none by hand.
+Every endpoint translates through this extension, and its output matches the rules above.

@@ -1,18 +1,14 @@
 # Anemic domain model on .NET
 
-**Read `../nzt-backend/references/domain-anemic.md` first.** It holds what the entity
-is and is not, where the rules live, and why a shared rule is duplicated. This file holds only
-what is .NET.
+Builds on `../nzt-backend/references/domain-anemic.md` — read it first.
 
-## The entity on .NET
+## Rules
 
-A `sealed` class with **public `get; set;` properties**, its id, its foreign keys and its
-navigations.
-
-- **No extension methods giving it behaviour by the back door.**
-- The rules run in `ExecuteAsync` or in a private method of the use case class.
-
-## `Rules` and `Errors`
+1. **A `sealed` class with public `get; set;` properties**, its id, foreign keys and
+   navigations — no extension methods adding behaviour.
+2. **`Rules` and `Errors` are nested static classes**: `const` values, and `const` or
+   `static readonly` messages citing them.
+3. The rules run in the use case's `ExecuteAsync` or a private method of it.
 
 ```csharp
 public sealed class Order
@@ -30,10 +26,13 @@ public sealed class Order
         public static readonly string TooFewLines =
             $"El pedido necesita al menos {Rules.MinimumLineCount} línea";
     }
+
+    public int Id { get; set; }
+    public string Reference { get; set; } = string.Empty;
+}
 ```
 
-## Closing checklist
+## Done when
 
-- [ ] Entities are `sealed` with public `get; set;` properties, keys and navigations, and
-      **no methods, no factories, no validation**.
-- [ ] No extension method adds behaviour to an entity.
+Entities are `sealed` with public properties and nested `Rules`/`Errors`, and nothing adds them
+behaviour.

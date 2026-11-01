@@ -1,12 +1,8 @@
 # The Result pattern on .NET
 
-**Read `../nzt-backend/references/results.md` first.** It holds why a Result, its shape
-and the reasons for it, building it at each return and who decides the status. This file
-holds only the .NET types.
+Builds on `../nzt-backend/references/results.md` — read it first.
 
-## The implementation
-
-**These are the types. Write them exactly like this** — not as a starting point to adapt.
+**Write these types exactly like this**, never as a starting point to adapt:
 
 ```csharp
 public abstract class Result
@@ -54,45 +50,15 @@ public sealed class Result<TResponse> : Result
 }
 ```
 
-## What is .NET in it
+## Rules
 
-- The base's constructor is `private protected`, which is what closes the hierarchy, and the
-  generic stays `sealed`.
-- **Both live in the same file**, named after the base. They are one concept split by what
-  the payload type touches. **This is the exception to one top-level type per file, and it is
-  not extended to anything else.**
-- `Payload` is `TResponse?` because `Failure` takes none.
-- **The status is `HttpStatusCode`**, and no endpoint calls `Ok()`, `NotFound()` or
-  `StatusCode(...)` by hand.
+1. `private protected` closes the hierarchy; the generic is `sealed`.
+2. **Both types in one file, named after the base** — the only exception to one type per file.
+3. Each return builds its own: `return Result<SignInResponseDto>.Failure(HttpStatusCode.Unauthorized, [StaffAccount.Errors.SignInIsNotValid]);`
+   — never a private `Rejected()`.
+4. **`IsSuccess` before `Payload`**, never silenced with `!`.
 
-## Every return builds its own Result
+## Done when
 
-```csharp
-// no
-if (account is null) return Rejected();
-
-// yes
-if (account is null)
-{
-    return Result<SignInResponseDto>.Failure(
-        HttpStatusCode.Unauthorized,
-        [StaffAccount.Errors.SignInIsNotValid]);
-}
-```
-
-## Reading one
-
-**`IsSuccess` first, always.** Reading `Payload` before checking is exactly what the nullable
-warning is telling you — and it is never silenced with a `!`.
-
-## How it reaches HTTP
-
-`tech.md`'s *Result to HTTP* axis selects `references/results-extensions.md` or
-`references/results-filter.md`, and **the two do not produce the same response**.
-
-## Closing checklist
-
-- [ ] Every use case returns `Result<TResponse>`, and expected failures are not exceptions.
-- [ ] The two types are the ones written here: closed base, `sealed` generic, private
-      constructors, `Success` and `Failure`, nothing added.
-- [ ] `Payload` is read only after `IsSuccess`, and never with a `!`.
+The types are exactly these, every return builds its own, and `Payload` is read only after
+`IsSuccess`.

@@ -86,7 +86,17 @@ en el usuario; `nzt-build-backend-dotnet-*` → `nzt-dotnet-*`, `nzt-build-cshar
    - `csharp` dejó solo lo propio de C#: carpeta≠tipo, magic literals, reflexión y control de
      flujo genérico viven en `nzt-code`'s `code.md`.
    - En `dotnet` el ORM se escribe `EF Core` (con versión cualquiera), como en el `tech.md` viejo.
-2. **Reescribir las referencias de los packs** sin redundancia (hoy solo re-apuntadas):
+2. ~~**Reescribir las referencias de los packs**~~ — **hecho** (unidad 419): de 6177 a ~3000
+   líneas. Forma: título, una o dos líneas de propósito ("Builds on `../nzt-x/references/y.md` —
+   read it first" en los de tecnología), reglas o pasos numerados, ejemplo de código mínimo, y
+   un *Done when* de una o dos líneas en lugar de la lista de cierre. `backend/references/architecture.md`
+   junta lo común de las tres arquitecturas (el SKILL lo manda leer primero);
+   `dotnet/references/domain-ddd-behaviour.md` se fusionó en `domain-ddd.md` (el eval
+   `evals/stack/entity-shape` todavía la espera: unidad 422). Nombres viejos tipo
+   `nzt-ship-pipeline` pasaron a `` `nzt-ship`'s `references/pipeline.md` ``. Se corrigió el
+   ejemplo de `dotnet/testing.md` (usaba `var` y un `Create` que devolvía `Result`).
+   Texto original de antes:
+   sin redundancia (hoy solo re-apuntadas):
    ~90 archivos; criterio: la regla genérica en `backend/frontend/code`, la de tecnología solo
    lo propio. Ojo con títulos viejos tipo "Load `nzt-…` before applying this".
 3. **`nzt-learn` (refs), `nzt-research`, `nzt-retro`**: pasada con el mismo criterio (solo se

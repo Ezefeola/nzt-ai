@@ -1,15 +1,18 @@
 # Value objects on .NET
 
-**Read `../nzt-ddd/references/value-objects.md` first.** It holds when a
-value earns one, its shape, where it lives in the model and where the file goes. This file
-holds only what is .NET.
+Builds on `../nzt-ddd/references/value-objects.md` — read it first. Mapping is
+`ef-core-domain.md`.
 
-The mapping belongs to `nzt-dotnet-ef-core-domain`.
+## Rules
 
-## How it is written
-
-**A `sealed record`, immutable, with an empty private constructor and a static `Create`**
-that validates first:
+1. **A `sealed record`** — equality by value without writing `Equals`.
+2. **`init` properties**: the object initializer in `Create` fills them, and nobody changes them
+   after.
+3. **An empty private constructor and a static `Create`** that validates first and returns
+   `(IReadOnlyList<string> Errors, T? Value)`; no public constructor. The caller checks the value
+   for `null`.
+4. **Files**: `Entities/<Aggregate>/ValueObjects/` while one aggregate uses it,
+   `Common/ValueObjects/` once two do.
 
 ```csharp
 public sealed record DateRange
@@ -21,44 +24,16 @@ public sealed record DateRange
     public DateOnly Start { get; init; }
     public DateOnly End { get; init; }
 
-    public static (IReadOnlyList<string> Errors, DateRange? Range) Create(
-        DateOnly start,
-        DateOnly end)
+    public static (IReadOnlyList<string> Errors, DateRange? Range) Create(DateOnly start, DateOnly end)
     {
-        // validate, then:
+        // validate into errors, then:
         DateRange range = new() { Start = start, End = end };
+        return ([], range);
     }
 }
 ```
 
-- **`record` for equality by value**: two `DateRange` with the same dates compare equal
-  without writing `Equals`.
-- **The constructor is empty and takes no parameters**, like the aggregate's.
-- **Properties are `init`, never settable afterwards.** `init` is what lets the object
-  initializer fill it while keeping it immutable to everyone outside `Create`.
-- **No public constructor and no `Create` that skips validation.**
+## Done when
 
-The caller **checks the value for null**, never the error list, so no `!` is needed.
-
-## Where the file goes
-
-```
-Entities/
-  Orders/
-    Order.cs
-    OrderLine.cs
-    ValueObjects/
-      DeliveryWindow.cs      <- only Orders uses it
-Common/
-  ValueObjects/
-    Money.cs                 <- Orders and Invoices use it
-```
-
-A folder named after a type collides with it as a namespace segment.
-
-## Closing checklist
-
-- [ ] `sealed record`, `init` properties, immutable: modifying means creating another.
-- [ ] **Empty** private constructor, static `Create` returning `(errors, value?)` and
-      building with an object initializer, and no other way in.
-- [ ] The caller checks the value for null, not the error list.
+Every value object is a `sealed record` with `init` properties, built only through `Create`, in
+the right `ValueObjects/` folder.

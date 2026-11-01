@@ -1,35 +1,16 @@
 # Vertical slice on .NET
 
-**Read `../nzt-backend/references/architecture-vertical-slice.md` first.** It holds the
-architecture: the unit, the tree of roles, the slice rule and registration. This file holds
-only what is .NET.
+Builds on `../nzt-backend/references/architecture-vertical-slice.md` — read it first.
 
-## One project per component
+## Rules
 
-A component builds into **one `.csproj`**. No `.Domain`, no `.Application`, no `.Infrastructure`.
-**The `.csproj` folder is not the component's root**: the root holds `src/<Component>/`,
-`tests/` and `Docs/`, and its stack lives there, never beside the `.csproj`.
-**The compiler enforces *"the domain may not see the database"*** the moment the layers are
-projects, and nothing enforces the boundary between operations — which is why they are not.
-
-## The tree on .NET
-
-The generic tree, with these roles filled the .NET way:
-
-```
-src/<Component>/               at its root, the .csproj and Program.cs
-  Contracts/
-    Results/                   the result type and its HTTP translation, plus
-                               the response filter if there is one
-```
-
-**The aggregate's one mapping file is its `<Entity>MappingExtensions`**, at the feature level,
-holding the mapping to every operation's DTOs.
-
-## Dependency injection
-
-The entry point is `Program.cs`, and each registration file is a static class extending
-`IServiceCollection`:
+1. **One `.csproj` per component** — no `.Domain`, `.Application` or `.Infrastructure`. It sits in
+   `src/<Component>/`; the component's root holds `src/`, `tests/` and `Docs/`.
+2. **`Contracts/Results/`** holds the result type, its HTTP translation and the response filter
+   if there is one.
+3. **The aggregate's mapping file is its `<Entity>MappingExtensions`**, at the feature level.
+4. **Each registration file is a static class extending `IServiceCollection`**; `Program.cs`
+   makes two calls (features, persistence). Never assembly scanning.
 
 ```csharp
 // Features/FeaturesDependencyInjection.cs
@@ -48,12 +29,7 @@ public static class FeaturesDependencyInjection
 }
 ```
 
-`Persistence/` does the same for the handle and the repositories, so `Program.cs` is two
-calls. **Registrations are written out — never discovered by scanning the assembly.**
+## Done when
 
-## Closing checklist
-
-- [ ] One `.csproj` for the component, no layer projects.
-- [ ] The aggregate's mapping file is its `<Entity>MappingExtensions`.
-- [ ] `Program.cs` calls only the public method of each registration file, and nothing scans
-      the assembly.
+One `.csproj`, `<Entity>MappingExtensions` per aggregate, and `Program.cs` calling only the
+registration files' public methods.

@@ -1,82 +1,54 @@
 # Getting migrations into an environment
 
-**Generating a migration is build work** (`nzt-dotnet-ef-core-migrations`), which
-already separates generating from applying. This is what happens after: turning migrations into
-a deployment artifact and applying it to an environment, **under the authorisation rules of the
-release** — the one that names the environment.
+With `nzt-ship`'s `references/release.md`, whose authorisation names the environment. Generating
+is build work (`ef-core-migrations.md`); this is packaging and applying.
 
-## Choose the artifact
+## Steps
 
-| Strategy | Use it when | What it costs |
-|---|---|---|
-| **Migration bundle** | the deployment is automated | one executable built in CI; runs without the SDK, the EF tools or the source, and uses EF's migration lock |
-| **Idempotent SQL script** | a person or a DBA has to read or approve the SQL, or it runs through a database tool | `--idempotent` applies only what is missing; **not supported by every provider**, SQLite included |
-| `dotnet ef database update` | local development and disposable test databases | needs the SDK and the source — **never the production path** |
-| `Migrate()` at startup | only if the user accepts its trade-offs on a simple, single-instance app | the app identity needs schema permissions and there is no review step; **propose a separate job instead** |
+1. **Choose the artifact** and record it in the deployment document:
 
-**The adopted strategy is recorded in the deployment document.**
+   | Strategy | When | Cost |
+   |---|---|---|
+   | migration bundle | automated deployment | one executable built in CI, no SDK or source needed, uses EF's migration lock |
+   | idempotent SQL script | a person or DBA reads or approves it | `--idempotent` applies only what is missing; not every provider supports it (SQLite does not) |
+   | `dotnet ef database update` | local and disposable databases | needs SDK and source — never production |
+   | `Migrate()` at startup | only if the user accepts it on a simple single-instance app | app identity with schema rights, no review — propose a separate job |
 
-## Build it in CI
+2. **Build it in CI from the application's commit, with the environment set explicitly**
+   (design-time defaults to `Development`). Gate with
+   `dotnet ef migrations has-pending-model-changes`, and **read the SQL of every release that
+   alters or drops a column or table**.
 
-Generate the artifact in the pipeline, **from the same commit as the application artifact**, and
-**set the environment explicitly**: design-time tooling defaults to `Development` and will
-happily load development configuration.
+   ```bash
+   ASPNETCORE_ENVIRONMENT=Production dotnet ef migrations bundle \
+     --project src/Pedidos.Infrastructure --startup-project src/Pedidos.Api \
+     --self-contained --target-runtime linux-x64 --output artifacts/efbundle
+   ```
 
-```bash
-ASPNETCORE_ENVIRONMENT=Production dotnet ef migrations bundle \
-  --project src/Pedidos.Infrastructure --startup-project src/Pedidos.Api \
-  --self-contained --target-runtime linux-x64 --output artifacts/efbundle
+3. **Apply in one job, before the new version**, once the database is healthy, never restarted
+   after success — never from each replica's entrypoint, never `dotnet ef` in the app image:
 
-dotnet ef migrations script --idempotent \
-  --project src/Pedidos.Infrastructure --startup-project src/Pedidos.Api \
-  --output artifacts/migrations.sql
-```
+   ```bash
+   ASPNETCORE_ENVIRONMENT=Production ./efbundle --connection "$DEPLOYMENT_CONNECTION_STRING"
+   ```
 
-**Gate the model with `dotnet ef migrations has-pending-model-changes`** before any environment,
-and **read the generated SQL of every release that alters or drops a column or a table**: a
-rename can come out as drop and add, and that is data gone on the day it runs.
+   The connection comes from the secret store — never committed, embedded or pasted into the
+   conversation. **A deployment identity holds schema rights**; the runtime identity only data
+   rights.
+4. **Verify**: the job lists what it applied, the target's history table agrees, readiness
+   passes. Keep an executed script with the release record.
 
-## Apply it
+## Rules
 
-- **One job, before the new application version**, once the database is healthy. **The platform
-  must not restart the job after it succeeded.**
-- **Never from the entrypoint of every replica**, and **never install the SDK or run `dotnet ef`
-  in the application image.**
-- The connection comes from the deployment system's **secret store**, passed with `--connection`
-  or configuration — never committed, never embedded in the bundle, **never pasted into the
-  conversation**.
-- **Use a deployment identity with schema permissions.** The application's runtime identity keeps
-  only the data permissions it needs: an app that can drop a table will, eventually.
-- **The migration stays compatible with the application version still running**, so the code can
-  roll back on its own. A breaking change goes expand → migrate → contract across releases.
+1. **The migration stays compatible with the version still running**; a breaking change goes
+   expand → migrate → contract across releases.
+2. **A schema rollback is its own decision**, proposed with its consequence — the release's
+   rollback authorisation does not cover it. Targeting an earlier migration runs every newer
+   `Down` and can lose data: prefer a forward fix, test `Down` on a copy first. `UseSeeding` runs
+   after a downgrade too and must tolerate the older schema.
 
-```bash
-ASPNETCORE_ENVIRONMENT=Production ./efbundle --connection "$DEPLOYMENT_CONNECTION_STRING"
-```
+## Done when
 
-## Rolling the schema back
-
-A bundle or `database update` can target an earlier migration, running the `Down` of every newer
-one; a script can be generated from a newer migration to an older one. **Both can lose data.**
-
-**A schema rollback is its own decision, proposed with its consequence** — the release's own
-rollback authorisation does not cover it. Prefer a forward fix, and **test the `Down` path on a
-copy before relying on it**. Seeding configured with `UseSeeding` runs after a downgrade too, and
-has to tolerate the older schema.
-
-## Verify
-
-Check that the job's output lists the migrations applied, query the migrations history table of
-the target, and run the application's readiness check against it. For a script, **keep the
-executed file with the release record.**
-
-## Closing checklist
-
-- [ ] The strategy fits the environment and is written in the deployment document.
-- [ ] The artifact was built in CI, from the application's commit, with an explicit environment
-      and a pending-changes gate.
-- [ ] Destructive SQL was read before it reached any environment.
-- [ ] It ran once, before the app, with a deployment identity and a connection from the secret
-      store.
-- [ ] The running version stays compatible, and no schema rollback was assumed safe.
-- [ ] The applied migrations were confirmed in the target, and the evidence kept with the release.
+The strategy is recorded, the artifact came from CI with a pending-changes gate, destructive SQL
+was read, it ran once before the app with a deployment identity, and the applied migrations were
+confirmed in the target.

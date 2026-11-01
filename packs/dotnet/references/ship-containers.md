@@ -1,85 +1,58 @@
 # Packaging a .NET component as a container
 
-## Choose the build path
+With `nzt-ship`'s `references/release.md`.
 
-- **The repository already has a Dockerfile:** keep it and improve it within scope. **Replacing
-  the build path is the user's decision**, not a side effect of this unit.
-- **No Dockerfile:** prefer the SDK's built-in container publishing. It needs no Dockerfile,
-  infers the base image from the project, and on .NET 8 and later **runs as the non-root `app`
-  user on Linux by default**.
-- **OS packages or `RUN` steps are needed:** the SDK cannot run them. Use a multi-stage
-  Dockerfile, or a custom base image the SDK then builds on.
+## Steps
 
-## SDK container publishing
+1. **Choose the build path**: an existing Dockerfile is kept and improved within scope —
+   replacing it is the user's call. Without one, **SDK container publishing** (no Dockerfile,
+   base image inferred, non-root `app` user on Linux from .NET 8). OS packages or `RUN` steps
+   need a multi-stage Dockerfile or a custom base image.
+2. **SDK path**: configure the image in the project file, publish with `-t:PublishContainer`
+   (Git Bash on Windows rewrites `/t:` as a path).
 
-Configure the image **in the project file**, not in scattered command-line switches:
+   ```xml
+   <PropertyGroup>
+     <ContainerRepository>pedidos-api</ContainerRepository>
+     <ContainerFamily>noble-chiseled</ContainerFamily>
+   </PropertyGroup>
+   ```
 
-```xml
-<PropertyGroup>
-  <ContainerRepository>pedidos-api</ContainerRepository>
-  <ContainerFamily>noble-chiseled</ContainerFamily>
-</PropertyGroup>
-```
+   ```bash
+   dotnet publish src/Pedidos.Api -c Release --os linux --arch x64 \
+     -t:PublishContainer -p ContainerImageTag=1.8.0-a1b2c3d
+   ```
 
-```bash
-dotnet publish src/Pedidos.Api -c Release --os linux --arch x64 \
-  -t:PublishContainer -p ContainerImageTag=1.8.0-a1b2c3d
-```
+   | Property | Use |
+   |---|---|
+   | `ContainerImageTag(s)` | immutable versions — without one the tag is `latest`, which nothing deploys |
+   | `ContainerRegistry` | destination; without it the image stays local |
+   | `ContainerBaseImage` / `ContainerFamily` | a qualified base, or a variant — check the tag exists for this .NET version |
+   | `ContainerUser` | keep non-root; `root` only with a stated reason |
+   | `ContainerPort` | only when the ASP.NET Core port variables are absent |
+   | `ContainerArchiveOutputPath` | a `.tar.gz` to scan and inspect (`tar -xf`: `User`, `ExposedPorts`, base label) before pushing |
 
-**Write the target as `-t:PublishContainer`**: Git Bash on Windows rewrites `/t:PublishContainer`
-as a path and the command fails with something that looks unrelated.
+   Chiseled images have no shell or package manager; without invariant globalisation the SDK
+   picks `-extra`. Pushing authenticates with the registry login or federated identity — never
+   credentials in the project file.
+3. **Dockerfile path**: multi-stage (SDK to build, ASP.NET or runtime-deps to run — never the SDK
+   in the runtime image); base images pinned by tag, by digest when the project does; project
+   files copied and restored before the rest; `USER app`; a `.dockerignore` excluding `bin/`,
+   `obj/`, `.git/`, local settings and secrets.
+4. **Verify**: run it locally with its variables and disposable dependencies, call the health
+   endpoints and one real request, confirm the user. A built image is not a working one.
 
-| Property | Use |
-|---|---|
-| `ContainerRepository` | the image name; defaults to the assembly name |
-| `ContainerImageTag` / `ContainerImageTags` | immutable version tags; **without one the tag is `latest`, which nothing should deploy** |
-| `ContainerRegistry` | the destination registry; without it the image stays in the local container tool |
-| `ContainerBaseImage` / `ContainerFamily` | a fully qualified base image, or a family variant of the inferred one |
-| `ContainerUser` | keep the non-root default; `root` only with a stated reason |
-| `ContainerPort` | inferred from the ASP.NET Core port variables; set it only when they are absent |
-| `ContainerArchiveOutputPath` | write a `.tar.gz` to scan before pushing |
+## Rules
 
-**Check that the family tag exists for this project's .NET version before using it.** Chiseled
-images have no shell and no package manager; when the app does not use invariant globalisation
-the SDK picks the `-extra` variant, which carries the globalisation libraries.
+1. One process per image; **migrations run in their own job** (`ship-migrations.md`), never from
+   the entrypoint.
+2. Configuration and secrets come from the environment at runtime — no production `appsettings`,
+   **no secret in a layer**.
+3. **The same image is promoted across environments.**
+4. Liveness and readiness endpoints exist (`ship-observability.md`); scan the image in CI when a
+   scanner is adopted.
 
-To inspect an archive before pushing, open it with `tar -xf` and read the image config: `User`,
-`ExposedPorts`, the base image label. **Pushing authenticates through the registry's login or the
-pipeline's federated identity — never with credentials in the project file.**
+## Done when
 
-## Dockerfile, when that is the path
-
-- **Multi-stage**: build with the SDK image, run on the ASP.NET or runtime-deps image. **The SDK
-  never ships in the runtime image.**
-- Pin base images by version tag, and by digest when the project pins digests.
-- **Copy project files and restore before copying the rest**, so the restore layer caches.
-- Run as a non-root user — `USER app` on the Microsoft images.
-- A `.dockerignore` excludes `bin/`, `obj/`, `.git/`, local settings and secrets.
-
-## Rules for any path
-
-- **One process per image.** Migrations run from their own job
-  (`nzt-dotnet-ship-migrations`), **never from the application entrypoint**: every
-  replica would run them at once.
-- **Configuration and secrets come from the environment at runtime.** No `appsettings` with
-  production values, and **no secret baked into a layer** — a layer is readable by anyone who
-  pulls the image.
-- **The same image is promoted across environments**; only the configuration changes. An image
-  rebuilt per environment is a different artifact pretending to be the tested one.
-- Liveness and readiness endpoints exist, so the platform can manage the container.
-- Scan the image for known vulnerabilities in CI when the project adopted a scanner.
-
-## Verify it
-
-Build the image, **run it locally** with the environment variables it needs and disposable
-dependencies, call its health endpoints and one real request, and confirm the user it runs as.
-**Report what actually ran: an image that was only built is not a working image.**
-
-## Closing checklist
-
-- [ ] The existing build path was kept, or the SDK-versus-Dockerfile choice is justified.
-- [ ] The image runs as non-root and carries no SDK, no secret and no production settings.
-- [ ] Tags are immutable versions, and `latest` is not what gets deployed.
-- [ ] Migrations stay out of the application entrypoint.
-- [ ] The same image is what moves between environments.
-- [ ] It ran locally, its health endpoints answered, and that is what was reported.
+The image runs non-root with no SDK, secret or production settings, carries an immutable tag,
+keeps migrations out, and ran locally with its health endpoints answering.

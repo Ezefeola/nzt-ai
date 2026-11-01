@@ -1,57 +1,31 @@
 # Clean architecture on .NET
 
-**Read `../nzt-backend/references/architecture-clean.md` first.** It holds the
-architecture: the four layers, the tree of roles and the rules it does not show. This file
-holds only what is .NET.
+Builds on `../nzt-backend/references/architecture-clean.md` — read it first.
 
-## The layer is a project
+## Rules
 
-On .NET **the layer is a project** — so what each layer may know is **enforced by the
-compiler**, not by review. That is the boundary `tech.md` records for this
-architecture.
+1. **Each layer is a project**, so the compiler enforces the references — the mechanism
+   `tech.md` records:
 
-| Project | References |
-|---|---|
-| `<Component>.Domain` | nothing |
-| `<Component>.Application` | `Domain` |
-| `<Component>.Infrastructure` | `Application` |
-| `<Component>.Api` | `Application`, `Infrastructure` |
+   | Project | References |
+   |---|---|
+   | `<Component>.Domain` | nothing |
+   | `<Component>.Application` | `Domain` |
+   | `<Component>.Infrastructure` | `Application` |
+   | `<Component>.Api` | `Application`, `Infrastructure` |
 
-**`Program.cs` is the only file in `Api` that may name a type from `Infrastructure`** — it is
-the entry point, and the composition root lives there.
+2. **`Program.cs` is the composition root** and the only file in `Api` naming an
+   `Infrastructure` type.
+3. **`Api/Results/`** holds a result's HTTP translation and the response filter if any — it
+   depends on ASP.NET Core, so never in `Application`.
+4. The transaction boundary's interface gets its folder (the `I` prefix avoids the collision);
+   with direct persistence the interface over the handle is the handle's name with `I`.
+5. The aggregate's mapping file is its `<Entity>MappingExtensions`.
+6. **One registration file per project** with one public method (`AddApplication()`,
+   `AddInfrastructure()`) and a private one per feature; `Program.cs` makes two calls. Never
+   assembly scanning.
 
-## The tree on .NET
+## Done when
 
-The generic tree, with the layer folders and these roles filled the .NET way:
-
-```
-<Component>.Domain/
-<Component>.Application/       at its root, the registration file of the layer
-<Component>.Infrastructure/    at its root, the registration file of the layer
-<Component>.Api/               at its root, Program.cs — the composition root
-  Results/                     the HTTP translation of a result, and the
-                               response filter if there is one
-```
-
-- **The HTTP translation of a result is in `Api`**, never in `Application`: it depends on
-  ASP.NET Core.
-- The transaction boundary's interface gets a folder because the `I` prefix means there is
-  no collision.
-- The aggregate's single mapping file is its `<Entity>MappingExtensions`.
-
-## Dependency injection
-
-**One registration file per project**, at its root, each with one public method —
-`AddApplication()`, `AddInfrastructure()` — with private methods per feature inside.
-`Program.cs` is two calls. **Never discovered by scanning the assembly.**
-
-## With direct persistence
-
-The interface over the handle carries **the handle's type name with the usual `I` prefix**.
-
-## Closing checklist
-
-- [ ] Four projects, references **pointing inward**, and `Api` naming `Infrastructure` only in
-      `Program.cs`.
-- [ ] No entity named anywhere in `Api`, and the result's HTTP translation in `Api/Results/`.
-- [ ] One registration file per project, one private method per feature.
+Four projects referencing inward, `Infrastructure` named in `Api` only by `Program.cs`, and one
+registration method per project.

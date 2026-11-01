@@ -19,7 +19,7 @@ Domain model, Persistence) take the values of `nzt-backend`, and their file here
 | Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | as in `nzt-backend` |
 | | `clean-architecture` | `references/architecture-clean.md` | as in `nzt-backend` |
 | | `hexagonal-architecture` | `references/architecture-hexagonal.md` | as in `nzt-backend` |
-| Domain model | `ddd` | `references/domain-ddd.md`, `references/domain-ddd-behaviour.md` | as in `nzt-backend` |
+| Domain model | `ddd` | `references/domain-ddd.md` | as in `nzt-backend` |
 | | `anemic` | `references/domain-anemic.md` | as in `nzt-backend` |
 | Persistence | `repositories` | `references/persistence-repositories.md` | as in `nzt-backend` |
 | | `direct` | `references/persistence-direct.md` | as in `nzt-backend` |

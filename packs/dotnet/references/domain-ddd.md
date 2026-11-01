@@ -1,56 +1,59 @@
 # DDD entities and aggregates on .NET
 
-**Read `../nzt-ddd/references/ddd.md` first.** It holds the entity, the
-aggregate and its root, `Rules` and `Errors`, the id between aggregates, the layout, creation,
-change and the minimum aggregate. This file and `domain-ddd-behaviour.md` hold only what is
-.NET.
+Builds on `../nzt-ddd/references/ddd.md` — read it first. Mapping is `ef-core-domain.md`.
 
-How this is mapped belongs to `nzt-dotnet-ef-core-domain`.
+## Rules
 
-## The entity on .NET
-
-The id is `int` or `Guid`. Entities are `sealed`, properties have **private setters**,
-collections are exposed read-only.
-
-Between aggregates, without the navigation outwards, an `Include` cannot walk from one
-aggregate into another.
-
-## `Rules` and `Errors`
-
-```csharp
-public sealed class Order
-{
-    public static class Rules
-    {
-        public const int ReferenceMaximumLength = 32;
-        public const int MinimumLineCount = 1;
-    }
-
-    public static class Errors
-    {
-        public const string ReferenceIsRequired = "El pedido necesita una referencia";
-
-        public static readonly string TooFewLines =
-            $"El pedido necesita al menos {Rules.MinimumLineCount} línea";
-    }
-```
-
-## The entity's layout, in this order
+1. **The id is `int` or `Guid`** (unless typed ids); entities are `sealed`, properties have
+   **private setters**, collections are exposed read-only. Without outward navigations, an
+   `Include` cannot walk into another aggregate.
+2. **`Rules` and `Errors` are nested static classes** — `const` values, messages `const` or
+   `static readonly` citing them.
+3. **One constructor: private, empty, assigning nothing** — it stops outside construction and is
+   what EF materialises with. A constructor listing every field is a second place to change and
+   an unreadable call site.
+4. **`Create` is static, validates, then builds with an object initializer** (the private
+   setters are reachable inside the type), returning `(IReadOnlyList<string> Errors, T? Entity)`.
+   The use case checks the entity for `null` — so no `!`.
+5. **A mutating method returns `IReadOnlyList<string>`**, empty when it worked.
+6. **Layout**: constructor · `Rules` · `Errors` · every property · `Create` · behaviour.
 
 ```csharp
 public sealed class StaffAccount
 {
-    private StaffAccount() { }                          // 1 · empty, and the only one
-    public static class Rules { /* … */ }               // 2
-    public static class Errors { /* … */ }              // 3
+    private StaffAccount() { }
 
-    public Guid Id { get; private set; }                // 4 · every property, together
-    public string Name { get; private set; }
-    public string? PasswordHash { get; private set; }
+    public static class Rules { /* … */ }
+    public static class Errors { /* … */ }
 
-    public static (IReadOnlyList<string> Errors, StaffAccount? Account) Create(/* … */)  // 5
-    public void DefinePassword(string passwordHash) { } // 6 · behaviour, after it
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } = string.Empty;
+    public StaffAccountStatus Status { get; private set; }
+
+    public static (IReadOnlyList<string> Errors, StaffAccount? Account) Create(string name)
+    {
+        // validate into errors, then:
+        StaffAccount account = new()
+        {
+            Id = Guid.CreateVersion7(),
+            Name = name.Trim(),
+            Status = StaffAccountStatus.Active
+        };
+        return ([], account);
+    }
+
+    public IReadOnlyList<string> Deactivate() { /* … */ }
+}
+
+// in the use case
+(IReadOnlyList<string> errors, StaffAccount? account) = StaffAccount.Create(request.Name);
+if (account is null)
+{
+    return Result<CreateStaffAccountResponseDto>.Failure(HttpStatusCode.BadRequest, errors);
 }
 ```
 
-Creating and changing on .NET continue in `domain-ddd-behaviour.md`.
+## Done when
+
+Entities are `sealed` with private setters and an empty private constructor, `Create` returns
+`(errors, entity?)` checked for `null`, methods return their errors, and the layout holds.

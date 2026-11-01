@@ -9,7 +9,7 @@ this file says where it goes and what is never built around it.
 1. **Every use case that touches data receives the concrete handle** as a dependency held for
    its life. No interface over it — one member per entity is a repository with extra steps —
    except the one a layered architecture declares (`architecture-clean.md`,
-   `-hexagonal.md`).
+   `architecture-hexagonal.md`).
 2. **Nothing wraps it**: no repository or unit of work "just for this aggregate", no query
    helper, no function attached to the handle from outside. Half the project wrapped is the
    inconsistency this axis prevents; changing it is a `tech.md` decision.

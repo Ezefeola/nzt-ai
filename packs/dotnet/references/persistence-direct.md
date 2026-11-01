@@ -1,19 +1,15 @@
 # Direct persistence on .NET
 
-**Read `../nzt-backend/references/persistence-direct.md` first.** It holds what direct
-means, what must not appear around the handle, the use case as the transactional unit and
-where queries live. This file holds only what is .NET.
+Builds on `../nzt-backend/references/persistence-direct.md` — read it first.
 
-The handle is the type the ORM axis names (`references/ef-core.md`). **The use case takes it
-in a `readonly` field from an explicit constructor** — the concrete type, not an interface,
-unless the architecture declares one.
+## Rules
 
-- No `QueryHelper`, no `DataAccess`, **no static extension over the handle that runs
-  queries**.
-- Transaction cleanup follows EF's disposal pattern (`await using`), with no rollback-only
-  catch. The global handler is `references/exceptions.md`.
+1. **The use case takes the `DbContext` (`ef-core.md`) in a `readonly` field from an explicit
+   constructor** — the concrete type, unless the architecture declares an interface.
+2. No `QueryHelper`, `DataAccess` class or static extension over the context that runs queries.
+3. A transaction is disposed with `await using`, with no rollback-only catch; the global handler
+   is `exceptions.md`.
 
-## Closing checklist
+## Done when
 
-- [ ] The use case takes the handle in a `readonly` field with an explicit constructor, and no
-      interface over it unless the architecture declares one.
+Each use case holds the concrete context in a `readonly` field, and nothing wraps it.
