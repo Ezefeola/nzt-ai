@@ -1,40 +1,19 @@
 # Interactive Server
 
-**Read `../nzt-frontend/references/rendering.md` first** — *Interactive on the server*.
-It holds the round trip per interaction, every user's state in server memory, the dropped
-connection and why server-side does not mean data-side. This file holds only what is Blazor.
+Builds on `../nzt-frontend/references/rendering.md`, *Interactive on the server* — read it
+first. Prerendering or persistent state: `prerendering.md`.
 
-How a component is written does not change — that is
-`nzt-blazor-components`. This is only what the host changes.
+## Rules
 
-## Every user's state lives in the circuit
+1. **User state is scoped to the circuit**, never a singleton shared across users.
+2. **A retained circuit may reconnect — not guaranteed.** .NET 10 circuit persistence keeps
+   explicitly serialisable state for pause and resume; it does not serialise the component tree
+   or replace durable saving. Adopt it only when the agreed state strategy asks.
+3. **No database from a component**: it would pin the component to this mode.
+4. **`@rendermode InteractiveServer` on the component that needs interactivity**, not sprinkled;
+   no child of it uses another interactive mode.
 
-**User state is scoped to the circuit, never a singleton shared across users.**
+## Done when
 
-## The connection can drop
-
-A retained circuit **can** reconnect with its state — but that is not a guarantee.
-
-.NET 10 circuit persistence can retain explicitly serialisable state for pause and resume. It
-**does not serialise the component tree and does not replace saving anything durable**; adopt it
-only when the agreed state strategy asks for it.
-
-## The trap: server-side does not mean data-side
-
-A screen that queries the database directly silently makes that component unmovable to any
-other render mode.
-
-## Prerendering
-
-When prerendering or persistent state is involved, load
-`nzt-blazor-prerendering` and apply it with this host's boundaries. **Do not load
-another render-mode skill just for prerendering.**
-
-## Closing checklist
-
-- [ ] Reconnection and loss are handled and were actually exercised — temporary drop, expired
-      circuit, full reload.
-- [ ] Nothing with a side effect in initialisation, which can run twice when prerendering is on.
-- [ ] `@rendermode InteractiveServer` sits on the component that needs interactivity, not
-      sprinkled over the ones that do not, and **no child of it uses a different interactive
-      mode**.
+A temporary drop, an expired circuit and a full reload were exercised, and initialisation has no
+side effect.

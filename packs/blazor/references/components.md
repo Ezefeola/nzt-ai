@@ -1,111 +1,49 @@
 # Writing a Blazor component
 
-## Contents
-- The file, and the order inside it
-- Parameters in, events out
-- Injection follows the chosen organisation
-- The lifecycle
-- Nothing blocks, and the component owns its cancellation
-- The typed client
-- Interop and authorisation
-- Closing checklist
+Builds on `../nzt-frontend/references/components.md` — read it first. This file holds only what
+is Blazor. A form adds `forms.md`.
 
-**Read `../nzt-frontend/references/components.md` first.** It holds the library and the
-UI documents before writing, inputs in and events out, the owner of the state, loading on the
-input that changed, disposal, cancellation, the typed client with the backend's result shape,
-the three states, what a component never does and hiding is not protecting. This file holds
-only what is Blazor.
+## The file
 
-A form has its own: `nzt-blazor-forms`.
+1. **`inline` or `code-behind` is `tech.md`'s**: `inline` puts the C# in `@code` at the end of
+   the `.razor`; `code-behind` uses a `.razor.cs` partial with the same name and namespace.
+2. **Order**: directives (`@page` when routable, `@using` if needed, `@inject` when inline) ·
+   markup · C# (parameters, state, lifecycle, handlers, helpers). Everything typed, inside
+   `@code` and lambdas too.
+3. **`_Imports.razor` is the one exception to explicit usings**; nothing is added to it — a
+   component needing more declares its own `@using`.
 
-## The file, and the order inside it
+## Rules
 
-- **Inline or code-behind is `tech.md`'s decision**, not a line count: `inline` keeps the C# in
-  `@code` at the end of the `.razor`; `code-behind` uses a `.razor.cs` partial with the same
-  name and namespace.
-- **`_Imports.razor` is the one exception to explicit usings** — Razor has no other way to share
-  what every component needs. **Nothing is added to the ones the project already has**: a
-  component that needs something else declares its own `@using`.
+1. **`[Parameter]` public properties in, `[Parameter] EventCallback<T>` out**, awaited.
+   `[EditorRequired]` on the essential ones — design-time help, no runtime check. Movable
+   repeated items take a stable `@key`.
+2. **Injection follows the organisation**: `@inject` inline; `[Inject]` properties with nullable
+   storage and guards (no `!`) in code-behind; never in both partials. The typed client is a
+   plain class with constructor injection.
+3. **The lifecycle**:
 
-The order:
+   | Method | Runs | Holds |
+   |---|---|---|
+   | `OnInitialized{Async}` | once per instance — prerendering can make two | parameter-independent setup, no side effects |
+   | `OnParametersSet{Async}` | after init and on every new parameters | parameter-dependent loads, guarded on the one that matters |
+   | `OnAfterRender{Async}` | after interactive renders, never static or prerendered | DOM and JS setup, guarded by `firstRender` |
+   | `Dispose{Async}` | when it goes away | unsubscribing, stopping timers — never `StateHasChanged` |
+   | `ShouldRender`, `SetParametersAsync` | — | nothing, until a measurement says otherwise |
 
-1. **Directives** — `@page` when it is routable, `@using` if it needs one, `@inject` when inline.
-2. **Markup.**
-3. **C#** — parameters, state, lifecycle, handlers, private helpers.
+   `StateHasChanged` in `OnAfterRender` re-renders and runs it again: only under a condition
+   that stops. Outside notifications go through `InvokeAsync`, and their failures are observed.
+4. **Nothing blocks** — no `.Result`, `.Wait()` or `Task.Run` to fake a thread (WebAssembly has
+   one). **There is no automatic lifetime token**: the component owns a
+   `CancellationTokenSource`, passes its token through the client, cancels and disposes it.
+5. **No `HttpClient`, URL or status code in a component.**
+6. **Interop**: DOM-dependent JS after interactive rendering, never touching the DOM Blazor
+   owns; JS and .NET references disposed; `JSDisconnectedException` handled on Server cleanup;
+   no live circuit assumed during disposal.
+7. **`AuthorizeView` controls visibility, not permission.**
 
-**Everything is typed, including inside `@code` and inside a lambda chain**: in a component the
-reader is usually deciding whether a value can be bound to markup.
+## Done when
 
-## Parameters in, events out
-
-- **`[Parameter]` on a public property** for everything that comes from the parent, and
-  **`[EditorRequired]`** on the ones without which the component makes no sense — it helps at
-  design time and **validates nothing at runtime**.
-- **`[Parameter] public EventCallback<T>`** for everything that goes back up, and callbacks are
-  awaited.
-- **Repeated items that can be inserted, removed or reordered carry a stable `@key`.**
-
-## Injection follows the chosen organisation
-
-Inline uses `@inject`; code-behind uses `[Inject]` properties with nullable storage and access
-guards, **without `!`**. **The same dependency is never injected in both partials.**
-
-**A plain class is the opposite case.** The typed client is not a component, so it takes its
-dependencies in an explicit constructor with `readonly` fields, like any other class.
-
-## The lifecycle
-
-| Method | When it runs | What belongs in it |
-|---|---|---|
-| `OnInitialized{Async}` | once per instance — **and prerendering can create two instances** | parameter-independent setup; **no side effects** |
-| `OnParametersSet{Async}` | right after initialisation, and **every time the parent passes parameters again** | anything that depends on a parameter, reloaded only when the one that matters changed |
-| `OnAfterRender{Async}` | after interactive renders, **never in static or prerendered output** | DOM-dependent work and JS setup, guarded by `firstRender` |
-| `Dispose` / `DisposeAsync` | when the component goes away | unsubscribing from what it subscribed to, stopping timers |
-| `ShouldRender` | before each re-render | nothing, until a measurement says otherwise |
-| `SetParametersAsync` | before all of the above | nothing — overriding it is framework-level work |
-
-- **Parameter-dependent data loads in `OnParametersSetAsync`**, guarded on the parameter that
-  matters.
-- **`StateHasChanged` inside `OnAfterRender` triggers another render**, which calls
-  `OnAfterRender` again. Only under a condition that stops. It is also the one lifecycle method
-  the framework does not rerender after — that is deliberate, and it is what keeps the loop
-  from being automatic.
-- **`Dispose` is where subscriptions die.** Never call `StateHasChanged` while disposing.
-- **A notification from outside is dispatched with `InvokeAsync`**, which is where state is
-  updated and a render requested. Failures of those tasks are observed, not dropped.
-
-## Nothing blocks, and the component owns its cancellation
-
-**No `.Result`, no `.Wait()`, no `Task.Run` to fake a thread.** On WebAssembly there is a single
-thread.
-
-A component has **no automatic lifetime token**: it owns a `CancellationTokenSource`, passes the
-token through the typed client, and cancels and disposes it.
-
-## The typed client
-
-**A component never sees `HttpClient`**, never builds a URL and never reads a status code.
-
-## Interop and authorisation
-
-- **DOM-dependent JS is initialised after interactive rendering**, never during prerendering,
-  and **the DOM Blazor owns is not modified behind the renderer's back**.
-- **JS and .NET references are disposed**, and `JSDisconnectedException` is handled on Server
-  cleanup. For cleanup on DOM removal, use an observer or a custom element's disconnect
-  callback — **do not assume a live circuit during disposal.**
-- **`AuthorizeView` controls visibility, not permission.**
-
-## Closing checklist
-
-- [ ] Inline or code-behind follows `tech.md`, with the partial's name and namespace matching.
-- [ ] Everything in through `[Parameter]`, everything out through an awaited `EventCallback`,
-      and no parameter mutated by its receiver.
-- [ ] Injection follows the organisation, with no duplicate property and no `!`.
-- [ ] Parameter-dependent loads live in `OnParametersSetAsync`, guarded, not duplicated, and a
-      superseded response never reaches the UI.
-- [ ] `firstRender` guards anything that must happen once, renders cannot loop, and everything
-      subscribed to is unsubscribed on disposal.
-- [ ] Nothing blocks; cancellable work owns its token source and disposes it.
-- [ ] **No `HttpClient` in a component**: every call goes through the typed client, which
-      returns the backend's result shape and does not throw on an expected failure.
-- [ ] JS references disposed, and nothing relies on `AuthorizeView` for permission.
+Organisation follows `tech.md`, loads live in `OnParametersSetAsync` guarded, `firstRender`
+guards one-time work, token sources and JS references are disposed, and no component holds an
+`HttpClient`.

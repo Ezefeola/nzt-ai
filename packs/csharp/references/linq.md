@@ -1,151 +1,34 @@
 # LINQ
 
-## Contents
-- This skill is base .NET only
-- Existence and counting
-- Enumerate once
-- Order of operations
-- Lookups instead of nested loops
-- `OfType<T>` filters by type and drops nulls
-- Pick the operator that says what you mean
-- Never return null for a sequence
-- Closing checklist
+Builds on `../nzt-code/references/collections.md` — read it first. This file holds only what is
+LINQ, in memory: a query a database runs is its data pack's (`nzt-dotnet`'s EF Core files).
 
-**Read `../nzt-code/references/collections.md` first.** It holds existence and counting,
-enumerating once, the order of operations, lookups instead of nested loops, the operator for
-the intent and never returning null for a sequence. This file holds only what is LINQ.
+## Rules
 
-Method syntax, always. Query syntax (`from x in xs select x`) is never used, not even for
-joins and groupings: one syntax across a codebase means one thing to read.
+1. **Method syntax always** — never query syntax, not even for joins or groupings.
+2. **Only what ships with .NET.** An operator that needs a package does not belong here, and an
+   `Async` suffix does not make something a persistence API.
+3. **`Count`/`Length` on a materialised collection** (a readability convention — `Any()` would
+   not enumerate either); **`Any()` on a lazy `IEnumerable<T>`**. Predicates go into the
+   operator: `items.Count(p)`, `items.Any(p)`, `items.FirstOrDefault(p)`, never after a
+   `Where`.
+4. **`ToList()` once**, when the result is used more than once; never mid-chain.
+5. **Lookups**: `ToHashSet()` for membership, `ToDictionary` for the matching element,
+   `ToLookup` when the key repeats.
+6. **`OfType<T>()`** keeps what is a `T` (`Cast<T>()` throws) — and gives the non-null elements
+   typed, with no `!`:
 
-## This skill is base .NET only
+   ```csharp
+   List<Order> found = ids.Select(FindOrder).OfType<Order>().ToList();
+   ```
 
-**Everything here ships with .NET.** If an operator needs a package, it does not belong
-here, and provider translation is its own assessment — an `Async` suffix alone does not make
-something a persistence API.
+7. **Operators for the intent**: `MaxBy`/`MinBy` (never `OrderByDescending(...).First()`),
+   `SingleOrDefault` when two is a bug, `FirstOrDefault` when more is fine, `DistinctBy`,
+   `Chunk` for batches, `Zip` to pair, `Order`/`OrderDescending` to sort by the element.
+   Prefer handling `null` over `Single`/`First`, which throw on empty.
+8. **An empty sequence is `[]` or `Enumerable.Empty<T>()`**, never `null`.
 
-The distinction is not pedantry: it is what stops an EF Core call from being written where
-EF Core is not installed, and what keeps this checklist verifiable on its own.
+## Done when
 
-## Existence and counting
-
-**On a materialised collection — `List<T>`, an array, anything with `Count` or `Length` —
-use the property.**
-
-```csharp
-// no
-if (lines.Any()) { }
-
-// yes
-if (lines.Count > 0) { }
-```
-
-This is a readability convention, not an allocation claim: modern .NET can answer a
-parameterless `Any()` from a count without enumerating.
-
-**On a lazy `IEnumerable<T>` it is the other way round**: `Any()` stops at the first element,
-while `Count() > 0` can walk the whole sequence when the count is not directly available.
-
-| Instead of | Write |
-|---|---|
-| `items.Where(p).Count()` | `items.Count(p)` |
-| `items.Where(p).Any()` | `items.Any(p)` |
-| `items.Where(p).FirstOrDefault()` | `items.FirstOrDefault(p)` |
-
-## Enumerate once
-
-```csharp
-// no — filters twice
-IEnumerable<Order> pending = orders.Where(order => order.IsPending);
-int count = pending.Count();
-Order first = pending.First();
-
-// yes
-List<Order> pending = orders.Where(order => order.IsPending).ToList();
-int count = pending.Count;
-Order first = pending[0];
-```
-
-Mid-chain, `ToList()` pulls the whole set into memory.
-
-## Order of operations
-
-```csharp
-// no
-List<OrderLineDto> lines = order.Lines
-    .OrderBy(line => line.Sku)
-    .Where(line => line.Units > 0)
-    .Select(line => line.ToOrderLineDto())
-    .ToList();
-
-// yes
-List<OrderLineDto> lines = order.Lines
-    .Where(line => line.Units > 0)
-    .OrderBy(line => line.Sku)
-    .Select(line => line.ToOrderLineDto())
-    .ToList();
-```
-
-**Never move a filter across `Take`, `Skip` or a grouping.**
-
-## Lookups instead of nested loops
-
-```csharp
-// no — one scan of skus per line
-foreach (OrderLine line in lines)
-{
-    if (skus.Any(sku => sku == line.Sku)) { }
-}
-
-// yes — one hash lookup per line
-HashSet<string> skuSet = skus.ToHashSet();
-foreach (OrderLine line in lines)
-{
-    if (skuSet.Contains(line.Sku)) { }
-}
-```
-
-`ToDictionary` when the matching element is needed, `ToLookup` when the key can repeat.
-
-## `OfType<T>` filters by type and drops nulls
-
-`OfType<T>()` keeps what **is** a `T` and skips the rest; `Cast<T>()` throws on the first
-element that is not one.
-
-Its second use is the one that pays every day — **the non-null elements, typed, without a
-single `!`**:
-
-```csharp
-// no
-List<Order> found = ids.Select(FindOrder).Where(order => order is not null).Select(order => order!).ToList();
-
-// yes
-List<Order> found = ids.Select(FindOrder).OfType<Order>().ToList();
-```
-
-## Pick the operator that says what you mean
-
-| Intent | Operator |
-|---|---|
-| The largest or smallest by a key | `MaxBy` / `MinBy`, never `OrderByDescending(...).First()` |
-| Exactly one, and more than one is a bug | `SingleOrDefault` |
-| The first, and more than one is fine | `FirstOrDefault` |
-| Distinct by a field | `DistinctBy` |
-| Batches of N | `Chunk` |
-| Pair two sequences | `Zip` |
-| Sort by the element itself | `Order` / `OrderDescending` |
-
-`Single` and `First` throw on an empty sequence: prefer handling the `null`.
-
-## Never return null for a sequence
-
-An empty collection is `[]` or `Enumerable.Empty<T>()`.
-
-## Closing checklist
-
-- [ ] Method syntax everywhere.
-- [ ] No operator here needs a package — if it does, it is not this skill.
-- [ ] `Count`/`Length` for a materialised collection, `Any()` for a lazy one, predicates
-      passed to the operator.
-- [ ] No search inside a loop where a `HashSet`, `Dictionary` or `Lookup` does it in one pass.
-- [ ] `MaxBy`/`MinBy` instead of ordering to take one, `OfType<T>()` instead of `!`.
+Method syntax everywhere, no package operator, `OfType<T>()` instead of `!`, and no search in a
+loop that a set or dictionary answers.

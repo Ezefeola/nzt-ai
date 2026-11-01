@@ -1,71 +1,35 @@
 # Interactive Auto
 
-**Read `../nzt-frontend/references/rendering.md` first** — *A component that may run in
-either place*, with the server and browser sections it combines. It holds being correct in both
-places and the strictest of the two always applying. This file holds only what is Blazor.
+Builds on `../nzt-frontend/references/rendering.md`, *Either place* — read it first.
+Prerendering or persistent state: `prerendering.md`, with both hosts in mind.
 
-The component **runs on whichever host is ready**. On the first visit, while the WebAssembly
-runtime downloads, it runs **on the server** so the screen is usable immediately; once the
-runtime is cached, **later visits run in the browser**.
+The component **runs on whichever host is ready**: on the server during the first visit while
+the runtime downloads, in the browser on later visits. **It never moves while running** — the
+switch shows on the next visit, so there is nothing to handle mid-session.
 
-How a component is written does not change — that is
-`nzt-blazor-components`. This is only what having two possible hosts changes.
+## Rules
 
-## What it does not do
+1. **Nothing synchronous that waits** (WebAssembly freezes); no server-only service, database or
+   secret.
+2. **Where it runs now is `RendererInfo.Name` / `RendererInfo.IsInteractive`** (.NET 10);
+   `AssignedRenderMode` is the assignment, not the host.
+3. **Register on both hosts with the lifetime the service deserves**:
 
-**It does not move a running component from one host to the other.** The host is chosen when the
-component starts; a screen that began on the server finishes there. The switch shows up on the
-**next** visit, not in the middle of this one.
+   | Service | Registration |
+   |---|---|
+   | server user state | scoped — never a singleton across users |
+   | ordinary browser services | the app's normal lifetime |
+   | with prerendered persistent state | scoped on the server with `RegisterPersistentService<T>(RenderMode.InteractiveAuto)`, singleton in `.Client` |
 
-So there is no moment to handle, no event to subscribe to and nothing to migrate.
+   A service registered only on the browser side fails during prerendering.
+4. **No child with another interactive mode.** Interactive roots can coexist under a static
+   parent; parameters crossing that boundary are serialisable (no delegates or
+   `RenderFragment`s; a cascading value does not cross by itself).
+5. **The component lives in the project the browser downloads** (`architecture-vertical-slice.md`);
+   on the server side the mode is silently lost. `@rendermode InteractiveAuto` on the component
+   that needs it.
 
-## The strictest of the two always applies
+## Done when
 
-- **Nothing synchronous that waits.** On WebAssembly it freezes the page.
-
-On .NET 10, `RendererInfo.Name` and `RendererInfo.IsInteractive` say where the code is executing
-now; **`AssignedRenderMode` is the assigned mode, not the current host** — confusing the two is
-how a check passes on the visit that does not matter.
-
-## Register on both hosts, with the lifetime the service deserves
-
-| Where | How |
-|---|---|
-| server user state | scoped, **never a singleton shared across users** |
-| ordinary browser services | the app's normal lifetime — **auto does not make everything a singleton** |
-| a service with prerendered persistent state | scoped on the server with `RegisterPersistentService<T>(RenderMode.InteractiveAuto)`, **singleton in `.Client`** so restoration and injection resolve the same instance |
-
-And the mirror image: **a service registered only on the browser side fails during
-prerendering**, because prerendering runs on the server, where it does not exist.
-
-## A component cannot change the mode of its children
-
-**A component of one interactive mode cannot be a child of a component of another.** Separate
-interactive roots can coexist under a static parent, but **parameters crossing the
-static-to-interactive boundary must be serialisable** — a delegate or a `RenderFragment` cannot
-cross, and a cascading value does not cross by itself.
-
-## Where the component lives is not free
-
-An auto component has to be in the part of the solution the browser can download. **Which
-project that is comes from the architecture skill**; what matters here is that putting it on the
-server side **silently takes the mode away**.
-
-## Prerendering
-
-When prerendering or persistent state is involved, load
-`nzt-blazor-prerendering` and apply it with both hosts in mind. Do not load
-another render-mode skill just for prerendering.
-
-## Closing checklist
-
-- [ ] Everything injected exists on **both** hosts, with the lifetime its purpose asks for —
-      including the client singleton for a persistent service.
-- [ ] **No server-only service, no database, no secret**: the browser is a possible destination.
-- [ ] Nothing synchronous that waits.
-- [ ] The component sits in the project the browser can download, and **no child of it uses a
-      different interactive mode**; boundary parameters are serialisable.
-- [ ] Execution checks use `RendererInfo`, not the assigned mode.
-- [ ] `@rendermode InteractiveAuto` on the component that needs interactivity.
-- [ ] The first visit **and** a cached browser execution were both exercised, with restored and
-      absent state.
+The first visit and a cached browser run were both exercised with restored and absent state,
+and every injected service resolves on both hosts.

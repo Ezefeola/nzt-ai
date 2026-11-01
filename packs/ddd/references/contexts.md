@@ -1,27 +1,12 @@
 # Context map
 
-## Contents
-- It talks about meaning, not machinery
-- The file
-- Writing it
-- Domain events
-- What this document does not carry
-- The diagram
-- Done when
+Produces `Docs/Domain/context-map.md`: how the business is cut up and who depends on whom — for
+whoever decides where to spend effort and which model to defend. **Meaning, never machinery**:
+no endpoints, queues, payloads, packages or classes.
 
-Produces `Docs/Domain/context-map.md`: how the business is cut up and who depends on whom. Its
-reader is deciding where to spend effort and which model to defend.
-
-## It talks about meaning, not machinery
-
-> *This context understands "reservation" this way, and depends on that one this way* — yes.
-> Endpoints, queues, payloads, packages, classes — never, in any form.
-
-**It is written only when there is more than one context, or one of ours plus a third
-party's.** With a single context it says less than the first sentence of
-`Docs/Architecture/architecture.md`, and then it does not exist. Offer it when a second context appears
-in the conversation, and say what is lost without it: the same word keeps meaning two things
-and nobody knows which side has to change when the other moves.
+**Only with more than one context, or one of ours plus a third party's.** Offer it when a
+second context appears, saying what is lost without it: one word keeps meaning two things, and
+nobody knows who changes when the other moves.
 
 ## The file
 
@@ -33,19 +18,13 @@ and nobody knows which side has to change when the other moves.
 <the bounded-contexts diagram>
 
 ### Sales · core
-Where the product differentiates: building the order and promising delivery. An *order*
-here is the customer's intent to buy, until it is confirmed.
+Building the order and promising delivery. An *order* here is the customer's intent to buy,
+until it is confirmed.
 - Modules: Catalogue · Checkout
 - Components: `Pedidos.Api`, `Pedidos.Web`
 
-### Stock · supporting
-Keeps available and reserved units. Ours and necessary, but not why anyone chooses us: it
-is built simple on purpose.
-- Modules: Inventory
-- Components: `Stock.Api`
-
 ### Payments · generic
-The industry already solved it. We do not model it: the gateway does.
+The industry solved it; the gateway models it.
 - Modules: —
 - Components: the payment gateway — theirs
 
@@ -53,87 +32,42 @@ The industry already solved it. We do not model it: the gateway does.
 
 | From | To | Pattern | What happens if the other changes |
 |---|---|---|---|
-| Sales | Stock | customer/supplier | Stock plans what Sales needs; a change is agreed before it ships |
-| Sales | Billing | open host service | Billing publishes one contract for everyone; we adapt to it |
-| Billing | Payments | anticorruption layer | the gateway's vocabulary does not enter our model: it is translated at the boundary, so their change touches one place |
+| Billing | Payments | anticorruption layer | the gateway's vocabulary is translated at the boundary: their change touches one place |
 
 ## Domain events
 
 - **Order confirmed** — the customer finished buying. Stock and Billing find out. (INT-02)
-- **Units taken** — Stock set aside what the order needs.
 
 ## Terms that change meaning
 
-- **Reservation** — in Sales it is what the customer set aside; in Stock it is the unit
-  taken out of the available count. Both readings are in `Docs/Domain/glossary.md`.
+- **Reservation** — in Sales, what the customer set aside; in Stock, the unit taken out of
+  the available count. Both in `Docs/Domain/glossary.md`.
 ```
 
-## Writing it
+## Rules
 
-- **A context is a boundary of meaning**, and its paragraph says **what a term of the
-  business means inside it**. A paragraph that could be copied onto another context is not a
-  context: it is a folder with ambitions.
-- **The type is one of three and it is never omitted**: `core` (where the product
-  differentiates), `supporting` (ours, necessary, built simple) and `generic` (the industry
-  solved it; buy it). It is the most actionable line in the file — it says where to build
-  carefully and what not to model at all.
-- **The join lines are two and they are the point.** Modules order `Docs/Product/product.md`,
-  components order `Docs/Architecture/architecture.md`, and the context orders neither: naming the three
-  together is what lets them be read at once **without forcing them to match**. A context
-  with no component is normal — it may be a third party's, or not built yet.
-- **Every pair that touches has a row, and the last column is what the row is for.** *"What
-  happens if the other changes"* turns a pattern name into something someone can act on. A
-  row whose last column says nothing means the pattern was picked from a list instead of
-  from the conversation.
-- **The pattern is one of seven**: customer/supplier, conformist, anticorruption layer,
-  shared kernel, open host service, published language, separate ways. Anything else is a
-  relationship nobody named.
-- **An anticorruption layer is written as what it protects**, never as where it lives. *"The
-  gateway's vocabulary does not enter our model"* — yes; a folder, a project or a class that
-  translates — never, that is code.
-- **Nothing is said about a third party's insides.** Name it, say what it resolves, say how
-  we relate to it. Its model is theirs to describe.
-- **The prose is in the user's language**, and context names are the ones the business
-  already uses.
-
-## Domain events
-
-- **An event is a past-tense fact in ubiquitous language**: *Order confirmed*. Not
-  `OrderConfirmedEvent`, not a topic, not a queue.
-- Each one says **who needs to find out**, and cites the `INT-NN` of
-  `Docs/Architecture/architecture.md` when an integration carries it.
-- **Nothing here says when it is dispatched, who handles it or where it accumulates.** That
-  is the feature design and `tech.md`. An event listed by name invites explaining how it
-  travels; it does not travel here.
-
-## What this document does not carry
-
-| Not here | Where it goes |
-|---|---|
-| What we send, what comes back, timeouts, retries | `Docs/Architecture/architecture.md` external systems, and the feature design |
-| Whether it is an event or a call, and over which pipe | the feature design |
-| What each component is built with | `Docs/Architecture/tech.md` |
-| The fields and relationships of the model | `Docs/Domain/domain-model.md` |
-| What each term means | `Docs/Domain/glossary.md` — here go the boundaries |
-| Why the product has this technical shape | `Docs/Architecture/architecture.md` |
-
-## The diagram
-
-`bounded-contexts` is earned whenever this file exists, and it is the first thing anyone
-reads. It is offered like any diagram — `nzt-architecture-diagrams` decides, and
-`nzt-ddd-diagrams` draws it. It is **not** the `context` diagram of
-`Docs/Architecture/architecture.md`: that one draws the perimeter with its actors, this one the
-boundaries of meaning inside it.
+1. **A context is a boundary of meaning**: its paragraph says what a business term means inside
+   it. One that could be copied onto another context is a folder.
+2. **Its type is never omitted**: `core` (where the product differentiates), `supporting` (ours,
+   built simple), `generic` (buy it, do not model it).
+3. **Modules and components lines** join it to `product.md` and `architecture.md` without
+   forcing them to match; a context with no component is normal.
+4. **Every pair that touches has a row**, with one of seven patterns — customer/supplier,
+   conformist, anticorruption layer, shared kernel, open host service, published language,
+   separate ways — and a last column someone can act on. An anticorruption layer is written as
+   what it protects, never where it lives.
+5. **A domain event is a past-tense fact in the business's words** (*Order confirmed*, not
+   `OrderConfirmedEvent`), saying who finds out and citing its `INT-NN`. When, how and where it
+   travels is the feature design's and `tech.md`'s.
+6. **Never a third party's insides**: name it, what it resolves, how we relate.
+7. Prose in the user's language, context names as the business uses them. Not here: what is
+   sent and its failures (`architecture.md`, the feature design), technologies (`tech.md`),
+   fields (`domain-model.md`), meanings (the glossary).
+8. The `bounded-contexts` diagram is earned whenever this file exists (`diagrams.md`); it is not
+   the `context` diagram, which draws the perimeter and its actors.
 
 ## Done when
 
-Rehearse it: could someone read this file and say which model to defend, and who has to
-change when a neighbour moves?
-
-- There is more than one context, or a third party. Otherwise the file does not exist.
-- Every context carries its type, and its paragraph says what a term means inside it.
-- Every context has its modules and components lines, and none was forced to match.
-- Every pair that touches has a named pattern and a real last column.
-- Every event is a past-tense fact that says who finds out, with no dispatch mechanism.
-- No payloads, no pipes, no packages, no classes, no tables.
-- No foreign system's model is described.
+Someone could say which model to defend and who changes when a neighbour moves: every context
+has its type and meaning, every touching pair a pattern and a real consequence, every event is
+a fact with no mechanism.

@@ -1,41 +1,21 @@
 # Interactive WebAssembly
 
-**Read `../nzt-frontend/references/rendering.md` first** — *Interactive in the browser*.
-It holds the first visit paying for everything, long work belonging on the server, everything in
-the browser being public and the backend trusting nothing it sends. This file holds only what is
-Blazor.
+Builds on `../nzt-frontend/references/rendering.md`, *Interactive in the browser* — read it
+first. Prerendering or persistent state: `prerendering.md` (standalone WebAssembly has no server
+pass at all).
 
-How a component is written does not change — that is
-`nzt-blazor-components`. This is only what the host changes.
+## Rules
 
-## The first visit pays for everything
+1. **Startup downloads the runtime and client assets**: caching, trimming and lazy loading
+   change the cost — measure; every package in the client project slows the first visit.
+2. **One thread**: `.Result`, `.Wait()` or any synchronous wait freezes the page, and `Task.Run`
+   does not make long work faster.
+3. Browser storage and JavaScript after the first interactive render; dependencies resolve in
+   the browser and in the prerender host when there is one.
+4. **`@rendermode InteractiveWebAssembly` on the component that needs it**; no child of it uses
+   another interactive mode.
 
-Startup downloads the runtime and the client assets. Caching, trimming and deliberate lazy
-loading change the cost, so measure rather than assuming every referenced assembly ships
-eagerly. **Every package added to the client project makes the first visit slower for
-everyone.**
+## Done when
 
-## One thread, and blocking it freezes the page
-
-There is no thread to fall back on. **`.Result`, `.Wait()` and any synchronous wait do not slow
-the page down, they freeze it** — including the animation that was telling the user to wait.
-
-**Long work does not get faster wrapped in `Task.Run`**: it runs in the same place.
-
-## Prerendering
-
-When prerendering or persistent state is involved, load
-`nzt-blazor-prerendering` and apply it with this host's boundaries. **Standalone
-WebAssembly has no server pass at all**, so nothing may assume one. Do not load another
-render-mode skill just for prerendering.
-
-## Closing checklist
-
-- [ ] **Nothing synchronous that waits**: no `.Result`, no `.Wait()`, no `Task.Run` pretending
-      to be a background thread.
-- [ ] Browser storage and JavaScript only after the first interactive render.
-- [ ] Dependencies resolve in the browser **and** in the prerender host when there is one.
-- [ ] `@rendermode InteractiveWebAssembly` on the component that needs interactivity, and **no
-      child of it using a different interactive mode**.
-- [ ] A cold load, interactive navigation, an unavailable API and restored state were all
-      exercised.
+A cold load, interactive navigation, an unavailable API and restored state were exercised, and
+nothing waits synchronously.
