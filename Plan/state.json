@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-01T18:00:00Z",
+  "updated": "2026-11-01T20:00:00Z",
   "goal": "Marco genérico: skills globales cortas y sin redundancia, packs por proyecto (skills y MCP) con nzt-ai project, y Docs/Architecture/tech.md en lugar de los stack por área",
   "phases": [
     {
@@ -20,7 +20,7 @@
         { "id": 418, "do": "SKILL.md de cada pack con Axes y Opt-ins, y ddd/references/aggregates.md", "status": "done", "detail": "7 SKILL.md (code, backend, frontend, ddd, csharp, dotnet, blazor) con Axes, Opt-ins y costos; ddd/references/aggregates.md; kernel: un pack carga primero los que pide. Lint 0 problemas" },
         { "id": 419, "do": "Reescribir las referencias de los packs sin redundancia (ya re-apuntadas por script)", "status": "done", "detail": "6177 → ~3000 líneas; backend/references/architecture.md nueva (lo común de las 3 arquitecturas); dotnet domain-ddd-behaviour.md fusionada en domain-ddd.md; listas de cierre → Done when; lint 0" },
         { "id": 417, "do": "Pasada de nzt-learn (referencias), nzt-research y nzt-retro con el mismo criterio", "status": "done", "detail": "1187 → ~700 líneas; pasos o reglas numeradas y Done when de una o dos líneas; el formato de progress.md y sus reglas solo en learn/plan.md, las reglas comunes (caso distinto, solo assess escribe achieved, log append-only) solo en el SKILL; nombres nzt-learn-<x> → <x>.md; ejemplos sin EF Core/LINQ; research sin repetir el kernel; retro en seis pasos. Lint 0" },
-        { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "todo" },
+        { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "done", "detail": "ProjectChecks.cs: 20 casos (resolve, add/remove/sync, conflicto, desconocido, editado, dry-run, MCP JSON y TOML del usuario, stdio por plataforma, cambio de proveedor, packs embebidos, lint de packs y del repo). Nombres de prueba al árbol nuevo; llaves extra fuera de CheckSkill. 229 ok; falla solo 'bloque idéntico al build' porque dist/CLAUDE.md es viejo (se regenera en 421/424)" },
         { "id": 421, "do": "build.sh y build.ps1 validan packs; decidir check-extraction y check-references", "status": "todo" },
         { "id": 422, "do": "evals: fixtures y casos a tech.md y nombres de packs, más un caso de setup", "status": "todo", "detail": "evals/stack/entity-shape/case.yaml espera leer domain-ddd-behaviour.md, que ya no existe: pasar a nzt-dotnet/references/domain-ddd.md" },
         { "id": 423, "do": "README, installer/README, specs/nzt-installer.md y D88 en specs/nzt-core.md", "status": "todo" }

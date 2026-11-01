@@ -88,40 +88,38 @@ public static class Linter
 
     private static void CheckSkill(SkillFile skill, List<LintIssue> issues)
     {
+        var name = skill.FrontMatter.Get("name");
+        var description = skill.FrontMatter.Get("description");
+
+        if (!skill.FrontMatter.Exists)
+            issues.Add(new LintIssue(skill.RepoPath, "sin frontmatter"));
+
+        if (name != skill.Name)
+            issues.Add(new LintIssue(skill.RepoPath,
+                $"el name del frontmatter es '{name}', y el path deriva '{skill.Name}'"));
+
+        if (string.IsNullOrWhiteSpace(description))
+            issues.Add(new LintIssue(skill.RepoPath, "sin description"));
+        else if (description.Length > MaxDescription)
+            issues.Add(new LintIssue(skill.RepoPath,
+                $"la description tiene {description.Length} chars, sobre el límite de {MaxDescription}"));
+
+        if (skill.LineCount > MaxLines)
+            issues.Add(new LintIssue(skill.RepoPath,
+                $"{skill.LineCount} líneas, sobre el techo de {MaxLines} (D3: se parte, no se sube)"));
+
+        // C1: el frontmatter portable es sólo name + description.
+        foreach (var extra in new[] { "model", "allowed-tools", "context", "disable-model-invocation" })
+            if (skill.FrontMatter.Get(extra) is not null)
+                issues.Add(new LintIssue(skill.RepoPath,
+                    $"el frontmatter trae '{extra}', que rompe portabilidad (C1)"));
+
+        foreach (var reference in skill.References)
         {
-            var name = skill.FrontMatter.Get("name");
-            var description = skill.FrontMatter.Get("description");
-
-            if (!skill.FrontMatter.Exists)
-                issues.Add(new LintIssue(skill.RepoPath, "sin frontmatter"));
-
-            if (name != skill.Name)
-                issues.Add(new LintIssue(skill.RepoPath,
-                    $"el name del frontmatter es '{name}', y el path deriva '{skill.Name}'"));
-
-            if (string.IsNullOrWhiteSpace(description))
-                issues.Add(new LintIssue(skill.RepoPath, "sin description"));
-            else if (description.Length > MaxDescription)
-                issues.Add(new LintIssue(skill.RepoPath,
-                    $"la description tiene {description.Length} chars, sobre el límite de {MaxDescription}"));
-
-            if (skill.LineCount > MaxLines)
-                issues.Add(new LintIssue(skill.RepoPath,
-                    $"{skill.LineCount} líneas, sobre el techo de {MaxLines} (D3: se parte, no se sube)"));
-
-            // C1: el frontmatter portable es sólo name + description.
-            foreach (var extra in new[] { "model", "allowed-tools", "context", "disable-model-invocation" })
-                if (skill.FrontMatter.Get(extra) is not null)
-                    issues.Add(new LintIssue(skill.RepoPath,
-                        $"el frontmatter trae '{extra}', que rompe portabilidad (C1)"));
-
-            foreach (var reference in skill.References)
-            {
-                var lines = reference.Text.Replace("\r\n", "\n").TrimEnd('\n').Split('\n').Length;
-                if (lines > MaxLines)
-                    issues.Add(new LintIssue($"{skill.RepoPath}/references/{reference.FileName}",
-                        $"{lines} líneas, sobre el techo de {MaxLines}"));
-            }
+            var lines = reference.Text.Replace("\r\n", "\n").TrimEnd('\n').Split('\n').Length;
+            if (lines > MaxLines)
+                issues.Add(new LintIssue($"{skill.RepoPath}/references/{reference.FileName}",
+                    $"{lines} líneas, sobre el techo de {MaxLines}"));
         }
     }
 }

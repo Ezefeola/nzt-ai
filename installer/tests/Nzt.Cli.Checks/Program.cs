@@ -12,7 +12,7 @@ namespace Nzt.Cli.Checks;
 /// tocan el HOME real: cada caso arma su propio árbol y lo borra al terminar.
 /// No prueban comportamiento de los CLIs ni selección de skills por el modelo.
 /// </summary>
-public static class Program
+public static partial class Program
 {
     private static int _passed;
     private static readonly List<string> Failures = [];
@@ -73,6 +73,7 @@ public static class Program
         StateCheckCatchesEveryBrokenSliceInvariant();
         StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
+        RunProjectChecks();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -95,7 +96,7 @@ public static class Program
         Check("el bloque lleva los marcadores del build",
             File.ReadAllText(provider.InstructionsFile).Contains(InstructionBlock.Begin));
         Check("aplana la skill anidada",
-            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build-implement", "SKILL.md")));
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-plan", "SKILL.md")));
         // Instrucciones + tres skills.
         Check("registra todo en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 4);
@@ -177,7 +178,7 @@ public static class Program
         var (provider, catalog, manifests) = Setup(home);
         Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
 
-        var gone = Path.Combine(provider.SkillsDirectory, "nzt-build-implement", "SKILL.md");
+        var gone = Path.Combine(provider.SkillsDirectory, "nzt-plan", "SKILL.md");
         var edited = Path.Combine(provider.SkillsDirectory, "nzt-build", "SKILL.md");
         File.WriteAllText(edited, "lo toqué\n");
 
@@ -195,12 +196,12 @@ public static class Program
     private static void InstallsReferencesInsideTheirSkill() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        var withReferences = WithReferences(catalog, "nzt-build", "implement.md", "tests.md");
+        var withReferences = WithReferences(catalog, "nzt-build", "tests.md", "review.md");
 
         Installer.Install(provider, withReferences, "0.1.0", manifestDirectory: manifests);
 
         Check("copia la referencia dentro de la carpeta de su skill",
-            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references", "implement.md")));
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references", "tests.md")));
         // Instrucciones + tres skills + dos referencias.
         Check("registra las referencias en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 6);
@@ -209,7 +210,7 @@ public static class Program
     private static void RemovesOrphanReferencesAndEmptyFolders() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        Installer.Install(provider, WithReferences(catalog, "nzt-build", "implement.md"),
+        Installer.Install(provider, WithReferences(catalog, "nzt-build", "tests.md"),
             "0.1.0", manifestDirectory: manifests);
         Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
 
@@ -379,8 +380,7 @@ public static class Program
 
     private static void FlattensTheNestedPathIntoTheName()
     {
-        var skill = new SkillFile("nzt-build-backend-dotnet-ef-core-queries",
-            "nzt/build/backend/dotnet/ef-core/queries", "---\nname: x\n---\n");
+        var skill = new SkillFile("nzt-build", "nzt/build", "---\nname: x\n---\n");
 
         Check("el nombre plano sale del path",
             skill.RepoPath.Replace('/', '-') == skill.Name);
@@ -735,8 +735,7 @@ public static class Program
             [
                 Skill("nzt", "---\nname: nzt\ndescription: router raíz\n---\n\ncuerpo\n"),
                 Skill("nzt-build", "---\nname: nzt-build\ndescription: router de build\n---\n\ncuerpo\n"),
-                Skill("nzt-build-implement",
-                    "---\nname: nzt-build-implement\ndescription: hoja\n---\n\ncuerpo\n")
+                Skill("nzt-plan", "---\nname: nzt-plan\ndescription: router de plan\n---\n\ncuerpo\n")
             ]);
 
         return (provider, catalog, Path.Combine(home, "manifests"));
