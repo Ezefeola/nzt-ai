@@ -35,9 +35,9 @@
     },
     {
       "name": "verify",
-      "status": "doing",
+      "status": "done",
       "units": [
-        { "id": 424, "do": "Gates: build, checks, lint global y de packs, smoke de project en carpeta temporal, state check", "status": "todo" }
+        { "id": 424, "do": "Gates: build, checks, lint global y de packs, smoke de project en carpeta temporal, state check", "status": "done", "detail": "Build 0 avisos (y CLI 0 advertencias), 234 checks, lint 0 en 12 skills y 8 packs, state check ok. Smoke en carpetas temporales: packs; add dotnet --dry-run sin escribir nada; add dotnet trae code, backend y csharp, 62 archivos, MCP microsoft-learn en .mcp.json sin tocar un MCP del usuario; sync repone una skill borrada; pack desconocido sale con 1; remove deja solo el MCP del usuario y borra .nzt/project.json. Con --provider all: unity y ddd en .claude/skills y .agents/skills, unity-mcp stdio de Windows en .mcp.json y en el bloque nzt de .codex/config.toml, con el MCP del usuario intacto; una skill editada se conserva en sync y en remove, con aviso. Defecto D-424-01 (cosmético, abierto): en nzt-ai project la línea 'MCP claude-codeunity-mcp' no separa el proveedor del servidor, porque ProgramProject.cs:93 rellena a 11 y claude-code mide 11" }
       ]
     }
   ],
@@ -48,6 +48,6 @@
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
     "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario; DB-04 (marco para cualquier trabajo: protocolo y flujos) abierto, solo análisis, y el resto Docs/UX/ en architecture sin decidir",
-    "Sigue la 424 (gates); la fase build quedó hecha. Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
+    "Run terminado (424 hecha). Abierto: D-424-01 (cosmético, a arreglar con el sí del usuario). Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
   ]
 }
