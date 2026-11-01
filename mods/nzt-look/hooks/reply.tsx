@@ -118,9 +118,9 @@ export const bandOf = (palette: Palette): string => {
 /**
  * The table on the desktop: a grid of boxes, each cell in its column's share of the row and its
  * text wrapping inside it. A proportional font does not line up padded text, and a row that
- * wraps as one line breaks its columns apart. The header sits on its own band with the copy
- * button at its end; `zebra` alone is too close to `surface` to tell the rows apart, so each row
- * also gets room above and below.
+ * wraps as one line breaks its columns apart. The copy button sits on a row of its own above the
+ * header, as on a code block, and the header on its own band; `zebra` alone is too close to
+ * `surface` to tell the rows apart, so each row also gets room above and below.
  */
 const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment & { kind: 'table' }, index: number, ctx: ReplyContext) => {
   const { palette, t } = ctx
@@ -141,20 +141,23 @@ const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment
           paddingX="md"
           paddingY="sm"
           flexDirection="row"
-          columnGap="sm"
-          alignItems="center"
-          justifyContent={isHeader && copy && i === cells.length - 1 ? 'space-between' : JUSTIFY[segment.align[i] ?? 'left']}
+          justifyContent={JUSTIFY[segment.align[i] ?? 'left']}
         >
           <Text color={palette.fg} bold={isHeader} wrap="wrap">
             {cell}
           </Text>
-          {isHeader && i === cells.length - 1 && copy}
         </Box>
       ))}
     </Box>
   )
   return (
     <Box flexDirection="column" borderStyle="round" borderColor={palette.zebra} overflow="hidden">
+      {copy && (
+        <Box flexDirection="row" justifyContent="space-between" alignItems="center" paddingX="md" backgroundColor={palette.surface}>
+          <Text color={palette.muted}>{t.table(rows.length)}</Text>
+          {copy}
+        </Box>
+      )}
       {row(header, bandOf(palette), true)}
       {shown.map((cells, i) => row(cells, i % 2 === 1 ? palette.zebra : palette.surface, false))}
       {canFoldThis && (

@@ -27,7 +27,9 @@
 > reglas con `[modify]` hasta que el usuario lo vea en la app; la banda, sin botón limpiar
 > (`[remove]`, usuario 2026-10-25) · **0.8.1 (2026-10-28):** tablas del escritorio con el encabezado
 > en una banda de acento con Copiar al final, y anchos de columna enteros (uno decimal hacía
-> volver la tabla al dibujo de Claude Code) ·
+> volver la tabla al dibujo de Claude Code) · **0.8.2 (2026-11-01):** *Copiar* de las tablas del
+> escritorio sale de la banda a una fila propia arriba, con `tabla · N filas`, como en el código
+> (QT-21) ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
@@ -371,7 +373,7 @@ convive con la referencia si la persona también lo tiene instalado.
 | Ediciones | tarjeta de diff con `+N −M`, líneas numeradas y resaltado | la misma tarjeta, en celdas (RN-skin-diff-legible) |
 | Consola | tarjeta con estado, stderr aparte, salida larga plegada, rutas, números y palabras de error, aviso y éxito en color | tarjeta con el comando, la salida en color, `✓` o `✗ exit N`, stderr en rojo, cada flujo plegado a 8 + 4 líneas |
 | Salida de solo lectura (apagada por defecto) | lecturas y búsquedas en una fila; un fallo deja su línea de error | igual |
-| Tablas | tarjeta con el encabezado en una banda (el acento sobre `surface`, con el tinte que deje legible el texto) y *Copiar* al final de ella; filas alternadas con aire arriba y abajo (opción A de `mods/nzt-look/mocks/tablas.html`, elegida por el usuario 2026-10-28) | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) |
+| Tablas | tarjeta con una fila arriba, `tabla · N filas` tenue y *Copiar* a la derecha, como el código (QT-21); debajo, el encabezado en una banda (el acento sobre `surface`, con el tinte que deje legible el texto); filas alternadas con aire arriba y abajo (opción A de `mods/nzt-look/mocks/tablas.html`, elegida por el usuario 2026-10-28) | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) |
 | Diagramas | bloques Mermaid como tarjeta (los 17 tipos de la referencia) | los mismos, en celdas |
 | Fórmulas | tarjeta tipográfica; `$…$` en línea como Unicode | fracciones y límites apilados |
 | Salida de comandos | `/cost`, `/context` y salida de plugins: tablas, código y pares `clave: valor` como tarjetas | como grillas |
@@ -578,8 +580,8 @@ acción principal**; lo que se aprieta es secundario: `▸` abre una fila, `▾ 
 5. **Tablas**:
    - en la terminal, una grilla con banda de encabezado y filas alternadas en *cebra*; más ancha que
      la terminal, las celdas bajan de línea (RN-skin-tabla-ancha);
-   - en el escritorio, una tarjeta con el encabezado en una banda y *Copiar* en ella, como dice
-     la tabla *Qué se redibuja*.
+   - en el escritorio, una tarjeta con *Copiar* en una fila arriba y el encabezado en una banda,
+     como dice la tabla *Qué se redibuja*.
 6. **Código**: marco con el lenguaje en el borde y resaltado en los colores del tema; en el escritorio,
    con números de línea.
 7. **Spinner** (RN-skin-palabras, RN-skin-spinner-cifras): el cuadro braille y la palabra de Claude
@@ -1340,6 +1342,12 @@ de la 223; mientras tanto, los flujos van en lista.
   mod sigue redibujando.
 - respuesta: dibujo de Claude · usuario 2026-10-20. La paleta neutra es la de `mono` · agente,
   dentro del alcance.
+
+### QT-21 · ¿Dónde va *Copiar* en las tablas del escritorio (0.8.2)?
+- lo que la forzó: dentro de la última celda de la banda (0.8.1) se ve mal (usuario 2026-11-01).
+- opciones: **fila superior** con `tabla · N filas` y *Copiar*, como el código y los diagramas;
+  **pie de la tarjeta**, junto a `▾ N más`; **fuera de la tarjeta**, arriba a la derecha.
+- respuesta: fila superior · usuario 2026-11-01. Sin *Copiar* prendido, la fila no se dibuja.
 
 ## Notas técnicas (para la unidad 223)
 

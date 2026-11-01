@@ -91,7 +91,7 @@ test('on the desktop a table is a grid of boxes: one per cell, its text alone, w
   expect(await ui.find({ type: 'Text', text: 'claude-code' })).toBeUndefined()
 })
 
-test('on the desktop the header sits on a band of the accent over the surface, with the copy button at its end', async ($, on) => {
+test('on the desktop the header sits on a band of the accent over the surface, under a row with the table and its copy button', async ($, on) => {
   const seen = world(on, { prefs: { variant: 'dark' } })
   await start($)
   const palette = paletteOf('nzt', [], 'dark')
@@ -101,6 +101,7 @@ test('on the desktop the header sits on a band of the accent over the surface, w
 
   expect((await ui.findAll({ type: 'Box' })).some(box => box.props.backgroundColor === bandOf(palette))).toBe(true)
   expect(await ui.find({ type: 'Text', text: 'Antes' })).toMatchObject({ props: { bold: true, color: palette.fg } })
+  expect(await ui.find({ type: 'Text', text: 'tabla · 1 fila' })).toMatchObject({ props: { color: palette.muted } })
   await ui.press({ key: 'block:g3:0:copy' })
   expect(seen.copies).toEqual([source])
 })

@@ -111,6 +111,7 @@ const es = {
   more: (n: number) => `▾ ${n} más`,
   less: '▴ menos',
   copy: 'Copiar',
+  table: (rows: number) => `tabla · ${rows === 1 ? '1 fila' : `${rows} filas`}`,
   footerExtra: (tools: number, added: number, removed: number) =>
     `${tools > 0 ? ` · ${tools === 1 ? '1 herramienta' : `${tools} herramientas`}` : ''}${added + removed > 0 ? ` · +${added} −${removed}` : ''}`,
   callouts: { note: 'Nota', tip: 'Consejo', important: 'Importante', warning: 'Aviso', caution: 'Cuidado' },
@@ -222,6 +223,7 @@ const en: Texts = {
   more: (n: number) => `▾ ${n} more`,
   less: '▴ less',
   copy: 'Copy',
+  table: (rows: number) => `table · ${rows === 1 ? '1 row' : `${rows} rows`}`,
   footerExtra: (tools: number, added: number, removed: number) =>
     `${tools > 0 ? ` · ${tools === 1 ? '1 tool' : `${tools} tools`}` : ''}${added + removed > 0 ? ` · +${added} −${removed}` : ''}`,
   callouts: { note: 'Note', tip: 'Tip', important: 'Important', warning: 'Warning', caution: 'Caution' },
