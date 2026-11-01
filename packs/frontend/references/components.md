@@ -12,7 +12,7 @@ through a typed client and never decides a business rule. A form adds `forms.md`
    file or beside it) is `tech.md`'s, never a line count; order declarations → markup → code
    (inputs, state, lifecycle, handlers, private helpers). Existing components are not
    reorganised outside the scope.
-3. **Check the rendered result** with `nzt-ux`'s `references/generic.md` for a new screen or a
+3. **Check the rendered result** with `nzt-design`'s `references/generic.md` for a new screen or a
    changed look, or report that it could not be rendered.
 
 ## Rules

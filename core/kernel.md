@@ -63,7 +63,7 @@ Load the router of the work's phase, even when you know its guidance, unless alr
 | Building, changing or executing a plan; closing an accepted feature | `nzt-plan` |
 | What to build: requirements, rules, scope, specs, stories, vocabulary, changing an existing feature, specs from an existing product | `nzt-discovery` |
 | How to build it: components, technology choices, domain model, technical design, decision records, deferred debt, reviewing an existing structure, diagrams | `nzt-architecture` |
-| What a person sees: screens, flows, visual design, mockups, design system, usability, the end-user manual | `nzt-ux` |
+| What a person sees: screens, flows, visual design, mockups, design system, usability, the end-user manual | `nzt-design` |
 | Producing the work: implementing a story, fixing a defect, surveying before changing, refactoring, removing, dependencies, secrets, the tests that ship with it | `nzt-build` |
 | Checking the built slice: test plans, test data, runs, evidence, defects, exploratory sessions, performance, regression; reading code or documents for defects | `nzt-verify` |
 | Versioning and delivery: commits, branches, pull requests, changelog, CI, releasing, deploying, rollback, monitoring | `nzt-ship` |

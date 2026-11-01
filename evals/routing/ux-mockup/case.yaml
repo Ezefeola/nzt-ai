@@ -4,11 +4,11 @@ description: >
   A mockup of a designed screen, asked for as "an HTML to see how it would look". It reads
   as building the screen (nzt-build, Blazor); it is a visual reference drawn from the screen
   design. Before D50 only the mockup leaf's description carried this; since D50 it is the
-  kernel row, and the guide is nzt-ux's references/mockup.md, graded as a Read. New case, no
+  kernel row, and the guide is nzt-design's references/mockup.md, graded as a Read. New case, no
   baseline (sonnet judge).
 tags: [routing]
 expected_outcome: >
-  Loads nzt-ux, reads its references/mockup.md and the screen design, and proposes one
+  Loads nzt-design, reads its references/mockup.md and the screen design, and proposes one
   self-contained HTML beside the design with every state reachable, as a reference and never
   as code for the project.
 context:
@@ -24,11 +24,11 @@ graders:
   - name: ux-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ux"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design"'
   - name: mockup-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-ux[/\\]+references[/\\]+mockup\.md'
+    input_match: 'nzt-design[/\\]+references[/\\]+mockup\.md'
   - name: design-read
     type: tool_used
     tool: Read

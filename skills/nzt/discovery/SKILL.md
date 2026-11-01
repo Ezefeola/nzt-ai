@@ -6,7 +6,7 @@ description: Use when what to build has to be established - functional analysis,
 # Discovery — what the product does
 
 Establishes **what** something is and **who** it is for, in business language, and writes it
-down. **Does not own** how it is solved (`nzt-architecture`), screens (`nzt-ux`) or the work
+down. **Does not own** how it is solved (`nzt-architecture`), screens (`nzt-design`) or the work
 (`nzt-build`): a spec naming a class, table, engine or package has drifted.
 
 ## References

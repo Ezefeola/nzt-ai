@@ -65,6 +65,7 @@ public static partial class Program
         StateCheckAcceptsAValidState();
         StateCheckWithoutAFileIsNotAnError();
         StateCheckCatchesEveryBrokenInvariant();
+        StateCheckAcceptsDesignAndTheOldUx();
         StateCheckAcceptsEachDelegationModeAndItsAbsence();
         StateCheckAcceptsAParallelGroup();
         StateCheckCatchesEveryBrokenParallelGroup();
@@ -874,6 +875,14 @@ public static partial class Program
         Check("una fase que no es de NZT", Says("la fase 'discusion' no es una fase de NZT"));
         Check("las fases de NZT no se marcan", !Says("la fase 'build' no es una fase"));
         Check("un modo de delegación que no existe", Says("delegation es 'always'"));
+    });
+
+    private static void StateCheckAcceptsDesignAndTheOldUx() => InTemp(home =>
+    {
+        foreach (var name in new[] { "design", "ux" })
+            Check($"la fase {name} cumple", CheckState(home, $$"""
+                { "approved": true, "phases": [{ "name": "{{name}}", "status": "todo", "units": [] }] }
+                """).Ok);
     });
 
     private static void StateCheckAcceptsEachDelegationModeAndItsAbsence() => InTemp(home =>

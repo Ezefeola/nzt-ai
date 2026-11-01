@@ -1,9 +1,9 @@
 ---
-name: nzt-ux
+name: nzt-design
 description: Use when a person will see or operate something - a screen or menu's layout, content, states and navigation, its mockup or prototype, the design system and brand, a usability review, or the end user's manual.
 ---
 
-# UX — what the person sees and does
+# Design — what the person sees and does
 
 Decides how a person accomplishes what the story describes, before anyone builds it.
 **Owns** layout, content, every state, navigation, the design system and shared components,

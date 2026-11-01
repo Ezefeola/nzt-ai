@@ -8,7 +8,7 @@ description: Use when technical decisions come before the work: components and b
 Decides **how** the product solves what discovery defined, records why, and sets up the
 project's packs. **Owns** components, technologies and packs (`Docs/Architecture/tech.md`),
 the domain model, integrations, decision records, deferred debt, diagrams, and the map of
-`Docs/`. **Does not own** business rules (`nzt-discovery`), screens (`nzt-ux`) or the work
+`Docs/`. **Does not own** business rules (`nzt-discovery`), screens (`nzt-design`) or the work
 itself (`nzt-build`).
 
 ## References

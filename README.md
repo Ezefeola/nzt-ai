@@ -66,7 +66,7 @@ por tramos de una a tres historias). Eso es lo que hace que se banque el uso dia
 |---|---|
 | `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias, y el cambio a una feature que ya existe |
 | `nzt-architecture` | Cómo se resuelve: componentes, documento técnico y packs del proyecto, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
-| `nzt-ux` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
+| `nzt-design` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
 | `nzt-build` | El código, y los tests que viajan con él |
 | `nzt-verify` | Diseñar y correr pruebas —API o pantalla, y lo dice antes de correr—, **crear los datos que faltan y borrarlos después**, medir la performance que espera el usuario, registrar la evidencia, y leer código o documentos buscando lo que no cierra |
 | `nzt-ship` | Versionado, CI/CD, despliegue, observabilidad |

@@ -24,7 +24,7 @@ cannot reach is reported as *not covered until QA*.
 | Writing the test first — **only if `tech.md` selected test-first** | `references/tdd.md` | `references/tests.md`, `references/implement.md` |
 
 Writing what a person sees (a screen, a page, a component's look) also reads
-`../nzt-ux/references/generic.md` first.
+`../nzt-design/references/generic.md` first.
 
 ## Steps
 

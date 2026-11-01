@@ -4,11 +4,11 @@ description: >
   The design system, asked for in the words of someone who builds the frontend: colours,
   fonts, common components. It reads as Blazor work (nzt-build); it is a cross-screen UX
   decision. Before D50 only the system leaf's description carried this; since D50 it is the
-  kernel row, and the guide is nzt-ux's references/system.md, graded as a Read. New case,
+  kernel row, and the guide is nzt-design's references/system.md, graded as a Read. New case,
   no baseline (sonnet judge).
 tags: [routing]
 expected_outcome: >
-  Loads nzt-ux, reads its references/system.md, and proposes the design system as roles with
+  Loads nzt-design, reads its references/system.md, and proposes the design system as roles with
   their use and limit, separate from the shared component inventory, without writing CSS or
   components.
 context:
@@ -24,11 +24,11 @@ graders:
   - name: ux-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-ux"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design"'
   - name: system-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-ux[/\\]+references[/\\]+system\.md'
+    input_match: 'nzt-design[/\\]+references[/\\]+system\.md'
   - name: not-routed-to-build
     type: tool_used
     tool: Skill

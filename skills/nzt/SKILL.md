@@ -36,7 +36,7 @@ artifact and never proposes a plan (that is `nzt-plan`).
 5. **Pick the phases** that change what gets built, in this order:
    - **analysis** (`nzt-discovery`) — the request names a product, a feature, users or rules;
    - **architecture** — new components, a technology choice, cross-component interaction;
-   - **ux** — a person will look at a screen that does not exist yet;
+   - **design** (`nzt-design`) — a person will look at a screen that does not exist yet;
    - **build** — always, if the product changes;
    - **verify** — always, if behavior changes, after build finishes the slice;
    - **ship** — the user asked for a release, a pipeline or a deploy.

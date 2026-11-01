@@ -13,7 +13,7 @@ user before the whole scope is built. For full work, or when the user wants earl
    shape of the rest in one line. When it closes, rewrite the plan with the concrete slices,
    set `approved: false` and ask again.
 4. Plan only **delivery 1** (from `product.md`) in slices; later deliveries are one line.
-   When delivery 1 has something to learn from users, offer a prototype (`nzt-ux`) inside
+   When delivery 1 has something to learn from users, offer a prototype (`nzt-design`) inside
    the analysis slice. A new product's first build slice is the **walking skeleton**: the
    whole path end to end, thinnest form.
 

@@ -23,7 +23,11 @@
         { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "done", "detail": "ProjectChecks.cs: 20 casos (resolve, add/remove/sync, conflicto, desconocido, editado, dry-run, MCP JSON y TOML del usuario, stdio por plataforma, cambio de proveedor, packs embebidos, lint de packs y del repo). Nombres de prueba al árbol nuevo; llaves extra fuera de CheckSkill. 229 ok; falla solo 'bloque idéntico al build' porque dist/CLAUDE.md es viejo (se regenera en 421/424)" },
         { "id": 421, "do": "build.sh y build.ps1 validan packs; decidir check-extraction y check-references", "status": "done", "detail": "Los dos builds validan packs/ (pack.json, description, requires, skill con las mismas reglas que las globales, skill o MCP) con una función compartida, y copian packs/ a evals/_fixtures/packs. check-extraction.sh y check-references.sh borrados (probaban migraciones viejas contra main). tech.md y learn/plan.md suman ## Contents. Build 0 avisos, 230 checks" },
         { "id": 422, "do": "evals: fixtures y casos a tech.md y nombres de packs, más un caso de setup", "status": "done", "detail": "Fixtures a Docs/{Product,Architecture,Domain}/ con tech.md; _fixtures/packs.sh siembra packs como skills de proyecto (.claude/skills/nzt-<pack>, con requires) desde los packs que copia el build; node-project y foreign-repo los instalan sin listarlos; graders a nzt-dotnet, nzt-blazor, nzt-csharp y ship-*.md; entity-shape sin el grader de behaviour; caso nuevo routing/pack-setup. Los 35 scaffolds corren; ningún eval corrido (pedido del usuario)" },
-        { "id": 423, "do": "README, installer/README, specs/nzt-installer.md y D88 en specs/nzt-core.md", "status": "done", "detail": "README: packs por proyecto, tech.md, nzt-ai project, cifras (12 skills y 60 referencias globales, 8 packs con 77). installer/README: sección Packs por proyecto, lint de packs, 230 checks. nzt-installer.md: sección 13 (RN-proj-*), I1 modificada, Historia. nzt-core.md: D88 con QT-01..04, D18 derogada, estado actual de la sección 14" }
+        { "id": 423, "do": "README, installer/README, specs/nzt-installer.md y D88 en specs/nzt-core.md", "status": "done", "detail": "README: packs por proyecto, tech.md, nzt-ai project, cifras (12 skills y 60 referencias globales, 8 packs con 77). installer/README: sección Packs por proyecto, lint de packs, 230 checks. nzt-installer.md: sección 13 (RN-proj-*), I1 modificada, Historia. nzt-core.md: D88 con QT-01..04, D18 derogada, estado actual de la sección 14" },
+        { "id": 425, "do": "nzt-ux pasa a nzt-design, con cada mención re-apuntada (DB-02)", "status": "done", "detail": "git mv skills/nzt/ux → design; nzt-design en kernel, routers, packs/frontend, README y graders de evals. La fase del estado pasa a design y state check sigue aceptando ux (nzt-state ya lo trataba como alias). Historia de specs/ y Plan/mejoras/ sin tocar. Build 0 avisos, 232 checks, lint 0" },
+        { "id": 426, "do": "Tabla de ruteo del kernel y descripción y encabezados de los routers en términos de cualquier producto (DB-02)", "status": "todo" },
+        { "id": 427, "do": "tech.md (paso 4) y nzt-research: catálogo e investigación siempre, fuente de más confianza, propuesta conjunta, anotar en tech.md (DB-03)", "status": "todo" },
+        { "id": 428, "do": "Evals: casos que nombran nzt-ux, y routing/pack-setup con investigación además del catálogo, sin correrlos (DB-02, DB-03)", "status": "todo" }
       ]
     },
     {
@@ -37,7 +41,7 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": { "units": [], "keep_stops": [] },
-  "waiting_on": "Aprobar las unidades 425-428 propuestas en Plan/mejoras/12-debate-marco.md (DB-02: ux a design y palabras neutrales; DB-03: catálogo e investigación siempre, fuente de más confianza) antes de la 424. DB-01 queda pendiente",
+  "waiting_on": null,
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
     "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario",
