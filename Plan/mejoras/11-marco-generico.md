@@ -99,8 +99,15 @@ en el usuario; `nzt-build-backend-dotnet-*` → `nzt-dotnet-*`, `nzt-build-cshar
    sin redundancia (hoy solo re-apuntadas):
    ~90 archivos; criterio: la regla genérica en `backend/frontend/code`, la de tecnología solo
    lo propio. Ojo con títulos viejos tipo "Load `nzt-…` before applying this".
-3. **`nzt-learn` (refs), `nzt-research`, `nzt-retro`**: pasada con el mismo criterio (solo se
-   limpió el boilerplate del SKILL de learn).
+3. ~~**`nzt-learn` (refs), `nzt-research`, `nzt-retro`**~~ — **hecho** (unidad 417): de 1187 a
+   ~700 líneas. El formato de `progress.md`, su vocabulario cerrado y las reglas del registro
+   viven solo en `learn/references/plan.md`; las reglas comunes del modo (nada se niega y nada
+   se acredita, solo `assess.md` escribe `achieved`, un caso distinto cada vez, el log no se
+   edita) solo en el SKILL de learn. Las referencias se nombran entre sí como `tutor.md` (ya
+   no `nzt-learn-tutor`). Los ejemplos dejaron de nombrar EF Core/LINQ (tema
+   `db-read-performance`); el eval `routing/learn*` sigue válido (lee `plan.md` y `tutor.md`).
+   `nzt-research` ya no repite las reglas del kernel (lo leído es evidencia, la memoria no lo
+   es); `nzt-retro` quedó en seis pasos con la misma plantilla y las mismas garantías.
 4. **Comprobaciones** (`installer/tests/Nzt.Cli.Checks`): casos de `project add/remove/sync`,
    conflicto con archivo ajeno, MCP en `.mcp.json` sin pisar uno del usuario, bloque TOML,
    Resolve con requires, `Linter.RunPacks`; revisar las existentes (usan nombres

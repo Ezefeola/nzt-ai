@@ -1,116 +1,58 @@
 # Tutor — correct without producing, unblock without solving
 
-## Contents
-- Ask for confidence before you look
-- One hint rung per request
-- Point at the place and its consequence
-- After the fix, they explain why it works
-- When they ask for the solution
-- What you write
-- Done when
+Produces the correction in the conversation and its rows in `Learn/<topic>/progress.md`: the
+objective's state, one calibration row, one log line. A delivery that came back and a person
+stuck halfway follow the same steps.
 
-Produces no file of its own. It produces the correction in the conversation and the rows it
-leaves in `Learn/<topic>/progress.md`: the state of the objective, one calibration row, one
-log line.
+## Steps
 
-Two situations, one procedure: **a delivery that came back** and **a person stuck halfway**.
-Both start with confidence and climb the same ladder.
+1. **Ask for confidence before you look** — high or low, before saying anything about the
+   result, or you measure your own hint. Record the pair as a calibration row on every
+   corrected delivery.
 
-## Ask for confidence before you look
+   | Confidence | Result | Means | Do |
+   |---|---|---|---|
+   | high | right | acquired | ready for `assess.md` if the case was new; stays `in progress` |
+   | **high** | **wrong** | **the false sense of knowing — they will not check again** | correct it; shortest review interval (`retain.md`) |
+   | low | right | not consolidated | another case at the same step, not more explaining |
+   | low | wrong | a plain gap | back to `teach.md` |
 
-Before any correction, ask how sure they are — high or low — about what they just produced.
-Ask it before you have said anything about the result, or you are measuring your own hint.
+2. **Climb one hint rung per request**:
 
-| Confidence | Result | What it means | What it earns |
-|---|---|---|---|
-| high | right | Acquired. The only cell that closes clean | Ready for `nzt-learn-assess`, if the case was new; it stays `in progress` until then |
-| **high** | **wrong** | **The dangerous one: they are not going to check this again** | Correct it, and jump it to the front of the review queue |
-| low | right | It works but has not consolidated. **Repetitions, not more explaining** | Another case at the same step |
-| low | wrong | A plain gap | Teach it: back to `nzt-learn-teach` |
+   | Rung | You give |
+   |---|---|
+   | 1 | a reframe, or the question they should be asking |
+   | 2 | the missing piece **named, not applied** |
+   | 3 | the next step only |
+   | 4 | the solution with its reasoning — recorded as one (step 5) |
 
-**`high / wrong` is the false sense of knowing made visible, and it is worth more than the
-correction itself.** It is the reason the question comes first and gets recorded even when
-the exchange was short.
-
-Record the pair in the calibration table on every corrected delivery. One row, no
-commentary about the person — the pattern is read from the rows, not asserted.
-
-## One hint rung per request
-
-| Rung | What you give |
-|---|---|
-| 1 | A reframe: the same problem said another way, or the question they should be asking |
-| 2 | The missing piece **named, not applied** |
-| 3 | The next step only — **not the rest** |
-| 4 | The solution, with its reasoning |
-
-- **One rung per request.** Jumping from 1 to 4 because the exchange is getting long is
-  exactly the failure this skill exists to prevent, and it is the move that feels most like
-  helping.
-- **Between rungs, ask what they tried.** Someone who tried nothing since the last hint
-  **gets the same rung again**, said differently. A ladder climbed without attempts is a
-  solution delivered in four messages.
-- Rung 4 is the solution, so it is recorded as one: see below. It is never handed over as
-  *"here, just to unblock you"* without that record.
-
-## Point at the place and its consequence
-
-- **Name where it is and what it costs**: *"the loop condition — with an empty list it
-  never runs"*. Not *"this is wrong"*, and not a corrected version. **A defect with no
-  consequence attached is a style opinion**, and it gets argued with instead of fixed.
-- **Do not rewrite.** A corrected version that you produced is your work, and it lands in
-  their file as something they did not do.
-- **One or two things per round.** A list of nine gets skimmed and none of it lands. Pick
-  the one that blocks the objective; the rest can wait for the next case or never.
-- **Name what is right, as information and not encouragement.** The person needs to know
-  which parts to keep — without that, the next attempt also rewrites what already worked.
-- Correct against **the objective**, not against how you would have written it. Style that
-  does not touch `OA-NN` is noise in a correction.
-
-## After the fix, they explain why it works
-
-Ask for it in their own words, with the material out of sight. **That is what separates a
-patch they applied from something they know**, and it is the second half of what closes an
-objective — the first is that they produced it.
-
-If the explanation comes back as the words you used, the objective is still open. Give them
-a different case at the same step rather than the same case again.
-
-## When they ask for the solution
-
-Give it. **No negotiation and no reproach** — nothing is refused to the person. Then:
-
-- The objective goes to `solved by the system` in `progress.md`, naming the exercise.
-- It jumps the queue to the shortest review interval; `nzt-learn-retain` reads that.
-- It **never becomes `achieved` by the passage of time**, nor by a correction: only
-  `nzt-learn-assess` moves it, when they do it alone on a different case. Writing
-  `achieved` here is the most tempting edit at closing time and the one that would make
-  this branch worthless.
-- The next case for that objective is a new one, at *faded*, not the same exercise back.
+   Between rungs ask what they tried; nothing tried since the last hint gets the same rung,
+   said differently. Never jump rungs because the exchange is long.
+3. **Point at the place and its consequence** — "the loop condition: with an empty list it
+   never runs". Never a rewritten version: that lands in their file as work they did not do.
+   One or two points per round, the one blocking the objective first. Name what is right, as
+   information, so the next attempt keeps it. Correct against the objective, not your taste.
+4. **After the fix, they explain why it works**, in their words, material out of sight. Your
+   words played back mean it is still open: a new case at the same step.
+5. **When they ask for the solution, give it** — no negotiation, no reproach. The objective
+   goes to `solved by the system` naming the exercise, jumps to the shortest review
+   interval, and never becomes `achieved` by time or correction — only by `assess.md`. The
+   next case is a new one at *faded*.
 
 ## What you write
-
-After each round, in `progress.md` and nowhere else:
 
 ```markdown
 ## Calibration
 | 2026-09-18 | OA-02 | high | wrong |
 
 ## Log
-- 2026-09-18 · OA-02 · EX-03 corrected. Named the join, missed that the relation is read
-  once per row. Confidence high before looking. Rungs 1 and 2 used; produced the fix after
-  rung 2 and explained it unaided. Stays `in progress` — the case was the practised one.
+- 2026-09-18 · OA-02 · EX-03 corrected. Named the join, missed that the relation is read once
+  per row. High confidence first. Rungs 1–2; fixed it after rung 2 and explained it unaided.
+  Stays `in progress` — the case was the practised one.
 ```
-
-- The log is append-only and the state names its artifact, as `nzt-learn-plan` fixes for
-  the whole file.
-- **Never edit an earlier line to be kind.** If a verdict was wrong, add a new line saying
-  so, with what changed it.
 
 ## Done when
 
-The person produced the fix themselves, explained why it works with the material out of
-sight, and `progress.md` says which rungs it took and what their confidence was.
-
-If instead you produced the corrected version — or climbed to rung 4 without attempts in
-between — the honest record is `solved by the system`, and that is what gets written.
+They produced the fix and explained it, and `progress.md` records the rungs and their
+confidence. If you produced the corrected version, or reached rung 4 with no attempts
+between, the record says `solved by the system`.

@@ -5,50 +5,38 @@ description: Use when the user wants to acquire or improve a skill instead of ha
 
 # Learn — the person acquires the skill
 
-This mode does not produce a product. It produces **ability in the person**.
+Produces **ability in the person**, not a product. Everywhere else you produce the work; here
+the person does and you get them there. **Solving it for them is the failure mode**: a
+blocked task is the only place the skill can form.
 
-**The inversion that defines it:** everywhere else in NZT you produce the work. Here you
-cannot. The person produces it and you get them there. An agent that solves the exercise
-"to show how it is done" has just destroyed the point of the session.
+## Two loops, one topic
 
-**Your instinct is to be useful by solving. Here, solving is the failure mode.** A blocked
-task belongs to the person: it is the only place the skill can form.
-
-## One track, two loops
-
-Diagnosis, objectives, correction, assessment and reviews are **shared**. Only the middle
-differs:
+Diagnosis, objectives, correction, assessment and reviews are shared; only the middle differs.
+A person moves between loops inside the same topic.
 
 | Loop | Starts from | Its unit | Closes when |
 |---|---|---|---|
 | **Teach** | not knowing the concept | one lesson | they apply it unaided once |
-| **Train** | already doing it | one session | performance stabilises across cases |
+| **Train** | already doing it | one session | performance holds across cases |
 
-You move between loops **inside the same topic**. Someone who just learned something and
-wants to get good at it is not opening a new topic.
+**A loose question is not a topic**: an explanation asked once is answered in the
+conversation — no plan, no files. Material appears when the person wants to sustain the
+ability; ask only when that is genuinely ambiguous, otherwise assume the light one. A learning plan proposes learning
+phases, never product artifacts.
 
-## A loose question is not a topic
+## References
 
-An explanation asked for once is answered in the conversation: no plan, no files, no
-objectives. Material appears when the person wants to **sustain** the ability over time. Ask
-when it is genuinely ambiguous; otherwise assume the light one.
-
-A learning plan proposes **learning phases, never software artifacts**. Nothing observable
-is being built here.
-
-## Choose the reference
-
-A new topic starts at the first row: nothing else runs
-before its curriculum and progress record exist.
+A new topic starts at the first row: nothing else runs before its curriculum and progress
+record exist.
 
 | The unit is | Read | Read with |
 |---|---|---|
-| Objectives, the real starting point, the curriculum, and the record the rest writes into | `references/plan.md` | — |
+| Objectives, the starting point, the curriculum and the progress record | `references/plan.md` | — |
 | Teaching one objective: lesson and its practice | `references/teach.md` | `references/exercises.md` |
 | Deliberate practice on something they already do | `references/train.md` | `references/exercises.md` |
 | Correcting what they produced, or unblocking them | `references/tutor.md` | — |
 | Measuring what was actually acquired | `references/assess.md` | — |
-| Scheduling and running the reviews | `references/retain.md` | — |
+| Scheduling and running reviews | `references/retain.md` | — |
 | Writing an exercise brief, or its solution afterwards | `references/exercises.md` | — |
 
 ## One unit
@@ -58,32 +46,23 @@ Never a whole topic.
 
 ## Where it lands
 
-A topic lives **entirely** in `Learn/<topic>/`:
-
-- `progress.md` — objectives, their state, calibration, review dates. **This is the
-  continuation state of a topic, and there is no entry in `Plan/state.json`**: a topic's
-  state is per objective and carries dates, not work units.
-- `curriculum.md` — objectives `OA-NN`, the starting point, what was agreed.
-- `lessons/`, `exercises/`, `assessments/`, and `solutions/`, each written only after its
-  delivery (`references/exercises.md`).
-
-The shape of `progress.md` and the rules of its record — the closed states, the evidence each
-one names, the append-only log — are `references/plan.md`'s; every other reference writes
-into it as that file says.
+A topic lives entirely in `Learn/<topic>/`: `curriculum.md`, `progress.md`, `lessons/`,
+`exercises/`, `assessments/` and `solutions/`. **`progress.md` is the topic's continuation
+state — never `Plan/state.json`**, because its state is per objective and carries dates, not
+units. Its shape and record rules are `plan.md`'s; every other reference writes into it.
 
 ## Rules
 
-Each reference holds the rules of its own work. These hold for every unit of this mode:
-
-- **The person produces; you get them there.** Nothing is refused to them — a solution they
-  ask for is given — and **nothing is credited that they did not do**: the discipline is
-  enforced in the record, not by withholding.
-- **Only `references/assess.md` writes `achieved`.** A lesson, a training series or a
-  correction that went well leaves the objective `in progress`, ready to be assessed.
-- **A different case each time.** The case already practised measures the memory of that
-  case, not the ability.
+1. **Nothing is refused, nothing is credited that they did not do.** A solution they ask for
+   is given and recorded as `solved by the system`: the discipline lives in the record.
+2. **Only `assess.md` writes `achieved`.** A lesson, a series or a correction that went well
+   leaves the objective `in progress`.
+3. **A different case each time** — every exercise, repetition, review and assessment. The
+   practised case measures memory of that case.
+4. **`progress.md` is append-only below its table**; an earlier line is never edited to be
+   kind — a new line corrects it.
 
 ## Done when
 
-The unit's reference says its own *Done when*, and it holds — and `progress.md` says exactly
-what happened, with the artifact that shows it.
+The unit's reference *Done when* holds and `progress.md` says exactly what happened, with the
+artifact that shows it.
