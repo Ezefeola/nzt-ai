@@ -1,8 +1,8 @@
 # Version control
 
 Produces commits, branches, tags and changelog entries — **only when the user asked**.
-Finishing a unit is not an instruction to commit. The repository's rules win; say where they
-differ from this.
+Finishing a unit is not an instruction to commit. Say where the repository's rules differ
+from this.
 
 ## Steps
 
@@ -24,4 +24,4 @@ differ from this.
 ## Done when
 
 Someone could revert exactly this change, or read the changelog and know whether it affects
-them; nothing published was rewritten.
+them.

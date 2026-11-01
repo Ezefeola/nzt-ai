@@ -32,7 +32,7 @@ so I do not confirm an order expecting a discount.
 1. **`CA-NN` per criterion**, assigned once, never reused or renumbered; cited elsewhere as
    `US-NNN CA-NN`.
 2. **Declarative** (*when I apply a valid coupon*, never *when I click Apply*), **one `When`**,
-   **concrete data** (real amounts, dates, codes), **the rule cited by slug**, never copied.
+   **concrete data** (real amounts, dates, codes), **the rule cited by slug**.
    A criterion needing a paragraph is several.
 3. **At least one unhappy path** per story, or the written reason there is none.
 4. **The coverage line** lists **every** area `tech.md` declares, applicable or not, and

@@ -57,7 +57,7 @@ what it is for?"*).
    recorded even when you disagree (say so once). An assumed technical constraint is not one.
 5. **Delivery 1**: ask *is there anything to learn from users before building the rest?* Yes
    → the least that teaches it, with **To learn**. No → *"the whole scope: nothing to learn
-   first"*, written as a decision. It cuts scope, never the definition of done.
+   first"*, written as a decision.
 6. **Scope in both directions**; each *Out* line says why or where it lives. Neither in nor
    out is an open question.
 7. **A first version** (standard work, or an existing product without one): objectives (at

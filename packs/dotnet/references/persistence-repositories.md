@@ -4,15 +4,14 @@ Builds on `../nzt-backend/references/persistence-repositories.md` — read it fi
 
 ## Rules
 
-1. **`IOrderRepository` / `OrderRepository`, never a generic `IRepository<T>`**; methods named
-   after the domain, never `Get(Expression<...>)`, and **none returns `IQueryable`**.
+1. **`IOrderRepository` / `OrderRepository`**, never a generic `IRepository<T>`, a
+   `Get(Expression<...>)` or an `IQueryable` return.
 2. **`GetByIdAsync` returns the aggregate tracked**: changing it is enough, with no `Update`.
-   `Add` and `Remove` are synchronous — they only stage. No repository calls
-   `SaveChangesAsync`.
-3. **`IUnitOfWork` exposes the repositories and the one `SaveChangesAsync`**; registered scoped,
-   like the context. The use case's constructor takes it and nothing else from persistence.
-4. When two writes cannot be one save, one `BeginTransactionAsync` returns the transaction
-   `ef-core-writes.md` defines, committed by the use case with `await using`.
+3. **`Add` and `Remove` are synchronous.**
+4. **`IUnitOfWork` exposes the repositories and the one `SaveChangesAsync`**, registered scoped
+   like the context.
+5. **When two writes cannot be one save**, `BeginTransactionAsync` returns the transaction of
+   `ef-core-writes.md`.
 
 ```csharp
 public interface IOrderRepository
@@ -38,5 +37,4 @@ public interface IUnitOfWork
 
 ## Done when
 
-No generic repository or `IQueryable` return, no save outside `IUnitOfWork`, and every use case
-injects only `IUnitOfWork`.
+Every rule holds for the repositories you wrote.

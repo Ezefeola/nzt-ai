@@ -22,8 +22,6 @@ artifact and never proposes a plan (that is `nzt-plan`).
    `Learn/`) → load `nzt-learn`; a question that is not work → answer it, NZT does not apply.
 4. **Size it** by what the work touches, never by how it was phrased:
 
-   | The request | Size | Starts at |
-   |---|---|---|
    | What changes | Size | Starts at |
    |---|---|---|
    | Something that exists is corrected or adjusted; what was agreed stays as it is | Direct | Reproducing what fails, or the change itself |

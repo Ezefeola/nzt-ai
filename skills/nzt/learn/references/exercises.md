@@ -15,8 +15,7 @@ against.
 | **Out of scope** | what is not practised today, so they do not fix it and you do not correct it |
 | **Done when** | what has to be true of a good answer — not the answer — **visible to the person** |
 
-1. **Given follows the step**: *solved* — the complete solution, they produce the reasoning;
-   *faded* — the same form with the decisions removed; *alone* — the brief and nothing else.
+1. **Given follows the step** of `teach.md`'s fading table.
 2. State how long it should take; an exercise with no size gets postponed.
 3. A training series gets one brief for the series: it names the one component practised
    and says the rest is not looked at. Each repetition changes the case, not the brief.

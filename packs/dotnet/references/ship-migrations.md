@@ -49,6 +49,4 @@ is build work (`ef-core-migrations.md`); this is packaging and applying.
 
 ## Done when
 
-The strategy is recorded, the artifact came from CI with a pending-changes gate, destructive SQL
-was read, it ran once before the app with a deployment identity, and the applied migrations were
-confirmed in the target.
+Every step ran and every rule holds; the applied migrations were confirmed in the target.

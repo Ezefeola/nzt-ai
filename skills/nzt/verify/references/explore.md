@@ -19,11 +19,9 @@ scenarios, never replaces them.
    button, extreme data. Keep a running note of what you did. Something interesting outside
    the mission becomes a new charter, not a detour. Data you create is cleaned up at the end
    (`test-data.md`); what could not be is noted.
-3. **Classify against requirements, never taste**: contradicts a criterion or rule → a defect
-   (`bug.md`); nothing defines it → a `Q-NN`; risky or confusing → a note.
-4. **Every defect leaves a regression scenario** in the story's test file; an unreproduced
-   near miss is written down as such.
-5. **Report**, including what you did not cover:
+3. **Classify against requirements, never taste**, as `bug.md` defines a defect. An
+   unreproduced near miss is written down as such.
+4. **Report**, including what you did not cover:
 
    ```markdown
    ## Session 2026-09-16 · 45 min · coupons at checkout

@@ -25,9 +25,9 @@ product document every close keeps current. The only artifact the **end user** r
 6. **Interactive where it helps**: search, a contents list that follows the reader, long
    procedures collapsing with a checklist (persisted when storage allows, never breaking when
    it is blocked), copy buttons. No build, CDN or network font — it opens from a pen drive.
-   Phone and print are first-class. WCAG 2.2 AA. Nothing that pretends to be the product.
+   Phone and print are first-class. Nothing that pretends to be the product.
 7. **Only what was verified**: every step traces to a criterion that passed; unverified gets
-   no chapter, planned nothing. Undefined behavior is a `Q-NN`. No `TODO` on the reader's page.
+   no chapter, planned nothing. No `TODO` on the reader's page.
    A header comment names its stories, screenshot sources and date.
 8. **Measure** (`review.md`): width, contrast, the keyboard walk including search and every
    collapsible, and **open it with storage blocked**. Then `generic.md`'s pass on the render.

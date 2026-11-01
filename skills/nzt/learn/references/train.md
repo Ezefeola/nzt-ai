@@ -17,7 +17,7 @@ this**; someone who cannot produce it at all is learning it — `teach.md`, same
    | failing, cannot say which part | too hard | drop a step, cut one variable |
 
    Clean twice means the level moved: raise it in the same session.
-3. **Run three to six repetitions**, each a new case on the same component, each corrected
+3. **Run three to six repetitions** on the same component, each corrected
    (`tutor.md`) before the next starts.
 4. **Ask confidence at the first and the closing repetition only.** A `high / wrong` mid-series
    still gets its row and the review jump.
@@ -28,7 +28,7 @@ this**; someone who cannot produce it at all is learning it — `teach.md`, same
    - **corrections stop landing** — same correction, third repetition, no change: something
      underneath is missing. Say so and switch to `teach.md`.
 6. **Write the log line**: the component, the repetitions, what changed between first and
-   last, the ending. The objective stays `in progress` with that evidence.
+   last, the ending.
 
 ```markdown
 - 2026-09-24 · OA-03 · training series, component: choosing a projection's columns. Five

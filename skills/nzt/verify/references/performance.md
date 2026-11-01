@@ -34,8 +34,10 @@ or `testing/performance.md` when no single story owns them; captures in the run'
 
 ## Rules
 
-No optimisation without a before and after measured the same way; no measured gain → revert.
-Never change behavior to go faster. Production is measured only with authorisation naming it.
+- No optimisation without a before and after measured the same way.
+- No measured gain → revert.
+- Never change behavior to go faster.
+- Production is measured only with authorisation naming it.
 
 ## Done when
 

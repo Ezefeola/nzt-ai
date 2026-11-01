@@ -4,8 +4,7 @@
   (personal). Load one by reading its `SKILL.md`, using the name from the routing table.
 - The user can invoke any skill directly as `$<name>`.
 - The question tool is `request_user_input`, only in Plan mode or behind its flag; else the block.
-- A skill you have read stays in the conversation. Do not read the same `SKILL.md` twice.
+- A skill you have read stays in the conversation.
 - Instruction files merge from the repository root down to the working directory, so
   guidance closer to the working directory wins over this file.
-- Clearing means the user starting a fresh session; you never do it, and the only thing
-  that carries over is `Plan/state.json`.
+- Clearing means starting a fresh session; only `Plan/state.json` carries over.

@@ -54,5 +54,5 @@ With `nzt-ship`'s `references/release.md`.
 
 ## Done when
 
-The image runs non-root with no SDK, secret or production settings, carries an immutable tag,
-keeps migrations out, and ran locally with its health endpoints answering.
+Every step ran and every rule holds; the image ran locally with its health endpoints
+answering.

@@ -18,5 +18,4 @@ it is already emitted.
 
 ## Done when
 
-Readiness and liveness are separate, telemetry flows through OpenTelemetry with configured OTLP,
-and every log call is a template without sensitive values.
+Every rule holds for what you configured.

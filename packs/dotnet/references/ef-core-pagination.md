@@ -5,14 +5,12 @@ Builds on `../nzt-backend/references/data-pagination.md` — read it first, with
 
 ## Rules
 
-1. **One extension over `IQueryable<T>`**, written once: `CountAsync` on the query as it arrives,
-   then `Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(...)`, skipped when the
-   count is zero.
-2. **`PagedResponseDto<TItem>`** is the shared page; a paginated use case returns
-   `Result<PagedResponseDto<XResponseDto>>`. `TotalCount` counts the filtered set.
-3. **`PaginateAsync` does not order**: the query carries its `OrderBy`, ending in a unique column
-   — usually `ThenBy(x => x.Id)`. The compiler cannot check it.
-4. It trusts its arguments; the limits are the validator's (`validation.md`).
+1. **One `PaginateAsync` extension over `IQueryable<T>`**: `CountAsync`, then
+   `Skip(...).Take(...).ToListAsync(...)`, skipped when the count is zero.
+2. **`PagedResponseDto<TItem>` is the shared page**; a paginated use case returns
+   `Result<PagedResponseDto<XResponseDto>>`.
+3. **`PaginateAsync` does not order**: the query carries its `OrderBy`, ending in
+   `ThenBy(x => x.Id)` or another unique column.
 
 ```csharp
 public static async Task<PagedResponseDto<TItem>> PaginateAsync<TItem>(
@@ -37,5 +35,4 @@ PagedResponseDto<OrderSummaryResponseDto> page = await dbContext.Orders
 
 ## Done when
 
-Each paginated query is filtered, ordered with a unique tie-breaker and projected before
-`PaginateAsync`, and returns the shared page type.
+Every rule holds for the paginated reads you wrote.

@@ -51,7 +51,7 @@ The session is disposable; the state file is not.
 
 `Plan/state.json` holds the plan and where the work stands. Read it at session start before
 asking anything. **Reading or writing it loads `nzt-plan`**, which holds its schema: never
-write it from memory. Direct work never writes it.
+write it from memory.
 
 ## Routing
 

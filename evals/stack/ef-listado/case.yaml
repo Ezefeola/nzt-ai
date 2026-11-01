@@ -41,7 +41,7 @@ graders:
   - name: wrong-persistence-axis-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-dotnet[/\\]+references[/\\]+persistence-direct\.md'
+    input_match: 'nzt-backend[/\\]+references[/\\]+persistence-direct\.md'
     min: 0
     max: 0
     arm: both

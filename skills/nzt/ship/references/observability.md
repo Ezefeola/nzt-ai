@@ -17,8 +17,7 @@ nothing more. **Start from the signals the rollback thresholds in `deployment.md
 4. **Alerts** on symptoms the user feels, each with what it means and the first step. An
    alert nobody acts on is deleted or becomes a dashboard.
 5. **Watch it arrive**: call both health endpoints (in both states if you can), find a
-   request's lines by correlation id, watch a metric move. What was not observed is reported
-   as not observed.
+   request's lines by correlation id, watch a metric move.
 
 ## Done when
 

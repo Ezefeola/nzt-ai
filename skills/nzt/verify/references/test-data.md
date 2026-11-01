@@ -40,7 +40,7 @@ Material effects of creating data (welcome mail, webhook, charge) are declared.
 
 ## Around the run
 
-Setup → verify the precondition → run → **teardown whether it passed or failed** → record:
+The run (`test-run.md`) records data and cleanup like this:
 
 ```markdown
 - **Data:** `data/US-002/E-02-setup.sql` — 1 customer, order of $10.000, coupon

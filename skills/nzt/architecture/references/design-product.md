@@ -8,8 +8,8 @@ Every feature design fits into it. Technologies go to `tech.md`, entities to `do
 
 1. Read `Docs/Product/product.md` (modules, constraints, scope) and the existing specs; on an
    existing product, read the product itself first.
-2. Derive the expensive questions — which components, how they talk, which providers and
-   what each allows — and log them as `QT-NN` before proposing anything.
+2. The expensive questions are which components, how they talk, which providers and what
+   each allows (the router's *Steps*).
 3. For every component you are tempted to add, answer: which spec, constraint or objective
    requires it? What breaks without it? What does adding it later cost? The third answer
    goes in *Why*.
@@ -55,7 +55,7 @@ QT-02 (in architecture-decisions.md).
 2. Every component says **what it owns**; two owning the same decision is the defect this
    table catches. It lists its **areas** and its **root** (`./` when it is the only one).
 3. Every non-obvious choice has its cost; every rejected option its reason and the trigger
-   that would change the answer. An expensive-to-reverse decision also gets its ADR, named here.
+   that would change the answer. A decision that earned an ADR (`adr.md`) names it here.
 4. External systems get an `INT-NN`, assigned once; feature designs cite it.
 5. Earned diagrams: `components` always, `context` with third parties or several actors.
 6. What is not built yet is marked *planned*.

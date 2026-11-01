@@ -7,7 +7,7 @@ person produced — not how the lessons went.
 ## Steps
 
 1. **Build the tasks from the objective** and its *Closes with*; what it does not name is not
-   measured. Three or four tasks, each a new case. A task that names the technique asks for
+   measured. Three or four tasks. A task that names the technique asks for
    execution, not for knowing when it applies. Mix the forms:
 
    | Form | Catches |
@@ -56,5 +56,5 @@ topic: db-read-performance · objectives measured: OA-01, OA-02, OA-03
 
 ## Done when
 
-Every objective in scope has a verdict with its artifact, `not measurable` ones are fixed in
-the curriculum, and the report names what is missing before what was achieved.
+Every objective in scope has a verdict with its artifact, and the report names what is
+missing before what was achieved.

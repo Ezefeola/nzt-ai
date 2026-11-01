@@ -25,7 +25,7 @@ for, and writes it down. **Does not own** how it is made (`nzt-architecture`), i
 
 1. Read the feature's `analysis.md` if any, `product.md` and the glossary.
 2. Do **one document per unit**: one product definition, glossary, spec, story, reversed
-   capability, or change. Updating glossary entries the unit introduces is part of it.
+   capability, or change.
 3. What is not known is a question in `analysis.md` with its `Q-NN`, never an invention; the
    unit that needs it says it is open.
 

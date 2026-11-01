@@ -4,11 +4,9 @@ Builds on `../nzt-backend/references/domain-anemic.md` — read it first.
 
 ## Rules
 
-1. **A `sealed` class with public `get; set;` properties**, its id, foreign keys and
-   navigations — no extension methods adding behaviour.
+1. **A `sealed` class with public `{ get; set; }` properties.**
 2. **`Rules` and `Errors` are nested static classes**: `const` values, and `const` or
    `static readonly` messages citing them.
-3. The rules run in the use case's `ExecuteAsync` or a private method of it.
 
 ```csharp
 public sealed class Order
@@ -34,5 +32,4 @@ public sealed class Order
 
 ## Done when
 
-Entities are `sealed` with public properties and nested `Rules`/`Errors`, and nothing adds them
-behaviour.
+Every rule holds for the entities you wrote.

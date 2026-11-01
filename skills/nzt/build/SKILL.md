@@ -53,8 +53,7 @@ closing list. A story too big for one unit is cut by behavior, never by file or 
 ## Where it lands
 
 The work and its tests go wherever the project's structure puts them — follow it. Coverage
-marks go on the story's criteria in `Plan/specs/<feature>/stories/US-NNN-<slug>.md`, the only
-place progress is read from.
+marks go on the story's criteria in `Plan/specs/<feature>/stories/US-NNN-<slug>.md`.
 
 ## Rules
 

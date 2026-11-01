@@ -33,5 +33,4 @@ With `nzt-ship`'s `references/pipeline.md`, which decides which gates exist. Thi
 
 ## Done when
 
-The pinned SDK runs every gate whose precondition exists (or the gap is proposed), test steps
-match the enabled levels, and results are published without dumps.
+Every gate whose precondition exists runs on the pinned SDK (or the gap is proposed).

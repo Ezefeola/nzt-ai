@@ -8,8 +8,7 @@ Produces automated tests for scenarios already approved and passing.
 1. **Qualify**: approved, **passed by hand at least once**, no open question in its expected
    result. Never automate to find out whether it passes. Prefer paths carrying money,
    permissions, data loss, and defects already found once.
-2. **Write it** like running by hand: locate by role and accessible name, wait on observable
-   conditions, port the scenario's setup and teardown into the test's own hooks (no second
+2. **Write it** like running by hand (`test-run.md`); port the scenario's setup and teardown into the test's own hooks (no second
    seeding path, no dependence on other tests), assert the plan's expected result.
 3. **When one fails, diagnose before touching it**:
 

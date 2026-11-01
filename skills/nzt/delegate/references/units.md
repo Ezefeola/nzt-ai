@@ -43,8 +43,8 @@ its report and you apply it after merging.
    resolve only if no decision is in it); apply its shared-file changes.
 6. After the last merge, **run the phase's checks yourself**: those are the results you
    report and that coverage marks rest on. Remove merged worktrees.
-7. A failure, contradiction or user-only question in any report, or a context mark: start no
-   more workers, let running ones finish, merge what holds, write the state, report, stop.
+7. **On a batch stop** (the kernel's, in any report or in your context): start no more
+   workers, let running ones finish, merge what holds, write the state, report, stop.
 
 The report has one line per unit with its four fields, what was merged, and your checks.
 

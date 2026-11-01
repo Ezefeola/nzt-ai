@@ -9,11 +9,11 @@ The plan message: the table the user approves and the documents they keep or dro
 2. Use the plan's fixed words: a slice is a *tramo* in Spanish. Name documents by their
    name — the spec, the stories, the glossary — with a plain gloss beside, never instead.
 3. Under the table declare **where it stops**, **what it leaves out** (*"coupon admin is
-   F-009 and you did not ask for it"*), and what it covers beyond the minimum so the user
-   can drop it. One line per skipped phase and why.
+   F-009 and you did not ask for it"*), what it covers beyond the minimum so the user can
+   drop it, and the skipped phases `nzt` named.
 4. Standard work: one table and those declarations. Parallel groups: their id and model per
    unit, the work branch, and that the group stops once.
-5. The autonomy offer, once, in one line.
+5. The autonomy offer (the router's *Approve*), in one line.
 
 ## The documents
 
@@ -32,5 +32,5 @@ The plan message: the table the user approves and the documents they keep or dro
 
 ## Done when
 
-Every row says what it produces and why; stops, exclusions and droppable extras are
-declared; every document is declared mandatory or offered with its loss.
+Every row says what it produces and why, and every document is declared mandatory or offered
+with its loss.

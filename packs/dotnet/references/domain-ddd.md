@@ -4,19 +4,17 @@ Builds on `../nzt-ddd/references/ddd.md` — read it first. Mapping is `ef-core-
 
 ## Rules
 
-1. **The id is `int` or `Guid`** (unless typed ids); entities are `sealed`, properties have
-   **private setters**, collections are exposed read-only. Without outward navigations, an
-   `Include` cannot walk into another aggregate.
-2. **`Rules` and `Errors` are nested static classes** — `const` values, messages `const` or
+1. **The id is `int` or `Guid`**, unless typed ids.
+2. **Entities are `sealed`, properties have private setters**, collections are exposed
+   read-only.
+3. **`Rules` and `Errors` are nested static classes**: `const` values, messages `const` or
    `static readonly` citing them.
-3. **One constructor: private, empty, assigning nothing** — it stops outside construction and is
-   what EF materialises with. A constructor listing every field is a second place to change and
-   an unreadable call site.
-4. **`Create` is static, validates, then builds with an object initializer** (the private
-   setters are reachable inside the type), returning `(IReadOnlyList<string> Errors, T? Entity)`.
-   The use case checks the entity for `null` — so no `!`.
-5. **A mutating method returns `IReadOnlyList<string>`**, empty when it worked.
-6. **Layout**: constructor · `Rules` · `Errors` · every property · `Create` · behaviour.
+4. **One constructor: private, empty, assigning nothing**. EF materialises with it; a
+   constructor listing every field is a second place to change.
+5. **`Create` is static, validates, then builds with an object initializer**, returning
+   `(IReadOnlyList<string> Errors, T? Entity)`. The use case checks the entity for `null`.
+6. **A mutating method returns `IReadOnlyList<string>`**, empty when it worked.
+7. **Layout**: constructor · `Rules` · `Errors` · properties · `Create` · behaviour.
 
 ```csharp
 public sealed class StaffAccount
@@ -55,5 +53,4 @@ if (account is null)
 
 ## Done when
 
-Entities are `sealed` with private setters and an empty private constructor, `Create` returns
-`(errors, entity?)` checked for `null`, methods return their errors, and the layout holds.
+Every rule holds for the entities you wrote.

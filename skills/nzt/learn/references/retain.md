@@ -19,7 +19,7 @@ Produces the review dates in `Learn/<topic>/progress.md` and the short sessions 
    skipped review stays overdue and is offered again.
 2. **A review asks them to retrieve; it never reopens the lesson.** Re-reading together
    restores fluency for an hour and changes nothing.
-3. Three or four retrievals, each a new case. Ask confidence on anything wrong: `high /
+3. Three or four retrievals. Ask confidence on anything wrong: `high /
    wrong` earns the same jump.
 4. A failed retrieval is the review working: back to the start of the ladder; re-teach only
    after it fails twice.
@@ -36,5 +36,5 @@ Produces the review dates in `Learn/<topic>/progress.md` and the short sessions 
 
 ## Done when
 
-Every objective with a verdict has exactly one future date, the jump cases sit at the
-shortest interval, and the overdue ones were offered by name and size before anything new.
+Someone opening `progress.md` could tell, per objective, when it is next reviewed and why it
+sits on that step.

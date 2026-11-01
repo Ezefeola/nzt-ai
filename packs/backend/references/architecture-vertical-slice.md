@@ -1,14 +1,12 @@
 # Backend vertical slice
 
-The unit of organisation is **the operation**: everything it needs sits in one folder, so a
-change touches one place and removing it deletes a folder. Read `architecture.md` first.
+The unit of organisation is **the operation**: a change touches one folder and removing it
+deletes the folder. Read `architecture.md` first.
 
 ## The tree
 
-One build unit — no domain, application or infrastructure module. Layer units would enforce
-*"the domain may not see the database"* and leave unguarded *"this operation may not reach
-into that one"*, the boundary that breaks. The unit sits inside the component's root (under
-`src/` when the project uses one), beside its tests and `Docs/`.
+One build unit, inside the component's root (under `src/` when the project uses one), beside
+its tests and `Docs/`.
 
 ```
 <Component>/                       the build unit: manifest and entry point
@@ -28,18 +26,20 @@ into that one"*, the boundary that breaks. The unit sits inside the component's 
 
 ## Rules
 
-1. **A feature is its aggregate in plural** (`Order` → `Features/Orders/`): one name for the
-   folder, the endpoint class and the route. Either endpoint model is one class per feature.
-2. **No slice reaches into another.** A file in an operation folder never references another
-   operation or feature. Shared goes to `Domain/`, `Persistence/` or `Contracts/`; what fits
-   none is **written twice** — the duplicate is the cheap problem, the shared helper the
-   expensive one (the slice stops being removable). The feature level is shared on purpose.
-3. **A repository's interface stays beside its implementation**, not in `Domain/`: in one
-   unit that buys a convention and no guarantee.
-4. **`Integrations/` sits at the root**: two operations can call the same system.
-5. The entry point makes two calls: `Features/`'s registration and `Persistence/`'s.
+1. **One build unit**, never domain, application or infrastructure modules: they guard the
+   layers and leave unguarded the boundary that breaks here, one operation reaching into
+   another.
+2. **A feature is its aggregate in plural** (`Order` → `Features/Orders/`): one name for the
+   folder, the endpoint class and the route.
+3. **One endpoint class per feature**, whichever endpoint model.
+4. **No slice reaches into another**: a file in an operation folder never references another
+   operation or feature. The feature level is shared on purpose.
+5. **Shared code goes to `Domain/`, `Persistence/` or `Contracts/`; what fits none is written
+   twice** — a shared helper makes the slice unremovable.
+6. **A repository's interface stays beside its implementation**, not in `Domain/`.
+7. **`Integrations/` sits at the root**: two operations can call the same system.
+8. **The entry point makes two calls**: `Features/`'s registration and `Persistence/`'s.
 
 ## Done when
 
-One build unit, no reference between slices, and the feature folder holding the endpoint
-class and the single mapping file.
+Every rule holds for the slices you touched.

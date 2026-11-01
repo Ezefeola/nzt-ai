@@ -6,8 +6,8 @@ description: Use when tech.md lists the dotnet pack, before writing, testing or 
 # Backend on .NET
 
 Load `nzt-backend` and `nzt-csharp` first. Each file here names the generic file it builds
-on: read that one first; a row read alone is half the guidance. Versions come from the
-project — `global.json`, `TargetFramework`, the package manifest — never from an example.
+on: read that one first. Versions come from the project — `global.json`, `TargetFramework`,
+the package manifest — never from an example.
 
 ## Axes
 
@@ -22,7 +22,7 @@ Domain model, Persistence) take the values of `nzt-backend`, and their file here
 | Domain model | `ddd` | `references/domain-ddd.md` | as in `nzt-backend` |
 | | `anemic` | `references/domain-anemic.md` | as in `nzt-backend` |
 | Persistence | `repositories` | `references/persistence-repositories.md` | as in `nzt-backend` |
-| | `direct` | `references/persistence-direct.md` | as in `nzt-backend` |
+| | `direct` | `nzt-backend`'s file only | as in `nzt-backend` |
 | Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | an endpoint is a function: route, verb and handler in one declaration |
 | | `controllers` | `references/endpoints-controllers.md` | a class per feature with attribute routing and the MVC pipeline; more ceremony |
 | Result to HTTP | `result-extensions` | `references/results-extensions.md` | the `Result` stays inside: the payload on success, `ProblemDetails` on failure |
@@ -41,7 +41,6 @@ Whether use cases return `Result` is `nzt-backend`'s; how it reaches HTTP is the
 | API wiring: routing, binding, the pipeline | `references/api.md` |
 | An exception that can escape a use case, or the global handler | `references/exceptions.md` |
 | A value object — **only with *value objects yes*** | `references/domain-value-objects.md` |
-| A protected resource, a permission, suspected unauthorised access | `references/security.md` |
 | Test projects, doubles, running the suite | `references/testing.md` |
 
 ## EF Core

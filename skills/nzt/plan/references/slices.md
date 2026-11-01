@@ -35,7 +35,6 @@ step; when the index exists, cut one unit per story — no new approval needed.
 
 ## Run
 
-- Phase rules hold inside each slice; verify after the slice's last build unit.
 - The agent's QA chains inside the batch; a person's QA unit goes in `autonomy.keep_stops`.
 - **QA fails:** the batch stops. The verify unit is `done` (it ran) with the defect in the
   testing file; verify stays `doing` with `waiting_on` naming it. When the user authorises
@@ -49,5 +48,5 @@ One table per slice under `S2 · <name>`, never a slice column. Below: the decla
 
 ## Done when
 
-Every slice can be tried alone and is its own table; discovery comes first with re-approval
-after it; `cadence` is written; no verify unit sits between two build units of a slice.
+Every slice can be tried alone, discovery comes first with re-approval after it, and
+`cadence` is written.

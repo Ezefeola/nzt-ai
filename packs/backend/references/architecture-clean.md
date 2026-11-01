@@ -1,9 +1,8 @@
 # Backend clean architecture
 
 The unit of organisation is **the layer**, separated by the strongest boundary the technology
-offers, so what each layer may know is enforced by the tooling, not by review. `tech.md`
-records the mechanism; a boundary held only by folder names is recorded as a convention.
-Read `architecture.md` first.
+offers. `tech.md` records the mechanism; a boundary held only by folder names is recorded as
+a convention. Read `architecture.md` first.
 
 ## Four layers, every reference inward
 
@@ -13,10 +12,6 @@ Read `architecture.md` first.
 | `Application` | `Domain` |
 | `Infrastructure` | `Application` |
 | `Api` | `Application`, `Infrastructure` |
-
-The contract is declared by the layer that **needs** it and implemented by the one that knows
-**how**: `Application → Infrastructure` never exists. `Api` sees `Infrastructure` only to
-register it: **the entry point is the only file in `Api` naming an `Infrastructure` type.**
 
 ## The tree
 
@@ -43,21 +38,24 @@ Api/                               the entry point — the composition root
 
 ## Rules
 
-1. **Interfaces in `Application/Contracts/`, implementations in `Infrastructure/`**, never in
-   `Domain`: the model has no reason to know anything is stored. A pattern's two sides
-   appear and disappear together.
-2. The transaction boundary's **interface** gets a folder (`UnitOfWork/`); its
-   implementation sits at the root of `Infrastructure/Persistence/`.
-3. **A result's translation to the transport is in `Api`**: the layer that runs the operation
-   must not know it is reached over HTTP.
-4. **The global exception handler is in `Api`** and, besides the entry point, the only file
-   there that may name the ORM's exception types.
-5. **With direct persistence**, `Application/Contracts/Persistence/` declares one interface
-   over the handle with exactly what the use cases call, implemented on the handle in
-   `Infrastructure`. It is the only interface over a handle, and exists only so the layer's
-   reference does not turn around.
+1. **A contract is declared by the layer that needs it** (`Application/Contracts/`) and
+   implemented by the one that knows how (`Infrastructure/`), never in `Domain`.
+   `Application → Infrastructure` never exists.
+2. **A pattern's two sides appear and disappear together.**
+3. **`Domain` holds only entities and enums.**
+4. **The transaction boundary's interface gets a folder** (`UnitOfWork/`); its implementation
+   sits at the root of `Infrastructure/Persistence/`.
+5. **The entry point is the only file in `Api` naming an `Infrastructure` type**, to register
+   it.
+6. **A result's translation to the transport is in `Api`**: the layer that runs the operation
+   does not know it is reached over HTTP.
+7. **The global exception handler is in `Api`** and, besides the entry point, the only file
+   there that may name the data library's exception types.
+8. **With direct persistence**, `Application/Contracts/Persistence/` declares one interface
+   over the handle with exactly what the use cases call, implemented in `Infrastructure`. It
+   is the only interface over a handle, and exists only so the reference does not turn
+   around.
 
 ## Done when
 
-References point inward, held by what `tech.md` records; `Api` names `Infrastructure` only in
-the entry point; `Domain` holds only entities and enums.
+Every rule holds, and the references point inward through the mechanism `tech.md` records.

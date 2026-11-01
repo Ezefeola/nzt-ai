@@ -35,14 +35,14 @@ Evidence: `evidence/2026-09-16/E-02-total.png`
 ## Rules
 
 1. Steps reproduce it with real data; one that cannot be reproduced is filed as unreproduced
-   with what you were doing. It names what it violates (`US-NNN CA-NN`, rule).
-2. A suspected cause is labelled; diagnosis is not this file's job. Evidence reviewed for
-   secrets.
-3. **Three states**: `pending` · `fixed, pending verification` (a change proves nothing) ·
+   with what you were doing.
+2. It names what it violates (`US-NNN CA-NN`, rule).
+3. A suspected cause is labelled; diagnosis is not this file's job.
+4. **Three states**: `pending` · `fixed, pending verification` (a change proves nothing) ·
    `verified` (only after its scenario re-ran and passed). A failed retest returns it to
    `pending`. History is append-only.
-4. One defect per file; one cause with two symptoms is one defect.
-5. Every defect has its scenario in the story's test file — the one re-run to verify it.
+5. One defect per file; one cause with two symptoms is one defect.
+6. Every defect has its scenario in the story's test file — the one re-run to verify it.
 
 ## Done when
 

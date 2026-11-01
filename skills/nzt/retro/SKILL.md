@@ -90,5 +90,4 @@ Not reviewed: <what was asked and could not be read, or "none">
 
 ## Done when
 
-Someone who never saw the sessions could decide each proposal from the file alone, and the
-file — at a path the user chose — is the only thing written.
+Someone who never saw the sessions could decide each proposal from the file alone.

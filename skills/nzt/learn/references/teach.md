@@ -24,7 +24,7 @@ the person something first means the objective is badly formed — fix it there.
    person's language and vocabulary. Two lessons per objective at most; a third means the
    objective is too big — a finding for `curriculum.md`.
 3. **Fade the scaffolding**, one exercise per step (`exercises.md`), each corrected
-   (`tutor.md`) before the next, each a different case:
+   (`tutor.md`) before the next:
 
    | Step | The person gets | They produce |
    |---|---|---|
@@ -37,9 +37,8 @@ the person something first means the objective is badly formed — fix it there.
 4. **Close with the retrieval question**, never a summary. A failed retrieval is information:
    note what was missing and take it to the next step.
 5. **Write `progress.md` when the practice ends**: the state with its exercise and step, and a
-   log line with what they produced and what was missing. The objective stays `in progress`
-   — where they stopped, or ready for `assess.md`. A requested solution is recorded as
-   `tutor.md` says.
+   log line with what they produced, what was missing, and where they stopped or that it is
+   ready for `assess.md`. A requested solution is recorded as `tutor.md` says.
 
 ## The file
 

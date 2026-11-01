@@ -19,7 +19,7 @@ product: a web system, a game, a mobile app, a book, a course.
    component, read its evidence first — manifests, configuration, version pins, the work
    already there: **evidence answers; ask only what it cannot settle**.
 2. **Derive each component's technology decisions from what it is**, never from a fixed
-   list, and log each as `QT-NN`. Examples of what comes out:
+   list. Examples of what comes out:
 
    | The component is | Its decisions usually include |
    |---|---|
@@ -28,9 +28,9 @@ product: a web system, a game, a mobile app, a book, a course.
    | a game | engine and version, target platforms, scripting language, input, asset pipeline |
    | a document, book or course | format, authoring toolchain, publishing channel |
 
-3. **Resolve them**: facts (versions, support windows, licences, platform limits) are
-   researched with source and date; tradeoffs are asked with a recommendation, in one round
-   ordered by dependency (the technology before what depends on it).
+3. **Resolve them as the router says**, in one round ordered by dependency (the technology
+   before what depends on it). Facts here are versions, support windows, licences and
+   platform limits.
 4. **Prepare the work.** Once the technologies are chosen, or when the user asks what you
    need, propose in one round — written for someone who knows none of it:
    - **What you will do and what each part needs**: writing the work, running it, reading
@@ -120,8 +120,7 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
    **Agent tools** too: only installed ones, with their source and date, and `pack <name>`
    or who installed it in a few words (*the user, in the editor*) — never the steps: they
    live in the pack or the source.
-5. **Versions come from evidence** — the pins, manifests and lock files — named in the
-   evidence line. What could not be determined says so and what would settle it.
+5. **The evidence line names where each version came from** (pins, manifests, lock files). What could not be determined says so and what would settle it.
 6. **A convention is one line** the agent cannot deduce from the rest. Longer is a decision
    for the decisions log. Sources, history and folder trees go there too, never here.
 7. **Kept current in the same unit** that changes a version, a dependency, a pack or a
@@ -130,6 +129,4 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
 ## Done when
 
 Someone could do correct work in any component tomorrow with only this file, the specs and
-its pack skills: every decision has one value or an open `QT-NN`, every opt-in is answered,
-every pack and agent tool listed is installed and answers, every version and tool names its
-source, and the user was told what they do by hand and what the agent cannot do.
+its pack skills, and the user was told what they do by hand and what the agent cannot do.

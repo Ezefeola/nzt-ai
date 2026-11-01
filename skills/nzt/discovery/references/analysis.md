@@ -43,9 +43,9 @@ from it. Create it with the first question.
    what the project already answers.
 4. **Technical notes** get no id and no investigation: architecture resolves them.
 5. **Dismissed objections** record what you warned, proposed, and that the user keeps theirs.
-6. Two altitudes, both closed before the phase: the **product** by conversation only, never
-   by reading the repository; the **feature** by conversation, plus the existing product when
-   the behavior exists (`reverse.md`: findings for the user to rule on).
+6. Two altitudes, both closed before the phase: the **product** by conversation only
+   (`product.md`); the **feature** by conversation, plus the existing product when the
+   behavior exists (`reverse.md`).
 
 ## Playback
 

@@ -61,7 +61,4 @@ The `aggregates` diagram is earned with three aggregates or more (`references/di
 
 ## Done when
 
-- Every aggregate names its root and cites the rule that forces its boundary.
-- References across a boundary say *by id*, with cardinality and optional case, and nothing
-  about how they are mapped.
-- No *value* mark without *value objects yes*.
+Every rule holds: each aggregate names its root and cites the rule that forces its boundary.

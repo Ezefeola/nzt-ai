@@ -2,6 +2,7 @@
 
 Builds on `../nzt-backend/references/api.md`, *Result to HTTP* — read it first. **The `Result`
 never leaves the process**: the payload goes out on success, a `ProblemDetails` on failure.
+Write it exactly like this:
 
 ```csharp
 public static class ResultExtensions
@@ -34,12 +35,8 @@ public static class ResultExtensions
 
 ## Rules
 
-1. Under minimal APIs the same body returns `IResult` as `ToHttpResult` — same output.
-2. **`Status` is the `Result`'s** on both branches; **`Title` is the fixed sentence**; the errors
-   go as they came in `Extensions["errors"]`; **no `Detail`**; success carries the bare payload.
-3. **It is the only translation of use-case Results**; host failures and the global handler
-   (`exceptions.md`) keep their own `ProblemDetails`.
+1. **Under minimal APIs** the same body returns `IResult` as `ToHttpResult`.
 
 ## Done when
 
-Every endpoint translates through this extension, and its output matches the rules above.
+Every endpoint translates through this extension, written as above.

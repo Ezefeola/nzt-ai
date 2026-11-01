@@ -58,14 +58,12 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 ## Rules
 
 1. **One `GlobalExceptionHandler`** — no exception filter, no middleware with its own
-   `try/catch`. Pre-checks are `AnyAsync` (`use-cases.md`); no `catch … when`.
-2. **By .NET type only** — no `SqlException.Number`, no matching on `Message`.
-   `DbUpdateConcurrencyException` derives from `DbUpdateException`, so it comes first.
-3. **The shape follows the Result to HTTP axis**: the code above is `result-extensions`. Under
+   `try/catch`.
+2. **No `SqlException.Number`, no matching on `Message`.**
+3. **`DbUpdateConcurrencyException` first**: it derives from `DbUpdateException`.
+4. **The shape follows the Result to HTTP axis**: the code above is `result-extensions`. Under
    `result-filter` the handler writes a failed `Result` with `WriteAsJsonAsync`, and the
    Development detail is a second entry in `Errors`.
-4. The `exception` detail only in Development; the messages are placeholders for the project's
-   agreed wording.
 5. **Registration**, with diagnostics not suppressed — from .NET 10 the middleware stops logging
    handled exceptions without it; with it, the exception is logged once and the handler does
    not log. Before .NET 10 the option does not exist (check `TargetFramework`):
@@ -82,5 +80,4 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 
 ## Done when
 
-One handler dispatching by type with the most specific first, registered with diagnostics on
-from .NET 10, answering in the axis's shape with the project's messages.
+Every rule holds, and the handler is the code above or its `result-filter` form.

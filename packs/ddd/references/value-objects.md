@@ -8,13 +8,11 @@ DDD line. Storage is the data pack's.
 
 1. **It earns one** when the value has rules that must hold everywhere it appears **and** two
    with the same content mean the same thing (otherwise it is an entity). A plain string, or a
-   value whose only rule is *required*, earns none. What it buys: the rule is checked once and
-   cannot be skipped.
+   value whose only rule is *required*, earns none.
 2. **Immutable, equal by content** through what the language gives value types, never a
    hand-written comparison. Changing it is creating another.
-3. **One creation entry that validates first** and assigns by name, as an entity's (`ddd.md`),
-   with the same member order. No other way in. The caller checks the value, never the error
-   list.
+3. **Created like an entity** (`ddd.md`): the same layout, one entry that validates first, the
+   caller checking the value; no other way in.
 4. **A property of an entity** (it may hold others): never loaded, queried or identified on its
    own. Behaviour about the value lives inside it (`range.Overlaps(other)`) and returns new
    values.
@@ -25,5 +23,4 @@ DDD line. Storage is the data pack's.
 
 ## Done when
 
-Each value object has rules and equality by content, is immutable with one validating entry,
-lives in the right `ValueObjects/`, and appears in no DTO.
+Every rule holds for the value objects you wrote.

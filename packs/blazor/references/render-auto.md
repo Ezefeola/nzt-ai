@@ -4,16 +4,14 @@ Builds on `../nzt-frontend/references/rendering.md`, *Either place* — read it 
 Prerendering or persistent state: `prerendering.md`, with both hosts in mind.
 
 The component **runs on whichever host is ready**: on the server during the first visit while
-the runtime downloads, in the browser on later visits. **It never moves while running** — the
-switch shows on the next visit, so there is nothing to handle mid-session.
+the runtime downloads, in the browser on later visits. **It never moves while running**: there
+is nothing to handle mid-session.
 
 ## Rules
 
-1. **Nothing synchronous that waits** (WebAssembly freezes); no server-only service, database or
-   secret.
-2. **Where it runs now is `RendererInfo.Name` / `RendererInfo.IsInteractive`** (.NET 10);
+1. **Where it runs now is `RendererInfo.Name` / `RendererInfo.IsInteractive`** (.NET 10);
    `AssignedRenderMode` is the assignment, not the host.
-3. **Register on both hosts with the lifetime the service deserves**:
+2. **Register on both hosts with the lifetime the service deserves**:
 
    | Service | Registration |
    |---|---|
@@ -21,15 +19,13 @@ switch shows on the next visit, so there is nothing to handle mid-session.
    | ordinary browser services | the app's normal lifetime |
    | with prerendered persistent state | scoped on the server with `RegisterPersistentService<T>(RenderMode.InteractiveAuto)`, singleton in `.Client` |
 
-   A service registered only on the browser side fails during prerendering.
-4. **No child with another interactive mode.** Interactive roots can coexist under a static
-   parent; parameters crossing that boundary are serialisable (no delegates or
-   `RenderFragment`s; a cascading value does not cross by itself).
-5. **The component lives in the project the browser downloads** (`architecture-vertical-slice.md`);
-   on the server side the mode is silently lost. `@rendermode InteractiveAuto` on the component
-   that needs it.
+3. **No child with another interactive mode.** Interactive roots can coexist under a static
+   parent; a cascading value does not cross that boundary by itself.
+4. **The component lives in `.Client`** (`architecture-vertical-slice.md`): on the server side
+   the mode is silently lost.
+5. **`@rendermode InteractiveAuto` on the component that needs it.**
+6. **Test**: the first visit and a cached browser run, with restored and absent state.
 
 ## Done when
 
-The first visit and a cached browser run were both exercised with restored and absent state,
-and every injected service resolves on both hosts.
+Every rule holds and the tests of rule 6 ran.

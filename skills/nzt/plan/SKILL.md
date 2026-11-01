@@ -26,8 +26,7 @@ Turns the phases `nzt` chose into an approved plan of units, runs it, and keeps
 3. Verify's units go after the slice's last build unit, never between two.
 4. Plan only what you can see: the current phase in units, the rest as its shape.
 5. Write `goal`, `phases` (or `slices`) and `approved: false`; show the plan
-   (`references/proposal.md`) with the autonomy offer, and stop. Clarifying questions are a
-   unit of the plan, not part of the plan message.
+   (`references/proposal.md`), and stop.
 
 ## Approve
 

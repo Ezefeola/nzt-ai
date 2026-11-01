@@ -5,14 +5,11 @@ Builds on `../nzt-ddd/references/value-objects.md` — read it first. Mapping is
 
 ## Rules
 
-1. **A `sealed record`** — equality by value without writing `Equals`.
-2. **`init` properties**: the object initializer in `Create` fills them, and nobody changes them
-   after.
-3. **An empty private constructor and a static `Create`** that validates first and returns
-   `(IReadOnlyList<string> Errors, T? Value)`; no public constructor. The caller checks the value
-   for `null`.
-4. **Files**: `Entities/<Aggregate>/ValueObjects/` while one aggregate uses it,
-   `Common/ValueObjects/` once two do.
+1. **A `sealed record`.**
+2. **`init` properties**, filled by `Create`'s object initializer — unlike a DTO, nobody
+   changes them after.
+3. **An empty private constructor and a static `Create`** returning
+   `(IReadOnlyList<string> Errors, T? Value)`.
 
 ```csharp
 public sealed record DateRange
@@ -35,5 +32,4 @@ public sealed record DateRange
 
 ## Done when
 
-Every value object is a `sealed record` with `init` properties, built only through `Create`, in
-the right `ValueObjects/` folder.
+Every rule holds for the value objects you wrote.

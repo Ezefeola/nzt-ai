@@ -5,9 +5,8 @@ expected results and material effects — **approved before anything runs**.
 
 ## Steps
 
-1. **Take the expected result from the requirement**, never from the running product (that
-   test cannot fail). An edge no rule covers is a `Q-NN`; a scenario no requirement supports
-   is a question when it fails, not a defect.
+1. **Take the expected result from the requirement.** A scenario no requirement supports is
+   a question when it fails, not a defect.
 2. **Derive cases by the rule's shape**:
 
    | The rule looks like | Technique |
@@ -57,8 +56,7 @@ expected results and material effects — **approved before anything runs**.
    Data is the criterion's. Material effects (payments, messages, deletions) are declared; an
    unknown destination blocks that scenario. States: `pending`, `passed`, `failed`,
    `blocked` (always with its cause). Missing data gets its two scripts now (`test-data.md`).
-8. **Show the whole set and stop.** Being asked to test authorises the plan, not skipping
-   this stop; one approval covers every scenario.
+8. **Show the whole set and stop.** One approval covers every scenario.
 
 ## Done when
 

@@ -6,8 +6,8 @@ description: Use when tech.md lists the frontend pack for the component, before 
 # Frontend — what holds in any framework
 
 Load `nzt-code` first. A framework pack (`nzt-blazor`…) reads the matching file here first
-and adds only how it is done there. What a screen looks like is `Docs/Design/design-system.md` and
-`Docs/Design/ui-components.md`, never this pack.
+and adds only how it is done there. What a screen looks like is the design system's, never
+this pack's.
 
 ## Axes
 
@@ -15,7 +15,7 @@ and adds only how it is done there. What a screen looks like is `Docs/Design/des
 |---|---|---|---|
 | Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | one folder per feature, with its page and its typed client |
 
-Another value in `tech.md` is a gap there: say so and settle it, never improvise a layout.
+Another value in `tech.md` is a gap there: never improvise a layout.
 
 ## References
 
@@ -28,9 +28,8 @@ Another value in `tech.md` is a gap there: say so and settle it, never improvise
 
 ## Steps
 
-1. Read the design system and the component inventory before anything visual or shared.
-2. Read the axis row, then the rows the task selects.
-3. With a framework pack listed, read its matching file right after each one here.
+1. Read the axis row, then the rows the task selects.
+2. With a framework pack listed, read its matching file right after each one here.
 
 ## Done when
 

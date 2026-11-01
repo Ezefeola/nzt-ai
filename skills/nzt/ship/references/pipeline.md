@@ -22,10 +22,12 @@ project's own commands.
 
 ## Hardening
 
-Minimum declared permissions, widened per job. Third-party actions pinned to the full SHA
-(resolved from the real release, never invented) with the version as comment. Federated
-identity over long-lived keys. Never interpolate untrusted input (titles, branch names,
-messages) into a script. Fork pull requests get no secrets or write permissions.
+- Minimum declared permissions, widened per job.
+- Third-party actions pinned to the full SHA (resolved from the real release, never
+  invented) with the version as comment.
+- Federated identity over long-lived keys.
+- Never interpolate untrusted input (titles, branch names, messages) into a script.
+- Fork pull requests get no secrets or write permissions.
 
 ## Speed
 
@@ -34,7 +36,7 @@ move slow suites to a schedule — keeping the fast gates on every change.
 
 ## Verify by running it
 
-A pipeline only written is not verified. A new gate is proved by making it fail on purpose on
+A new gate is proved by making it fail on purpose on
 a throwaway branch. A failure is diagnosed (product, test, environment, pipeline) before it
 is fixed; disabling a gate is never a repair and never silent.
 

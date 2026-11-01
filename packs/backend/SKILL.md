@@ -40,7 +40,7 @@ does not imply direct.
 ## Data access
 
 When the component reads or writes a database, read `references/data-access.md` first, every
-time: what holds for every operation lives there and no row repeats it.
+time.
 
 | The operation | Read | Read with |
 |---|---|---|
@@ -54,8 +54,7 @@ time: what holds for every operation lives there and no row repeats it.
 
 ## Steps
 
-1. Read the axes' values in `tech.md`. A missing one is a gap there: say so and settle it
-   with the user, never pick it here.
+1. Read the axes' values in `tech.md`; never pick a missing one here.
 2. Read the axis rows, then the rows the task selects.
 3. With a technology pack listed, read its matching file right after each one here.
 

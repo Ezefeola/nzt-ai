@@ -5,8 +5,7 @@ description: Use when tech.md lists the code pack for the component, before writ
 
 # Code — the user's rules for any language
 
-The rules that hold whatever the language. A language pack (`nzt-csharp`…) adds only what
-is its own and reads these first.
+A language pack (`nzt-csharp`…) adds only what is its own and reads these first.
 
 ## References
 
@@ -19,10 +18,4 @@ is its own and reads these first.
 ## Steps
 
 1. Read `references/code.md`, then the rows the task selects.
-2. In a component this project's `Docs/` does not document, follow how that code is written
-   and report the difference (`code.md`).
-3. Close with each file's *Done when*.
-
-## Done when
-
-Every reference read holds for the code you wrote.
+2. Close with each file's *Done when*.

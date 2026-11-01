@@ -5,8 +5,8 @@ are the definition of done.
 
 ## Steps
 
-1. Read the story, its rules, the feature design if any, and `tech.md` with its packs. Work
-   landing on something nobody can describe gets `recon.md` first.
+1. Read the feature design, if any. Work landing on something nobody can describe gets
+   `recon.md` first.
 2. Take the criteria in order. Implement each **where the design says the rule is
    enforced**; if it does not say and the answer is structural, raise the gap and do the rest.
    **A rule lives in one place.**
@@ -14,13 +14,9 @@ are the definition of done.
    depends on it, build the rest. Create a folder only when something fills it.
 4. Check it: build or render what is affected; behavior that changed earns its tests at the
    levels `tech.md` enables (`tests.md`), and they are run.
-5. **Mark coverage** on each criterion you built: your area `✓` when it builds and its
-   enabled tests pass — a failing test is not `✓`. What those tests cannot reach is listed as
-   *not covered until QA*. `qa` and `[x]` are never yours. A `[modify]` criterion replaces the
-   old behavior, never adds a parallel path.
-6. Report what exists now, what is left, and what is not covered until QA.
-
-Never print a secret or ask the user to paste one (`secrets.md`).
+5. **Mark your area** on each criterion you built, as `nzt-discovery`'s `write-stories.md`
+   defines the marks: a failing test is not `✓`. A `[modify]` criterion replaces the old
+   behavior, never adds a parallel path.
 
 ## When the spec contradicts itself
 

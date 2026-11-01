@@ -39,12 +39,11 @@ are the exceptions. Arriving mid-build with no such request: say so and stop.
    | Both, same case | that they agree — kept for the flow that matters | — |
 
 3. **Check what this session can drive** before promising it; driving a browser or a game
-   build depends on the host's tools. Without one, screen scenarios are run by the user (you
-   record their evidence) or are `blocked` with that cause. **A screen scenario never passes
-   on interface evidence.**
+   build depends on the host's tools. **A screen scenario never passes on interface
+   evidence.**
 4. **The first reply to "test this" is the draft plan** (`test-design.md`), target and data
    mechanism per scenario, with the open questions in the same reply. Nothing runs before it
-   is approved. The data mechanism is `tech.md`'s Test data opt-in; asked only if missing.
+   is approved.
 5. Run, record, mark `qa`.
 
 ## One unit
@@ -70,6 +69,4 @@ without scenario, automated, data left behind); `data/<story>/` scripts; `eviden
 
 ## Done when
 
-The unit's reference *Done when* holds. For a story: every criterion has a scenario or is
-listed without one, every scenario has a closed status with evidence, `qa` matches the latest
-runs, every failure has its defect file, and what could not run is reported with its reason.
+The unit's reference *Done when* holds.

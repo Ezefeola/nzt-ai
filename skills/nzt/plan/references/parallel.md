@@ -6,8 +6,8 @@ the plan and the state.
 
 ## In the plan
 
-1. Offer a group only where it can run: `delegation` is not `off`, the host has subagents
-   and `nzt-worker` is installed. Otherwise the same plan runs in sequence.
+1. Offer a group only where `nzt-delegate` allows it (mode, host, `nzt-worker`). Otherwise
+   the same plan runs in sequence.
 2. A group is units of one phase in one slice that meet `units.md`'s conditions.
 3. Give each unit `group` (`P1`, `P2`… in plan order) and `model: "small"` when the model
    table sends it to a smaller model (absent or `"main"`: the main model).
@@ -27,7 +27,6 @@ the plan and the state.
 }
 ```
 
-- Several units `doing` only if they share a group.
 - A unit is `doing` from its worker's start, with the worker's branch in `detail`.
 - **`done` once its branch is merged and the checks after the last merge pass**, never on
   the worker's report alone.
@@ -36,5 +35,5 @@ the plan and the state.
 
 ## Done when
 
-Groups were offered only where they can run; the plan shows group, model and work branch;
-the state passes `nzt-ai state check` with the group running.
+The plan shows group, model and work branch, and the state passes `nzt-ai state check`
+with the group running.

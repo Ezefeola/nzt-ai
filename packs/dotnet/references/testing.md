@@ -54,6 +54,4 @@ dotnet test --filter "FullyQualifiedName~Coupon"
 
 ## Done when
 
-No project, provider or container exists for a disabled level, nothing the project owns is
-mocked, data access was proven on a real engine or reported uncovered, and `dotnet test`'s real
-result is reported.
+Every rule holds, and `dotnet test`'s real result is reported.

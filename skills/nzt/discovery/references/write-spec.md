@@ -1,12 +1,11 @@
 # Feature specification
 
 Produces `Plan/specs/F-NNN-<slug>/spec.md`: scope, rules, non-functional requirements and the
-story index of one feature. **The rules live here and nowhere else.**
+story index of one feature.
 
 ## Steps
 
-1. Read the feature's `analysis.md`, `product.md` and the glossary. A rule whose source you
-   cannot name goes back as a question.
+1. A rule whose source you cannot name goes back as a question.
 2. Write the file. Go through the rules once looking only for what can go wrong.
 
 ## The file
@@ -47,7 +46,7 @@ the customer is told the coupon expired.
 1. **A rule is always true**, never a scenario. Shapes: *The X always…* · *When trigger,
    what happens* · *If bad case, then…* (the one that pays) · *While state, what holds*. One
    statement per rule.
-2. **A slug, never a number** (`RN-cupon-vencido`); it never changes. **`origin:`** is `Q-NN`
+2. **A slug, never a number** (`RN-cupon-vencido`). **`origin:`** is `Q-NN`
    (the user said it), `PRD` (from `product.md`) or `reverse (R-NN)` (from the existing
    product, confirmed by the user).
 3. **Scope in both directions**; every *Out* says why or where it lives.
@@ -55,8 +54,7 @@ the customer is told the coupon expired.
    number and its condition (*at 5,000 orders*) — `nzt-verify` measures against it. A number
    the user did not give is not a requirement. *"Only the owner sees their order"* is a rule.
 5. **The story index has no checkboxes**; it is the backlog. A story for a later delivery
-   stays one line *As… I want… so that…*. Scope, rules and the whole index exist before the
-   feature's first slice is built.
+   stays one line *As… I want… so that…*.
 6. **It describes the present**: a change edits it in place; a rule that no longer holds is
    removed and its slug never reused.
 

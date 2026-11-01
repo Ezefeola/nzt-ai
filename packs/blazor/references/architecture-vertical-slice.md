@@ -1,7 +1,6 @@
 # Frontend vertical slice on Blazor
 
-Builds on `../nzt-frontend/references/architecture-vertical-slice.md` — read it first. This file
-holds only what is Blazor.
+Builds on `../nzt-frontend/references/architecture-vertical-slice.md` — read it first.
 
 ## Rules
 
@@ -24,10 +23,7 @@ holds only what is Blazor.
    ```
 
    Below `.Client/` the roles are the generic tree's.
-3. **Register in `Program.cs` of each project that runs the service** — both with `auto`: one
-   registration missing fails silently until the second visit.
 
 ## Done when
 
-The project count matches the render mode, no feature is split, and every service is
-registered in each project that runs it.
+The project count matches the render mode.

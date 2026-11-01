@@ -10,11 +10,10 @@ lost: *"where each rule is enforced would be decided while writing the code"*.
 
 ## Steps
 
-1. Read the spec and stories, `architecture.md`, `tech.md` and `domain-model.md`. You fit
-   into decisions already made; re-deciding them here starts a second architecture.
-2. Read every rule and story asking what must be settled for it to be buildable; each gap is
-   an open `QT-NN`. Then say how many and offer the mode. A rule the spec lacks goes back to
-   discovery; design the rest meanwhile.
+1. Read `domain-model.md` too. You fit into decisions already made: re-deciding them here
+   starts a second architecture.
+2. The questions are what each rule and story needs settled to be buildable (the router's
+   *Steps*).
 3. Write the file.
 
 ## The file

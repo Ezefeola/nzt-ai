@@ -36,5 +36,4 @@ not load the packs that say how this project writes code, so style never enters 
 
 ## Done when
 
-Someone could reproduce any finding from what it says, and nothing in it is about style,
-structure or naming.
+Someone could reproduce any finding from what it says.

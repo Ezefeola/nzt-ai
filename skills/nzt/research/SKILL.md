@@ -35,8 +35,7 @@ you here. Memory tells you what to look for, never what is true.
    and idempotency; a sandbox; deprecations, sunset dates, pricing or terms.
 5. **For a tool for the agent** (an MCP server, a CLI, an editor bridge), the trust order is:
    the maker of the technology it serves (Unity for Unity, Microsoft for .NET) → the tool's
-   maintainer (its repository and documentation) → third parties, labelled and never the
-   only source. Report what it does for the agent, its version and last release, how it
+   maintainer (its repository and documentation) → third parties (rank 5). Report what it does for the agent, its version and last release, how it
    connects (a local process or a URL), what it installs on the machine and what it can
    reach (files, network, credentials). A pack's tool is checked the same way. Reading about
    a tool never installs it: that is the user's yes.
@@ -83,5 +82,4 @@ you here. Memory tells you what to look for, never what is true.
 
 ## Done when
 
-The user could check every claim by following what you cited, against the version declared,
-with no claim resting only on rank 5 and every gap said out loud.
+The user could check every claim by following what you cited, against the version declared.

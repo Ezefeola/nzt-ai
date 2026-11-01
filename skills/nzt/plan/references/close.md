@@ -57,7 +57,7 @@ Anything missing is named and the close stops.
    `Impact` cites rules by slug and stories by id; `Decision` is one line citing its record.
    A `deprecate` gets two entries: when marked and when removed. No paths, classes or
    patterns: a change with no behavior change has no entry.
-4. **Stop**: safe point, state, report — what was accepted, swept, updated and deferred.
+4. **Stop** as the router says, reporting what was accepted, swept, updated and deferred.
 
 ## Done when
 

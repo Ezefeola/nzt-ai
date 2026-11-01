@@ -923,6 +923,11 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
    tanda, que protegen el contexto); qué significa cada caso del estado al arrancar, el
    tamaño y la clasificación, en `nzt`; los documentos obligatorios de cada fase, en su
    router.
+24. **Un pack lleva elecciones y errores, no documentación (QT-95).** Una regla de pack es
+   lo que el usuario elige entre opciones válidas (method syntax, `[]`, `get; set;`) o un
+   error que el agente comete sin ella. Lo que dice la documentación de la tecnología —qué
+   hace un operador, qué API existe— sale: el agente lo sabe o lo consulta (`nzt-research`,
+   el MCP del pack). Una regla que solo traduce una genérica a su API tampoco va.
 
 ## 11. Roadmap
 
@@ -3142,6 +3147,30 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Verificación (435):** build sin avisos, 235 comprobaciones, lint 0 en 12 skills y 8
     packs, los 36 scaffolds de evals corren, `state check` ok. **Ningún eval corrido.**
   - **Abiertos:** DB-01 (ceremonia) y DB-04 (protocolo y flujos) en el debate, para después.
+- **D90.** **Skills, referencias y packs, reescritos genéricos, sin redundancia y en pasos
+  simples, con `skill-creator`.** Lo que la forzó: el pedido del usuario (2026-11-01) de
+  hacer menos y unificar mejor, con el ejemplo de los DTOs de C# en tres reglas. Run de las
+  unidades 438–457; el relevamiento y las preguntas en `Plan/mejoras/13-refactor-skills.md`.
+  - **QT-92, cómo se escribe: B.** Con `skill-creator` de Anthropic, sin referencia NZT de
+    autoría: el §10 sigue siendo el dueño. Donde `skill-creator` choca con el §10 (explicar
+    el porqué, 500 líneas) manda el §10.
+  - **QT-93, el porqué de una regla: B.** Una cláusula corta solo donde sin ella la regla se
+    aplicaría mal.
+  - **QT-95, qué entra en un pack: A.** Regla 24 del §10: elecciones y errores, no
+    documentación ni traducciones de una regla genérica.
+  - **La forma en cada archivo:** una regla por línea; *Done when* que no repite reglas; un
+    dueño por regla y los demás lo nombran por nombre de archivo o sección, nunca por número.
+    Sin cambios de nombres, filas de ruteo ni ejes de packs, salvo dos referencias de
+    `dotnet` borradas porque todo lo suyo era del genérico (`security.md`,
+    `persistence-direct.md`; la fila del eje apunta a la de `backend`).
+  - **Medido con `wc -l` contra 94976a0:** packs 3.387 → 3.070 líneas y 77 → 75
+    referencias; skills 4.008 → 3.970; kernel 136 → 135. En las skills se sacaron duplicados
+    entre router y referencias; las plantillas y los procedimientos quedan.
+  - **QT-94, evidencia: B.** No-pérdida por unidad contra HEAD (cada regla quitada sigue en un
+    solo dueño) y puertas: build sin avisos, 240 comprobaciones, lint 0 en 12 skills y 8
+    packs, `state check` ok, los paths que nombran los evals existen. **Ningún eval corrido.**
+  - **Versión:** sigue **4.0.0**, sin tag: el refactor entra en la misma versión que el
+    usuario todavía prueba en local (D89).
 
 ## 13. Revisión contra Temper v3
 
@@ -4516,10 +4545,11 @@ curiosidad.
 
 > **Estado actual (2026-11-01), rama `refactor-marco-generico`.** D88: global queda solo el
 > marco —12 skills, 60 referencias—, y lo de una tecnología o una arquitectura son 8 packs
-> por proyecto (77 referencias) que instala `nzt-ai project`, con sus MCP. El documento
+> por proyecto (75 referencias) que instala `nzt-ai project`, con sus MCP. El documento
 > técnico es `Docs/Architecture/tech.md`. D89: antes de trabajar el agente prepara el
 > trabajo con el usuario (`references/tech.md`, paso 4), el diseño vive en `Docs/Design/` y la
-> versión es **4.0.0, sin tag ni release** hasta que el usuario la pruebe en local. El bloque
+> versión es **4.0.0, sin tag ni release** hasta que el usuario la pruebe en local. D90:
+> skills, referencias y packs reescritos sin redundancia, con `skill-creator`. El bloque
 > de abajo, del 2026-10-11, es historia: sus cuentas y su capa de stack ya no valen.
 
 > **Estado al 2026-10-11, rama `capa-generica`.** Lo que sigue a este bloque es la

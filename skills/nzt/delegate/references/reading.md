@@ -6,8 +6,8 @@ An answer to one question gathered by a subagent (`nzt-explorer` in Claude Code,
 ## What can go
 
 Surveying something nobody has described, searching the whole repository without knowing
-where, researching the web. **Never**: writing anything, a question or decision, a file you
-will need whole anyway (you are going to change it), or a search one command answers.
+where, researching the web. **Never**: writing anything, a file you will need whole anyway
+(you are going to change it), or a search one command answers.
 
 ## The prompt
 

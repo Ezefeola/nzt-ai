@@ -9,8 +9,7 @@ stories = **approved, not finished**.
 
 ## Steps
 
-1. Read `spec.md`, its stories, `analysis.md` and the glossary. Technical points go to the
-   technical notes. Observed behavior never becomes the new rule on its own.
+1. Read `spec.md` and its stories. Technical points go to the technical notes. Observed behavior never becomes the new rule on its own.
 2. **Type each change**:
 
    | Type | Means | In the spec |

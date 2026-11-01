@@ -281,7 +281,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**12 skills globales con 60 referencias, y 8 packs** —7 con skill— **con 77 referencias**. El plan en curso y dónde
+**12 skills globales con 60 referencias, y 8 packs** —7 con skill— **con 75 referencias**. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.

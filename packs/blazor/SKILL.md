@@ -37,8 +37,6 @@ the package manifest — and a missing fact from the entry point and the compone
 | Prerendered state, initial state transfer, persistent services | `references/prerendering.md`, with the render-mode file |
 | Lists, grids, repeated components, frequent events — after a measurement | `references/performance.md` |
 
-`AuthorizeView` hides; it does not protect. Whether the operation may run is the backend's.
-
 ## Done when
 
 Every file read was selected by `tech.md` or by the task, never two of one axis, the

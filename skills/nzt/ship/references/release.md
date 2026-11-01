@@ -21,8 +21,7 @@ Errors above 1% over the base rate, or p95 above 800 ms, trigger rollback.
 ```
 
 An environment without a named authoriser is a question. The document names; the pipeline and
-platform define — no copied YAML, secrets by key. The project's thresholds win; agree them
-the first time.
+platform define — no copied YAML. The project's thresholds win; agree them the first time.
 
 ## Steps
 
@@ -58,7 +57,7 @@ the first time.
    error types. Otherwise it is *released and not verified*.
 7. **Roll back** to the previous version of the same environment when a threshold breaks —
    covered by the release's authorisation; report it at once. Data excepted.
-8. **Log it**, newest on top, never rewritten; a rollback gets its own entry with its cause:
+8. **Log it** in `releases.md`; a rollback gets its own entry with its cause:
 
    ```markdown
    ## 1.4.0 · production · 2026-09-18 · verified

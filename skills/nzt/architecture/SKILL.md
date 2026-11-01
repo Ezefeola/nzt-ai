@@ -46,7 +46,7 @@ Every question also follows `../nzt-plan/references/questions.md`.
 4. **Write the document** of the unit's reference. A finding that contradicts an agreed rule
    goes back to discovery; a question of a later phase is left, undecided, where that phase
    reads it.
-5. Offer a diagram while the document is planned, never by habit (`references/diagrams.md`).
+5. Offer a diagram as `references/diagrams.md` says.
 
 **Skip this phase** when the change adds no component, chooses no technology, crosses no
 boundary and sets no precedent. Say so in one line.
@@ -79,7 +79,6 @@ before its work is touched.
   discovery.
 - **Respect what exists**: the current structure is a constraint and evidence.
 - **Planned is not adopted** until it is.
-- **Expensive to reverse gets an ADR**; one that needs outside agreement gets an RFC first.
 - Versions and capabilities come from the project's own evidence (manifests, configuration,
   pins), never from what compiles or what is newest.
 

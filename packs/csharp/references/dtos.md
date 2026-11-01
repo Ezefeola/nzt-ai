@@ -1,14 +1,14 @@
 # DTOs in C#
 
-Builds on `../nzt-code/references/dtos.md` — read it first. This file holds only what is C#.
+Builds on `../nzt-code/references/dtos.md` — read it first.
 
 ## Rules
 
-1. **A `sealed record` with explicit `{ get; set; }` properties** — never positional, `init` or a
-   primary constructor. Nested DTOs are `sealed record`s inside the parent, after its
-   properties.
-2. **Mapping is extension methods** in `<Entity>MappingExtensions.cs`, a `static` class, with
-   `To<DtoName>` methods. A second class of that name in another namespace means it was copied.
+1. **A DTO is a `sealed record`**, nested DTOs too.
+2. **Properties are `{ get; set; }`**, never `init`.
+3. **Properties declared in the body**, never positional.
+4. **Mapping is a `static class <Entity>MappingExtensions`** with `To<DtoName>` extension
+   methods. Two classes of that name in different namespaces means one was copied.
 
 ```csharp
 public sealed record OrderSummaryResponseDto
@@ -38,5 +38,4 @@ public static class OrderMappingExtensions
 
 ## Done when
 
-Every DTO is a `sealed record` with `get; set;`, and each entity has one
-`<Entity>MappingExtensions` class.
+Every rule holds for the DTOs and mappers you wrote.

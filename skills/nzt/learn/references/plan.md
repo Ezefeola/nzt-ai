@@ -99,11 +99,11 @@ last session: 2026-09-25
 ## Record rules
 
 1. The table is where each objective stands now and the only part rewritten; calibration
-   rows and log lines are appended.
+   rows and log lines are appended. An earlier line is never edited to be kind — a new line
+   corrects it.
 2. **Every state names its evidence**: an exercise, an assessment, a log date.
 3. **The state vocabulary is closed.** Before measuring: `not started`, `in progress`. After,
-   the five verdicts of `assess.md`: `achieved`, `not achieved`, `solved by the system`,
-   `no evidence`, `not measurable`. No sixth word invented to be kind.
+   the five verdicts of `assess.md`. No sixth word invented to be kind.
 4. Calibration is data: one row per corrected delivery, no commentary about the person.
 
 ## Resuming a topic

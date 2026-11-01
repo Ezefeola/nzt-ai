@@ -52,13 +52,8 @@ public sealed class Result<TResponse> : Result
 
 ## Rules
 
-1. `private protected` closes the hierarchy; the generic is `sealed`.
-2. **Both types in one file, named after the base** — the only exception to one type per file.
-3. Each return builds its own: `return Result<SignInResponseDto>.Failure(HttpStatusCode.Unauthorized, [StaffAccount.Errors.SignInIsNotValid]);`
-   — never a private `Rejected()`.
-4. **`IsSuccess` before `Payload`**, never silenced with `!`.
+1. **Both types in one file, named after the base** — the only exception to one type per file.
 
 ## Done when
 
-The types are exactly these, every return builds its own, and `Payload` is read only after
-`IsSuccess`.
+The types are exactly these.

@@ -21,8 +21,8 @@ A person moves between loops inside the same topic.
 
 **A loose question is not a topic**: an explanation asked once is answered in the
 conversation — no plan, no files. Material appears when the person wants to sustain the
-ability; ask only when that is genuinely ambiguous, otherwise assume the light one. A learning plan proposes learning
-phases, never product artifacts.
+ability; ask only when that is genuinely ambiguous, otherwise assume the light one. A
+learning plan proposes learning phases, never product artifacts.
 
 ## References
 
@@ -59,10 +59,7 @@ units. Its shape and record rules are `plan.md`'s; every other reference writes 
    leaves the objective `in progress`.
 3. **A different case each time** — every exercise, repetition, review and assessment. The
    practised case measures memory of that case.
-4. **`progress.md` is append-only below its table**; an earlier line is never edited to be
-   kind — a new line corrects it.
 
 ## Done when
 
-The unit's reference *Done when* holds and `progress.md` says exactly what happened, with the
-artifact that shows it.
+The unit's reference *Done when* holds.
