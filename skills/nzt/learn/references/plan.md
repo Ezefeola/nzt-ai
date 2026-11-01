@@ -4,6 +4,14 @@ Produces the two files a topic lives by: `Learn/<topic>/curriculum.md` (purpose,
 point, what was agreed, the `OA-NN` objectives) and `Learn/<topic>/progress.md` (the record
 every other reference writes into). `<topic>` is a lowercase slug that never changes.
 
+## Contents
+- Steps
+- `curriculum.md`
+- `progress.md`
+- Record rules
+- Resuming a topic
+- Done when
+
 ## Steps
 
 1. **Probe, do not ask what they know** — "how much do you know?" returns a feeling, and the

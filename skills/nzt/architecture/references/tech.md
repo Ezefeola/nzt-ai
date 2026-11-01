@@ -5,6 +5,12 @@ do the work correctly — its technologies, the packs that guide it, the decisio
 ask, the opt-ins, the dependencies and the conventions. Read in a minute; it works for any
 product: a web system, a game, a mobile app, a book, a course.
 
+## Contents
+- Steps
+- The file
+- Rules
+- Done when
+
 ## Steps
 
 1. **Read the product and its components**: `Docs/Product/product.md` (who it is for, where
