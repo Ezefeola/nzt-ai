@@ -7,7 +7,7 @@
       "name": "build",
       "status": "todo",
       "units": [
-        { "id": 432, "do": "tech.md paso 4 como preparación para trabajar: qué hace el agente y qué necesita, catálogo e investigación, lo que hace el usuario paso a paso, lo que el agente no puede, qué tener en cuenta; con el sí instalar, guiar y comprobar que anda; tech.md con cómo repetirla", "status": "todo" },
+        { "id": 432, "do": "tech.md paso 4 como preparación para trabajar: qué hace el agente y qué necesita, catálogo e investigación, lo que hace el usuario paso a paso, lo que el agente no puede, qué tener en cuenta; con el sí instalar, guiar y comprobar que anda; en tech.md solo la fila de Agent tools (quién lo instala, en pocas palabras), sin sección de setup: el cómo vive en el pack o en la fuente citada", "status": "todo" },
         { "id": 433, "do": "Eval routing/tool-research: además del catálogo y la investigación, explicar lo que hace el usuario, lo que el agente no puede y cómo se comprueba; sin correrlo", "status": "todo" },
         { "id": 434, "do": "Docs/UX/ → Docs/Design/ y ux-ui/ → design/ en design, architecture, sus referencias y los evals; un proyecto con las carpetas viejas se sigue leyendo ahí (QT-07)", "status": "todo" }
       ]
