@@ -64,4 +64,4 @@ if (customer is null) return CustomerNotFound(id);
       as it came.
 - [ ] No `!`, zero nullable warnings.
 - [ ] No `async void`, `.Result` or `.Wait()`; tokens taken and passed down.
-- [ ] `nzt-code`'s checklist holds too.
+- [ ] `nzt-code`'s rules hold too.

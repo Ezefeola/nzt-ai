@@ -10,7 +10,8 @@ and adds only how it is done there.
 
 ## Axes
 
-`tech.md` names one value per axis. Read only that row; never two of the same axis.
+`tech.md` names one value per axis. Read only that row; never two of the same axis. Every
+architecture value reads `references/architecture.md` first.
 
 | Axis | Value | Read | What it costs |
 |---|---|---|---|
@@ -61,4 +62,4 @@ time: what holds for every operation lives there and no row repeats it.
 ## Done when
 
 Every file read was selected by `tech.md` or by the task, never two of one axis, and each
-file's checklist holds.
+file's *Done when* holds.

@@ -1,70 +1,29 @@
 # Backend persistence — direct
 
-The persistence axis says direct, which is **the name of a decision, not the absence of one**:
-this project has **no repositories and no unit of work, anywhere**.
+**No repositories and no unit of work, anywhere** — the name of a decision, not its absence.
+The handle is what the data library gives you to read and write (`data-access.md` says how);
+this file says where it goes and what is never built around it.
 
-**The persistence handle is whatever the ORM axis names** — the type the data access package
-gives you to read and write with. The data access guidance says what it is called and how to
-query with it; **this one says where it goes and what must not be built around it.**
+## Rules
 
-## The shape
+1. **Every use case that touches data receives the concrete handle** as a dependency held for
+   its life. No interface over it — one member per entity is a repository with extra steps —
+   except the one a layered architecture declares (`architecture-clean.md`,
+   `-hexagonal.md`).
+2. **Nothing wraps it**: no repository or unit of work "just for this aggregate", no query
+   helper, no function attached to the handle from outside. Half the project wrapped is the
+   inconsistency this axis prevents; changing it is a `tech.md` decision.
+3. **Neither the handle nor an unexecuted query leaves the use case**: built, executed and
+   materialised inside it; a DTO comes out.
+4. **The use case is the unit of work**: everything it changes is saved once, at the end
+   (`data-writes.md`).
+5. **No `try/catch` around persistence, the save included**, and no classifier of provider
+   errors. What the save could reject is checked before it; the rest reaches the global
+   handler (`errors.md`). Cleanup uses the language's disposal pattern.
+6. **Queries are written out in the use case**, in order. The same query in two use cases is
+   written twice: extracting it is how the helper of rule 2 is born.
 
-The use case receives the handle as a dependency it holds for its whole life, and **every
-use case that touches data gets it**. There is no layer in between.
+## Done when
 
-**The concrete type is injected, not an interface over it.** An interface with one member per
-entity is a repository with extra steps and no benefit: nothing else can implement it and
-still work.
-
-**One exception**: a layered architecture where the handle lives in a unit the use case may
-not reference. There the architecture reference declares the interface and the data access
-guidance says what it exposes.
-
-## What must not appear
-
-- **No repository, no unit of work.** Not *just for this aggregate*, not *because this one is
-  complex*. **Half a project wrapped and half not is exactly the inconsistency this axis
-  exists to prevent**, and changing it is a stack decision taken once for the whole project.
-- **No helper class wrapping the handle** — no query helper, no data-access class, no function
-  attached to the handle from outside that runs queries. Same thing under another name.
-- **The handle does not leave the use case.** Not to a service, not to a mapper, not to a
-  method in another class that queries with it.
-- **An unexecuted query does not leave either.** It is built, executed and materialised inside
-  the use case; what comes out is a DTO.
-- **No classifier of provider errors** — no static helper that inspects a database exception
-  to decide what it meant. What the save could reject is checked before it; the rest goes to
-  the global handler.
-
-## The use case is the transactional unit
-
-Everything the operation changes is committed **once, at the end**. There is no unit of work
-here, so **the use case is the unit of work** — which is precisely why this axis needs no such
-type. How the save is written, and the one case that needs an explicit transaction, is the
-data writes guidance's.
-
-**No `try/catch` around persistence calls, the save included.** A business response comes
-from a check before the write, never from catching its failure; whatever escapes reaches the
-global handler (`backend-errors.md`). Transaction cleanup follows the language's disposal
-pattern, with no rollback-only catch.
-
-## Where the queries live
-
-**In the use case, written out.** A use case that reads three things has three queries in it,
-and **that is the intended shape**: reading it top to bottom shows every hit to the database,
-in order, with its filters.
-
-If the same query appears in two use cases, **it is written twice.** Extracting it is how the
-helper class from the section above gets born, and **the second caller always ends up needing
-one column more.**
-
-## Closing checklist
-
-- [ ] The use case holds the handle as an injected dependency, and no interface over it
-      unless the architecture declares one.
-- [ ] **No repository, no unit of work, no query helper, no provider-error classifier** — not
-      even for one aggregate.
-- [ ] No `try/catch` around persistence calls; business failures come from checks before the
-      write.
-- [ ] Neither the handle nor an unexecuted query leaves the use case.
-- [ ] Everything the operation changes is committed once, at the end.
-- [ ] A query shared with another use case was written twice rather than extracted.
+No repository, unit of work, query helper or error classifier exists, nothing catches around
+persistence, and each use case saves once.

@@ -21,8 +21,8 @@ is its own and reads these first.
 1. Read `references/code.md`, then the rows the task selects.
 2. In a component this project's `Docs/` does not document, follow how that code is written
    and report the difference (`code.md`).
-3. Close with each file's checklist.
+3. Close with each file's *Done when*.
 
 ## Done when
 
-Every checklist of the references read holds for the code you wrote.
+Every reference read holds for the code you wrote.

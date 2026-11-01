@@ -1,134 +1,46 @@
 # Code — the rules that hold in any language
 
-## Contents
-- Everything you write is in English
-- Files and types
-- Members in one order, and each group together
-- Absence is handled, never asserted away
-- Async
-- Control flow
-- No magic strings, and no magic numbers
-- Reflection is exceptional
-- Comments say why
-- Closing checklist
+Project rules, written as prohibitions because a prohibition can be checked. A language pack
+adds only what is its own. **In a component this project's `Docs/` does not document, write
+the way that code is written** and report the difference: these rules step aside.
 
-These are **project rules written as prohibitions on purpose**: a prohibition is verifiable
-and a preference is not. They hold in every component, backend or frontend, whatever the
-language.
+## Rules
 
-**In a foreign component — one this project's `Docs/` does not document — you write the way
-that code is written and these rules step aside.** This set is installed globally and will
-see repositories that are not its own.
+1. **Everything you write is in English** — types, members, locals, files, folders,
+   comments — whatever language the spec uses.
+   - A domain term takes the code name `Docs/Domain/glossary.md` gives it. Missing there and
+     in the code, it is an entry `nzt-discovery` writes first, never a name coined here.
+   - Text the user reads (labels, messages, validation copy) comes from the story, in its
+     language, untranslated.
+2. **One top-level type per file**, named after it. **A folder never takes a type's name**
+   (`Orders/Order`): where folders become namespaces or modules, the two collide.
+3. **Members in one order, each group contiguous**: nested types · constants and static
+   fields · instance fields · constructors · properties · methods, public before private.
+   - **A member added later joins its group** — never beside the method that needed it,
+     never appended at the end of the file.
+   - The domain model's order wins inside an entity or value object (`nzt-ddd`); a DTO puts
+     properties before nested DTOs (`dtos.md`).
+4. **Absence is handled, never asserted away.** No operator or cast that tells the checker
+   "not null"; where the language checks nullability, zero warnings. A value that cannot be
+   absent says so in its type.
+5. **Async all the way.** Nothing fire-and-forget: every call is awaited or owned by
+   something that observes its failure. Take a cancellation signal wherever the caller can
+   give one and pass it to the end. Never block on async work.
+6. **No nested if/else**: guard clauses and early return; a match expression where a chain
+   would appear.
+7. **No magic literals.** A string or number that means something — keys, claims, headers,
+   policies, states, routes — gets a name: a constant, an enum, a member of a names type.
+8. **Reflection is exceptional**: reading something off an object by reflection is a missing
+   abstraction — give the type that surface. A case you are unsure of is asked, never decided
+   alone. Reflection a package does for you is not yours.
+9. **Comments say why**: a workaround and its cause, an imposed constraint, a decision that
+   looks wrong and is not — citing a record that does not move (an ADR, a defect id).
+   - A comment explaining *what* is a name to fix instead.
+   - **No rule slug, story id or requirement text**: a rule quoted in code is a second
+     original that drifts.
+   - No commented-out code, change logs, authors or dates. Follow the comment style around
+     you, and fix or delete a comment that stops being true in the same unit.
 
-## Everything you write is in English
+## Done when
 
-Type names, members, parameters, locals, files, folders and comments, whatever language the
-spec is in. The specs, the glossary and the artifacts in `Plan/` stay in the project's
-language: **you are the boundary where the term lands in English code.**
-
-- **The translation is not yours to invent.** `Docs/Domain/glossary.md` carries the code
-  name of every domain term; if it is there, that is the name. If it is missing and the code
-  has none, it is a glossary entry `nzt-discovery` writes before the code uses it — never a
-  name coined here. Two translations of one term are the same term with two names.
-- What is not a domain term — a local, a helper, a private method — you name yourself.
-- **The one exception is text the user reads**: labels, messages and validation copy come
-  from the story, in the story's language, and are never translated.
-
-## Files and types
-
-- **One top-level type per file**, and the file is named after it.
-- **A folder name never matches a type name.** For an `Order` type the folder is `Orders`:
-  the plural names the group, the singular names the thing, and in a language where the folder
-  becomes part of a namespace or a module path the two collide.
-
-## Members in one order, and each group together
-
-Inside a type: **nested types · constants and static fields · instance fields ·
-constructors · properties · methods**, public before private, for the kinds the language has.
-Each group is contiguous.
-
-**A member added later joins its group.** Declaring it beside the method that uses it, or at
-the end of the file because that is where the file ended, scatters a type's state through
-its behaviour — and it is the most common way this order breaks, because the member is
-usually written in the same edit as the method that needed it. **Adding a member is not
-appending to the file.**
-
-The domain model fixes its own order on top of this, and inside an entity or a value object
-that one wins (`backend-domain-ddd.md`). DTOs also override this order: **properties first,
-then nested DTO declarations**, recursively, as defined in `code-dtos.md`.
-
-## Absence is handled, never asserted away
-
-If a value can be absent, check it and handle it; if it cannot, the type should say so. **An
-operator or a cast that tells the checker "this is not null" is forbidden**, and where the
-language checks nullability, **zero nullability warnings**: a warning is a null dereference
-that has not happened yet.
-
-## Async
-
-- **Nothing is fire-and-forget.** Every asynchronous call is awaited or explicitly owned by
-  something that observes its failure.
-- **Take a cancellation signal wherever the caller can give one, and pass it down** — to the
-  next method, the data access, the HTTP call. A signal that stops halfway is the same as none.
-- **Never block on asynchronous work** to get its result synchronously. Always await.
-- If what you call is async, your method is async, all the way up.
-
-## Control flow
-
-**No nested if/else.** Guard clauses and early return, and a match expression or pattern
-matching where a chain would appear, where the language has them.
-
-Nesting is where the case nobody wrote hides.
-
-## No magic strings, and no magic numbers
-
-A literal that means something gets a name — a constant, an enum, or a member of a type that
-groups the names. Keys, claims, headers, policies, states and routes, and numbers that mean
-something too.
-
-## Reflection is exceptional
-
-**Reaching for reflection to read something off an object is the symptom of a missing
-abstraction.** Give the type the surface the code is asking for.
-
-The cases where reflection is genuinely right are rare, and **you do not decide alone: if
-you are not sure yours is one, ask before writing it.** Reflection a package does for you is
-not yours.
-
-## Comments say why
-
-- What the line already says is noise, and it goes stale: the line changes, the comment
-  stays, and the file carries two answers with nothing to say which one runs.
-- **What a comment usually tries to fix is a name.** A variable, a method or a type that
-  said too little. Fix the name instead.
-- Explain the non-obvious: a workaround with its cause, an externally imposed constraint, a
-  decision that looks wrong and is not. Name its source when the source is a record that
-  does not move — an ADR, a defect id, a provider's issue.
-- **The spec does not travel into the code.** No rule slug, no story id, no requirement
-  text in a comment. Traceability lives in the specs, where each rule has one original that
-  changes in one place; a rule quoted in the code is a **second original** that drifts the
-  first time the rule is edited, with nothing pointing at it to say so. The code implements
-  the rule; it does not cite it.
-- Never leave commented-out code. Version control already keeps it; a commented block is a
-  question nobody can answer.
-- No change logs, author names or dates in comments. That is the repository's job.
-- Follow the comment style of the code around you, even if it is not the one you would
-  choose.
-- A comment that stops being true is fixed or deleted in the same unit as the code.
-
-## Closing checklist
-
-- [ ] Every identifier, file, folder and comment in English, with domain terms taking the
-      name `Docs/Domain/glossary.md` gives them.
-- [ ] User-facing text in the story's language, as the story wrote it.
-- [ ] One top-level type per file, named after it.
-- [ ] No folder named after a type.
-- [ ] Members in order with each group contiguous, and nothing appended at the end of the
-      file; DTOs put properties before nested DTOs, and domain types use their own order.
-- [ ] No absence asserted away, and zero nullability warnings where the language checks them.
-- [ ] Nothing fire-and-forget, nothing blocking on async work; cancellation taken and
-      propagated.
-- [ ] No nested if/else, no meaningful literal left unnamed.
-- [ ] No hand-written reflection, and a doubtful case was asked rather than decided alone.
-- [ ] Every comment says why; none is commented-out code, a change log, a spec citation, or
-      no longer true.
+Every rule above holds for the code you wrote, and an unsure reflection case was asked.

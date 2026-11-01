@@ -41,4 +41,4 @@ later is the user's change to that line.
 ## Done when
 
 Every aggregate cites the rule that forces its boundary, no piece without `yes` was built,
-and each file's checklist holds.
+and each file's *Done when* holds.

@@ -1,79 +1,35 @@
 # Collections in memory
 
-## Contents
-- Existence and counting
-- Enumerate once
-- Order of operations
-- Lookups instead of nested loops
-- Pick the operator that says what you mean
-- Never return null for a sequence
-- Closing checklist
+A collection read, transformed or checked **in memory**. A query the database runs is the
+data pack's, even written with the same operators. **One style of collection operations
+across the codebase** — the one the code already uses.
 
-This is a collection read, transformed or checked **in memory**. A query the database runs is
-the data access guidance's, even when it is written with the same operators.
+## Rules
 
-**One style of collection operations across a codebase**: whichever `tech.md` and the code
-already use, the same one everywhere, so there is one thing to read.
+1. **Existence and counting**: a materialised collection uses its size; a lazy sequence asks
+   whether *any* element exists, which stops at the first. Pass the predicate to the operator
+   (*any matching*, *count matching*), never filter first.
+2. **Enumerate once.** A chain is a recipe: enumerating it twice runs it twice, and on a
+   changing source answers twice differently. Materialise once, when the result is needed
+   more than once — never mid-chain: **filter first, materialise last**.
+3. **Order of operations**: filter before sorting when that keeps the result. **Never move a
+   filter across a paging step or a grouping** — there it changes which elements are chosen.
+4. **Lookups instead of nested loops**: a repeated search over m candidates for n items is
+   O(n × m). Build a set or map once — a multi-map when the key repeats — and look up each.
+5. **The operator says the intent**:
 
-## Existence and counting
+   | Intent | Operator |
+   |---|---|
+   | largest or smallest by a key | max-by / min-by, never sort-then-first |
+   | exactly one, two is a bug | single-element, failing on two |
+   | the first, more is fine | first-element |
+   | distinct by a field | distinct-by |
+   | elements of one type, or the non-absent ones | filter by type, typed, no absence asserted away |
 
-**On a materialised collection — anything that knows its size — use the size.** On a lazy
-sequence it is the other way round: **ask whether any element exists**, which stops at the
-first one, instead of counting, which can walk the whole sequence.
+   Operators that fail on empty only where empty is impossible; otherwise handle absence.
+6. **Never return null for a sequence** — an empty one.
 
-With a predicate, pass it to the operator instead of filtering first: *count matching*, *any
-matching*, *first matching* — not *filter, then count*.
+## Done when
 
-## Enumerate once
-
-**A chain is a recipe, not a result.** Enumerating it twice runs it twice — twice the work,
-and with a changing source, twice a different answer.
-
-Materialise **once**, when the result is needed more than once. Mid-chain, materialising does
-the opposite: it pulls the whole set into memory so the next operator can filter it. **Filter
-first, materialise last.**
-
-## Order of operations
-
-Filter before sorting when that preserves the result, and place the projection according to
-what the later operators need.
-
-**Never move a filter across a paging step or a grouping**: there it changes which elements
-are selected, and the result is wrong rather than slower. Treat *filter, sort, project* as
-useful, not universal.
-
-## Lookups instead of nested loops
-
-A repeated linear search over m candidates for n items costs O(n × m). **Build a set or a map
-once and look up each item in it**: one hash lookup per item. A map when the matching element
-is needed, a multi-map when the key can repeat.
-
-## Pick the operator that says what you mean
-
-| Intent | Say it with |
-|---|---|
-| The largest or smallest by a key | a max-by or min-by, never sorting to take the first |
-| Exactly one, and more than one is a bug | a single-element operator that fails on two |
-| The first, and more than one is fine | a first-element operator |
-| Distinct by a field | a distinct-by |
-| The elements of one type, or the non-absent ones | a filter by type, typed, without asserting absence away |
-
-Operators that fail on an empty sequence are used only where empty is genuinely impossible;
-prefer handling the absence.
-
-## Never return null for a sequence
-
-An empty collection is an empty collection. **A null sequence turns every caller into a null
-check that someone will forget.**
-
-## Closing checklist
-
-- [ ] One style of collection operations everywhere.
-- [ ] The size for a materialised collection, *any* for a lazy one, predicates passed to the
-      operator.
-- [ ] No chain enumerated twice, nothing materialised mid-chain.
-- [ ] No filter moved across paging or grouping.
-- [ ] No search inside a loop where a set or a map does it in one pass.
-- [ ] Max-by or min-by instead of sorting to take one; a type filter instead of asserting
-      absence away.
-- [ ] No method returns `null` in place of an empty sequence.
+No chain runs twice, no filter crosses paging or grouping, no search runs inside a loop, and
+no method returns null for a sequence.

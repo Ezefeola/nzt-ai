@@ -34,4 +34,4 @@ Another value in `tech.md` is a gap there: say so and settle it, never improvise
 
 ## Done when
 
-Every file read was selected by `tech.md` or by the task, and each file's checklist holds.
+Every file read was selected by `tech.md` or by the task, and each file's *Done when* holds.
