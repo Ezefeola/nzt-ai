@@ -225,7 +225,19 @@ con IA, no solo para hacer productos.
   después de software, con base en `nzt-research`, y fácil de probar con un caso real.
 
 **Encontrado de paso:** el "Where it lands" de `skills/nzt/architecture/SKILL.md` todavía
-lista `Docs/UX/` (resto de la 425); pendiente de decidir si pasa a `Docs/Design/`.
+lista `Docs/UX/` (resto de la 425). **Decidido (2026-11-01, QT-07):** `Docs/UX/` pasa a
+`Docs/Design/` y `Plan/specs/<feature>/ux-ui/` a `design/`; un proyecto que ya tiene las
+carpetas viejas se sigue leyendo ahí hasta que las mueva.
+
+## Decisiones al cerrar el run (2026-11-01)
+
+- **QT-05 · Versión: 4.0.0.** Mayor: se van las skills de stack globales, llegan los packs
+  por proyecto y se renombran las fases (`ux` → `design`, `analysis` → `discovery`).
+- **QT-07 · Carpetas de diseño:** ver DB-04, *Encontrado de paso*.
+- **D-424-01 · arreglado:** la línea MCP de `nzt-ai project` separa el proveedor de sus
+  servidores, con un check.
+- **QT-06 · MCP que no vienen de un pack** (la sub-decisión de DB-03): el usuario no la
+  entendió como estaba planteada; se vuelve a explicar antes de decidir.
 
 ## Unidades propuestas (sin aprobar)
 

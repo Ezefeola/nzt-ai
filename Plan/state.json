@@ -47,7 +47,7 @@
   "waiting_on": null,
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
-    "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario; DB-04 (marco para cualquier trabajo: protocolo y flujos) abierto, solo análisis, y el resto Docs/UX/ en architecture sin decidir",
-    "Run terminado (424 hecha). Abierto: D-424-01 (cosmético, a arreglar con el sí del usuario). Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
+    "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario; DB-04 (marco para cualquier trabajo: protocolo y flujos) abierto, solo análisis",
+    "Run terminado (424 hecha); D-424-01 arreglado después (McpStatusLine, 235 checks). Decidido 2026-11-01: QT-05 versión 4.0.0, QT-07 Docs/UX/ → Docs/Design/ y ux-ui/ → design/; las dos son el próximo run, a planificar y aprobar. QT-06 (MCP que no vienen de un pack) se vuelve a explicar: el usuario no la entendió"
   ]
 }

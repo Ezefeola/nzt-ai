@@ -90,10 +90,14 @@ public static partial class Program
             + (edited > 0 ? $", {edited} editado(s) localmente" : "")
             + (missing > 0 ? $", {missing} faltante(s): nzt-ai project sync los repone" : ""));
         foreach (var (provider, servers) in current.Mcp)
-            Console.WriteLine($"  MCP {provider,-11}{string.Join(", ", servers)}");
+            Console.WriteLine(McpStatusLine(provider, servers));
         if (unknown.Count > 0) Warn($"packs que este nzt-ai no conoce: {string.Join(", ", unknown)}.");
         return 0;
     }
+
+    /// <summary>La línea de `nzt-ai project` con los MCP de un proveedor, en la columna de las demás.</summary>
+    public static string McpStatusLine(string provider, IEnumerable<string> servers) =>
+        $"  MCP            {provider}: {string.Join(", ", servers)}";
 
     private static int ProjectApply(string directory, IReadOnlyList<string> packs, IReadOnlyList<ProjectTarget> targets,
         PackCatalog catalog, bool dryRun)

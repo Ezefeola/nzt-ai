@@ -277,6 +277,9 @@ public static partial class Program
             Cli.Program.ProjectTargetsFor(Cli.Program.ProviderChoice.All).Count == ProjectTarget.All.Count);
         Check("volver en el menú de project no elige ninguno",
             Cli.Program.ProjectTargetsFor(Cli.Program.ProviderChoice.Back).Count == 0);
+        // D-424-01: claude-code medía lo mismo que el relleno y quedaba pegado al servidor.
+        Check("la línea MCP separa el proveedor de sus servidores",
+            Cli.Program.McpStatusLine("claude-code", ["unity-mcp"]) == "  MCP            claude-code: unity-mcp");
     }
 
     // ── Repo y lint ────────────────────────────────────────────────────────────
