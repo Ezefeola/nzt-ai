@@ -9,12 +9,12 @@ user before the whole scope is built. For full work, or when the user wants earl
    of up to three stories. Bigger is the user's call.
 2. Work for the whole run — the product definition, a final release — is its own slice.
    Nothing lives outside slices.
-3. **Analysis first**: a new product or feature starts with only the analysis slice and the
+3. **Discovery first**: a new product or feature starts with only the discovery slice and the
    shape of the rest in one line. When it closes, rewrite the plan with the concrete slices,
    set `approved: false` and ask again.
 4. Plan only **delivery 1** (from `product.md`) in slices; later deliveries are one line.
    When delivery 1 has something to learn from users, offer a prototype (`nzt-design`) inside
-   the analysis slice. A new product's first build slice is the **walking skeleton**: the
+   the discovery slice. A new product's first build slice is the **walking skeleton**: the
    whole path end to end, thinnest form.
 
 Delivery 1 cuts scope, never the definition of done.
@@ -25,9 +25,9 @@ Propose one, with its cost, and write it in `cadence`:
 
 | Cadence | Cut | When |
 |---|---|---|
-| `delivery` *(default)* | first slice analyses the whole delivery; then one slice per feature with the other phases | most new work |
-| `upfront` | the whole run's analysis in the first slice | the problem is clear |
-| `just-in-time` | each slice brings its own analysis | almost nothing is known |
+| `delivery` *(default)* | first slice runs discovery for the whole delivery; then one slice per feature with the other phases | most new work |
+| `upfront` | the whole run's discovery in the first slice | the problem is clear |
+| `just-in-time` | each slice brings its own discovery | almost nothing is known |
 
 Whatever the cadence, a feature's scope, rules and story index exist before its first slice
 is built; only the stories' criteria may wait. "The spec of F-001 and its stories" is one
@@ -49,5 +49,5 @@ One table per slice under `S2 · <name>`, never a slice column. Below: the decla
 
 ## Done when
 
-Every slice can be tried alone and is its own table; analysis comes first with re-approval
+Every slice can be tried alone and is its own table; discovery comes first with re-approval
 after it; `cadence` is written; no verify unit sits between two build units of a slice.

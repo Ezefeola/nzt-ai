@@ -27,19 +27,19 @@ artifact and never proposes a plan (that is `nzt-plan`).
    | What changes | Size | Starts at |
    |---|---|---|
    | Something that exists is corrected or adjusted; what was agreed stays as it is | Direct | Reproducing what fails, or the change itself |
-   | Behavior is added or changed within the current structure, in one or two stories | Standard | Analysis of that change |
-   | Something new end to end, the structure (a new part or technology), or three or more stories | Full | Analysis, cut into slices |
+   | Behavior is added or changed within the current structure, in one or two stories | Standard | Discovery of that change |
+   | Something new end to end, the structure (a new part or technology), or three or more stories | Full | Discovery, cut into slices |
    | Existing work has no `Plan/specs/` and has to be put in order | Full | Reconstructing what it does, part by part |
 
    Standard: one plan of phases, approved once. Full: slices.
    In doubt, the lighter size; when the work outgrows it, say so and propose the next.
    Size cuts ceremony, never the definition of done.
 5. **Pick the phases whose question is still open**, in this order:
-   - **analysis** (`nzt-discovery`) — what it must do, or for whom, is not agreed yet, or
+   - **discovery** — what it must do, or for whom, is not agreed yet, or
      changes;
    - **architecture** — how it is made is not decided yet: a new part, a new technology or
      tool, or parts that start depending on each other;
-   - **design** (`nzt-design`) — someone will perceive or operate something whose form is not
+   - **design** — someone will perceive or operate something whose form is not
      decided yet;
    - **build** — always, if the work product changes;
    - **verify** — always, if what it does changes;

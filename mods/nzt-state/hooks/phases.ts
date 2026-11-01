@@ -6,7 +6,7 @@ import type { Lang } from './i18n'
  * per language and the spellings a state.json may use for it.
  */
 export const PHASES = [
-  { id: 'analysis', color: '#9B7BEA', label: { es: 'Análisis', en: 'Analysis' }, names: ['analysis', 'discovery', 'análisis', 'analisis'] },
+  { id: 'discovery', color: '#9B7BEA', label: { es: 'Discovery', en: 'Discovery' }, names: ['discovery', 'analysis', 'análisis', 'analisis'] },
   { id: 'architecture', color: '#4C8DF6', label: { es: 'Arquitectura', en: 'Architecture' }, names: ['architecture', 'arquitectura'] },
   { id: 'design', color: '#EC5FA6', label: { es: 'Diseño', en: 'Design' }, names: ['design', 'diseño', 'diseno', 'ux'] },
   { id: 'build', color: '#F59E0B', label: { es: 'Build', en: 'Build' }, names: ['build', 'construcción', 'construccion'] },

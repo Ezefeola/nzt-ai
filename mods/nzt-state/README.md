@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.12.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.13.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -17,7 +17,7 @@ Modo  ⚡ autónomo · 80–82 sin            ██ ▀▀  ▀▀ ██
 Objetivo Mods de NZT: spec, el              Build
 mod en mods/ y el catálogo.
 
-✓ Análisis → ● Build → ○ Verificación
+✓ Discovery → ● Build → ○ Verificación
 
 3 de 5 unidades hechas                         60%
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -84,7 +84,7 @@ grupos.
 
 | Fase | Sombrero | Color |
 |---|---|---|
-| Análisis | birrete | violeta |
+| Discovery | birrete | violeta |
 | Arquitectura | casco de obra | azul |
 | Diseño | boina | rosa |
 | Build | casco con llave, y un martillo chico en alto en la mano derecha | naranja |

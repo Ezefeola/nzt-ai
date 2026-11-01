@@ -65,7 +65,7 @@ public static partial class Program
         StateCheckAcceptsAValidState();
         StateCheckWithoutAFileIsNotAnError();
         StateCheckCatchesEveryBrokenInvariant();
-        StateCheckAcceptsDesignAndTheOldUx();
+        StateCheckAcceptsTheRenamedPhasesAndTheirOldNames();
         StateCheckAcceptsEachDelegationModeAndItsAbsence();
         StateCheckAcceptsAParallelGroup();
         StateCheckCatchesEveryBrokenParallelGroup();
@@ -834,7 +834,7 @@ public static partial class Program
         var report = CheckState(home, """
             { "version": 1, "approved": true,
               "phases": [
-                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] },
                 { "name": "build", "status": "doing", "units": [
                   { "id": 2, "status": "doing" }, { "id": 3, "status": "todo" }] },
                 { "name": "verify", "status": "todo", "units": [] }],
@@ -854,7 +854,7 @@ public static partial class Program
         var report = CheckState(home, """
             { "approved": "yes",
               "phases": [
-                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "todo" }] },
+                { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "todo" }] },
                 { "name": "build", "status": "doing", "units": [
                   { "id": 2, "status": "doing" }, { "id": 2, "status": "running" }] },
                 { "name": "verify", "status": "doing", "units": [{ "id": 4, "status": "doing" }] },
@@ -870,16 +870,16 @@ public static partial class Program
         Check("más de una fase en doing", Says("hay 2 fases en doing"));
         Check("más de una unidad en doing", Says("hay 3 unidades en doing"));
         Check("una unidad en doing fuera de la fase en doing", Says("la unidad 5 está en doing, pero su fase 'ship'"));
-        Check("una fase done con unidades pendientes", Says("la fase 'analysis' está done con la unidad 1 en todo"));
+        Check("una fase done con unidades pendientes", Says("la fase 'discovery' está done con la unidad 1 en todo"));
         Check("autonomy que nombra una unidad que no existe", Says("autonomy.units nombra la unidad 9"));
         Check("una fase que no es de NZT", Says("la fase 'discusion' no es una fase de NZT"));
         Check("las fases de NZT no se marcan", !Says("la fase 'build' no es una fase"));
         Check("un modo de delegación que no existe", Says("delegation es 'always'"));
     });
 
-    private static void StateCheckAcceptsDesignAndTheOldUx() => InTemp(home =>
+    private static void StateCheckAcceptsTheRenamedPhasesAndTheirOldNames() => InTemp(home =>
     {
-        foreach (var name in new[] { "design", "ux" })
+        foreach (var name in new[] { "discovery", "analysis", "design", "ux" })
             Check($"la fase {name} cumple", CheckState(home, $$"""
                 { "approved": true, "phases": [{ "name": "{{name}}", "status": "todo", "units": [] }] }
                 """).Ok);
@@ -942,8 +942,8 @@ public static partial class Program
         var report = CheckState(home, """
             { "version": 2, "approved": true, "cadence": "delivery",
               "slices": [
-                { "id": "S1", "name": "Análisis de la entrega 1", "status": "done", "phases": [
-                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] }] },
+                { "id": "S1", "name": "Discovery de la entrega 1", "status": "done", "phases": [
+                  { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] }] },
                 { "id": "S2", "name": "F-003 Cupones", "status": "doing", "phases": [
                   { "name": "build", "status": "doing", "units": [
                     { "id": 2, "status": "done" }, { "id": 3, "status": "doing" }] },
@@ -967,7 +967,7 @@ public static partial class Program
             { "version": 2, "approved": true, "cadence": "sprint",
               "slices": [
                 { "id": "S1", "status": "done", "phases": [
-                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                  { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] },
                   { "name": "build", "status": "todo", "units": [{ "id": 2, "status": "todo" }] }] },
                 { "id": "S2", "status": "doing", "phases": [
                   { "name": "build", "status": "doing", "units": [{ "id": 3, "status": "doing" }] },

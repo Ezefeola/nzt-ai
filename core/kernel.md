@@ -61,12 +61,12 @@ Load the router of the work's phase, even when you know its guidance, unless alr
 |---|---|
 | Starting, resuming, or an unclear phase | `nzt` |
 | Building, changing or executing a plan; closing an accepted feature | `nzt-plan` |
-| What to make and for whom: purpose, requirements, rules, scope, specs, stories, vocabulary, changing an existing feature, specs from an existing product | `nzt-discovery` |
-| How it is made: components, technologies and tools, domain model, technical design, decision records, deferred debt, reviewing an existing structure, diagrams | `nzt-architecture` |
-| What a person sees or operates: screens, menus, levels, page layout, flows, visual direction, mockups and prototypes, design system, usability, the end-user manual | `nzt-design` |
-| Producing the work — code, assets or content: implementing a story, fixing a defect, surveying before changing, refactoring, removing, dependencies, secrets, the tests that ship with it | `nzt-build` |
-| Checking the made slice: test plans, test data, runs, evidence, defects, exploratory sessions and playtests, performance, regression; reading the work or documents for defects | `nzt-verify` |
-| Getting it to people: commits, branches, pull requests, changelog, versions, CI, releasing, deploying or publishing to an environment, store or channel, rollback, monitoring | `nzt-ship` |
+| What it must do and for whom: purpose, rules, scope, vocabulary, specs and stories, changing what was agreed, reconstructing it from existing work | `nzt-discovery` |
+| How it is made: its parts and their boundaries, technologies and tools, the domain model, one feature's technical design, decision records, deferred debt, reviewing an existing structure, diagrams | `nzt-architecture` |
+| The form of what a person perceives or operates: layout, content, states, navigation, mockups and prototypes, the visual system, usability, the end user's manual | `nzt-design` |
+| Producing or changing the work: implementing a story, fixing a defect, surveying before changing, refactoring, removing, dependencies, secrets, the automated tests that ship with it | `nzt-build` |
+| Evidence that the made slice works: test plans, test data, runs, defects, exploratory sessions, performance, regression; reading the work or documents for defects | `nzt-verify` |
+| Getting it to other people: version control, changelog and versions, the release pipeline, releasing, deploying or publishing, rollback, monitoring a release | `nzt-ship` |
 | Teaching the user instead of doing it for them, or continuing a topic in `Learn/` | `nzt-learn` |
 
 **References.** A router's table names files in its own `references/` folder: read the

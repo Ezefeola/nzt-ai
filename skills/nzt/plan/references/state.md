@@ -21,7 +21,7 @@ in the artifacts.
 
 1. `status` is `todo`, `doing`, `done` or `dropped`. One unit `doing`, or one parallel
    group's units. Every entry is one line.
-2. `phases` are named `analysis`, `architecture`, `design`, `build`, `verify` or `ship`, in run
+2. `phases` are named `discovery`, `architecture`, `design`, `build`, `verify` or `ship`, in run
    order, skipped ones absent, **at most one `doing`**: the current phase. Ids are unique in
    the file; the next unit is the first `todo` of the `doing` phase.
 3. When a phase's last unit ends, the same write marks it `done` and the next one `doing`.

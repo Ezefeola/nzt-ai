@@ -19,7 +19,7 @@
 > cajas flex en lugar de columnas contadas (sección **Escritorio**); en la terminal no cambia
 > nada. Revisión que lo pidió: `specs/mods/revision-escritorio.md`. Visto andar en la app por el
 > usuario el 2026-10-24 ("funciono bien ahora el mod").
-> **0.12.0 construido** (2026-11-01): la fase UX pasa a Diseño. **0.11.0** (2026-10-29): panel angosto legible en el escritorio y sin
+> **0.13.0 construido** (2026-11-01): la fase Análisis pasa a Discovery. **0.12.0**: la fase UX pasa a Diseño. **0.11.0** (2026-10-29): panel angosto legible en el escritorio y sin
 > `nzt-questions`, que se quitó del repo (**Historia**). Falta verlo en la app.
 
 ## Qué resuelve
@@ -116,7 +116,7 @@ del archivo y cada una con su estado. Una fase `dropped` aparece tachada.
 ### RN-panel-fase-desconocida · origin: usuario 2026-10-19 ("eso no es una fase, no? las fases son análisis, ux, build, etc")Si `phases` trae un nombre que no es ninguna fase de NZT (ni en ninguna de sus grafías), la
 línea de fases lo muestra igual, tal como viene (RN-panel-fases-tal-cual), y debajo avisa cuáles
 no son fases y cuáles son: *⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las
-fases son Análisis, Arquitectura, Diseño, Build, Verificación, Release*. Se encontró con el estado de
+fases son Discovery, Arquitectura, Diseño, Build, Verificación, Release*. Se encontró con el estado de
 este repo: el agente había escrito cada cambio como una fase.
 
 ### RN-panel-tramos · origin: D72 y D73 de `specs/nzt-core.md` (usuario 2026-10-23: "sin fases repetidas en el mod")
@@ -512,6 +512,14 @@ pasos por onda, solo mientras hay algo en curso o se espera): se vio en la prueb
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. Empieza en 0.7.0: lo anterior está
 en el encabezado y en **Hallazgos resueltos**.
+
+### 2026-11-01 · La fase Análisis pasa a Discovery — 0.13.0
+Type:     modify
+Change:   la fase `analysis` se llama `discovery` y se muestra como Discovery en los dos idiomas, con el mismo color y el mismo birrete; `analysis` sigue siendo una grafía de esa fase.
+Reason:   el usuario prefirió que la fase lleve el nombre de su router (`nzt-discovery`) también en el estado y en el mod.
+Before:   id `analysis`, etiqueta Análisis (Analysis en inglés).
+Now:      id `discovery`, etiqueta Discovery; un estado escrito antes, con `analysis`, se ve igual que uno nuevo y sin aviso.
+Impact:   RN-panel-fase-desconocida (el texto del aviso) · tabla de personajes
 
 ### 2026-11-01 · La fase UX pasa a Diseño — 0.12.0
 Type:     modify

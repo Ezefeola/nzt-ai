@@ -9,7 +9,7 @@ exists is enforced while its behaviour is built, with no `tech.md` flag.
 1. **Find the project's rule** for caller, resource and action — ownership, tenant, role, an
    agreed permission — and the access mechanism already there. Never invent an ownership rule
    per resource, never assume read implies update or delete. An undefined permission is a
-   question for analysis; keep going on independent work meanwhile.
+   question for discovery; keep going on independent work meanwhile.
 2. **Take authority only from the server**: authentication or the authorised execution
    context. An id in a body, URL or header is input, never authority; binding never
    overwrites the trusted context. The use case uses the project's caller abstraction, never

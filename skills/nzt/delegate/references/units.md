@@ -17,7 +17,7 @@ Only units the approved plan marked parallel. Check again, before starting, that
 | Starts without asking the user | an open question its result depends on |
 
 A unit that fails one runs here after the group: *"the plan said parallel, I run it after
-because …"*. Analysis, architecture and UX never go.
+because …"*. Discovery, architecture and design never go.
 
 | The unit is | Model |
 |---|---|

@@ -19,10 +19,11 @@ public static class StateCheck
 
     private static readonly string[] Statuses = ["todo", "doing", "done", "dropped"];
 
-    private static readonly string[] Phases = ["analysis", "architecture", "design", "build", "verify", "ship"];
+    private static readonly string[] Phases = ["discovery", "architecture", "design", "build", "verify", "ship"];
 
-    // `ux` fue el nombre de `design` hasta D88: un estado escrito antes sigue cumpliendo.
-    private static readonly string[] LegacyPhases = ["ux"];
+    // `analysis` fue el nombre de `discovery` y `ux` el de `design` hasta D88: un estado
+    // escrito antes sigue cumpliendo.
+    private static readonly string[] LegacyPhases = ["analysis", "ux"];
 
     private static readonly string[] DelegationModes = ["auto", "ask", "off"];
 

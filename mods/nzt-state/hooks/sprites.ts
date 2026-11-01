@@ -39,7 +39,7 @@ export const PALETTE: Record<string, string> = {
 const NO_HAT = ['..............', '..............', '..............', '..............']
 
 const HATS: Record<PhaseId, string[]> = {
-  analysis: ['..............', '.VVVVVVVVVVVV.', '...vvvvvvvv.y.', '....vvvvvv..y.'],
+  discovery: ['..............', '.VVVVVVVVVVVV.', '...vvvvvvvv.y.', '....vvvvvv..y.'],
   architecture: ['......BB......', '....bbBBbb....', '...bbbbbbbb...', '.bbbbbbbbbbbb.'],
   design: ['......p.......', '...pppppppp...', '..pppppppppppp', '...pppppppp...'],
   build: ['...........g.g', '....aaaaaa.ggg', '...aawwwwaa.g.', '..aaaaaaaaaa.g'],
@@ -84,7 +84,7 @@ export const frameOf = (phase: PhaseId | undefined, tick: number): string[] => {
 export const MINI_WIDTH = 4
 
 const MINI_HATS: Record<PhaseId, string[]> = {
-  analysis: ['VVVV', '.vvy'],
+  discovery: ['VVVV', '.vvy'],
   architecture: ['.BB.', 'bbbb'],
   design: ['.ppp', 'pppp'],
   build: ['.aa.', 'awwa'],
