@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "updated": "2026-11-02T00:30:00Z",
+  "updated": "2026-11-02T01:00:00Z",
   "goal": "Preparación para trabajar: el agente propone y explica lo que necesita para el trabajo, como a alguien que no sabe; además Docs/Design/ (QT-07) y la versión 4.0.0 (QT-05)",
   "phases": [
     {
       "name": "build",
-      "status": "todo",
+      "status": "doing",
       "units": [
-        { "id": 432, "do": "tech.md paso 4 como preparación para trabajar: qué hace el agente y qué necesita, catálogo e investigación, lo que hace el usuario paso a paso, lo que el agente no puede, qué tener en cuenta; con el sí instalar, guiar y comprobar que anda; en tech.md solo la fila de Agent tools (quién lo instala, en pocas palabras), sin sección de setup: el cómo vive en el pack o en la fuente citada", "status": "todo" },
+        { "id": 432, "do": "tech.md paso 4 como preparación para trabajar: qué hace el agente y qué necesita, catálogo e investigación, lo que hace el usuario paso a paso, lo que el agente no puede, qué tener en cuenta; con el sí instalar, guiar y comprobar que anda; en tech.md solo la fila de Agent tools (quién lo instala, en pocas palabras), sin sección de setup: el cómo vive en el pack o en la fuente citada", "status": "done", "detail": "references/tech.md paso 4 'Prepare the work': una ronda para quien no sabe nada, con qué hará el agente y qué necesita, cómo se cubre (catálogo e investigación siempre, fuente y fecha, contradicción con el pack dicha), lo que hace el usuario a mano, lo que el agente no puede, qué tener en cuenta; instalar con el sí en el proyecto y guiar. Paso 7: comprobar que cada herramienta responde (un MCP, en la sesión nueva). Regla 4: Agent tools con quién lo instaló en pocas palabras, nunca los pasos. Done when y fila del router ('what the agent needs to do the work'). Orden de fuentes sin repetir (vive en nzt-research). Build 0 avisos, 235 checks, lint 0" },
         { "id": 433, "do": "Eval routing/tool-research: además del catálogo y la investigación, explicar lo que hace el usuario, lo que el agente no puede y cómo se comprueba; sin correrlo", "status": "todo" },
         { "id": 434, "do": "Docs/UX/ → Docs/Design/ y ux-ui/ → design/ en design, architecture, sus referencias y los evals; un proyecto con las carpetas viejas se sigue leyendo ahí (QT-07)", "status": "todo" }
       ]
@@ -27,10 +27,10 @@
       ]
     }
   ],
-  "approved": false,
+  "approved": true,
   "delegation": "ask",
   "autonomy": { "units": [], "keep_stops": [] },
-  "waiting_on": "que el usuario apruebe este plan",
+  "waiting_on": null,
   "notes": [
     "Rama refactor-marco-generico. El run anterior (marco genérico, 413-431 y 424) terminó en d1fb199; su detalle está en git y en Plan/mejoras/11-marco-generico.md",
     "Pedido del usuario (2026-11-01): que el agente ofrezca y explique todo lo necesario para trabajar —packs, MCP, herramientas, lo que hace el usuario, lo que no puede hacer, qué tener en cuenta— como hizo Claude solo con el juego de Unity, escrito en términos de 'el trabajo' y no de 'el componente' (DB-04). QT-06 cerrada en A: el MCP queda en el archivo del proyecto y viaja con git",

@@ -16,7 +16,7 @@ itself (`nzt-build`).
 | The unit is | Read | Read with |
 |---|---|---|
 | The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/decisions-log.md`, `references/diagrams.md` |
-| Technologies, packs, decisions and opt-ins of each component | `references/tech.md` | `references/decisions-log.md` |
+| Technologies, packs, decisions and opt-ins of each component; what the agent needs to do the work | `references/tech.md` | `references/decisions-log.md` |
 | One feature's technical design | `references/design-feature.md` | `references/decisions-log.md`, `references/diagrams.md` |
 | The business entities and their relationships | `references/domain.md` | — |
 | A consequential decision with alternatives | `references/adr.md` | — |

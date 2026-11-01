@@ -31,21 +31,25 @@ product: a web system, a game, a mobile app, a book, a course.
 3. **Resolve them**: facts (versions, support windows, licences, platform limits) are
    researched with source and date; tradeoffs are asked with a recommendation, in one round
    ordered by dependency (the technology before what depends on it).
-4. **Choose the packs and the agent's tools — catalogue and research, always both.**
-   - Run `nzt-ai project packs` and match packs to what was chosen.
-   - **Research too, even when a pack matches** (`nzt-research`, *a tool for the agent*):
-     the MCP servers and tools the chosen technologies offer an agent — a better, newer or
-     more official one may exist than the pack's.
-   - **Propose both together in one round**, each with its source and date, what it brings
-     (a pack: its skill, MCP servers and requirements) and what it costs (permissions, what
-     it installs on the machine). The most trusted source wins; when the research contradicts
-     a pack — another version, another command — say so.
-   - **Install only on the user's yes, in the project, never globally**: a pack with
-     `nzt-ai project add <pack>...` (`--provider codex` or `all` when the project uses
-     Codex); a researched MCP server with the provider's project scope (`.mcp.json` for
-     Claude Code, `.codex/config.toml` for Codex), which `nzt-ai project` keeps untouched.
-   - No matching pack and nothing found, or no `nzt-ai`: say so — the component is built
-     from the generic routers and the work next to it.
+4. **Prepare the work.** Once the technologies are chosen, or when the user asks what you
+   need, propose in one round — written for someone who knows none of it:
+   - **What you will do and what each part needs**: writing the work, running it, reading
+     its documentation, seeing its output.
+   - **How each need is met — catalogue and research, always both**: `nzt-ai project
+     packs`, and the MCP servers, editor packages, CLIs or SDKs the technologies offer an
+     agent (`nzt-research`, *a tool for the agent*), even when a pack matches. Each with
+     its source and date and what it brings; when the research contradicts a pack, say so.
+   - **What the user does by hand**, step by step in plain words: install, approve a
+     connection, create an account or a key.
+   - **What you cannot do even with all of it** — judge how it feels, try it where you
+     cannot reach — so the user knows where they are needed.
+   - **What to keep in mind**: licences, costs, permissions, what it installs on the machine.
+
+   On the user's yes, install **in the project, never globally**: a pack with `nzt-ai
+   project add <pack>...` (`--provider codex` or `all` when the project uses Codex); a
+   researched MCP server in the provider's project file (`.mcp.json`, `.codex/config.toml`),
+   which `nzt-ai project` leaves untouched. Guide the user's steps. No pack and nothing
+   found, or no `nzt-ai`: say so — the work goes on with the generic routers.
 5. **Ask the packs' decisions.** Read each installed pack's `SKILL.md` (in `.claude/skills/`
    or `.agents/skills/`) — its `## Axes` and `## Opt-ins` — and ask them in one round, each
    option's cost as its consequence. Write the value **exactly as the pack spells it**: the
@@ -53,7 +57,8 @@ product: a web system, a game, a mobile app, a book, a course.
    never an invented value.
 6. **Ask the core opt-ins** below, every one, including the `no`s.
 7. **Write `tech.md`**, agent tools included, and tell the user that MCP servers load in a
-   new session.
+   new session. **Check that each tool answers** before relying on it — an MCP server, in
+   that session; what does not answer is said with what is missing.
 
 ## The file
 
@@ -113,7 +118,8 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
 4. **Dependencies are the user's**: one enters only after the user confirmed it (here or via
    `nzt-build`'s `dependencies.md`), with its version. Transitive ones are not listed.
    **Agent tools** too: only installed ones, with their source and date, and `pack <name>`
-   or how it was installed, so the next session knows they exist.
+   or who installed it in a few words (*the user, in the editor*) — never the steps: they
+   live in the pack or the source.
 5. **Versions come from evidence** — the pins, manifests and lock files — named in the
    evidence line. What could not be determined says so and what would settle it.
 6. **A convention is one line** the agent cannot deduce from the rest. Longer is a decision
@@ -125,4 +131,5 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
 
 Someone could do correct work in any component tomorrow with only this file, the specs and
 its pack skills: every decision has one value or an open `QT-NN`, every opt-in is answered,
-every pack and agent tool listed is installed, and every version and tool names its source.
+every pack and agent tool listed is installed and answers, every version and tool names its
+source, and the user was told what they do by hand and what the agent cannot do.
