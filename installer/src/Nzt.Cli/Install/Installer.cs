@@ -67,10 +67,11 @@ public static class Installer
         string? manifestDirectory = null)
     {
         var planned = Plan(provider, catalog);
-        var manifest = Manifest.Load(provider.Id, manifestDirectory);
+        var (directory, root) = ManifestLocation(provider, manifestDirectory);
+        var manifest = Manifest.Load(provider.Id, directory, root);
 
         // ── Pre-scan: nunca sobrescribe un archivo que no instaló él ────────────
-        // Las carpetas son globales y las comparte con lo que el usuario tenga.
+        // Las carpetas las comparte con lo que el usuario tenga, global o en el repo.
         // Con un solo conflicto no se escribe nada: se corta y se informa.
         var conflicts = new List<Conflict>();
         foreach (var file in planned)
@@ -107,8 +108,10 @@ public static class Installer
                     string.Equals(f.Path, file.TargetPath, StringComparison.OrdinalIgnoreCase));
 
                 // Primera vez sobre un archivo del usuario: el bloque va arriba y
-                // su contenido queda abajo, intacto.
-                var replacement = file.Content + current;
+                // su contenido queda abajo, intacto. Uno nuevo lleva lo que el
+                // proveedor pida a continuación (RN-proy-agents-md).
+                var replacement = file.Content + (exists ? current : provider.CreatedSuffix ?? "");
+                var created = !exists || previous?.Created == true;
 
                 if (exists && previous is not null)
                 {
@@ -129,12 +132,12 @@ public static class Installer
                 if (!dryRun && action != FileAction.Unchanged)
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(file.TargetPath)!);
-                    Backup(file.TargetPath, exists, previous is null);
+                    Backup(file.TargetPath, exists, previous is null, provider.BackupDirectory);
                     File.WriteAllText(file.TargetPath, replacement);
                 }
 
                 outcomes.Add(new FileOutcome(file.TargetPath, action));
-                entries.Add(new ManifestEntry(file.TargetPath, newHash, ManagedBlock: true));
+                entries.Add(new ManifestEntry(file.TargetPath, newHash, ManagedBlock: true, Created: created));
                 continue;
             }
 
@@ -214,10 +217,28 @@ public static class Installer
                 Version = version,
                 InstalledAt = DateTimeOffset.Now,
                 Files = entries,
-                Mods = manifest?.Mods
-            }.Save(manifestDirectory);
+                Mods = manifest?.Mods,
+                Mode = provider.Scope == Scope.Project
+                    ? provider.Personal ? Manifest.PersonalMode : Manifest.SharedMode
+                    : null
+            }.Save(directory, root);
 
         return new InstallResult(provider, [], outcomes);
+    }
+
+    /// <summary>
+    /// Dónde está el manifiesto de este destino: el de un proyecto, en el proyecto y
+    /// con rutas relativas; el de usuario, donde diga `manifestDirectory`.
+    /// </summary>
+    public static (string? Directory, string? Root) ManifestLocation(Provider provider, string? manifestDirectory) =>
+        provider.Scope == Scope.Project
+            ? (provider.ManifestDirectory, provider.Project!.Path)
+            : (manifestDirectory, null);
+
+    public static Manifest? LoadManifest(Provider provider, string? manifestDirectory)
+    {
+        var (directory, root) = ManifestLocation(provider, manifestDirectory);
+        return Manifest.Load(provider.Id, directory, root);
     }
 
     /// <summary>
@@ -227,7 +248,8 @@ public static class Installer
     public static UninstallResult Uninstall(Provider provider, bool dryRun = false,
         string? manifestDirectory = null)
     {
-        var manifest = Manifest.Load(provider.Id, manifestDirectory);
+        var (directory, root) = ManifestLocation(provider, manifestDirectory);
+        var manifest = Manifest.Load(provider.Id, directory, root);
         // Un manifiesto que solo anota mods no es una instalación del método.
         if (manifest is null || manifest.Files.Count == 0)
             return new UninstallResult(provider, HadManifest: false, []);
@@ -263,11 +285,33 @@ public static class Installer
         if (!dryRun)
         {
             var remaining = manifest with { Files = retained };
-            if (remaining.IsEmpty) Manifest.Delete(provider.Id, manifestDirectory);
-            else remaining.Save(manifestDirectory);
+            if (remaining.IsEmpty) Manifest.Delete(provider.Id, directory);
+            else remaining.Save(directory, root);
+            if (provider.Scope == Scope.Project) RemoveEmptyProjectFolders(provider);
         }
 
         return new UninstallResult(provider, HadManifest: true, outcomes);
+    }
+
+    /// <summary>
+    /// Un proyecto queda como si NZT nunca hubiera estado: las carpetas que crearon
+    /// sus archivos se van si quedaron vacías. Nunca la raíz, ni una con algo adentro.
+    /// </summary>
+    private static void RemoveEmptyProjectFolders(Provider provider)
+    {
+        string?[] folders =
+        [
+            provider.SkillsDirectory, Path.GetDirectoryName(provider.SkillsDirectory),
+            provider.AgentsDirectory, Path.GetDirectoryName(provider.AgentsDirectory),
+            provider.ManifestDirectory, Path.GetDirectoryName(provider.ManifestDirectory)
+        ];
+
+        foreach (var folder in folders)
+        {
+            if (folder is null || ProjectRoot.SamePath(folder, provider.Project!.Path)) continue;
+            if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
+                Directory.Delete(folder);
+        }
     }
 
     private static void RemoveManagedBlock(ManifestEntry entry, bool dryRun,
@@ -286,12 +330,16 @@ public static class Installer
 
     /// <summary>
     /// Copia de seguridad la primera vez que se toca un archivo de instrucciones
-    /// que ya existía y no es nuestro. Una sola: no se pisa un backup previo.
+    /// que ya existía y no es nuestro. Una sola: no se pisa un backup previo. En un
+    /// proyecto va a `.nzt/backup/`, que es del usuario y no del repo.
     /// </summary>
-    private static void Backup(string path, bool exists, bool firstTime)
+    private static void Backup(string path, bool exists, bool firstTime, string? directory)
     {
         if (!exists || !firstTime) return;
-        var backup = path + ".nzt-backup";
+        var backup = directory is null
+            ? path + ".nzt-backup"
+            : Path.Combine(directory, Path.GetFileName(path) + ".nzt-backup");
+        if (directory is not null) Directory.CreateDirectory(directory);
         if (!File.Exists(backup)) File.Copy(path, backup);
     }
 

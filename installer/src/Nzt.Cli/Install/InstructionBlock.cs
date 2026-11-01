@@ -10,6 +10,12 @@ public static class InstructionBlock
     public const string Begin = "<!-- nzt:start -->";
     public const string End = "<!-- nzt:end -->";
 
+    /// <summary>
+    /// Lo que sigue al bloque en un archivo de Claude Code que NZT creó en un repo
+    /// que solo tenía `AGENTS.md` (RN-proy-agents-md). Va fuera del bloque.
+    /// </summary>
+    public const string AgentsImport = "\n@AGENTS.md\n";
+
     /// <summary>Byte por byte lo que produce el build: kernel, línea en blanco, adapter.</summary>
     public static string Render(string kernel, string adapter) =>
         Begin + "\n" + kernel.Replace("\r\n", "\n").TrimEnd() + "\n\n"
@@ -50,8 +56,11 @@ public static class InstructionBlock
 
     public static void Remove(string path, string text, int start, int length)
     {
+        // Sin el bloque, un archivo que solo importa AGENTS.md es el que creó NZT:
+        // se va con él, y el repo queda como estaba.
         var remaining = text.Remove(start, length);
-        if (remaining.Trim().Length == 0) File.Delete(path);
+        var rest = remaining.Trim();
+        if (rest.Length == 0 || rest == AgentsImport.Trim()) File.Delete(path);
         else File.WriteAllText(path, remaining);
     }
 }

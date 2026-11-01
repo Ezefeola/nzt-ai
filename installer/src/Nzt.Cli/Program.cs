@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Nzt.Cli.Content;
 using Nzt.Cli.Install;
@@ -5,11 +6,10 @@ using Nzt.Cli.Lint;
 using Nzt.Cli.Mods;
 using Nzt.Cli.Providers;
 using Nzt.Cli.State;
-using Spectre.Console;
 
 namespace Nzt.Cli;
 
-public static class Program
+public static partial class Program
 {
     private static readonly string Version =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
@@ -32,23 +32,52 @@ public static class Program
 
     private static int Run(string[] args)
     {
+        if (args.Contains("--version")) return Line(Version);
+
         var command = args.FirstOrDefault(a => !a.StartsWith('-'))?.ToLowerInvariant();
         var dryRun = args.Contains("--dry-run");
         var manifestDir = ValueOf(args, "--manifest-dir");
         _binDir = ValueOf(args, "--bin-dir");
+        if (OperatingSystem.IsWindows()) Updater.CleanUp(CliCommand.PathFor(_binDir));
 
         var modsValue = ValueOf(args, "--mods");
         var mods = modsValue is null ? null : ModsChoiceFor(modsValue);
         if (modsValue is not null && mods is null)
             return Fail($"--mods desconocido: {modsValue}. Son all, none u only.");
 
+        var scopeValue = ValueOf(args, "--scope")?.ToLowerInvariant();
+        if (scopeValue is not (null or "user" or "project"))
+            return Fail($"--scope desconocido: {scopeValue}. Son user o project.");
+        var scope = scopeValue == "project" ? Scope.Project : Scope.User;
+
+        var modeValue = ValueOf(args, "--mode")?.ToLowerInvariant();
+        if (modeValue is not (null or "personal" or "shared"))
+            return Fail($"--mode desconocido: {modeValue}. Son personal o shared.");
+        if (modeValue is not null && scope != Scope.Project)
+            return Fail("--mode solo vale con --scope project.");
+
+        // Los mods siguen siendo globales (RN-proy-mods).
+        if (modsValue is not null && scope == Scope.Project)
+            return Fail("Los mods son globales: --mods no vale con --scope project. No se tocó nada.");
+
+        var projectsValue = ValueOf(args, "--projects")?.ToLowerInvariant();
+        if (projectsValue is not (null or "all" or "none"))
+            return Fail($"--projects desconocido: {projectsValue}. Son all o none.");
+
         // Instalar sin --mods es solo el método, como la línea de siempre; desinstalar
         // saca también los mods que instaló este CLI.
         return command switch
         {
             null => Menu(),
-            "install" => Install(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.MethodOnly),
-            "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.All),
+            "init" => Init(manifestDir),
+            "install" => Install(ProvidersFrom(args, scope, modeValue != "shared", manifestDir), dryRun, manifestDir,
+                mods ?? ModsChoice.MethodOnly),
+            "uninstall" when args.Contains("--all") => UninstallAll(dryRun, manifestDir),
+            "uninstall" => Uninstall(ProvidersFrom(args, scope, personal: true, manifestDir), dryRun, manifestDir,
+                mods ?? ModsChoice.All),
+            "update" => args.Contains("--apply")
+                ? Apply(dryRun, manifestDir, projectsValue)
+                : Update(dryRun, manifestDir, projectsValue),
             "status" => Status(manifestDir),
             "lint" or "verify" => Lint(detailed: false),
             "state" => SubcommandOf(args) == "check"
@@ -59,141 +88,35 @@ public static class Program
         };
     }
 
-    // ── Interfaz ───────────────────────────────────────────────────────────────
-
     private static int Help()
     {
         Console.WriteLine($"""
             NZT installer {Version}
 
               nzt-ai                                    menú interactivo
-              nzt-ai install --provider <id> [--mods all|none|only] [--dry-run]
-              nzt-ai uninstall --provider <id> [--mods all|none|only] [--dry-run]
+              nzt-ai init                               el menú, en "Instalar en este proyecto"
+              nzt-ai install --provider <id> [--scope user|project] [--mode personal|shared]
+                             [--mods all|none|only] [--dry-run]
+              nzt-ai uninstall --provider <id> [--scope user|project] [--mods all|none|only] [--dry-run]
+              nzt-ai uninstall --all [--dry-run]        global, proyectos, mods de NZT y nzt-ai
+              nzt-ai update [--projects all|none] [--dry-run]
               nzt-ai status
               nzt-ai lint | verify
               nzt-ai state check                        revisa Plan/state.json de esta carpeta
+              nzt-ai --version
 
             Proveedores: claude-code, codex, all
-            Mods (solo Claude Code): all = el método y los mods, none = solo el método,
-            only = solo los mods. Instalar sin --mods es none; desinstalar sin --mods es all.
+            Alcance: user (por defecto) o project, el repo de esta carpeta. Global y proyecto
+            no conviven por proveedor. Modo en un proyecto: personal (por defecto, nada en el
+            diff de git) o shared (para commitear).
+            Mods (solo Claude Code, siempre globales): all = el método y los mods, none = solo
+            el método, only = solo los mods. Instalar sin --mods es none; desinstalar, all.
             """);
         return 0;
     }
 
-    /// <summary>Las acciones del menú principal, en el orden en que se ofrecen.</summary>
-    public enum MenuAction { Install, Uninstall, Verify, Status, Exit }
-
-    /// <summary>Los destinos que ofrecen instalar y desinstalar. `Back` no elige ninguno.</summary>
-    public enum ProviderChoice { ClaudeCode, Codex, All, Back }
-
     /// <summary>Qué se instala o se saca en Claude Code. `All` va primero: es la marcada al abrir.</summary>
     public enum ModsChoice { All, MethodOnly, ModsOnly, Back }
-
-    /// <summary>
-    /// El menú: instalar, desinstalar, verificar el contenido, ver estado. Se
-    /// recorre con las flechas y se elige con Enter —no se escribe nada, así que
-    /// no hay opción inválida posible—, y vuelve a preguntar hasta que se elige
-    /// salir, porque verificar y ver estado no son el final de nada. Las dos
-    /// acciones que escriben muestran la simulación completa y recién ahí preguntan.
-    /// </summary>
-    private static int Menu()
-    {
-        Console.WriteLine($"NZT installer {Version}\n");
-
-        // Sin terminal —una tubería cerrada— no hay flechas que leer: se sale en
-        // vez de girar sobre un prompt que nadie puede contestar.
-        if (Console.IsInputRedirected)
-        {
-            Console.WriteLine("  El menú necesita una terminal. Sin ella están los comandos: nzt-ai help.");
-            return 0;
-        }
-
-        while (true)
-        {
-            var action = Ask("¿Qué querés hacer?", MenuLabel,
-                MenuAction.Install, MenuAction.Uninstall, MenuAction.Verify,
-                MenuAction.Status, MenuAction.Exit);
-
-            Console.WriteLine();
-
-            switch (action)
-            {
-                case MenuAction.Install: MenuInstall(); break;
-                case MenuAction.Uninstall: MenuUninstall(); break;
-                case MenuAction.Verify: Lint(detailed: true); break;
-                case MenuAction.Status: Status(null); break;
-                default: return 0;
-            }
-
-            Console.WriteLine();
-        }
-    }
-
-    private static void MenuInstall()
-    {
-        var targets = AskProvider("¿Dónde lo instalo?");
-        if (targets.Count == 0) return;
-
-        var mods = AskMods(targets, "¿Qué instalo en Claude Code?");
-        if (mods is not { } choice) return;
-
-        // Primero se muestra exactamente lo que haría, y recién ahí se pregunta.
-        if (Install(targets, dryRun: true, null, choice) != 0) return;
-
-        if (!Confirm("¿Instalar?"))
-        {
-            Console.WriteLine("  No se escribió nada.");
-            return;
-        }
-
-        Install(targets, dryRun: false, null, choice);
-    }
-
-    private static void MenuUninstall()
-    {
-        var targets = AskProvider("¿De dónde lo saco?");
-        if (targets.Count == 0) return;
-
-        var mods = AskMods(targets, "¿Qué saco de Claude Code?");
-        if (mods is not { } choice) return;
-
-        // La simulación va primero acá también, y más: esto borra. Lo que se
-        // conserva por estar editado aparece antes de confirmar, no después.
-        Console.WriteLine("  Se remueve solamente lo que instaló este CLI, según su manifiesto.\n");
-        if (Uninstall(targets, dryRun: true, null, choice) != 0) return;
-
-        if (!Confirm("¿Desinstalar?"))
-        {
-            Console.WriteLine("  No se borró nada.");
-            return;
-        }
-
-        Uninstall(targets, dryRun: false, null, choice);
-    }
-
-    private static IReadOnlyList<Provider> AskProvider(string question)
-    {
-        var choice = Ask(question, ProviderLabel,
-            ProviderChoice.ClaudeCode, ProviderChoice.Codex, ProviderChoice.All, ProviderChoice.Back);
-
-        Console.WriteLine();
-        return ProvidersFor(choice);
-    }
-
-    /// <summary>
-    /// La pregunta de los mods, solo si entre los destinos está Claude Code: es el
-    /// único proveedor que los tiene, y con Todos se hace una sola vez. `null` es Volver.
-    /// </summary>
-    private static ModsChoice? AskMods(IReadOnlyList<Provider> targets, string question)
-    {
-        if (!targets.Any(p => p.HasMods)) return ModsChoice.MethodOnly;
-
-        var choice = Ask(question, ModsLabel,
-            ModsChoice.All, ModsChoice.MethodOnly, ModsChoice.ModsOnly, ModsChoice.Back);
-
-        Console.WriteLine();
-        return choice == ModsChoice.Back ? null : choice;
-    }
 
     /// <summary>El valor de `--mods`. `null` si no es uno de los tres.</summary>
     public static ModsChoice? ModsChoiceFor(string value) => value.ToLowerInvariant() switch
@@ -204,67 +127,7 @@ public static class Program
         _ => null
     };
 
-    /// <summary>La opción elegida, traducida a proveedores. `Back` no elige ninguno.</summary>
-    public static IReadOnlyList<Provider> ProvidersFor(ProviderChoice choice) => choice switch
-    {
-        ProviderChoice.ClaudeCode => [Provider.ClaudeCode()],
-        ProviderChoice.Codex => [Provider.Codex()],
-        ProviderChoice.All => Provider.All,
-        _ => []
-    };
-
-    /// <summary>
-    /// La confirmación de lo que escribe o borra, también con las flechas. `No`
-    /// va primero porque la primera opción es la marcada al abrir: ese es el
-    /// valor por defecto, y acá tiene que ser el que no toca el disco.
-    /// </summary>
-    private static bool Confirm(string question)
-    {
-        Console.WriteLine();
-        var answer = Ask(question, yes => yes ? "Sí" : "No", false, true);
-        Console.WriteLine();
-        return answer;
-    }
-
-    /// <summary>
-    /// El único prompt del CLI: una lista que se recorre con las flechas y se
-    /// elige con Enter. La primera opción es la que está marcada al abrirse.
-    /// </summary>
-    private static T Ask<T>(string question, Func<T, string> label, params T[] choices)
-        where T : notnull =>
-        AnsiConsole.Prompt(
-            new SelectionPrompt<T>()
-                .Title($"  {Markup.Escape(question)}")
-                .HighlightStyle(new Style(foreground: Color.Cyan1))
-                .UseConverter(label)
-                .AddChoices(choices));
-
-    private static string MenuLabel(MenuAction action) => action switch
-    {
-        MenuAction.Install => "Instalar",
-        MenuAction.Uninstall => "Desinstalar",
-        MenuAction.Verify => "Verificar el contenido",
-        MenuAction.Status => "Ver estado",
-        _ => "Salir"
-    };
-
-    private static string ProviderLabel(ProviderChoice choice) => choice switch
-    {
-        ProviderChoice.ClaudeCode => "Claude Code",
-        ProviderChoice.Codex => "Codex",
-        ProviderChoice.All => "Todos los proveedores soportados",
-        _ => "Volver"
-    };
-
-    private static string ModsLabel(ModsChoice choice) => choice switch
-    {
-        ModsChoice.All => "Todo NZT: el método y los mods",
-        ModsChoice.MethodOnly => "Solo el método",
-        ModsChoice.ModsOnly => "Solo los mods",
-        _ => "Volver"
-    };
-
-    // ── Comandos ───────────────────────────────────────────────────────────────
+    // ── Instalar ───────────────────────────────────────────────────────────────
 
     private static int Install(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir,
         ModsChoice mods)
@@ -289,7 +152,7 @@ public static class Program
 
         foreach (var provider in providers)
         {
-            Console.WriteLine($"{provider.DisplayName}{(dryRun ? "  (simulación)" : "")}");
+            Console.WriteLine($"{provider.DisplayName} · {provider.ScopeLabel}{(dryRun ? "  (simulación)" : "")}");
 
             if (!provider.HasMods && mods != ModsChoice.MethodOnly)
                 Console.WriteLine(installsMethod
@@ -298,12 +161,14 @@ public static class Program
 
             if (installsMethod && !InstallMethod(provider, catalog, dryRun, manifestDir)) failed = true;
 
-            if (provider.HasMods && mods != ModsChoice.MethodOnly
+            if (provider.HasMods && provider.Scope == Scope.User && mods != ModsChoice.MethodOnly
                 && !InstallMods(provider, dryRun, manifestDir, methodSkipped: !installsMethod))
                 failed = true;
 
             Console.WriteLine();
         }
+
+        if (!dryRun) SyncProjects(providers, manifestDir);
 
         ReportCli(CliCommand.Install(CliCommand.RunningSingleFile(), dryRun, _binDir), dryRun);
 
@@ -320,7 +185,20 @@ public static class Program
 
     private static bool InstallMethod(Provider provider, ContentCatalog catalog, bool dryRun, string? manifestDir)
     {
+        if (Blocker(provider, manifestDir) is { } blocker)
+        {
+            Error(blocker);
+            return false;
+        }
+
         if (provider.PathWarning is { } warning) Warn(warning);
+        if (provider.AgentsWarning is { } agents) Warn(agents);
+        if (TrackedAgentsWarning(provider, manifestDir) is { } tracked) Warn(tracked);
+
+        // Una global con proyectos de ese proveedor los tapa (RN-proy-exclusivo).
+        if (provider.Scope == Scope.User)
+            foreach (var project in ProjectsWith(provider.Id, manifestDir))
+                Warn($"{project.Path} tiene NZT en {provider.DisplayName}: la global lo va a tapar.");
 
         var result = Installer.Install(provider, catalog, Version, dryRun, manifestDir);
 
@@ -335,6 +213,14 @@ public static class Program
         Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
         Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
+        if (provider.CreatedSuffix is not null && !File.Exists(provider.InstructionsFile))
+            Console.WriteLine("  importa        AGENTS.md, para que Claude Code lo siga leyendo");
+        if (provider.Scope == Scope.Project)
+            Console.WriteLine(provider.Project!.IsGitRepo
+                ? provider.Personal
+                    ? "  git            lo que se crea va a .git/info/exclude: no aparece en el diff"
+                    : "  git            compartido: para commitear"
+                : "  git            sin repo: no hay nada que excluir");
         Summary(result.Outcomes);
 
         foreach (var skipped in result.Outcomes.Where(o => o.Action == FileAction.SkippedLocallyEdited))
@@ -342,6 +228,61 @@ public static class Program
 
         if (!dryRun) Console.WriteLine($"  {provider.Usage}");
         return true;
+    }
+
+    /// <summary>
+    /// Lo que impide instalar en un proyecto sin escribir nada: la global del mismo
+    /// proveedor (RN-proy-exclusivo) o un proyecto con una versión más nueva que
+    /// este CLI (RN-proy-version).
+    /// </summary>
+    private static string? Blocker(Provider provider, string? manifestDir)
+    {
+        if (provider.Scope != Scope.Project) return null;
+
+        if (Manifest.Load(provider.Id, manifestDir) is { Files.Count: > 0 })
+            return $"{provider.DisplayName} está instalado global, y la global taparía este proyecto. "
+                + $"Desinstalala primero: nzt-ai uninstall --provider {provider.Id}. No se escribió nada.";
+
+        return NewerProject(provider, manifestDir);
+    }
+
+    private static string? NewerProject(Provider provider, string? manifestDir) =>
+        Installer.LoadManifest(provider, manifestDir) is { } manifest && IsNewer(manifest.Version, Version)
+            ? $"Este proyecto tiene NZT {manifest.Version} en {provider.DisplayName}, más nuevo que este "
+              + $"{CliCommand.Name} ({Version}). Actualizalo primero: nzt-ai update. No se tocó nada."
+            : null;
+
+    /// <summary>
+    /// Codex no tiene instrucciones solo del usuario (RN-proy-codex-personal): en
+    /// *Solo para mí*, un `AGENTS.md` que git versiona va a mostrar el bloque en el diff.
+    /// </summary>
+    private static string? TrackedAgentsWarning(Provider provider, string? manifestDir)
+    {
+        if (provider is not { Scope: Scope.Project, Id: Provider.CodexId, Personal: true }) return null;
+        if (!File.Exists(provider.InstructionsFile)) return null;
+        if (Installer.LoadManifest(provider, manifestDir)?.Files.Any(f => f is { ManagedBlock: true, Created: true }) == true)
+            return null;
+
+        var git = new ProcessRunner().Run("git",
+            ["-C", provider.Project!.Path, "ls-files", "--error-unmatch", "--", "AGENTS.md"]);
+        if (git is { Ok: false }) return null;
+
+        return git is null
+            ? "AGENTS.md ya existe y Codex no tiene instrucciones solo del usuario: si git lo versiona, "
+              + "el bloque de NZT va a aparecer en el diff."
+            : "AGENTS.md está versionado y Codex no tiene instrucciones solo del usuario: el bloque de NZT "
+              + "va a aparecer en el diff.";
+    }
+
+    /// <summary>Después de escribir en un proyecto: su exclude y el registro, al día.</summary>
+    private static void SyncProjects(IEnumerable<Provider> providers, string? manifestDir)
+    {
+        foreach (var project in providers.Where(p => p.Project is not null).Select(p => p.Project!)
+                     .DistinctBy(p => p.Path, StringComparer.OrdinalIgnoreCase))
+        {
+            GitExclude.Sync(project);
+            ProjectRegistry.Sync(project, manifestDir);
+        }
     }
 
     /// <summary>
@@ -419,8 +360,14 @@ public static class Program
 
     private static ClaudePlugins Claude() => new(new ProcessRunner());
 
+    // ── Desinstalar ────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// `keepCli` lo usan los flujos que desinstalan para seguir —sacar la global e
+    /// instalar en el proyecto, o *Todo*—: deciden ellos al final si `nzt-ai` se va.
+    /// </summary>
     private static int Uninstall(IReadOnlyList<Provider> providers, bool dryRun, string? manifestDir,
-        ModsChoice mods)
+        ModsChoice mods, bool keepCli = false)
     {
         if (providers.Count == 0) return 1;
 
@@ -428,27 +375,66 @@ public static class Program
 
         foreach (var provider in providers)
         {
-            Console.WriteLine($"{provider.DisplayName}{(dryRun ? "  (simulación)" : "")}");
+            Console.WriteLine($"{provider.DisplayName} · {provider.ScopeLabel}{(dryRun ? "  (simulación)" : "")}");
+
+            if (provider.Scope == Scope.Project && NewerProject(provider, manifestDir) is { } newer)
+            {
+                Error(newer);
+                failed = true;
+                Console.WriteLine();
+                continue;
+            }
 
             if (!provider.HasMods && mods == ModsChoice.ModsOnly)
                 Console.WriteLine($"  {provider.DisplayName} no tiene mods: no se saca nada.");
 
             if (mods != ModsChoice.ModsOnly) UninstallMethod(provider, dryRun, manifestDir);
 
-            if (provider.HasMods && mods != ModsChoice.MethodOnly && !UninstallMods(provider, dryRun, manifestDir))
+            if (provider.HasMods && provider.Scope == Scope.User && mods != ModsChoice.MethodOnly
+                && !UninstallMods(provider, dryRun, manifestDir))
                 failed = true;
 
             Console.WriteLine();
         }
 
-        // nzt-ai se va cuando no queda nada instalado por el CLI (QT-26). La simulación no
-        // borra manifiestos, así que ahí solo se dice la regla.
-        if (dryRun)
-            Console.WriteLine($"{CliCommand.Name}  se saca si después no queda ningún proveedor ni mod instalado por este CLI.");
-        else if (Provider.All.All(p => Manifest.Load(p.Id, manifestDir) is null))
-            ReportCli(CliCommand.Uninstall(dryRun, _binDir), dryRun);
+        if (!dryRun) SyncProjects(providers, manifestDir);
+        if (!keepCli) RemoveCliIfUnused(dryRun, manifestDir);
 
         return failed ? 1 : 0;
+    }
+
+    /// <summary>
+    /// *Todo*: la global, cada proyecto registrado, los mods que instaló el CLI y el
+    /// CLI. Lo editado se queda, como siempre.
+    /// </summary>
+    private static int UninstallAll(bool dryRun, string? manifestDir)
+    {
+        var failed = false;
+
+        var globals = Provider.All.Where(p => Manifest.Load(p.Id, manifestDir) is not null).ToList();
+        if (globals.Count > 0 && Uninstall(globals, dryRun, manifestDir, ModsChoice.All, keepCli: true) != 0)
+            failed = true;
+
+        foreach (var project in ProjectRegistry.Load(manifestDir))
+            if (Uninstall(ProvidersIn(project, manifestDir), dryRun, manifestDir, ModsChoice.MethodOnly, keepCli: true) != 0)
+                failed = true;
+
+        if (dryRun) ReportCli(new CliOutcome(CliAction.Removed, CliCommand.PathFor(_binDir)), dryRun);
+        else RemoveCliIfUnused(dryRun, manifestDir);
+
+        return failed ? 1 : 0;
+    }
+
+    // nzt-ai se va cuando no queda nada instalado por el CLI: ni proveedor, ni mod, ni
+    // proyecto (QT-26, RN-cli-desinstalar). La simulación no borra manifiestos, así que
+    // ahí solo se dice la regla.
+    private static void RemoveCliIfUnused(bool dryRun, string? manifestDir)
+    {
+        if (dryRun)
+            Console.WriteLine($"{CliCommand.Name}  se saca si después no queda ningún proveedor, mod ni proyecto instalado por este CLI.");
+        else if (Provider.All.All(p => Manifest.Load(p.Id, manifestDir) is null)
+                 && ProjectRegistry.Load(manifestDir).Count == 0)
+            ReportCli(CliCommand.Uninstall(dryRun, _binDir), dryRun);
     }
 
     private static void ReportCli(CliOutcome outcome, bool dryRun)
@@ -528,8 +514,96 @@ public static class Program
         return !result.Failed;
     }
 
+    // ── Actualizar ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// `update` (RN-cli-update): baja el binario del release, lo verifica, se
+    /// reemplaza y corre el nuevo con `--apply`, porque el contenido viaja embebido
+    /// en el binario y es el nuevo el que tiene que reinstalar. Ya al día, aplica
+    /// él mismo: puede haber proyectos atrás de este CLI.
+    /// </summary>
+    private static int Update(bool dryRun, string? manifestDir, string? projects)
+    {
+        if (CliCommand.RunningSingleFile() is not { } running)
+            return Fail("No se actualiza: corre desde el repo, no es el binario del release. "
+                + "Con el repo, actualizar es volver a instalar.");
+
+        var downloader = new HttpDownloader(TimeSpan.FromMinutes(5));
+        var check = Updater.Check(downloader, running);
+        if (check.Problem is not null) return Fail($"No se actualizó: {check.Problem}.");
+
+        if (!check.Available)
+        {
+            Console.WriteLine($"{CliCommand.Name}  al día, {Version}\n");
+            return Apply(dryRun, manifestDir, projects);
+        }
+
+        var target = CliCommand.PathFor(_binDir);
+        if (dryRun)
+        {
+            Console.WriteLine($"{CliCommand.Name}  se reemplaza por el del release ({check.BaseUrl})");
+            Console.WriteLine("  Después el nuevo reinstala la global y los mods que instaló, y pregunta por los proyectos.\n");
+            return 0;
+        }
+
+        Console.WriteLine($"  Bajando {check.Asset}...");
+        var (content, problem) = Updater.Download(downloader, check);
+        if (content is null) return Fail($"No se actualizó: {problem}. No se tocó nada.");
+
+        Updater.Replace(content, target);
+        Console.WriteLine($"{CliCommand.Name}  reemplazado en {target}\n");
+
+        List<string> arguments = ["update", "--apply"];
+        if (projects is not null) arguments.AddRange(["--projects", projects]);
+        if (manifestDir is not null) arguments.AddRange(["--manifest-dir", manifestDir]);
+        if (_binDir is not null) arguments.AddRange(["--bin-dir", _binDir]);
+
+        // Sin redirigir nada: el nuevo hereda la terminal, y con ella el menú de proyectos.
+        var start = new ProcessStartInfo(target) { UseShellExecute = false };
+        foreach (var argument in arguments) start.ArgumentList.Add(argument);
+        using var process = Process.Start(start)!;
+        process.WaitForExit();
+        return process.ExitCode;
+    }
+
+    /// <summary>
+    /// Lleva la global y los proyectos elegidos a la versión de este binario. Los
+    /// proyectos no se actualizan solos (RN-cli-update-proyectos): en *Compartido*,
+    /// actualizar genera un diff que nadie pidió.
+    /// </summary>
+    private static int Apply(bool dryRun, string? manifestDir, string? projects)
+    {
+        var failed = false;
+
+        foreach (var provider in Provider.All)
+        {
+            if (Manifest.Load(provider.Id, manifestDir) is not { } manifest || manifest.IsEmpty) continue;
+
+            var mods = manifest.Files.Count == 0 ? ModsChoice.ModsOnly
+                : manifest.Mods is { Count: > 0 } ? ModsChoice.All
+                : ModsChoice.MethodOnly;
+            if (Install([provider], dryRun, manifestDir, mods) != 0) failed = true;
+        }
+
+        var behind = ProjectRegistry.Load(manifestDir)
+            .Where(project => ProvidersIn(project, manifestDir).Any(p =>
+                Installer.LoadManifest(p, manifestDir) is { } m && IsNewer(Version, m.Version)))
+            .ToList();
+
+        if (behind.Count == 0) return failed ? 1 : 0;
+
+        foreach (var project in ChooseProjects(behind, projects, manifestDir))
+            if (Install(ProvidersIn(project, manifestDir), dryRun, manifestDir, ModsChoice.MethodOnly) != 0)
+                failed = true;
+
+        return failed ? 1 : 0;
+    }
+
+    // ── Estado ─────────────────────────────────────────────────────────────────
+
     private static int Status(string? manifestDir)
     {
+        Console.WriteLine("Global\n");
         foreach (var provider in Provider.All)
         {
             var manifest = Manifest.Load(provider.Id, manifestDir);
@@ -538,14 +612,44 @@ public static class Program
             if (manifest is not { Files.Count: > 0 })
                 Console.WriteLine("  método         no instalado");
             else
-                MethodStatus(provider, manifest, manifestDir);
+                MethodStatus(provider, manifest, Manifest.PathFor(provider.Id, manifestDir));
 
             if (provider.HasMods) ModsStatus(provider, manifestDir);
             Console.WriteLine();
         }
 
+        var here = ProjectRoot.Find(Directory.GetCurrentDirectory());
+        var installedHere = ProvidersIn(here, manifestDir);
+        if (installedHere.Count > 0)
+        {
+            Console.WriteLine($"Este proyecto · {here.Path}\n");
+            foreach (var provider in installedHere)
+            {
+                Console.WriteLine(provider.DisplayName);
+                MethodStatus(provider, Installer.LoadManifest(provider, manifestDir)!,
+                    Manifest.PathFor(provider.Id, provider.ManifestDirectory));
+                if (Manifest.Load(provider.Id, manifestDir) is { Files.Count: > 0 })
+                    Warn($"la global de {provider.DisplayName} tapa este proyecto.");
+                Console.WriteLine();
+            }
+        }
+
+        var projects = ProjectRegistry.Load(manifestDir);
+        Console.WriteLine("Proyectos registrados\n");
+        if (projects.Count == 0) Console.WriteLine("  ninguno");
+        foreach (var project in projects)
+            Console.WriteLine($"  {project.Path}\n    {DescribeProject(project, manifestDir)}");
+        Console.WriteLine();
+
         return 0;
     }
+
+    /// <summary>"Claude Code 3.1.0, solo para mí · Codex no": una línea por proyecto.</summary>
+    private static string DescribeProject(ProjectRoot project, string? manifestDir) =>
+        string.Join(" · ", Provider.AllIn(project, personal: true).Select(p =>
+            Installer.LoadManifest(p, manifestDir) is { Files.Count: > 0 } m
+                ? $"{p.DisplayName} {m.Version}" + (project.IsGitRepo ? (m.Personal ? ", solo para mí" : ", compartido") : "")
+                : $"{p.DisplayName} no"));
 
     private static void ModsStatus(Provider provider, string? manifestDir)
     {
@@ -564,7 +668,7 @@ public static class Program
                 : "no instalado" + (outcome.Detail is { } detail ? $" ({detail})" : "")));
     }
 
-    private static void MethodStatus(Provider provider, Manifest manifest, string? manifestDir)
+    private static void MethodStatus(Provider provider, Manifest manifest, string manifestPath)
     {
         var missing = manifest.Files.Count(f => !File.Exists(f.Path));
         var edited = manifest.Files.Count(f =>
@@ -574,14 +678,15 @@ public static class Program
                 : Manifest.HashFile(f.Path) != f.Sha256));
 
         Console.WriteLine($"  versión        {manifest.Version}");
+        Console.WriteLine($"  alcance        {provider.ScopeLabel}");
         Console.WriteLine($"  instalado      {manifest.InstalledAt:yyyy-MM-dd HH:mm}");
-        Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
+        Console.WriteLine($"  instrucciones  {manifest.Files.FirstOrDefault(f => f.ManagedBlock)?.Path ?? provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
         Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
         Console.WriteLine($"  archivos       {manifest.Files.Count}"
             + (edited > 0 ? $", {edited} editado(s) localmente" : "")
             + (missing > 0 ? $", {missing} faltante(s)" : ""));
-        Console.WriteLine($"  manifiesto     {Manifest.PathFor(provider.Id, manifestDir)}");
+        Console.WriteLine($"  manifiesto     {manifestPath}");
     }
 
     /// <summary>
@@ -647,10 +752,27 @@ public static class Program
 
     // ── Auxiliares ─────────────────────────────────────────────────────────────
 
+    /// <summary>Los proveedores con NZT en un proyecto, cada uno en el modo de su manifiesto.</summary>
+    public static IReadOnlyList<Provider> ProvidersIn(ProjectRoot project, string? manifestDir = null) =>
+        Provider.Ids
+            .Select(id => (id, manifest: Manifest.Load(id, project.Combine(".nzt", "manifests"), project.Path)))
+            .Where(x => x.manifest is not null)
+            .Select(x => Provider.ById(x.id, project, x.manifest!.Personal)!)
+            .ToList();
+
+    /// <summary>Los proyectos registrados con NZT en ese proveedor: los que una global taparía.</summary>
+    private static IReadOnlyList<ProjectRoot> ProjectsWith(string providerId, string? manifestDir) =>
+        ProjectRegistry.Load(manifestDir)
+            .Where(project => ProvidersIn(project, manifestDir).Any(p => p.Id == providerId))
+            .ToList();
+
+    public static bool IsNewer(string candidate, string than) =>
+        System.Version.TryParse(candidate, out var a) && System.Version.TryParse(than, out var b) && a > b;
+
     private static string? SubcommandOf(string[] args) =>
         args.Where(a => !a.StartsWith('-')).Skip(1).FirstOrDefault()?.ToLowerInvariant();
 
-    private static IReadOnlyList<Provider> ProvidersFrom(string[] args)
+    private static IReadOnlyList<Provider> ProvidersFrom(string[] args, Scope scope, bool personal, string? manifestDir)
     {
         var id = ValueOf(args, "--provider");
 
@@ -660,16 +782,30 @@ public static class Program
             return [];
         }
 
-        if (string.Equals(id, "all", StringComparison.OrdinalIgnoreCase)) return Provider.All;
-
-        var provider = Provider.ById(id);
-        if (provider is null)
+        var all = string.Equals(id, "all", StringComparison.OrdinalIgnoreCase);
+        if (!all && Provider.ById(id) is null)
         {
             Fail($"Proveedor desconocido: {id}. Son claude-code, codex o all.");
             return [];
         }
 
-        return [provider];
+        if (scope == Scope.User) return all ? Provider.All : [Provider.ById(id)!];
+
+        var project = ProjectRoot.Find(Directory.GetCurrentDirectory());
+        if (project.IsUserHome())
+        {
+            Fail("Esta es tu carpeta de usuario: ahí .claude/ y .agents/ son la instalación global. "
+                + "Corré el comando desde un proyecto.");
+            return [];
+        }
+
+        // Al desinstalar, cada uno en el modo de su manifiesto: el modo decide el exclude.
+        var installed = ProvidersIn(project, manifestDir);
+        Provider For(string providerId) =>
+            installed.FirstOrDefault(p => p.Id == providerId && !args.Contains("--mode"))
+            ?? Provider.ById(providerId, project, personal)!;
+
+        return all ? Provider.Ids.Select(For).ToList() : [For(Provider.ById(id)!.Id)];
     }
 
     private static string? ValueOf(string[] args, string flag)
@@ -686,6 +822,12 @@ public static class Program
         Console.WriteLine($"  {Count(FileAction.Created)} creados · {Count(FileAction.Updated)} actualizados"
             + $" · {Count(FileAction.Unchanged)} sin cambios · {Count(FileAction.Removed)} eliminados"
             + $" · {Count(FileAction.SkippedLocallyEdited)} conservados");
+    }
+
+    private static int Line(string text)
+    {
+        Console.WriteLine(text);
+        return 0;
     }
 
     private static int Fail(string message)
