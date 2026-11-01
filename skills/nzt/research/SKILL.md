@@ -1,6 +1,6 @@
 ---
 name: nzt-research
-description: Use before stating or building on how an external system, API, library or standard behaves: the version in use, the authoritative source, every claim labelled.
+description: Use before stating or building on how an external system, API, library, standard or agent tool (an MCP server) behaves: the version in use, the authoritative source, every claim labelled.
 ---
 
 # Research — how something outside the project behaves
@@ -33,7 +33,14 @@ you here. Memory tells you what to look for, never what is true.
    request, response, webhook and event shapes; limits, quotas and expiries of tokens, URLs
    and ids; webhook signatures, retries, ordering, duplicates, timeouts; retryable errors
    and idempotency; a sandbox; deprecations, sunset dates, pricing or terms.
-5. **Label every claim**:
+5. **For a tool for the agent** (an MCP server, a CLI, an editor bridge), the trust order is:
+   the maker of the technology it serves (Unity for Unity, Microsoft for .NET) → the tool's
+   maintainer (its repository and documentation) → third parties, labelled and never the
+   only source. Report what it does for the agent, its version and last release, how it
+   connects (a local process or a URL), what it installs on the machine and what it can
+   reach (files, network, credentials). A pack's tool is checked the same way. Reading about
+   a tool never installs it: that is the user's yes.
+6. **Label every claim**:
 
    | Label | Means | Carries |
    |---|---|---|
@@ -44,10 +51,10 @@ you here. Memory tells you what to look for, never what is true.
 
    An inference is never presented as a fact; a decision resting on something unverified
    says so before anything is proposed on it.
-6. **When the documentation is ambiguous** and the decision depends on it, propose a small
+7. **When the documentation is ambiguous** and the decision depends on it, propose a small
    proof against the sandbox inside the authorised work; its result is `observed`. Never
    production credentials or data without the user saying so.
-7. **Without web access, say so**: use what is local — vendored SDK source, documentation in
+8. **Without web access, say so**: use what is local — vendored SDK source, documentation in
    the repository, the contract already written — and label the rest `unverified`.
 
 ```markdown
@@ -67,6 +74,8 @@ you here. Memory tells you what to look for, never what is true.
 - **The conversation**: the answer, its labelled claims, and what it means for the decision,
   with the options when there is a real trade-off.
 - **A technical decision**: its `QT-NN` cites the sources it rests on.
+- **A tool for the agent**: proposed with its source; once installed, its row in `tech.md`'s
+  *Agent tools*.
 - **An integration**: the external systems table of `Docs/Architecture/architecture.md` and
   the feature's design **link** the provider's documentation, never transcribe it.
 - A provider's capability is not a business rule: what the product promises is agreed in

@@ -63,7 +63,8 @@ before its work is touched.
 `Operations/`, `Manual/`.
 
 - Components, boundaries, external systems → `Docs/Architecture/architecture.md`
-- Technologies, packs, decisions, opt-ins, dependencies per component → `Docs/Architecture/tech.md`
+- Technologies, packs, decisions, opt-ins, dependencies and agent tools per component →
+  `Docs/Architecture/tech.md`
 - Technical questions → `Docs/Architecture/architecture-decisions.md` (product) or
   `Plan/specs/<feature>/tech-design/decisions.md` (feature). Append-only
 - Entities → `Docs/Domain/domain-model.md`
