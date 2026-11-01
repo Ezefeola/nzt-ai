@@ -236,8 +236,12 @@ carpetas viejas se sigue leyendo ahí hasta que las mueva.
 - **QT-07 · Carpetas de diseño:** ver DB-04, *Encontrado de paso*.
 - **D-424-01 · arreglado:** la línea MCP de `nzt-ai project` separa el proveedor de sus
   servidores, con un check.
-- **QT-06 · MCP que no vienen de un pack** (la sub-decisión de DB-03): el usuario no la
-  entendió como estaba planteada; se vuelve a explicar antes de decidir.
+- **QT-06 · MCP que no vienen de un pack** (la sub-decisión de DB-03): **A**, queda en el
+  archivo de MCP del proyecto y viaja con git; `nzt-ai` no lo registra. Al explicarla salió
+  lo que el usuario quería de verdad: que el agente proponga y explique **todo lo que
+  necesita para trabajar** (packs, MCP, herramientas, lo que hace el usuario a mano, lo que
+  el agente no puede hacer, qué tener en cuenta) como a alguien que no sabe, igual que Claude
+  solo con el juego de Unity. Es el run siguiente (unidades 432-436 en `Plan/state.json`).
 
 ## Unidades propuestas (sin aprobar)
 
