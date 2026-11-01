@@ -12,7 +12,7 @@
       { "id": 4, "do": "Elegir el stack y registrar la decisión", "status": "done", "detail": "ADR-001 escrito." },
       { "id": 5, "do": "Modelo de dominio", "status": "done", "detail": "Diagrama incluido." }
     ] },
-    { "name": "ux", "status": "dropped", "units": [
+    { "name": "design", "status": "dropped", "units": [
       { "id": 6, "do": "Maqueta de la pantalla de login", "status": "dropped", "detail": "Se usa el diseño existente." }
     ] },
     { "name": "build", "status": "doing", "units": [

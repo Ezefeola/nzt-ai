@@ -22,7 +22,7 @@ describe('timelineOf', () => {
       [
         { name: 'architecture', status: 'done' },
         { name: 'build', status: 'doing' },
-        { name: 'ux', status: 'dropped' },
+        { name: 'design', status: 'dropped' },
         { name: 'verify', status: 'todo' },
       ],
       null,
@@ -31,7 +31,7 @@ describe('timelineOf', () => {
     expect(steps.map(s => `${s.label}=${s.status}`)).toEqual([
       'Arquitectura=done',
       'Build=doing',
-      'UX=dropped',
+      'Diseño=dropped',
       'Verificación=todo',
     ])
   })
@@ -286,16 +286,27 @@ test('every unit in progress is shown, with a warning when there is more than on
   await ui.unmount()
 })
 
+test('a state written before D88 shows its ux phase as design', async ($, on) => {
+  const ui = await mountPane($, on, {
+    goal: 'Old state',
+    phases: [{ name: 'ux', status: 'doing', units: [{ id: 1, do: 'Mockup', status: 'doing' }] }],
+    approved: true,
+  })
+  expect(await ui.find({ type: 'Text', text: /^ ● Diseño $/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /no es una fase de NZT/ })).toBeUndefined()
+  await ui.unmount()
+})
+
 test('every phase in progress is lit, with a warning when there is more than one', async ($, on) => {
   const ui = await mountPane($, on, {
     goal: 'Phases left open',
     phases: [
-      { name: 'ux', status: 'doing', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
+      { name: 'design', status: 'doing', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
       { name: 'verify', status: 'doing', units: [{ id: 2, do: 'Check it', status: 'doing' }] },
     ],
     approved: true,
   })
-  expect(await ui.find({ type: 'Text', text: /^ ● UX $/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^ ● Diseño $/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^ ● Verificación $/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /2 fases en curso: el kernel permite una sola/ })).toBeDefined()
   await ui.unmount()
@@ -314,7 +325,7 @@ test('a phase NZT does not know is drawn as written, with a warning naming the r
   expect(
     await ui.find({
       type: 'Text',
-      text: '⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las fases son Análisis, Arquitectura, UX, Build, Verificación, Release',
+      text: '⚠ «cambio: modelo y effort en la banda» no es una fase de NZT: las fases son Análisis, Arquitectura, Diseño, Build, Verificación, Release',
     }),
   ).toBeDefined()
   await ui.unmount()
@@ -324,7 +335,7 @@ test('a single phase in progress draws no phase warning', async ($, on) => {
   const ui = await mountPane($, on, {
     goal: 'One phase',
     phases: [
-      { name: 'ux', status: 'done', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
+      { name: 'design', status: 'done', units: [{ id: 1, do: 'Mockup', status: 'done' }] },
       { name: 'verify', status: 'doing', units: [{ id: 2, do: 'Check it', status: 'doing' }] },
     ],
     approved: true,
@@ -425,14 +436,14 @@ test('with no unit in progress, the first pending of the phase in progress is th
     goal: 'Between units',
     phases: [
       { name: 'discovery', status: 'done', units: [{ id: 294, do: 'Spec', status: 'done' }] },
-      { name: 'ux', status: 'doing', units: [{ id: 295, do: 'Mockup', status: 'todo' }] },
+      { name: 'design', status: 'doing', units: [{ id: 295, do: 'Mockup', status: 'todo' }] },
       { name: 'build', status: 'todo', units: [{ id: 296, do: 'Build it', status: 'todo' }] },
     ],
     approved: true,
   })
   expect(await ui.find({ type: 'Text', text: '▷' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: / · sigue$/ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /^AHORA · UX$/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^AHORA · Diseño$/ })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: /^Unidad 2 de 3$/ })).toBeDefined()
   expect((await ui.findAll({ type: 'Text', text: '▷' })).length).toBe(1)
   // Only one follows: in the tasks the mockup is marked again, and the build unit keeps ○.

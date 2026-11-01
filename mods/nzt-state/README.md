@@ -1,6 +1,6 @@
 # nzt-state
 
-> Versión **0.11.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
+> Versión **0.12.0** · spec en [`specs/mods/nzt-state/spec.md`](../../specs/mods/nzt-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -86,7 +86,7 @@ grupos.
 |---|---|---|
 | Análisis | birrete | violeta |
 | Arquitectura | casco de obra | azul |
-| UX | boina | rosa |
+| Diseño | boina | rosa |
 | Build | casco con llave, y un martillo chico en alto en la mano derecha | naranja |
 | Verificación | gorro de detective con lupa | verde agua |
 | Release | galera gris con cinta dorada | dorado |

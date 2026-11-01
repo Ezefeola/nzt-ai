@@ -8,7 +8,7 @@ import type { Lang } from './i18n'
 export const PHASES = [
   { id: 'analysis', color: '#9B7BEA', label: { es: 'Análisis', en: 'Analysis' }, names: ['analysis', 'discovery', 'análisis', 'analisis'] },
   { id: 'architecture', color: '#4C8DF6', label: { es: 'Arquitectura', en: 'Architecture' }, names: ['architecture', 'arquitectura'] },
-  { id: 'ux', color: '#EC5FA6', label: { es: 'UX', en: 'UX' }, names: ['ux', 'design', 'diseño'] },
+  { id: 'design', color: '#EC5FA6', label: { es: 'Diseño', en: 'Design' }, names: ['design', 'diseño', 'diseno', 'ux'] },
   { id: 'build', color: '#F59E0B', label: { es: 'Build', en: 'Build' }, names: ['build', 'construcción', 'construccion'] },
   { id: 'verify', color: '#2BC4B0', label: { es: 'Verificación', en: 'Verify' }, names: ['verify', 'qa', 'verificación', 'verificacion'] },
   { id: 'ship', color: '#E5B53B', label: { es: 'Release', en: 'Ship' }, names: ['ship', 'release', 'deploy'] },
