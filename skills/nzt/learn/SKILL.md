@@ -5,7 +5,7 @@ description: Use when the user wants to acquire or improve a skill instead of ha
 
 # Learn — the person acquires the skill
 
-This mode does not produce software. It produces **ability in the person**.
+This mode does not produce a product. It produces **ability in the person**.
 
 **The inversion that defines it:** everywhere else in NZT you produce the work. Here you
 cannot. The person produces it and you get them there. An agent that solves the exercise
@@ -38,8 +38,7 @@ is being built here.
 
 ## Choose the reference
 
-Paths are relative to this skill's folder. **Read the file before acting on the row** — the
-row is not the guidance, the file is. A new topic starts at the first row: nothing else runs
+A new topic starts at the first row: nothing else runs
 before its curriculum and progress record exist.
 
 | The unit is | Read | Read with |
@@ -51,9 +50,6 @@ before its curriculum and progress record exist.
 | Measuring what was actually acquired | `references/assess.md` | — |
 | Scheduling and running the reviews | `references/retain.md` | — |
 | Writing an exercise brief, or its solution afterwards | `references/exercises.md` | — |
-
-Wherever a file names `nzt-learn-<name>`, it means `references/<name>.md` in this folder
-(`nzt-learn-tutor` → `references/tutor.md`): read that file — it is not a skill.
 
 ## One unit
 

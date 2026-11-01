@@ -1,8 +1,7 @@
 # The state file
 
-Produces `Plan/state.json` at the project root: plan and state together. There is no
-separate plan file, it is never a log, and progress lives in the artifacts. Write it from
-this file, never from memory.
+`Plan/state.json` at the project root: plan and state together. Not a log — progress lives
+in the artifacts.
 
 ```json
 {
@@ -18,31 +17,27 @@ this file, never from memory.
 }
 ```
 
-- `status` is `todo`, `doing`, `done` or `dropped`. One unit `doing`, or one group's. Every entry, one line.
-- `phases` are the phases `nzt` chose, in run order, named `analysis`, `architecture`, `ux`,
-  `build`, `verify` or `ship` and no other, with the same statuses and **at most one `doing`**:
-  that one is the current phase, a skipped one is not listed. **Each unit lives in its phase's
-  `units`**, in run order, ids unique in the file; the next unit is the first `todo` of the
-  phase `doing`. **When a phase's last unit ends, that same write marks it `done` and the
-  next one `doing`**; one with empty `units` stays `todo`, one the user drops is `dropped`.
-- **A plan cut into slices** has `version` 2 and `slices` (`id`, `name`, `status`, `phases`)
-  in place of `phases`: each is walked end to end under the rules above, one `doing` at most;
-  `cadence` (`delivery`, `upfront`, `just-in-time`; absent `upfront`) says how. How slices are
-  cut and run is `nzt-plan`'s slices reference.
-- `approved` is the lock on the main stop: without `true`, nothing executes.
-- `autonomy` records the batch the user selected: which units run without stopping, and
-  which stops are kept anyway. **Absent or empty means accompanied.** `delegation` is the
-  project's subagent mode, `auto`, `ask` or `off`; absent is `ask`, and only the user sets it.
-- **A parallel group** adds `group`, `model` and `work_branch`; their shape is in
-  `nzt-plan`'s parallel reference, read when the plan marks one.
-- Never write the file while you are inside a unit. Rewrite the plan when the user changes
-  it. **A new run rewrites the file** with its own goal, phases and units, ids counting on
-  from the last run, `delegation` kept; inside a run, nothing `done` or `dropped` is deleted.
-- **Write it for a session that has none of this conversation**: a decision taken out loud,
-  where a unit actually stopped, what it is waiting on — if resuming needs it, it goes in
-  the file. Context gets cleared; what is not here is gone.
+## Rules
+
+1. `status` is `todo`, `doing`, `done` or `dropped`. One unit `doing`, or one parallel
+   group's units. Every entry is one line.
+2. `phases` are named `analysis`, `architecture`, `ux`, `build`, `verify` or `ship`, in run
+   order, skipped ones absent, **at most one `doing`**: the current phase. Ids are unique in
+   the file; the next unit is the first `todo` of the `doing` phase.
+3. When a phase's last unit ends, the same write marks it `done` and the next one `doing`.
+   A phase with empty `units` stays `todo`; one the user drops is `dropped`.
+4. **Sliced plans** have `version: 2` and `slices` (`id`, `name`, `status`, `phases`)
+   instead of `phases`, each walked under the rules above; `cadence` is `delivery`,
+   `upfront` or `just-in-time` (absent: `upfront`). See `slices.md`.
+5. `approved` locks execution. `autonomy` is the batch the user chose; absent or empty is
+   accompanied. `delegation` is `auto`, `ask` or `off` (absent: `ask`), set only by the user.
+6. Parallel groups add `group`, `model` and `work_branch` (`parallel.md`).
+7. Never write it inside a unit. A new run rewrites the file — ids continue, `delegation`
+   kept; inside a run nothing `done` or `dropped` is deleted.
+8. **Write it for a session that has none of this conversation**: decisions taken out loud,
+   where the unit stopped, what it waits on.
 
 ## Done when
 
-The file passes `nzt-ai state check`, and a session that has none of this conversation can
-read where the work stands, what comes next and what it is waiting on.
+It passes `nzt-ai state check`, and a fresh session can tell where the work stands, what
+comes next and what it is waiting on.

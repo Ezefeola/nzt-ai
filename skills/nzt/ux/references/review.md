@@ -1,126 +1,51 @@
 # Usability review
 
-## Contents
-- What your input can and cannot prove
-- Walk the tasks first
-- Then sweep the heuristics
-- Then accessibility
-- Then the generic default
-- Measuring an HTML file
-- The finding
-- Done when
+Produces findings about one screen, each with severity and **type** — the type says where it
+goes. **An expert review, and the report says so**: it does not replace testing with users.
 
-Produces a report of findings about one screen, each with its severity and its **type** —
-and the type is what says where the finding goes next.
+## Steps
 
-**This is an expert review, and the report says so.** It finds many problems cheaply. It
-**does not replace testing with users**, and wherever a conclusion depends on how people
-actually behave, that is stated in the finding.
+1. **Say which input you reviewed** and what it cannot show:
 
-## What your input can and cannot prove
+   | Input | Shows | Cannot show |
+   |---|---|---|
+   | screen design | structure, missing cases, gaps against criteria | contrast, focus, real spacing |
+   | mockup | hierarchy, contrast, keyboard order | real data, latency, behavior |
+   | built screen | actual behavior, real data | the intent behind it |
 
-Say which one you reviewed, and do not claim what it cannot show:
+   What you could not render, reach or log into is **not run**, never passed.
+2. **Walk the tasks first**, start to finish, unhappy paths included; note where you
+   hesitated. Task problems do not appear element by element.
+3. **Sweep the ten heuristics**: system status · real-world match · user control · consistency
+   (with this product's design system and neighbouring screens too) · error prevention ·
+   recognition over recall · flexibility · minimalism · error recovery · help.
+4. **Accessibility, WCAG 2.2 AA** (or the product's declared level; none → AA, and ask):
+   contrast 4.5:1 text, 3:1 controls, computed on real pairs; visible focus not hidden by
+   sticky elements; targets ≥ 24×24; an alternative to dragging; errors in text next to their
+   cause; name, role and value on every control.
+5. **Run `generic.md`'s pass** on what is rendered (a design alone: its plan). A tell with no
+   reason is a finding.
+6. **Write findings**:
 
-| Input | Shows | Cannot show |
-|---|---|---|
-| Screen design | structure, missing cases, gaps against criteria | contrast, focus, real spacing |
-| Mockup | hierarchy, contrast, keyboard order | real data, latency, real behavior |
-| Built screen | actual behavior, real data | the intent it was built against |
+   ```markdown
+   ### The rejected coupon message disappears when the field is edited
+   - **Severity:** 3 — every customer who mistypes hits it.
+   - **Type:** breaks a criterion (US-002 CA-01) → defect.
+   - **Where:** checkout, coupon region, rejected state.
+   - **Evidence:** walked with an expired code in the mockup.
+   ```
 
-Whatever you could not run — because you could not render it, reach it, or log in — is
-reported as **not run**, never as passed.
-
-## Walk the tasks first
-
-Take the task from the screen design and do it, start to finish, as the person who arrives
-there.
-
-- Task problems are the severe ones, and **they do not appear by inspecting elements one at
-  a time**. A screen where every control is fine and the job cannot be finished passes
-  every checklist and fails its purpose.
-- Walk the unhappy paths too: the rejected coupon, the expired session, the empty result.
-- Note where you hesitated. Hesitation is the cheapest signal you get, and it disappears the
-  second time you look.
-
-## Then sweep the heuristics
-
-The ten classics — visibility of system status · match with the real world · user control
-and freedom · consistency and standards · error prevention · recognition over recall ·
-flexibility · minimalist design · help users recover from errors · help and documentation.
-
-**Consistency is measured against this project too**, not only against general convention:
-`Docs/UX/design-system.md`, `Docs/UX/ui-components.md`, and the neighbouring screens. A screen
-that is internally consistent and unlike every other screen in the product is inconsistent.
-
-## Then accessibility
-
-WCAG 2.2 AA, with the concrete checks:
-
-- Contrast 4.5:1 for text, 3:1 for controls and meaningful graphics — **computed on the
-  real pairs**.
-- Focus visible on every control, and not hidden behind sticky headers or footers.
-- Targets of at least 24×24, with spacing where smaller is unavoidable.
-- An alternative to dragging for anything that can be dragged.
-- Errors identified in text, not by colour alone, and next to what caused them.
-- Name, role and value available for every control.
-
-**The level the product commits to is a product requirement.** If none is declared, review
-against AA and ask whether it is adopted.
-
-## Then the generic default
-
-Run the pass of `nzt-ux-generic` on what you can see rendered; on a screen design alone,
-only its plan. Each tell with no reason from the subject is a finding: **construction** when
-it lives in this screen, **a missing convention** when the design system itself carries it.
+   Severity 0–4 by frequency, impact and persistence. Type → destination: breaks a criterion
+   → a defect (`nzt-verify`); needs behavior no criterion states → a proposal to the user;
+   construction only → fixed in the authorised work; a missing convention → the design
+   system. **The review proposes; the spec decides.**
 
 ## Measuring an HTML file
 
-A mockup, a prototype or the manual is measured before it is presented, and every result is
-written down:
-
-- **320 px with no horizontal scroll**: render it in an iframe at that width and compare
-  `scrollWidth` with `clientWidth`. "It looks responsive" is not a measurement.
-- **Contrast computed on the real pairs** actually used — text over its surface, control
-  over its background — against the thresholds above, not on the palette in the abstract.
-- **Keyboard order walked**, checking focus is visible and nothing is left unreachable.
-
-**A file that could not be rendered is not verified**, and it is reported that way. Never
-present a file you did not see.
-
-## The finding
-
-```markdown
-### The rejected coupon message disappears when the field is edited
-- **Severity:** 3 — every customer who mistypes a code hits it, and the explanation is gone
-  before they can read it.
-- **Type:** breaks a criterion (US-002 CA-01) → bug.
-- **Where:** checkout, coupon region, rejected state.
-- **Evidence:** walked with an expired code in the mockup; the message clears on keypress.
-```
-
-- **Severity on the 0–4 scale**: 0 is not a problem, 4 is a catastrophe. Judge it by
-  frequency, impact and persistence — how many people hit it, how bad it is when they do,
-  and whether they can get past it.
-- **The type decides the destination**:
-
-| Type | Where it goes |
-|---|---|
-| Breaks an existing criterion | a bug, opened by `nzt-verify` |
-| Needs behavior no criterion states | a proposal to the user; spec change if accepted |
-| Construction only, no behavior change | fixed inside the authorised work |
-| A missing convention | a proposal to `Docs/UX/design-system.md` |
-
-**The review proposes; the spec decides.** A finding you fixed by inventing behavior is not
-a fix, it is an unreviewed spec change.
+Before presenting a mockup, prototype or manual, and every result written down: **320 px with
+no horizontal scroll** (render in an iframe, compare `scrollWidth` and `clientWidth`);
+**contrast on the real pairs**; **the keyboard order walked**. Not rendered → not verified.
 
 ## Done when
 
-Rehearse it: could the user act on every finding without asking you what to do with it?
-
-- Which input you reviewed is stated, with what it could not show.
-- The tasks were walked before any element was inspected.
-- Every finding has its severity, its type and its evidence.
-- Accessibility was checked against concrete criteria, not asserted.
-- The pass of `nzt-ux-generic` ran, and each tell kept carries its reason from the subject.
-- Anything that could not be run is named as not run.
-- The report says plainly that this is an expert review, not a user test.
+The user could act on every finding without asking what to do with it.

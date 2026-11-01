@@ -51,6 +51,10 @@
     <EmbeddedResource Include="$(ContentRoot)skills\**\references\*.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
+    <!-- Los packs: lo que se instala por proyecto con `nzt-ai project`. -->
+    <EmbeddedResource Include="$(ContentRoot)packs\**\pack.json;$(ContentRoot)packs\**\*.md">
+      <LogicalName>content/packs/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
     <!-- Los subagentes (D71): un archivo por proveedor, que se elige por la extensión. -->
     <EmbeddedResource Include="$(ContentRoot)agents\*.*">
       <LogicalName>content/agents/%(Filename)%(Extension)</LogicalName>

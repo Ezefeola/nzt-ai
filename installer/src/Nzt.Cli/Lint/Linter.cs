@@ -27,8 +27,67 @@ public static class Linter
     public static LintReport Run(ContentCatalog catalog)
     {
         var issues = new List<LintIssue>();
+        foreach (var skill in catalog.Skills) CheckSkill(skill, issues);
 
-        foreach (var skill in catalog.Skills)
+        var duplicates = catalog.Skills
+            .GroupBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1);
+
+        foreach (var group in duplicates)
+            issues.Add(new LintIssue(group.Key, $"{group.Count()} skills derivan el mismo nombre plano"));
+
+        return new LintReport(issues, catalog.Skills.Count, catalog.ListingChars);
+    }
+
+    /// <summary>
+    /// Los packs: su skill cumple las mismas reglas que las globales, lo que
+    /// requieren existe y no forma un ciclo, y cada MCP dice cómo conectarse.
+    /// </summary>
+    public static LintReport RunPacks(PackCatalog catalog, ContentCatalog? global = null)
+    {
+        var issues = new List<LintIssue>();
+        var globalNames = global?.Skills.Select(s => s.Name).ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+
+        foreach (var pack in catalog.Packs)
+        {
+            var where = $"packs/{pack.Name}";
+            if (string.IsNullOrWhiteSpace(pack.Description)) issues.Add(new LintIssue(where, "pack.json sin description"));
+            if (pack.Skill is null && pack.Mcp.Count == 0) issues.Add(new LintIssue(where, "no trae skill ni MCP"));
+            if (pack.Skill is { } skill)
+            {
+                CheckSkill(skill, issues);
+                if (globalNames.Contains(skill.Name))
+                    issues.Add(new LintIssue(where, $"su skill se llama como una global: {skill.Name}"));
+            }
+
+            foreach (var required in pack.Requires.Where(r => catalog.ByName(r) is null))
+                issues.Add(new LintIssue(where, $"requiere '{required}', que no es un pack"));
+
+            if (Cycles(catalog, pack.Name, [])) issues.Add(new LintIssue(where, "sus requires forman un ciclo"));
+
+            foreach (var server in pack.Mcp)
+                if ((server.Url is null) == (server.Command is null or { Count: 0 }))
+                    issues.Add(new LintIssue(where, $"el MCP '{server.Name}' necesita url o command, uno solo"));
+        }
+
+        foreach (var name in catalog.Packs.SelectMany(p => p.Mcp).GroupBy(m => m.Name)
+                     .Where(g => g.Select(m => m.Url + string.Join(",", m.Command?.Values.AsEnumerable() ?? [])).Distinct().Count() > 1)
+                     .Select(g => g.Key))
+            issues.Add(new LintIssue("packs", $"el MCP '{name}' se define distinto en dos packs"));
+
+        var skills = catalog.Packs.Select(p => p.Skill).OfType<SkillFile>().ToList();
+        return new LintReport(issues, skills.Count, skills.Sum(s => s.ListingChars));
+    }
+
+    private static bool Cycles(PackCatalog catalog, string name, HashSet<string> path)
+    {
+        if (!path.Add(name)) return true;
+        var found = catalog.ByName(name)?.Requires.Any(r => Cycles(catalog, r, [.. path])) ?? false;
+        return found;
+    }
+
+    private static void CheckSkill(SkillFile skill, List<LintIssue> issues)
+    {
         {
             var name = skill.FrontMatter.Get("name");
             var description = skill.FrontMatter.Get("description");
@@ -55,15 +114,14 @@ public static class Linter
                 if (skill.FrontMatter.Get(extra) is not null)
                     issues.Add(new LintIssue(skill.RepoPath,
                         $"el frontmatter trae '{extra}', que rompe portabilidad (C1)"));
+
+            foreach (var reference in skill.References)
+            {
+                var lines = reference.Text.Replace("\r\n", "\n").TrimEnd('\n').Split('\n').Length;
+                if (lines > MaxLines)
+                    issues.Add(new LintIssue($"{skill.RepoPath}/references/{reference.FileName}",
+                        $"{lines} líneas, sobre el techo de {MaxLines}"));
+            }
         }
-
-        var duplicates = catalog.Skills
-            .GroupBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
-            .Where(g => g.Count() > 1);
-
-        foreach (var group in duplicates)
-            issues.Add(new LintIssue(group.Key, $"{group.Count()} skills derivan el mismo nombre plano"));
-
-        return new LintReport(issues, catalog.Skills.Count, catalog.ListingChars);
     }
 }

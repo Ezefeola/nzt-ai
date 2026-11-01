@@ -76,8 +76,8 @@ Destinations, by section:
 
 | Section | Where a proposal can land |
 |---|---|
-| For the project | its stack document, `Docs/` (glossary, architecture), `Docs/Architecture/tech-debt.md`, its CI gates and linters, its `CLAUDE.md` or `AGENTS.md` |
-| For NZT | the kernel, a router, a reference, a `nzt-ai` check, or a missing case in `evals/` |
+| For the project | `Docs/Architecture/tech.md`, its packs (`nzt-ai project`), `Docs/` (glossary, architecture), `Docs/Architecture/tech-debt.md`, its CI gates and linters, its `CLAUDE.md` or `AGENTS.md` |
+| For NZT | the kernel, a router, a reference, a pack, a `nzt-ai` check, or a missing case in `evals/` |
 
 A proposal names one destination and what would change there. It does not write the change.
 

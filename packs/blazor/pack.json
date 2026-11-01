@@ -1,0 +1,7 @@
+{
+  "description": "Frontend en Blazor: modos de render, componentes, formularios, prerendering y performance",
+  "requires": ["frontend", "csharp"],
+  "mcp": [
+    { "name": "microsoft-learn", "url": "https://learn.microsoft.com/api/mcp" }
+  ]
+}

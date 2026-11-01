@@ -1,73 +1,46 @@
 {
   "version": 1,
-  "updated": "2026-10-30T01:00:00Z",
-  "goal": "nzt-retro: una skill opcional que revisa una sesión y deja propuestas de mejora del entorno en un md para el equipo, sin modificar nada",
+  "updated": "2026-11-01T12:00:00Z",
+  "goal": "Marco genérico: skills globales cortas y sin redundancia, packs por proyecto (skills y MCP) con nzt-ai project, y Docs/Architecture/tech.md en lugar de los stack por área",
   "phases": [
     {
       "name": "architecture",
       "status": "done",
       "units": [
-        {
-          "id": 407,
-          "do": "Decisiones de nzt-retro: qué lee, qué destinos propone, dónde y cómo queda el md, cuándo se ofrece (QT) en Plan/mejoras/10-retro.md",
-          "status": "done",
-          "detail": "10-retro.md: QT-01..07 (md fuera del repo en la ruta que se elige cada vez; nunca se ofrece; actual o últimas N; proyecto y NZT separados; detalles del agente). Propone quitar 410: sin oferta ni fila en el kernel"
-        }
+        { "id": 413, "do": "Diseño: marco global vs packs por proyecto, tech.md y comando project (QT-01..04 en Plan/mejoras/11-marco-generico.md)", "status": "done", "detail": "Packs medianos, Claude Code y Codex, sin migración desde stack viejos, tech.md" }
       ]
     },
     {
       "name": "build",
-      "status": "done",
+      "status": "doing",
       "units": [
-        {
-          "id": 408,
-          "do": "Spec: decisión D87 en specs/nzt-core.md",
-          "status": "done",
-          "detail": "D87 tras D86 (skill propia con objeción, nunca se ofrece, no modifica nada, md fuera del repo, actual o últimas N con la fuente, proyecto y NZT); nzt-retro en el árbol de §4.3"
-        },
-        {
-          "id": 409,
-          "do": "La skill skills/nzt/retro/SKILL.md (y su reference si no entra en una)",
-          "status": "done",
-          "detail": "skills/nzt/retro/SKILL.md, 141 líneas, sin reference: sesiones, ruta preguntada, momentos, mecánico/criterio, destinos proyecto/NZT, plantilla del md"
-        },
-        {
-          "id": 410,
-          "do": "Ruteo y oferta: fila en core/kernel.md y la oferta opcional al cerrar una run y al recomendar limpiar",
-          "status": "dropped",
-          "detail": "Quitada por el usuario 2026-10-29: QT-02 = nunca se ofrece y la tabla del kernel es de fases; la descripción de la skill es su único disparo (409)"
-        },
-        {
-          "id": 411,
-          "do": "Presupuesto del listado, build, README y un caso de disparo en evals/",
-          "status": "done",
-          "detail": "build: 16 skills, ~2898 chars (antes ~2684), sin avisos; README y evals/README al día; caso evals/routing/retro sin correr"
-        }
+        { "id": 414, "do": "Mover skills de tecnología y arquitectura a packs/ con pack.json y MCP", "status": "done", "detail": "8 packs; microsoft-learn y unity-mcp verificados en sus docs" },
+        { "id": 415, "do": "CLI: catálogo de packs, .nzt/project.json, merge de MCP, nzt-ai project y menú, lint de packs", "status": "done", "detail": "Compila; smoke manual de add/remove ok antes de reescribir contenido" },
+        { "id": 416, "do": "Kernel y skills globales reescritas cortas y genéricas (nzt, plan, delegate, architecture, build, discovery, verify, ship, ux)", "status": "done", "detail": "architecture/references/tech.md nueva; stack.md y stack-axes.md borradas; agentes y retro re-apuntados" },
+        { "id": 418, "do": "SKILL.md de cada pack con Axes y Opt-ins, y ddd/references/aggregates.md", "status": "doing", "detail": "Cortado antes de escribir: ningún SKILL de pack quedó escrito. Ver pendiente 1 en 11-marco-generico.md" },
+        { "id": 419, "do": "Reescribir las referencias de los packs sin redundancia (ya re-apuntadas por script)", "status": "todo" },
+        { "id": 417, "do": "Pasada de nzt-learn (referencias), nzt-research y nzt-retro con el mismo criterio", "status": "todo" },
+        { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "todo" },
+        { "id": 421, "do": "build.sh y build.ps1 validan packs; decidir check-extraction y check-references", "status": "todo" },
+        { "id": 422, "do": "evals: fixtures y casos a tech.md y nombres de packs, más un caso de setup", "status": "todo" },
+        { "id": 423, "do": "README, installer/README, specs/nzt-installer.md y D88 en specs/nzt-core.md", "status": "todo" }
       ]
     },
     {
       "name": "verify",
-      "status": "done",
+      "status": "todo",
       "units": [
-        {
-          "id": 412,
-          "do": "Gates del repo y una retro real sobre esta sesión que deje su md, sin tocar nada más",
-          "status": "done",
-          "detail": "Puertas: build, 171 checks, tope 200 OK; citas sin correr. Retro en C:/Users/ezefe/OneDrive/Escritorio/retro-2026-10-29-nzt-retro.md (R-01..R-05)"
-        }
+        { "id": 424, "do": "Gates: build, checks, lint global y de packs, smoke de project en carpeta temporal, state check", "status": "todo" }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": {
-    "units": [],
-    "keep_stops": []
-  },
+  "autonomy": { "units": [], "keep_stops": [] },
   "waiting_on": null,
   "notes": [
-    "PR #10 (D86, D87 y mods M5) mergeado a main por el usuario; ramas viejas borradas, sólo queda main",
-    "v3.1.0 publicada (menor por QT-01 del usuario): workflow de release en verde, 6 binarios, 6 instaladores y SHA256SUMS",
-    "Falta correr evals/routing/retro"
+    "Rama refactor-marco-generico desde main, nada commiteado: todo está en el working tree",
+    "Traspaso completo (decisiones, mapeos de nombres, pendiente en orden): Plan/mejoras/11-marco-generico.md",
+    "Contenido viejo de los routers de packs: git show HEAD:skills/nzt/build/... (ver el traspaso)"
   ]
 }

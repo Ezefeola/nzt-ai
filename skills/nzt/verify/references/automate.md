@@ -1,77 +1,30 @@
 # Automated regression
 
-**This applies only where the stack document selected it** — an end-to-end tool, named.
-An absent field does not enable it, and a tool being installed is not a decision to use it.
+**Only where `tech.md` names an end-to-end tool.** An installed tool is not that decision.
+Produces automated tests for scenarios already approved and passing.
 
-Produces automated tests for scenarios that are already approved and already passing.
+## Steps
 
-## What qualifies
+1. **Qualify**: approved, **passed by hand at least once**, no open question in its expected
+   result. Never automate to find out whether it passes. Prefer paths carrying money,
+   permissions, data loss, and defects already found once.
+2. **Write it** like running by hand: locate by role and accessible name, wait on observable
+   conditions, port the scenario's setup and teardown into the test's own hooks (no second
+   seeding path, no dependence on other tests), assert the plan's expected result.
+3. **When one fails, diagnose before touching it**:
 
-A scenario is automated when all three are true:
+   | Diagnosis | Do |
+   |---|---|
+   | product regression | open a defect; the test is right |
+   | broken test (locator, timing) | fix the test; the expectation stays |
+   | outdated scenario | the spec changes first, then the test |
+   | flaky | quarantine with its cause written, fix the cause |
 
-- It is **approved** in the test plan.
-- It has **passed by hand** at least once.
-- Its expected result depends on no open question.
-
-**A scenario that never passed is not automated to find out whether it passes.** That is
-running it for the first time through the most expensive possible mechanism, and a red test
-that was never green tells you nothing about what broke.
-
-Automate what is worth running forever: the paths that carry money, permissions, data loss,
-and the defects you already found once. Not everything that is automatable is worth
-maintaining.
-
-## Writing the test
-
-The same rules as running by hand, because it is the same act, delegated:
-
-- **Locate by role and accessible name.** A selector tied to markup breaks on every
-  restyle and teaches the team to distrust the suite.
-- **Wait for observable conditions**, never for fixed time. A sleep is a flaky test with a
-  delay fuse.
-- **Each test creates the data it needs and removes it afterwards, and does not depend on
-  another test's leftovers.** Order-dependent suites fail in whatever order the runner picks
-  tomorrow. The manual scenario already has its setup and teardown
-  (`nzt-verify-test-data`): port them into the test's own hooks instead of inventing a
-  second way to seed the same rows.
-- Assert the scenario's expected result, the one the plan wrote — not what the application
-  happens to produce today.
-
-## When one fails, diagnose before you touch it
-
-Four possibilities, and they have different answers:
-
-| Diagnosis | What you do |
-|---|---|
-| **Product regression** | It is a bug. Open it; the test is right |
-| **Broken test** — a locator or a timing assumption | Fix the test; the expectation does not move |
-| **Outdated scenario** — the requirement changed | The spec changes first, then the test |
-| **Flaky** | Quarantine it **with its cause written**, and fix the cause |
-
-**Never change the expected result to make a test pass.** The expectation moves only when
-the requirement moved, and that goes through the spec.
-
-This holds for tooling that "repairs" tests on its own: **accept a locator fix, reject
-anything that changes what is asserted.** A suite that heals itself into agreeing with the
-product is a suite that cannot fail.
-
-A flaky test goes to quarantine with its cause, not to the bin. Deleting it removes the
-symptom and keeps the defect, which is usually a real race in the product.
-
-## Keeping the suite honest
-
-- A test that fails for a reason nobody explains is not "known"; it is unverified, and it is
-  reported that way.
-- When a scenario is removed from the plan, its automated test goes with it.
-- The test index says which scenarios are automated, so the manual run stops repeating them
-  blindly.
+   **Never change the expected result to get green.** Self-healing tooling: accept locator
+   fixes, reject anything that changes what is asserted.
+4. Keep it honest: an unexplained failure is unverified, not "known"; a removed scenario takes
+   its test along; the testing index says what is automated.
 
 ## Done when
 
-Rehearse it: would this test fail if — and only if — the behavior it protects broke?
-
-- Every automated scenario was approved and had passed by hand.
-- Nothing is located by brittle markup or waits on a fixed time.
-- Each test builds its own data.
-- Every failure in this unit was diagnosed into one of the four categories.
-- No expectation was edited to get to green.
+Each test would fail if, and only if, the behavior it protects broke.

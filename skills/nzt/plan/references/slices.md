@@ -1,99 +1,53 @@
 # Planning by slices
 
-Produces a plan cut into **slices**: pieces walked end to end, each with its own phases, so
-value reaches the user — and a defect reaches you — before the whole scope is built. The
-state format is in `references/state.md`; this file says how to cut and run it.
+A slice is a piece walked end to end with its own phases, so value — and defects — reach the
+user before the whole scope is built. For full work, or when the user wants early delivery.
 
-## When
+## Cut
 
-Full work as `nzt` sizes it, or work the user wants delivered early. Standard work stays a
-plan with `phases`, which is a plan of one slice.
+1. A slice is cut by an outcome the user can try, never by layer or file. Default: a feature
+   of up to three stories. Bigger is the user's call.
+2. Work for the whole run — the product definition, a final release — is its own slice.
+   Nothing lives outside slices.
+3. **Analysis first**: a new product or feature starts with only the analysis slice and the
+   shape of the rest in one line. When it closes, rewrite the plan with the concrete slices,
+   set `approved: false` and ask again.
+4. Plan only **delivery 1** (from `product.md`) in slices; later deliveries are one line.
+   When delivery 1 has something to learn from users, offer a prototype (`nzt-ux`) inside
+   the analysis slice. A new product's first build slice is the **walking skeleton**: the
+   whole path end to end, thinnest form.
 
-## What a slice is
-
-What the plan cuts to walk end to end, with its phases. **By default a feature of up to
-three stories**; a bigger one, slices of one to three tried together, so QA comes early. The
-cut is a plan line the user approves: a bigger slice is their call, never the default.
-
-- A slice is cut by outcome the user can try, never by layer or by file.
-- Work that belongs to the whole run — the product definition, a final release — is its own
-  slice. There are no phases outside slices.
-
-## Analysis comes first
-
-Slices come out of analysis; you cannot cut what you do not know yet.
-
-1. A new product or feature starts with a plan that knows **only the analysis slice**, and
-   draws the shape of the rest in one line.
-2. When that slice closes, **rewrite the plan with the concrete slices** — which, in what
-   order, how big, with which cadence — set `approved: false`, and ask again. That approval
-   is where delivery 1 and the batch are decided.
-
-## Delivery 1
-
-The product's delivery 1 (`nzt-discovery`'s `product.md`) says what reaches the user first
-and for which objective. Its slices are planned; later deliveries stay as one line in the
-plan's shape, never as units. When delivery 1 has something to learn from users, **offer an
-HTML prototype** (`nzt-ux`) inside the analysis slice: usable, deleted or kept as the user
-decides, never turned into production code. In a new product, the first build slice is the **walking skeleton**: the
-whole path end to end in its thinnest form, real code the next slices grow.
-
-**Delivery 1 cuts scope, never the definition of done**: coverage per area, `qa` and the
-user's acceptance hold in every slice.
+Delivery 1 cuts scope, never the definition of done.
 
 ## Cadence
 
-Propose it in the plan, say what each mode costs, and write the one approved in `cadence`.
+Propose one, with its cost, and write it in `cadence`:
 
-| Cadence | How the slices are cut | When |
+| Cadence | Cut | When |
 |---|---|---|
-| `delivery` — **propose by default** | first slice: the analysis of the whole delivery, its specs and stories; then one slice per feature or smaller, with architecture, UX, build and verify | most new work: define once, then run in a batch |
-| `upfront` | the analysis of the whole run in the first slice | the problem is clear, or delivery 1 is the whole scope |
-| `just-in-time` | each slice brings its own analysis | almost nothing is known yet |
+| `delivery` *(default)* | first slice analyses the whole delivery; then one slice per feature with the other phases | most new work |
+| `upfront` | the whole run's analysis in the first slice | the problem is clear |
+| `just-in-time` | each slice brings its own analysis | almost nothing is known |
 
-**Whatever the cadence, a feature's scope, business rules and story index are written
-before its first slice is built.** What waits is the stories' criteria, never the rules: a
-rule crosses stories, and defined late it gets defined three different ways. The story
-index, one line *As… I want… so that…* per story, is the backlog; there is no other list.
+Whatever the cadence, a feature's scope, rules and story index exist before its first slice
+is built; only the stories' criteria may wait. "The spec of F-001 and its stories" is one
+step; when the index exists, cut one unit per story — no new approval needed.
 
-**The spec and its stories are one step of the plan**, named as such — *the spec of F-001
-and its user stories* — without counting them: the count is not known until the index
-exists. When the spec closes, cut one unit per story of the index into that step. That is an
-ordinary step of the approved plan, not a change to it: it asks for no new approval.
+## Run
 
-## Inside a slice
+- Phase rules hold inside each slice; verify after the slice's last build unit.
+- The agent's QA chains inside the batch; a person's QA unit goes in `autonomy.keep_stops`.
+- **QA fails:** the batch stops. The verify unit is `done` (it ran) with the defect in the
+  testing file; verify stays `doing` with `waiting_on` naming it. When the user authorises
+  the fix, reopen that slice's `build` with a new unit and set verify back to `todo` with a
+  re-run unit — the only case where a `done` phase reopens.
 
-The phase rules of the state file hold inside each slice: in order, no name repeated, at
-most one `doing`, and verify after the slice's last build unit (step 2 of *Building the
-plan*).
+## Show
 
-- **Who tests.** The AI's QA chains inside the batch. A person's QA unit goes in
-  `autonomy.keep_stops`: the batch waits for them there.
-- When a slice's last phase ends, the same write marks it `done` and the next `doing`, with
-  its first phase `doing`.
-
-## When QA fails inside the batch
-
-The batch stops. Nothing is built on top of what failed.
-
-1. The verify unit is `done` — it ran — and its result is in the testing file, with the bug.
-2. Verify stays `doing`; `waiting_on` names the slice and the bug. Report and stop.
-3. When the user authorises the fix, reopen that slice's `build` to `doing` with the fix as
-   a new unit, and set verify back to `todo` with a new unit for the re-run. **It is the only
-   case where a `done` phase goes back**, and only inside the current slice.
-
-## How it is shown
-
-**One table per slice**, under a heading with its id and name (`S2 · Walking skeleton`) — never
-a slice column, which leaves blank cells. Under the tables, the declarations of `proposal.md`, plus:
-
-- the cadence, and why;
-- the autonomy offer, once, as `nzt-plan` says: the next N units or up to a checkpoint;
-- the shape of what comes after delivery 1, in one line.
+One table per slice under `S2 · <name>`, never a slice column. Below: the declarations of
+`proposal.md`, the cadence and why, the autonomy offer, and the shape after delivery 1.
 
 ## Done when
 
-- Every slice can be tried on its own, says which phases it needs, and is its own table.
-- The analysis slice comes first when the scope is not known yet, with re-approval after it.
-- `cadence` is written; no feature is built without its scope, rules and a step for its stories.
-- No verify unit sits between two build units of the same slice.
+Every slice can be tried alone and is its own table; analysis comes first with re-approval
+after it; `cadence` is written; no verify unit sits between two build units of a slice.
