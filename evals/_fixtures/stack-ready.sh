@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Seeds the project of story-specified.sh with what the .NET and Blazor stack cases kept
 # stopping on: every operation they ask for has its story with status codes, the domain
-# model has every field they touch, and the manifest agrees with the stack document
-# (Directory.Packages.props exists, the projects reference what the stack lists). What is
-# left - Result, DbContext, entities - is setup the stack authorises, not a gap to ask about.
+# model has every field they touch, and the manifest agrees with tech.md
+# (Directory.Packages.props exists, the projects reference what tech.md lists). What is
+# left - Result, DbContext, entities - is setup tech.md authorises, not a gap to ask about.
 #
 # Sourced by a case's scaffold.sh. Runs as you, outside the agent's sandbox,
 # and only under `claude plugin eval --scaffold`.
@@ -114,7 +114,8 @@ Como operador quiero dar de alta un cliente con su nombre y su email.
 - RN-01, RN-02.
 MD
 
-cat > "$ws/Docs/domain-model.md" <<'MD'
+mkdir -p "$ws/Docs/Domain"
+cat > "$ws/Docs/Domain/domain-model.md" <<'MD'
 # Domain model — Pedidos
 
 update-when: an entity, a field or a relationship changes.
@@ -227,7 +228,7 @@ cat > "$ws/tests/Pedidos.Api.Tests/Pedidos.Api.Tests.csproj" <<'XML'
 </Project>
 XML
 
-# The stack lists Microsoft.EntityFrameworkCore.Design (migrations) and the test SDK too,
-# so the manifest and the stack document say the same thing.
+# tech.md lists Microsoft.EntityFrameworkCore.Design (migrations) and the test SDK too,
+# so the manifest and tech.md say the same thing.
 sed -i 's/^| Testcontainers.PostgreSql 4.6.0 |.*$/&\n| Microsoft.EntityFrameworkCore.Design 10.0.2 | migrations tooling | generating migrations |\n| Microsoft.NET.Test.Sdk 17.14.1 | test host | every test project |/' \
-  "$ws/Docs/backend-stack-Pedidos.Api.md"
+  "$ws/Docs/Architecture/tech.md"

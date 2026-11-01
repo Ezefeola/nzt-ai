@@ -1,12 +1,12 @@
 schema_version: "1.1"
 name: stack-blazor-render
 description: >
-  The frontend area, whose stack selects auto rendering and code-behind. Measures that the
+  Pedidos.Web, whose tech.md section selects auto rendering and code-behind. Measures that the
   render axis resolves to the selected mode and that the screen's three states are there
   from the first version instead of only the happy path.
 tags: [stack]
 expected_outcome: >
-  Loads the Blazor area router, reads its components and auto render references, and writes a
+  Loads the nzt-blazor pack, reads its components and auto render references, and writes a
   component that calls the feature's typed client and renders loading, empty and error.
 context:
   scaffold_script: scaffold.sh
@@ -21,19 +21,19 @@ graders:
   - name: blazor-area-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build-frontend-blazor"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-blazor"'
   - name: selected-render-leaf-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-frontend-blazor[/\\]+references[/\\]+render-auto\.md'
+    input_match: 'nzt-blazor[/\\]+references[/\\]+render-auto\.md'
   - name: components-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-frontend-blazor[/\\]+references[/\\]+components\.md'
+    input_match: 'nzt-blazor[/\\]+references[/\\]+components\.md'
   - name: other-render-modes-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-frontend-blazor[/\\]+references[/\\]+render-(?:server|webassembly|static)\.md'
+    input_match: 'nzt-blazor[/\\]+references[/\\]+render-(?:server|webassembly|static)\.md'
     min: 0
     max: 0
     arm: both
@@ -48,4 +48,4 @@ graders:
       PASS if the component reaches the API through the feature's typed client, and renders
       loading, empty and error as well as the list.
       FAIL if it only renders the list, if it injects HttpClient or builds a URL itself, or
-      if it puts the C# inline when the stack document selects code-behind.
+      if it puts the C# inline when tech.md selects code-behind.

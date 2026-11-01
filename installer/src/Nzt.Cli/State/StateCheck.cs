@@ -19,7 +19,11 @@ public static class StateCheck
 
     private static readonly string[] Statuses = ["todo", "doing", "done", "dropped"];
 
-    private static readonly string[] Phases = ["analysis", "architecture", "ux", "build", "verify", "ship"];
+    private static readonly string[] Phases = ["discovery", "architecture", "design", "build", "verify", "ship"];
+
+    // `analysis` fue el nombre de `discovery` y `ux` el de `design` hasta D88: un estado
+    // escrito antes sigue cumpliendo.
+    private static readonly string[] LegacyPhases = ["analysis", "ux"];
 
     private static readonly string[] DelegationModes = ["auto", "ask", "off"];
 
@@ -193,7 +197,7 @@ public static class StateCheck
             var name = Text(phase, "name") ?? $"#{index}";
             var phaseStatus = Text(phase, "status");
 
-            if (!Phases.Contains(Text(phase, "name")))
+            if (!Phases.Contains(Text(phase, "name")) && !LegacyPhases.Contains(Text(phase, "name")))
                 problems.Add($"la fase '{name}'{where} no es una fase de NZT: son {string.Join(", ", Phases)}");
 
             if (!Statuses.Contains(phaseStatus))

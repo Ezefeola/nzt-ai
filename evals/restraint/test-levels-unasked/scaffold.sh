@@ -3,38 +3,8 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 bash "$here/../../_fixtures/project.sh" "$PWD"
 
-# The backend stack in the shape D42 leaves behind: the Tests axis names the framework
+# Pedidos.Api in the shape D42 leaves behind: the test framework is named
 # and nothing else, and no `Test levels` opt-in was ever written. An absent opt-in
 # enables no level, unit included. The story reaches the database, so a set that still
 # has the old unconditional rule will build an integration suite nobody asked for.
-cat > "$PWD/Docs/backend-stack-Pedidos.Api.md" <<'MD'
-# Backend stack — Pedidos.Api
-component: Pedidos.Api · area: backend
-
-| Axis | Choice | When |
-|---|---|---|
-| Runtime | .NET 10.0.2 | — |
-| Language | C# 14 | — |
-| Database | PostgreSQL 17 | — |
-| Architecture | vertical-slice | — |
-| Domain model | ddd | entities and aggregates protect the order rules |
-| Persistence | repositories with unit of work | every write goes through the unit of work |
-| ORM | EF Core 10 | every access to PostgreSQL |
-| Endpoints | minimal-apis | every HTTP endpoint |
-| Error handling | result pattern | expected failures; exceptions stay exceptional |
-| Result to HTTP | result-extensions | endpoints translate Result to payload or ProblemDetails |
-| Tests | xUnit 3 | — |
-
-## Opt-ins
-- **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
-- **Test-first:** no
-- **Automated end-to-end tests:** no
-
-## Packages
-| Package | What for | When to use it |
-|---|---|---|
-| Npgsql.EntityFrameworkCore.PostgreSQL 10.0.0 | EF Core provider for PostgreSQL | persistence and migrations |
-| xunit.v3 3.0.0 | test framework | every automated test |
-
-Versions read on 2026-09-17 from `global.json` and `Directory.Packages.props`.
-MD
+sed -i -e '/^- \*\*Test levels:\*\* unit yes/d' -e '/Testcontainers.PostgreSql/d' "$PWD/Docs/Architecture/tech.md"

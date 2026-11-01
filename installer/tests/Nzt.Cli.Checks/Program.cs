@@ -12,7 +12,7 @@ namespace Nzt.Cli.Checks;
 /// tocan el HOME real: cada caso arma su propio árbol y lo borra al terminar.
 /// No prueban comportamiento de los CLIs ni selección de skills por el modelo.
 /// </summary>
-public static class Program
+public static partial class Program
 {
     private static int _passed;
     private static readonly List<string> Failures = [];
@@ -65,6 +65,7 @@ public static class Program
         StateCheckAcceptsAValidState();
         StateCheckWithoutAFileIsNotAnError();
         StateCheckCatchesEveryBrokenInvariant();
+        StateCheckAcceptsTheRenamedPhasesAndTheirOldNames();
         StateCheckAcceptsEachDelegationModeAndItsAbsence();
         StateCheckAcceptsAParallelGroup();
         StateCheckCatchesEveryBrokenParallelGroup();
@@ -73,6 +74,7 @@ public static class Program
         StateCheckCatchesEveryBrokenSliceInvariant();
         StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
+        RunProjectChecks();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -95,7 +97,7 @@ public static class Program
         Check("el bloque lleva los marcadores del build",
             File.ReadAllText(provider.InstructionsFile).Contains(InstructionBlock.Begin));
         Check("aplana la skill anidada",
-            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build-implement", "SKILL.md")));
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-plan", "SKILL.md")));
         // Instrucciones + tres skills.
         Check("registra todo en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 4);
@@ -177,7 +179,7 @@ public static class Program
         var (provider, catalog, manifests) = Setup(home);
         Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
 
-        var gone = Path.Combine(provider.SkillsDirectory, "nzt-build-implement", "SKILL.md");
+        var gone = Path.Combine(provider.SkillsDirectory, "nzt-plan", "SKILL.md");
         var edited = Path.Combine(provider.SkillsDirectory, "nzt-build", "SKILL.md");
         File.WriteAllText(edited, "lo toqué\n");
 
@@ -195,12 +197,12 @@ public static class Program
     private static void InstallsReferencesInsideTheirSkill() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        var withReferences = WithReferences(catalog, "nzt-build", "implement.md", "tests.md");
+        var withReferences = WithReferences(catalog, "nzt-build", "tests.md", "review.md");
 
         Installer.Install(provider, withReferences, "0.1.0", manifestDirectory: manifests);
 
         Check("copia la referencia dentro de la carpeta de su skill",
-            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references", "implement.md")));
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-build", "references", "tests.md")));
         // Instrucciones + tres skills + dos referencias.
         Check("registra las referencias en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 6);
@@ -209,7 +211,7 @@ public static class Program
     private static void RemovesOrphanReferencesAndEmptyFolders() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        Installer.Install(provider, WithReferences(catalog, "nzt-build", "implement.md"),
+        Installer.Install(provider, WithReferences(catalog, "nzt-build", "tests.md"),
             "0.1.0", manifestDirectory: manifests);
         Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
 
@@ -379,8 +381,7 @@ public static class Program
 
     private static void FlattensTheNestedPathIntoTheName()
     {
-        var skill = new SkillFile("nzt-build-backend-dotnet-ef-core-queries",
-            "nzt/build/backend/dotnet/ef-core/queries", "---\nname: x\n---\n");
+        var skill = new SkillFile("nzt-build", "nzt/build", "---\nname: x\n---\n");
 
         Check("el nombre plano sale del path",
             skill.RepoPath.Replace('/', '-') == skill.Name);
@@ -735,8 +736,7 @@ public static class Program
             [
                 Skill("nzt", "---\nname: nzt\ndescription: router raíz\n---\n\ncuerpo\n"),
                 Skill("nzt-build", "---\nname: nzt-build\ndescription: router de build\n---\n\ncuerpo\n"),
-                Skill("nzt-build-implement",
-                    "---\nname: nzt-build-implement\ndescription: hoja\n---\n\ncuerpo\n")
+                Skill("nzt-plan", "---\nname: nzt-plan\ndescription: router de plan\n---\n\ncuerpo\n")
             ]);
 
         return (provider, catalog, Path.Combine(home, "manifests"));
@@ -834,7 +834,7 @@ public static class Program
         var report = CheckState(home, """
             { "version": 1, "approved": true,
               "phases": [
-                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] },
                 { "name": "build", "status": "doing", "units": [
                   { "id": 2, "status": "doing" }, { "id": 3, "status": "todo" }] },
                 { "name": "verify", "status": "todo", "units": [] }],
@@ -854,7 +854,7 @@ public static class Program
         var report = CheckState(home, """
             { "approved": "yes",
               "phases": [
-                { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "todo" }] },
+                { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "todo" }] },
                 { "name": "build", "status": "doing", "units": [
                   { "id": 2, "status": "doing" }, { "id": 2, "status": "running" }] },
                 { "name": "verify", "status": "doing", "units": [{ "id": 4, "status": "doing" }] },
@@ -870,11 +870,19 @@ public static class Program
         Check("más de una fase en doing", Says("hay 2 fases en doing"));
         Check("más de una unidad en doing", Says("hay 3 unidades en doing"));
         Check("una unidad en doing fuera de la fase en doing", Says("la unidad 5 está en doing, pero su fase 'ship'"));
-        Check("una fase done con unidades pendientes", Says("la fase 'analysis' está done con la unidad 1 en todo"));
+        Check("una fase done con unidades pendientes", Says("la fase 'discovery' está done con la unidad 1 en todo"));
         Check("autonomy que nombra una unidad que no existe", Says("autonomy.units nombra la unidad 9"));
         Check("una fase que no es de NZT", Says("la fase 'discusion' no es una fase de NZT"));
         Check("las fases de NZT no se marcan", !Says("la fase 'build' no es una fase"));
         Check("un modo de delegación que no existe", Says("delegation es 'always'"));
+    });
+
+    private static void StateCheckAcceptsTheRenamedPhasesAndTheirOldNames() => InTemp(home =>
+    {
+        foreach (var name in new[] { "discovery", "analysis", "design", "ux" })
+            Check($"la fase {name} cumple", CheckState(home, $$"""
+                { "approved": true, "phases": [{ "name": "{{name}}", "status": "todo", "units": [] }] }
+                """).Ok);
     });
 
     private static void StateCheckAcceptsEachDelegationModeAndItsAbsence() => InTemp(home =>
@@ -934,8 +942,8 @@ public static class Program
         var report = CheckState(home, """
             { "version": 2, "approved": true, "cadence": "delivery",
               "slices": [
-                { "id": "S1", "name": "Análisis de la entrega 1", "status": "done", "phases": [
-                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] }] },
+                { "id": "S1", "name": "Discovery de la entrega 1", "status": "done", "phases": [
+                  { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] }] },
                 { "id": "S2", "name": "F-003 Cupones", "status": "doing", "phases": [
                   { "name": "build", "status": "doing", "units": [
                     { "id": 2, "status": "done" }, { "id": 3, "status": "doing" }] },
@@ -959,7 +967,7 @@ public static class Program
             { "version": 2, "approved": true, "cadence": "sprint",
               "slices": [
                 { "id": "S1", "status": "done", "phases": [
-                  { "name": "analysis", "status": "done", "units": [{ "id": 1, "status": "done" }] },
+                  { "name": "discovery", "status": "done", "units": [{ "id": 1, "status": "done" }] },
                   { "name": "build", "status": "todo", "units": [{ "id": 2, "status": "todo" }] }] },
                 { "id": "S2", "status": "doing", "phases": [
                   { "name": "build", "status": "doing", "units": [{ "id": 3, "status": "doing" }] },

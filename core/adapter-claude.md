@@ -4,8 +4,8 @@
   (personal). Load one with the Skill tool, using the name from the routing table.
 - The user can invoke any skill directly as `/<name>`.
 - The question tool is `AskUserQuestion`: 1–4 questions a call, 2–4 options each, Other added.
-- A skill's content stays in context once loaded. Do not reload a skill you already have.
+- A skill's content stays in context once loaded.
 - Plan mode and its approval prompt do not replace `Plan/state.json`; the plan has to
   survive the session and stay editable by the user.
-- Clearing the session is `/clear`, and it is the user who runs it. If this session gives
-  you no usage signal, say so and point them at `/context`, which prints it.
+- Clearing the session is `/clear`. With no usage signal, point the user at `/context`,
+  which prints it.

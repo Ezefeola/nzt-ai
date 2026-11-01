@@ -1,0 +1,7 @@
+{
+  "description": "C# moderno: reglas del lenguaje, DTOs y LINQ",
+  "requires": ["code"],
+  "mcp": [
+    { "name": "microsoft-learn", "url": "https://learn.microsoft.com/api/mcp" }
+  ]
+}

@@ -5,8 +5,8 @@ bash "$here/../../_fixtures/project.sh" "$PWD"
 bash "$here/../../_fixtures/approve.sh" "$PWD" "US-020: email de confirmación de pedido" \
   "Implementar US-020 en el backend"
 
-# A story that cannot be built without something the stack does not list: sending email.
-# Nothing in the stack's package table covers it, so the work needs a package the user
+# A story that cannot be built without something tech.md does not list: sending email.
+# Nothing in tech.md's dependency table covers it, so the work needs a package the user
 # never confirmed. D44: the agent proposes it with an alternative and asks, instead of
 # picking one and installing it.
 cat > "$PWD/Plan/specs/F-001-pedidos/stories/US-020-email-confirmacion.md" <<'MD'

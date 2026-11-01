@@ -1,0 +1,78 @@
+schema_version: "1.1"
+name: route-tool-research
+description: >
+  A Unity game whose engine is decided and whose packs and agent tools are not, asked the
+  way the user asked it in a real project: "what do you need to do it all yourself?". DB-03
+  (2026-11-01): the catalogue and research always run together, even when a pack matches;
+  the most trusted source wins, named with its date; both are proposed together with what
+  they cost, and nothing is installed without the user's yes. Since unit 432 it is the
+  preparation of the work, written for someone who knows none of it: what the user does by
+  hand, what the agent cannot do even with every tool, and that each tool is checked to
+  answer before it is relied on. The failure modes are offering only the catalogue's unity
+  pack, offering only what a search found, resting on a third-party source alone,
+  installing unasked, and a list of tools with no word on the user's part. New case, no
+  baseline.
+tags: [routing]
+expected_outcome: >
+  Loads nzt-architecture and reads its tech.md reference, reads the project's tech.md,
+  looks at the pack catalogue and researches the agent tools for Unity 6 in Unity's own
+  documentation, proposes the unity pack and what the research found together, each with
+  its source, date and cost, explains in plain words what the user does by hand and what the
+  agent cannot do, says how it will check each tool answers, and waits for the user's yes
+  before installing anything.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero que codees este juego vos y lo hagas todo vos. ¿Qué necesitás instalar para
+    eso? Dejalo listo.
+  max_turns: 30
+  timeout_seconds: 800
+  # Bash, so `nzt-ai project packs` can be run to look; installing is what must wait.
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite, Bash, WebSearch, WebFetch]
+graders:
+  - name: architecture-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture"'
+  - name: tech-guidance-read
+    type: tool_used
+    tool: Read
+    input_match: 'nzt-architecture[/\\]+references[/\\]+tech\.md'
+  - name: read-tech
+    type: tool_used
+    tool: Read
+    input_match: 'Docs[/\\]+Architecture[/\\]+tech\.md'
+  - name: no-install-without-yes
+    type: tool_used
+    tool: Bash
+    input_match: 'nzt-ai\s+project\s+(?:add|sync)|(?:claude|codex)\s+mcp\s+add'
+    min: 0
+    max: 0
+    arm: both
+  - name: catalogue-and-research-together
+    type: llm
+    criteria: |
+      The reply is in Spanish and is about what the agent needs to work on the Unity game.
+      PASS if it proposes BOTH the catalogue's unity pack (or says `nzt-ai` is not available
+      and what to run to see the catalogue) AND what it researched about agent tools for
+      Unity 6 - such as Unity's official MCP server - naming a source and the date it was
+      read, preferring Unity's own documentation over third parties; says what each brings
+      and costs (what it installs on the machine, what it can reach); says so if the
+      research contradicts the pack; and asks the user to confirm before installing.
+      FAIL if it installs anything without asking, if it offers only the pack without any
+      research, if it offers only researched tools without looking at the catalogue, if a
+      claim rests only on a forum, article or video, or if it starts writing game code.
+  - name: explained-for-a-newcomer
+    type: llm
+    criteria: |
+      The reply is in Spanish and proposes what the agent needs to work on the Unity game.
+      PASS if, in words someone new to Unity can follow, it says: what the user has to do
+      by hand, step by step (for example installing a package in the editor or approving
+      the agent's connection there); at least one thing the agent cannot do even with every
+      tool installed (for example judging how the game feels, or seeing it on the user's
+      screen); and how it will check that each tool answers before relying on it (for
+      example in the next session, once MCP servers load).
+      FAIL if it lists tools without saying what the user does, if it claims the agent can
+      do everything alone once installed, or if it says nothing about checking that the
+      tools work.

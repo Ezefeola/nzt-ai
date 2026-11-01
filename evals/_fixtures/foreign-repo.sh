@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Seeds a .NET repository that is not NZT's: no stack document, no Plan/, and code
-# written against conventions NZT would not choose. The set is installed anyway.
+# Seeds a .NET repository that is not NZT's: no tech.md, no Plan/, and code written
+# against conventions NZT would not choose. The set is installed anyway, and so is the
+# dotnet pack, as project skills: installed is not listed, and nothing lists it.
 # What is measured is whether NZT's conventions step aside and the difference is
 # reported instead of applied.
 set -euo pipefail
@@ -9,6 +10,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ws="${1:-$PWD}"
 
 cp "$here/CLAUDE.md" "$ws/CLAUDE.md"
+bash "$here/packs.sh" "$ws" dotnet
 
 mkdir -p "$ws/Legacy.Billing/Services" "$ws/Legacy.Billing/Controllers"
 

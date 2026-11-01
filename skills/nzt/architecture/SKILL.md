@@ -1,166 +1,89 @@
 ---
 name: nzt-architecture
-description: Use when technical decisions come before code: component boundaries, stack, how a feature is solved across components, persistence, integrations, decisions worth recording.
+description: Use when how it is made has to be decided before the work - its parts and boundaries, technologies, tools and the project's packs, the domain model, one feature's technical design, integrations, decision records, debt, diagrams.
 ---
 
-# Architecture — technical design
+# Architecture — how it is made
 
-This phase defines **how** the system solves the problem discovery defined. It decides
-structure, and it records why.
+Decides **how** the product does what discovery agreed, records why, and sets up the
+project's packs. **Owns** its parts, technologies and packs (`Docs/Architecture/tech.md`),
+the domain model, integrations, decision records, deferred debt, diagrams, and the map of
+`Docs/`. **Does not own** the rules (`nzt-discovery`), its form (`nzt-design`) or the work
+itself (`nzt-build`).
 
-## Boundaries
-
-**Owns:** components and their boundaries, stack and technology choices, the domain model
-in technical terms (entities, aggregates, value objects), the cut into contexts,
-persistence, consistency, integrations and contracts, cross-cutting concerns, decision
-records, deferred technical work, the diagrams of all of it, and the inventory of `Docs/` —
-which documents exist, in which folder, and when each one is created.
-
-**Does not own:** business rules (`nzt-discovery`), screen design (`nzt-ux`), writing the
-code (`nzt-build`). Nor are two sets of `Docs/` files: the UX documents (design system,
-shared components) are `nzt-ux`'s; `product.md`, `glossary.md` and `analysis.md`, discovery's.
-
-## Required guidance
-
-Before deciding, read what already binds you: the feature spec and its stories, the stack
-document of every component you touch, and the existing decision records. Reuse what is
-already loaded — the table below does not mean load every row.
-
-## The questions come before the design
-
-**This phase never decides alone what it could have asked.** Before writing a line of a
-design, derive from the rules, the stories and the stack **every** technical question the
-document has to answer — including what each third party allows and how it fails — and
-write them as open `QT-NN` in the decisions log. An analysis' technical notes are one
-input; the rules are the source.
-
-Then resolve each one **by its kind**, and the kind is not the user's to pick:
-
-| Kind | Example | How it is resolved |
-|---|---|---|
-| Checkable fact | what the gateway returns when it rejects a charge | researched in its authoritative source (`nzt-research`), answered with source and date — **never asked** |
-| Detail inside the agreed scope | how many retries before giving up | the agent decides it, labelled as its own |
-| Tradeoff or material change | validating the licence online or with a signed token | **asked**, with the options, their consequences and a recommendation — in every mode |
-
-A finding that contradicts an agreed rule does not bend the design: it goes back to
-discovery as a question or a change proposal. How any question is asked, written and closed
-is `nzt-plan`'s (`../nzt-plan/references/questions.md`); this phase adds the kinds above and
-the modes below.
-
-## How they get resolved is the user's choice
-
-Once the questions are derived — **never before, or the user chooses blind, not knowing
-whether there are three or twenty-five** — say how many came out and of what kind, and
-offer three ways:
-
-| Mode | What the agent does with the details |
-|---|---|
-| **Proposals** | decides them, labelled, and the user objects to what does not fit |
-| **Together** | asks them too, **grouped into one round**, never one at a time |
-| **Dictated** | the user says how it goes, and the agent writes it |
-
-The mode governs **only the middle row of the table above**, so those details get no answer
-— not even a suggested one — until it is chosen. A checkable fact is never asked in any
-mode; a tradeoff is always asked in every one. It is chosen per document, and logged.
-
-**Dictated does not mean stenography.** What the user dictates is contrasted against the
-spec and the stack, and a contradiction is raised before it is written — otherwise it is
-found in build, by someone with less information than you have now.
-
-Every `QT-NN`, and the mode chosen, lives in the document's **append-only decisions log**:
-`references/decisions-log.md` has its shape and the labels that say where each answer came
-from.
-
-## Choose the reference
-
-Paths are relative to this skill's folder. **Read the file before acting on the row** — the
-row is not the guidance, the file is.
+## References
 
 | The unit is | Read | Read with |
 |---|---|---|
-| The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/decisions-log.md`, `references/diagrams.md`, `../nzt-plan/references/questions.md` |
-| One component's adopted technologies, versions and areas | `references/stack.md` | `references/stack-axes.md` — its axes, options and how they are asked —, the area's `../nzt-build/references/practices-<area>.md` — the values and their cost —, `references/decisions-log.md`, `../nzt-plan/references/questions.md` |
-| One feature's technical design: flows, data, integrations | `references/design-feature.md` | `references/decisions-log.md`, `references/diagrams.md`, `../nzt-plan/references/questions.md` |
-| The entities of the business, their fields and their aggregates | `references/domain.md` | — |
-| More than one context, or meaning shared with a third party | `references/contexts.md` | — |
-| A consequential decision with alternatives and consequences | `references/adr.md` | — |
-| A decision that needs agreement from people outside this conversation — **on request** | `references/rfc.md` | — |
-| Technical work found and deliberately deferred | `references/tech-debt.md` | — |
-| Judging an existing structure against evidence, not designing one | `references/review.md` | — |
-| Deciding whether a document earns a diagram, and offering it | `references/diagrams.md` | — |
-| Drawing `context` or `components` | `references/diagrams-components.md` | `references/diagrams.md` |
-| Drawing `bounded-contexts` or `aggregates` | `references/diagrams-domain.md` | `references/diagrams.md` |
-| Drawing `sequence`, `state` or `flow` | `references/diagrams-behavior.md` | `references/diagrams.md` |
+| The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/decisions-log.md`, `references/diagrams.md` |
+| Technologies, packs, decisions and opt-ins of each component; what the agent needs to do the work | `references/tech.md` | `references/decisions-log.md` |
+| One feature's technical design | `references/design-feature.md` | `references/decisions-log.md`, `references/diagrams.md` |
+| The business entities and their relationships | `references/domain.md` | — |
+| A consequential decision with alternatives | `references/adr.md` | — |
+| A decision that needs people outside this conversation — **on request** | `references/rfc.md` | `references/adr.md` |
+| Work found and deliberately deferred | `references/tech-debt.md` | — |
+| Judging an existing structure against evidence | `references/review.md` | — |
+| Drawing a diagram the user accepted | `references/diagrams-draw.md` | `references/diagrams.md` |
 
-Wherever a file names `nzt-architecture-<name>`, it means `references/<name>.md` in this
-folder (`nzt-architecture-adr` → `references/adr.md`): read that file — it is not a skill.
+Every question also follows `../nzt-plan/references/questions.md`.
 
-**A diagram is never drawn from habit, and it is offered while the document is planned.**
-So `references/diagrams.md` is read before that plan is shown — with the design rows, as
-their Read with says — and the row that draws one is read only once the user wants it. A
-diagram the user does not want is not drawn, and the prose carries the weight alone.
+## Steps
 
-## When to skip this phase
+1. **Read what binds you**: the spec and its stories, `tech.md`, `architecture.md`, the ADRs.
+2. **Derive every technical question first** — from the rules, the stories and each third
+   party's limits — and log each as an open `QT-NN` before designing. Resolve each by kind:
 
-Skip it when the change adds no component, chooses no technology, crosses no boundary and
-sets no precedent. Most changes to an existing system are in that category. Say you
-skipped it and why; do not design a system that already exists.
+   | Kind | Example | Resolved by |
+   |---|---|---|
+   | Checkable fact | what the gateway returns on a rejected charge | research with source and date (`nzt-research`) — never asked |
+   | Detail inside the agreed scope | how many retries | the mode below |
+   | Tradeoff or material change | online licence check or signed token | **asked**, with options, consequences and a recommendation |
 
-## One unit
+3. **Offer the mode** once the questions exist — say how many and of what kind, never before:
+   **Proposals** (you decide the details, labelled; the user objects), **Together** (asked
+   in one grouped round), **Dictated** (the user says, you write — contrasting it against the
+   spec and `tech.md` first). The mode governs only details; log it per document.
+4. **Write the document** of the unit's reference. A finding that contradicts an agreed rule
+   goes back to discovery; a question of a later phase is left, undecided, where that phase
+   reads it.
+5. Offer a diagram as `references/diagrams.md` says.
 
-One document: the product design, one feature's design, one stack, or one decision record.
+**Skip this phase** when the change adds no component, chooses no technology, crosses no
+boundary and sets no precedent. Say so in one line.
 
 ## Mandatory
 
-**The stack document is mandatory and this phase writes it.** No component gets built
-without one, nor without its row in `Docs/Architecture/architecture.md`: a new component
-gets both when it is designed, an existing one gets them from evidence before its code is
-touched.
+`Docs/Architecture/tech.md` and the component's row in `architecture.md` exist before a
+component is built: a new component gets them when designed, an existing one from evidence
+before its work is touched.
 
 ## Where it lands
 
-`Docs/` has one folder per subject, whichever phase writes it: `Product/` (product, interview,
-history), `Domain/`, `Architecture/`, `UX/`, `Operations/` (deployment, releases), `Manual/`.
+`Docs/` has one folder per subject: `Product/`, `Domain/`, `Architecture/`, `Design/`,
+`Operations/`, `Manual/`. A project that already has `UX/` keeps it until the user moves it.
 
-- Components, boundaries, external systems and why → `Docs/Architecture/architecture.md`, from
-  the first stack; **each row names the component's root** (`Pedidos.Api/`; `./` if it is the
-  only one), never a build project's folder: it is how every phase finds that stack
-- Entities, with aggregates when the stack says so → `Docs/Domain/domain-model.md`; contexts,
-  dependencies, domain events → `Docs/Domain/context-map.md`, only past one context or with a third party
-- Decision records → `Docs/Architecture/adr/` · proposals still being agreed →
-  `Docs/Architecture/rfc/`, on request · deferred work → `Docs/Architecture/tech-debt.md`
-- One stack per component and area, **in the component's root** →
-  `<component folder>/Docs/Architecture/<area>-stack.md` (`backend-stack.md`, `frontend-stack.md`)
-- The technical questions and their answers → `Docs/Architecture/architecture-decisions.md`
-  for the product, `Plan/specs/<feature>/tech-design/decisions.md` for a feature. Append-only
-- A feature's technical design → `Plan/specs/<feature>/tech-design/design.md`, **offered, not
-  declared**, with any contract or diagram it needs beside it in the same folder
-- A review writes no document of its own: its findings land where each belongs — an ADR,
-  deferred work, or a proposal back to the product design.
+- Components, boundaries, external systems → `Docs/Architecture/architecture.md`
+- Technologies, packs, decisions, opt-ins, dependencies and agent tools per component →
+  `Docs/Architecture/tech.md`
+- Technical questions → `Docs/Architecture/architecture-decisions.md` (product) or
+  `Plan/specs/<feature>/tech-design/decisions.md` (feature). Append-only
+- Entities → `Docs/Domain/domain-model.md`
+- Decision records → `Docs/Architecture/adr/` · RFCs → `Docs/Architecture/rfc/` · debt →
+  `Docs/Architecture/tech-debt.md`
+- A feature's design → `Plan/specs/<feature>/tech-design/design.md`, **offered**, not declared
+- A review writes no document of its own: each finding lands where it belongs.
 
 ## Rules
 
-Each reference holds the rules of its own document. These hold for every unit of the phase:
-
-- **Design against the spec, not against the request.** If the spec does not say it, it is
-  not a requirement — go back to discovery instead of inventing one.
-- **Respect what exists.** In an existing system the current structure is a constraint and a
-  source of information, not an accident to correct in passing.
-- **Distinguish what is planned from what is adopted**, until it is adopted.
-- **A decision that is expensive to reverse gets an ADR**: the alternatives considered, what
-  was chosen, what it costs. A decision nobody can reconstruct gets relitigated every
-  quarter. **One that also has to be agreed by people outside this conversation goes through
-  an RFC first**, and nothing is built while that RFC is open.
-- **A question that belongs to a later phase goes where that phase reads it**, undecided:
-  deciding a build question now is deciding it with less information than whoever gets there
-  will have.
-- A version or a capability is verified in the project's own evidence — the manifest, the
-  configuration, the SDK pin — not inferred from what compiles or from what is newest. How
-  an external system behaves is verified in its own documentation: `nzt-research`.
+- **Design against the spec, not the request.** What the spec does not say is a question for
+  discovery.
+- **Respect what exists**: the current structure is a constraint and evidence.
+- **Planned is not adopted** until it is.
+- Versions and capabilities come from the project's own evidence (manifests, configuration,
+  pins), never from what compiles or what is newest.
 
 ## Done when
 
-The unit's reference says its own *Done when*, and it holds. Build can start without an open
-technical decision in its way: every component you touch has its stack document with its
-areas declared, every consequential decision has its record, and every technical question
-still open has a `QT-NN` written where it will be read.
+The work can start with no open technical decision in its way: every component touched has
+its `tech.md` section and its packs installed, every consequential decision its record, and
+every open question its `QT-NN` where it will be read.

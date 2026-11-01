@@ -1,33 +1,10 @@
 # Product definition
 
-## Contents
-- It is the minutes, not the source
-- The file
-- Objectives
-- Users
-- Modules
-- Constraints
-- Delivery 1
-- Scope, in both directions
-- A first version
-- Keep it current
-- Done when
-
-Produces `Docs/Product/product.md`: what the product is, for whom, and what it will not be. It is
-the document every feature is checked against — a feature that serves none of its
-objectives is a feature nobody should be building.
-
-## It is the minutes, not the source
-
-- **It is written from `Docs/Product/analysis.md`**, the product interview. Every line traces back
-  to something the user said. What you filled in yourself is marked as proposed until they
-  confirm it.
-- **Never written by reading the repository.** Code says what exists, not what the product
-  is for. Features emerge from the conversation and this document records what the phase
-  established; it is not a source features get derived from afterwards.
-- On an existing product with no document, it is still built from the interview. Evidence
-  from the code goes in as a question — *"the system does X today; is that what it is
-  for?"* — never as a definition.
+Produces `Docs/Product/product.md`: what the product is, for whom, and what it will not be —
+the document every feature is checked against. **The minutes, not the source**: every line
+traces to `Docs/Product/analysis.md`; what you filled in is marked proposed. Never written by
+reading the repository: existing behavior enters as a question (*"it does X today; is that
+what it is for?"*).
 
 ## The file
 
@@ -35,132 +12,60 @@ objectives is a feature nobody should be building.
 # Product — Pedidos
 
 ## Objectives
-- **Coupons get redeemed.** Today a campaign runs and nobody can use the code, so the
-  spend produces no orders. Known by: campaigns end with redemptions above zero.
-- **Support stops handling discounts by hand.** Known by: no manual discount tickets.
+- **Coupons get redeemed.** Today campaigns run and nobody can use the code.
+  Known by: campaigns end with redemptions above zero.
 
 ## Users
 | Who | What they need | What they cannot do today |
 |---|---|---|
-| Customer | Pay the promotional price without calling anyone | Enter a code anywhere |
+| Customer | Pay the promotional price alone | Enter a code anywhere |
 | Support agent | See why a coupon was rejected | Only sees the final total |
 
 ## Modules
 - **Ordering** — building an order and confirming it.
-- **Promotions** — coupons, their validity and their redemption.
-- **Support desk** — looking up an order and what happened to it.
+- **Promotions** — coupons, validity and redemption.
 
 ## Constraints
-- Billing stays in the current system; this product does not issue invoices.
-- The team is two people; nothing that needs an operations shift.
+- Billing stays in the current system. The team is two people.
 
 ## Delivery 1
 - **For:** coupons get redeemed.
-- **In:** applying a valid coupon and the rejected cases, in ordering and promotions.
-- **To learn:** whether customers find where to enter the code (Q-15). Support desk waits.
+- **In:** applying a valid coupon and the rejected cases.
+- **To learn:** whether customers find where to enter the code (Q-15).
 - **Known by:** the first campaign after it ends with redemptions above zero.
 
 ## Scope
-
 **In**
-- Redeeming a coupon during checkout, across the ordering and promotions modules.
-
+- Redeeming a coupon during checkout.
 **Out**
-- Creating campaigns. Marketing keeps doing it in their own tool (Q-04).
-- A customer-facing mobile app. Not this round; the user decided web first.
+- Creating campaigns: marketing keeps its own tool (Q-04).
 
 ## Open
 - Q-13 · Does a refund return the coupon?
 ```
 
-## Objectives
+## Rules
 
-An objective is a **result for someone**, with how you will know it happened.
-
-- Not a feature list. *"Coupons"* is a module; *"coupons get redeemed"* is an objective.
-- Say what is wrong today. An objective with no current pain is a preference, and it is
-  worth saying so out loud before anyone builds for it.
-- **Known by:** what changes when it is achieved. If nobody can tell the difference, the
-  objective is not written yet.
-- Three to five. A product with twelve objectives has none.
-
-## Users
-
-Who they are, what they need, and **what they cannot do today**. That third column is what
-turns a user list into something a feature can be checked against.
-
-- A role only earns a row when it changes what the product must do or what it is allowed to
-  show. Two job titles doing the same thing are one row.
-- Name the user who is not the buyer when there is one: the person operating it every day
-  often has needs the buyer never mentions.
-
-## Modules
-
-The product's capabilities, one line each. A module is what the product **does** — not a
-folder, not a screen, not a component. Components are architecture's.
-
-- The module list is stable; features are not. Do not keep a feature index here: it goes
-  stale the day a feature is split, and the features already live in `Plan/specs/`.
-
-## Constraints
-
-What the user imposes and you do not get to trade away: existing systems that stay, a
-deadline, a budget, team size, legal or regulatory obligations.
-
-- A constraint the user stated is recorded even when you disagree with it. Say so once,
-  with the consequence, and write down their decision.
-- A technical constraint you assumed is not a constraint. It goes to architecture.
-
-## Delivery 1
-
-What reaches the user first — the MVP — and for which objective. Ask one question to define
-it: **is there anything we need to learn from users before building the rest?**
-
-- If yes, delivery 1 is the least that teaches it, and **To learn** names what.
-- If no, **delivery 1 is the whole scope**, and the section says so as a decision — *"the
-  whole scope: nothing to learn first (Q-15)"* — never left out by omission.
-- **Known by** is the objective's, measured on this delivery.
-- It cuts scope, never the definition of done: coverage per area, `qa` and the user's
-  acceptance hold for every story in it.
-- It is a scope line, not a priority. Later deliveries are one line each in **Open** or in
-  the plan's shape, until their turn.
-
-## Scope, in both directions
-
-**Out** is the half that stops work nobody asked for. Each excluded line says why, or where
-it lives instead.
-
-- What the user dismissed goes here in their terms, not paraphrased into something softer.
-- Something that is neither in nor out is an open question, not scope.
-
-## A first version
-
-When a feature enters Analysis in standard work, or in an existing product with no
-document, the product definition starts as a **first version**: the feature's work is not
-held up by a whole product interview nobody asked for.
-
-- It carries **Objectives** — at least the one this feature serves —, the **Users** it
-  touches, **Scope** in both directions and **Open**. Modules, constraints and delivery 1
-  wait for the product interview.
-- It opens with `> First version: grows with each feature.` Each feature that enters
-  Analysis adds what it establishes; the line goes when the product interview completes it.
-- It is still the minutes: every line traces to the user, never to the repository.
-
-## Keep it current
-
-The document describes the present. A change edits it in place; a second document that says
-something different about the same product is how two truths start. The history of how it
-got there is in `analysis.md`, which is the file that accumulates.
+1. **Objectives**: three to five results for someone, each with today's pain and **Known by**
+   (what changes when achieved). *Coupons* is a module; *coupons get redeemed* is an objective.
+2. **Users**: a role earns a row only if it changes what the product must do or show; the
+   third column turns the list into something checkable. Name the daily operator when it is
+   not the buyer.
+3. **Modules**: what the product does, one line each — not folders, screens or components.
+   No feature index here.
+4. **Constraints**: what the user imposes (existing systems, deadline, budget, team, law),
+   recorded even when you disagree (say so once). An assumed technical constraint is not one.
+5. **Delivery 1**: ask *is there anything to learn from users before building the rest?* Yes
+   → the least that teaches it, with **To learn**. No → *"the whole scope: nothing to learn
+   first"*, written as a decision.
+6. **Scope in both directions**; each *Out* line says why or where it lives. Neither in nor
+   out is an open question.
+7. **A first version** (standard work, or an existing product without one): objectives (at
+   least the feature's), users it touches, scope and open, opening with `> First version:
+   grows with each feature.`
+8. It describes the present and is edited in place.
 
 ## Done when
 
-Rehearse it: could someone decide whether a proposed feature belongs in this product,
-using only this file?
-
-- Every objective says how it is known.
-- Every user row says what they cannot do today.
-- Scope is written in both directions.
-- Delivery 1 says what is in and why, or that it is the whole scope — or the file is a
-  first version, with the sections that one carries.
-- Nothing here names a technology, a component or a screen.
-- What is undecided is in **Open** with its `Q-NN`, not filled in by you.
+Someone could decide whether a proposed feature belongs, using only this file; it names no
+technology, component or screen.

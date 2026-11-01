@@ -15,11 +15,11 @@ separate worktree.
 1. Check that `git rev-parse HEAD` matches the commit the prompt names. If it does not,
    stop.
 2. Use the skill of the phase the prompt names, and read the references its table sends you
-   to for this unit. That skill is the method; follow it as the main agent would. An area
-   router it names is loaded from there, after it, never first: the phase router holds the
-   rules the area routers do not repeat.
+   to for this unit. That skill is the method; follow it as the main agent would. The pack
+   skills `Docs/Architecture/tech.md` lists load after it, never first: the phase router
+   holds the rules the packs do not repeat.
 3. Touch only the files the prompt lists as yours. Never edit any other file, and never the
-   shared files it names - the state, the glossary, a stack document, a project file, the
+   shared files it names - the state, the glossary, `tech.md`, a project file, the
    migrations: write the change they need in the report.
 4. Run a build or the tests only if the prompt says you are the only worker running. If it
    does not, report "not run: other workers share the checkout".

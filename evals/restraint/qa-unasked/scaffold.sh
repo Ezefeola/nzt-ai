@@ -5,43 +5,11 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # does not stop on a functional gap before reaching what this case measures.
 bash "$here/../../_fixtures/story-specified.sh" "$PWD"
 
-# The backend stack with unit tests only. The story reaches the database, so most of what
+# Pedidos.Api with unit tests only. The story reaches the database, so most of what
 # its criteria promise cannot be proven at the enabled level. That gap is exactly where the
 # old set reached for a manual test script in the middle of building (D43).
-cat > "$PWD/Docs/backend-stack-Pedidos.Api.md" <<'MD'
-# Backend stack — Pedidos.Api
-component: Pedidos.Api · area: backend
-
-| Axis | Choice | When |
-|---|---|---|
-| Runtime | .NET 10.0.2 | — |
-| Language | C# 14 | — |
-| Database | PostgreSQL 17 | — |
-| Architecture | vertical-slice | — |
-| Domain model | ddd | entities and aggregates protect the order rules |
-| Persistence | repositories with unit of work | every write goes through the unit of work |
-| ORM | EF Core 10 | every access to PostgreSQL |
-| Endpoints | minimal-apis | every HTTP endpoint |
-| Error handling | result pattern | expected failures; exceptions stay exceptional |
-| Result to HTTP | result-extensions | endpoints translate Result to payload or ProblemDetails |
-| Tests | xUnit 3 | — |
-
-## Opt-ins
-- **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
-- **Test levels:** unit yes · integration against the real engine: no · ephemeral
-  containers: no · in-process API: no
-- **Test-first:** no
-- **Automated end-to-end tests:** no
-- **Test data:** SQL scripts, run by the user against `dev`
-
-## Packages
-| Package | What for | When to use it |
-|---|---|---|
-| Npgsql.EntityFrameworkCore.PostgreSQL 10.0.0 | EF Core provider for PostgreSQL | persistence and migrations |
-| xunit.v3 3.0.0 | test framework | every automated test |
-
-Versions read on 2026-09-17 from `global.json` and `Directory.Packages.props`.
-MD
+sed -i -e 's/^- \*\*Test levels:\*\* unit yes · .*$/- **Test levels:** unit yes · integration against the real engine no · ephemeral containers no · in-process API no\n- **Test data:** SQL scripts, run by the user against `dev`/' \
+  -e '/Testcontainers.PostgreSql/d' "$PWD/Docs/Architecture/tech.md"
 
 # An approved plan with QA as its own phase after the increment. The unit in progress is
 # the build of US-012; nothing in it asks for testing the application.

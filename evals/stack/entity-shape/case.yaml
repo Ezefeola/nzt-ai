@@ -8,7 +8,8 @@ description: >
   that uses it.
 tags: [stack]
 expected_outcome: >
-  Loads the .NET area router and the DDD domain leaf, and writes an entity with an empty
+  Loads the nzt-dotnet pack and reads its domain-ddd.md (since D88 one file, without the
+  old behaviour part), and writes an entity with an empty
   private constructor, Rules and Errors at the top, every property together, and Create
   building through an object initializer.
 context:
@@ -24,18 +25,14 @@ graders:
   - name: ddd-reference-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+domain-ddd\.md'
-  - name: ddd-second-part-read
-    type: tool_used
-    tool: Read
-    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+domain-ddd-behaviour\.md'
+    input_match: 'nzt-dotnet[/\\]+references[/\\]+domain-ddd\.md'
   - name: the-private-constructor-takes-nothing
     type: regex
     pattern: 'private\s+Customer\(\s*\)'
   - name: anemic-reference-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-backend-dotnet[/\\]+references[/\\]+domain-anemic\.md'
+    input_match: 'nzt-dotnet[/\\]+references[/\\]+domain-anemic\.md'
     min: 0
     max: 0
     arm: both

@@ -3,7 +3,7 @@
   "updated": "2026-10-14T12:00:00Z",
   "goal": "Estado de prueba del panel: varias fases con unidades pendientes, hechas y descartadas.",
   "phases": [
-    { "name": "analysis", "status": "done", "units": [
+    { "name": "discovery", "status": "done", "units": [
       { "id": 1, "do": "Relevar el pedido y escribir el alcance", "status": "done", "detail": "Alcance aprobado." },
       { "id": 2, "do": "Spec de login", "status": "done", "detail": "Spec al día." },
       { "id": 3, "do": "Spec de recuperar la contraseña", "status": "dropped", "detail": "El usuario la sacó del alcance." }
@@ -12,7 +12,7 @@
       { "id": 4, "do": "Elegir el stack y registrar la decisión", "status": "done", "detail": "ADR-001 escrito." },
       { "id": 5, "do": "Modelo de dominio", "status": "done", "detail": "Diagrama incluido." }
     ] },
-    { "name": "ux", "status": "dropped", "units": [
+    { "name": "design", "status": "dropped", "units": [
       { "id": 6, "do": "Maqueta de la pantalla de login", "status": "dropped", "detail": "Se usa el diseño existente." }
     ] },
     { "name": "build", "status": "doing", "units": [

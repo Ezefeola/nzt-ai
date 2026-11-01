@@ -1,56 +1,44 @@
-# Teach — one objective, one idea, until they do it unaided
+# Teach — one objective, until they do it unaided
 
-## Contents
-- Make them try before you explain
-- The lesson carries one idea
-- The file
-- The scaffolding fades in three steps
-- Close with retrieval, not a summary
-- What closes the objective
-- Done when
+Produces `Learn/<topic>/lessons/OA-NN-<slug>.md` and the state it leaves in `progress.md`.
+Starts from an objective already in `curriculum.md` with its *Closes with*; needing to ask
+the person something first means the objective is badly formed — fix it there.
 
-Produces `Learn/<topic>/lessons/OA-NN-<slug>.md` and the state it leaves in
-`progress.md`. The brief for each practice step is written by `nzt-learn-exercises`; what
-comes back is corrected with `nzt-learn-tutor`.
+## Steps
 
-**Start from an objective that is already in `curriculum.md`, with its *Closes with*.** If
-you have to ask the person something before you can write the lesson, the objective was
-badly formed: fix it there, not here.
+1. **Make them try first**: one or two minutes on a small task from the objective that they
+   cannot do yet. It is a hook, not a measurement: do not correct it. Afterwards say what it
+   was for — "that gap is what this lesson fills".
+2. **Write the lesson** — one idea, these parts in this order, nothing else:
 
-## Make them try before you explain
+   | Part | What goes in it |
+   |---|---|
+   | **The idea** | said plainly, before any nuance |
+   | **Why it exists** | what breaks without it, concretely |
+   | **In their context** | a case from their own work, product or domain |
+   | **The typical error** | the mistake almost everyone makes here |
+   | **Practice** | the three exercises, one per step |
+   | **Retrieval** | one question answered with the material out of sight — its answer is not in the file |
 
-Open with a small task they cannot do yet, from the objective, and let them fail at it.
+   Edges, history and alternatives go in another lesson or none. Read in one sitting, in the
+   person's language and vocabulary. Two lessons per objective at most; a third means the
+   objective is too big — a finding for `curriculum.md`.
+3. **Fade the scaffolding**, one exercise per step (`exercises.md`), each corrected
+   (`tutor.md`) before the next:
 
-- **A failed attempt makes the explanation land.** An explanation delivered to a blank mind
-  slides off it — nothing in the person is waiting for it.
-- **The attempt is a hook, not a measurement, and you do not correct it.** Correcting here
-  turns the opening into the lesson, and there is nothing left to teach into.
-- Keep it to one or two minutes of their work. If the attempt needs a setup, it is an
-  exercise and belongs after the lesson.
-- Say what it was for afterwards: *"that gap is what this lesson fills"*. Without that line
-  the attempt reads as a test they just failed.
+   | Step | The person gets | They produce |
+   |---|---|---|
+   | **solved** | the full solution | why each step is there, in their words |
+   | **faded** | the same form, decisions removed | the decisions |
+   | **alone** | the brief, nothing else | all of it |
 
-## The lesson carries one idea
-
-Four parts, in this order, and nothing else:
-
-| Part | What goes in it | Why it is there |
-|---|---|---|
-| **The idea** | Said plainly, **before any nuance** | Qualifications first make the idea unreachable |
-| **Why it exists** | What breaks without it, concretely | **A rule with no problem behind it gets memorised and forgotten** |
-| **In their context** | A case from their own code, product or domain | A generic example teaches the example |
-| **The typical error** | The mistake almost everyone makes here | The cheapest thing you can give them, and what eats them if you do not |
-
-**Completeness is what you leave out.** Edges, history, alternatives and "it depends" go in
-another lesson or in none. What is not needed to reach the objective is what turns a lesson
-into something nobody finishes.
-
-- **One lesson, one objective, read in one sitting.** If it does not fit, you are teaching
-  two ideas: split it.
-- An objective may need two lessons. **A third one means the objective is too big** — that
-  is a finding for `curriculum.md`, not something to absorb here.
-- Write it in the person's language, and in the vocabulary they already use. A lesson that
-  introduces three new terms to explain one idea teaches the terms.
+   Never skip *faded* — it is what lets them start from a blank page. A failure at *alone*
+   goes back to *faded* with a new case, not back to the explanation.
+4. **Close with the retrieval question**, never a summary. A failed retrieval is information:
+   note what was missing and take it to the next step.
+5. **Write `progress.md` when the practice ends**: the state with its exercise and step, and a
+   log line with what they produced, what was missing, and where they stopped or that it is
+   ready for `assess.md`. A requested solution is recorded as `tutor.md` says.
 
 ## The file
 
@@ -59,22 +47,19 @@ into something nobody finishes.
 objective: OA-02 · lesson 1 · 2026-09-18
 
 ## The idea
-One query brings the list. Then one more query goes out per row to fetch the relation.
-Twenty rows, twenty-one round trips to the database.
+One query brings the list, then one more per row fetches the relation. Twenty rows,
+twenty-one round trips.
 
 ## Why it exists
-The page is slow and every query in the log looks fast, so the search goes to indexes, to
-the connection pool, to the machine. The cost is not in any one query — it is in how many
-of them there are, and only counting them shows it.
+The page is slow and every query in the log looks fast. The cost is in how many there are.
 
 ## In your code
-`OrderListEndpoint` loads the orders, and the `foreach` below reads `order.Customer.Name`.
-That property access is the second query, once per order, and it is invisible at the call
-site because it looks like a field.
+`OrderListEndpoint` loads the orders; the loop below reads `order.Customer.Name`. That read
+is the second query, once per order, invisible because it looks like a field.
 
 ## The typical error
-Moving the `Include` around until the numbers change, and concluding the ORM batches it.
-It does not. The check is the query count in the log, not the shape of the LINQ.
+Moving the eager-load around until the numbers change. The check is the query count in the
+log, not the shape of the code.
 
 ## Practice
 - solved · exercises/EX-02 — the rewrite is given; explain what each step costs
@@ -82,61 +67,10 @@ It does not. The check is the query count in the log, not the shape of the LINQ.
 - alone · exercises/EX-04 — a list endpoint from your repository, nothing given
 
 ## Retrieval
-Why does adding an index to `Customer.Name` not fix an N+1?
+Why does adding an index to the customer's name not fix an N+1?
 ```
-
-**The answer to the retrieval question is not in this file**, for the same reason a
-solution never ships with its brief.
-
-## The scaffolding fades in three steps
-
-Practice is not a half that comes after the explaining half: **the lesson and its practice
-alternate, per objective**. A lesson with no exercise leaves the objective open, whatever
-the file says.
-
-| Step | The person gets | They produce |
-|---|---|---|
-| **solved** | The full solution | Why each step is there, in their words |
-| **faded** | The same form with the decisions taken out | The decisions |
-| **alone** | The brief, nothing else | All of it |
-
-- **Skipping the middle step is what produces someone who followed everything and cannot
-  start from a blank page.** It is the tempting one, because after *solved* the person
-  sounds like they have it.
-- **A failure in *alone* goes back to *faded* with a different case**, not back to the
-  explanation. Re-explaining something they almost produced spends the session on the part
-  that already worked.
-- Each step is one exercise, written by `nzt-learn-exercises`, corrected by
-  `nzt-learn-tutor` before the next one starts.
-- Each step uses a **different case**. Repeating the same one measures memory of that case.
-
-## Close with retrieval, not a summary
-
-End every lesson with a question the person answers **with the material out of sight**.
-
-- **Rereading produces fluency, which feels like knowing. Retrieval produces retention and,
-  when it fails, says so immediately.** A summary at the end is rereading with fewer words.
-- It is the step that gets skipped, because by then the lesson already feels finished.
-- A failed retrieval is not a bad lesson — it is the information the lesson was for. Note
-  what was missing and take it to the next practice step.
-
-## What closes the objective
-
-**Not a good lesson.** The practice closes when the person **produced** something at
-*alone* **and** explained it in their own words without the material. The objective stays
-`in progress` either way — naming where they stopped, or that it is ready to be assessed:
-the verdict is `nzt-learn-assess`'s, on a case nobody practised.
-
-Write into `progress.md` when the lesson's practice ends, not when the lesson is written:
-
-- The objective's state, with the artifact behind it — the exercise, and which step.
-- A log line with the date, what they produced and what was missing.
-- If they asked for the solution: `solved by the system`, with no reproach and no edit
-  later. That is the record doing its job.
 
 ## Done when
 
-Rehearse it: hand the person a case they have not seen, from the same objective, and walk
-away. If you can predict they would produce it — and say why it works with the file closed
-— the lesson did its job. If the honest answer is *"only with the example in front of
-them"*, the objective is still open and the next step is *faded*, not another explanation.
+They produced it at *alone* and explained it with the file closed; given an unseen case from
+the same objective, you can predict they would produce it.

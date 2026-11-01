@@ -2,13 +2,13 @@ schema_version: "1.1"
 name: route-build-story
 description: >
   An existing story, fully specified, that is the next unit of an approved plan. Measures
-  that the route is nzt-build and its implement reference, and that the stack document
+  that the route is nzt-build and its implement reference, and that tech.md
   decides the technical choices. Without an approved plan the right route is nzt-plan, which
   plans and stops - the kernel's main stop, not this case.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-build, reads references/implement.md, US-012 and the stack document, and starts
-  the unit with the technologies and patterns the stack selected.
+  Loads nzt-build, reads references/implement.md, US-012 and tech.md, and starts
+  the unit with the technologies and patterns tech.md selected.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -37,12 +37,12 @@ graders:
     type: tool_used
     tool: Read
     input_match: 'US-012'
-  - name: reads-the-stack-before-choosing
+  - name: reads-tech-before-choosing
     type: llm
     criteria: |
       The reply is in Spanish and is about implementing US-012.
-      PASS if the technical choices it names match the project's stack document - vertical
+      PASS if the technical choices it names match the project's tech.md - vertical
       slice, DDD, repositories with unit of work, EF Core, minimal APIs, result extensions -
       or if it says it read that document and will follow it.
-      FAIL if it proposes a technology or a pattern the stack document does not select, such
+      FAIL if it proposes a technology or a pattern tech.md does not select, such
       as controllers, an anemic model, Dapper, or direct DbContext access from the endpoint.

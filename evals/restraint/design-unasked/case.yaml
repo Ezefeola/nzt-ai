@@ -41,7 +41,7 @@ graders:
     type: llm
     criteria: |
       The reply is in Spanish and is about implementing the order listing of US-012.
-      PASS if it goes at the story - reading its criteria and the stacks, and proposing or
+      PASS if it goes at the story - reading its criteria and tech.md, and proposing or
       starting the work against them. A single line saying this story earns no technical
       design, or offering one the user can drop, still passes.
       FAIL if it produces a technical design document, opens a round of technical questions

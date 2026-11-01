@@ -1,47 +1,119 @@
 {
   "version": 1,
-  "updated": "2026-10-30T01:00:00Z",
-  "goal": "nzt-retro: una skill opcional que revisa una sesión y deja propuestas de mejora del entorno en un md para el equipo, sin modificar nada",
+  "updated": "2026-11-01T14:30:00Z",
+  "goal": "Refactor de skills, referencias y packs: genéricas, sin redundancia, en pasos simples, escritas con la skill de crear skills (Plan/mejoras/13-refactor-skills.md)",
   "phases": [
-    {
-      "name": "architecture",
-      "status": "done",
-      "units": [
-        {
-          "id": 407,
-          "do": "Decisiones de nzt-retro: qué lee, qué destinos propone, dónde y cómo queda el md, cuándo se ofrece (QT) en Plan/mejoras/10-retro.md",
-          "status": "done",
-          "detail": "10-retro.md: QT-01..07 (md fuera del repo en la ruta que se elige cada vez; nunca se ofrece; actual o últimas N; proyecto y NZT separados; detalles del agente). Propone quitar 410: sin oferta ni fila en el kernel"
-        }
-      ]
-    },
     {
       "name": "build",
       "status": "done",
       "units": [
         {
-          "id": 408,
-          "do": "Spec: decisión D87 en specs/nzt-core.md",
+          "id": 438,
+          "do": "Responder QT-92, QT-93 y QT-94 en 13-refactor-skills.md",
           "status": "done",
-          "detail": "D87 tras D86 (skill propia con objeción, nunca se ofrece, no modifica nada, md fuera del repo, actual o últimas N con la fuente, proyecto y NZT); nzt-retro en el árbol de §4.3"
+          "detail": "QT-92 B (skill-creator), QT-93 B (porqué solo donde sin él la regla se aplicaría mal), QT-94 B (no-pérdida y puertas, sin evals); donde skill-creator choque con el §10, manda el §10"
         },
         {
-          "id": 409,
-          "do": "La skill skills/nzt/retro/SKILL.md (y su reference si no entra en una)",
-          "status": "done",
-          "detail": "skills/nzt/retro/SKILL.md, 141 líneas, sin reference: sesiones, ruta preguntada, momentos, mecánico/criterio, destinos proyecto/NZT, plantilla del md"
-        },
-        {
-          "id": 410,
-          "do": "Ruteo y oferta: fila en core/kernel.md y la oferta opcional al cerrar una run y al recomendar limpiar",
+          "id": 439,
+          "do": "Estándar de autoría: la forma de un router, una referencia y un pack (reglas cortas numeradas, un ejemplo, Done when que no repite reglas), dueño único; §10 del spec lo nombra",
           "status": "dropped",
-          "detail": "Quitada por el usuario 2026-10-29: QT-02 = nunca se ofrece y la tabla del kernel es de fases; la descripción de la skill es su único disparo (409)"
+          "detail": "QT-92 eligió skill-creator: sin referencia NZT de autoría; el §10 sigue siendo el dueño"
         },
         {
-          "id": 411,
-          "do": "Presupuesto del listado, build, README y un caso de disparo en evals/",
+          "id": 440,
+          "do": "Piloto: packs code y csharp con skill-creator y el §10 (DTOs: sealed record, set nunca init, nunca constructor primario); se para para que el usuario revise el estilo",
           "status": "done",
-          "detail": "build: 16 skills, ~2898 chars (antes ~2684), sin avisos; README y evals/README al día; caso evals/routing/retro sin correr"
+          "detail": "code y csharp: 288 → 252 líneas. Una regla por línea, porqué solo donde evita un mal uso (QT-93), Done when sin repetir reglas. DTOs C#: sealed record, get;set; nunca init, propiedades en el cuerpo. Quitado por tener dueño: el escape de lo no documentado (nzt-build paso 3), la glosa faltante (nzt-build paso 1), en csharp las reglas que repetían nzt-code (una clase por archivo, warnings) y record de datos de DTOs. No-pérdida revisada contra la copia previa (git). Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 457,
+          "do": "QT-95: regla del §10 (un pack lleva elecciones y errores del agente, no documentación) y el piloto rehecho con ella (linq.md)",
+          "status": "done",
+          "detail": "Regla 24 del §10 (QT-95). linq.md de 8 a 5 reglas: quedan method syntax, solo .NET, Count/Any, OfType sin !, [] o Enumerable.Empty; salen ToList, lookups y la lista de operadores (documentación). nzt-csharp pierde las reglas 9-10 que solo traducían nzt-code (CancellationToken, switch). Piloto: 288 → 243 líneas. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 441,
+          "do": "Pack backend (21 referencias) con el estándar",
+          "status": "done",
+          "detail": "backend: 941 → 884 líneas (wc -l). Dueños únicos: chequear antes de guardar y la carrera al handler en errors.md (lo nombran use-cases, data-writes, persistencias, indexes); cada return arma su Result en results.md; token y async en nzt-code; validar primero en use-cases. Reglas compuestas partidas en una por línea; Done when sin repetir reglas; Verify → Test. No-pérdida contra la copia previa: 17 detalles restituidos. Sin cambios de nombres, filas ni ejes. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 442,
+          "do": "Pack dotnet, primera mitad: arquitectura, dominio, resultados, endpoints, use cases, validación, seguridad",
+          "status": "done",
+          "detail": "dotnet primera mitad (router, arquitecturas, dominio, results, endpoints, api, use cases, validación): 596 → 519 líneas, casi todo lo que queda es código. Regla 24: salen las traducciones de backend (AnyAsync, MappingExtensions repetido en 5 archivos, Program.cs hace dos llamadas, nunca assembly scanning, catch alrededor de SaveChanges, \"nunca agregar controllers\") y la documentación ([ApiController] da 400). dotnet/references/security.md borrado con su fila: sus tres líneas eran backend; \"nunca HttpContext\" pasó a use-cases. Quedan las elecciones: nombres, atributos, init en value objects, código exacto. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 443,
+          "do": "Pack dotnet, segunda mitad: EF Core, persistencias, ship, testing, exceptions",
+          "status": "done",
+          "detail": "EF Core y persistencias recortados por la regla 24 (traducciones de backend: operadores, AnyAsync, filtros opcionales, cascada, Skip creciente, nameof, catch del save); quedan AsNoTracking en tabla, nunca Update, nunca OwnsOne, ComplexProperty, PaginateAsync y el código. dotnet/references/persistence-direct.md borrado (todo era backend o csharp): la fila del eje dice el archivo de nzt-backend y el eval stack/ef-listado mira ese. ship, testing y exceptions casi intactos: son elecciones y errores reales; solo Done when. Pack dotnet 1264 → 1108 líneas, 32 → 30 referencias. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 444,
+          "do": "Packs frontend y blazor",
+          "status": "done",
+          "detail": "frontend 263 → 257 (genérico: reglas compuestas partidas, typed client, registro y secretos con un solo dueño; el router ya no repite leer el design system). blazor 308 → 267: salen las traducciones de frontend (AuthorizeView, @key, Virtualize, ShouldRender, RenderFragment, registro en Program.cs, sin HttpClient); quedan ciclo de vida, CTS propio, interop, CascadingParameter, IHandleEvent, PersistentState, RendererInfo, FormName/??=. Los casos de prueba de cada render mode pasan a una regla Test. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 445,
+          "do": "Pack ddd",
+          "status": "done",
+          "detail": "ddd 323 → 313: reglas compuestas de ddd.md partidas (11 → 12), FK sin navegación queda en data-mapping, value-objects se crea como entidad (apunta a ddd.md por nombre, no por número). En dotnet/domain-value-objects salen la carpeta ValueObjects y validar primero (eran del genérico). Documentos (aggregates, contexts, diagrams) sin cambios de fondo. Packs completos: 3387 → 3069 líneas (9%), 2 referencias menos. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 446,
+          "do": "Kernel, adaptadores y la skill nzt",
+          "status": "done",
+          "detail": "Cambios mínimos a propósito: el kernel ya estaba deduplicado (D85) y se carga en toda sesión. Sale \"Direct work never writes it\" de State (lo dice el loop); en los adaptadores salen \"no recargues una skill\" (lo dice Routing) y \"el usuario limpia\" (lo dice Context). nzt: arreglado el doble encabezado de la tabla de tamaños. El kernel instalado en ~/.claude no se reinstaló. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 447,
+          "do": "nzt-plan y nzt-delegate con sus referencias",
+          "status": "done",
+          "detail": "Estaban bien escritas; solo se sacaron 8 duplicados entre archivos: preguntas aclaratorias (questions.md), fases salteadas (nzt), autonomía una vez (router), verify tras el último build (router), varios doing por grupo (state.md), cuándo se puede delegar (nzt-delegate), parar y reportar (router), freno de tanda (kernel), preguntas y decisiones son tuyas (delegate). Done when de proposal, slices y parallel sin repetir. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 448,
+          "do": "nzt-discovery con sus referencias",
+          "status": "done",
+          "detail": "7 duplicados fuera: qué leer antes (router, no write-spec ni change), glosario actualizado (Mandatory, no Steps), las reglas viven en el spec y su slug no cambia (router, no write-spec ni write-stories), entrega 1 no recorta el done (slices), índice antes del primer tramo (slices), producto sin leer el repo (product.md, no analysis). Plantillas y reglas de cada documento intactas. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 449,
+          "do": "nzt-architecture con sus referencias",
+          "status": "done",
+          "detail": "7 duplicados fuera: qué leer antes y derivar y loguear QT-NN y ofrecer el modo (router, no design-feature, design-product ni tech), cómo se resuelve cada tipo de pregunta (tabla del router, no tech paso 3), versiones de evidencia (router; tech solo dice qué nombra la línea de evidencia), ofrecer diagramas (diagrams.md, no router), ADR y RFC (adr.md y rfc.md, no la regla del router). Done when de tech.md sin repetir. Apuntan por nombre de sección, no por número. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 450,
+          "do": "nzt-design con sus referencias",
+          "status": "done",
+          "detail": "Ya estaba limpia: solo 2 duplicados fuera de manual.md (lo indefinido es un Q-NN: router; el nivel WCAG: review.md, que además admite el nivel declarado del producto). Plantillas y pasos intactos. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 451,
+          "do": "nzt-build con sus referencias",
+          "status": "done",
+          "detail": "6 duplicados fuera de implement.md y el router: qué leer (router), qué significa cada marca (write-stories), no cubierto hasta QA y el reporte (router), no imprimir secretos (secrets.md), solo lugar del progreso (write-stories). tests, tdd, refactor, remove, recon, dependencies y secrets sin duplicados. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 452,
+          "do": "nzt-verify con sus referencias",
+          "status": "done",
+          "detail": "490 → 482 líneas. 12 duplicados fuera: valor esperado del requisito y borde sin regla (router, no test-design), mecanismo de datos (test-data, no router), correr sin poder manejarlo (test-run, no router), nada corre sin aprobar (router), datos del producto son datos y revisar secretos (router, no test-run ni bug), qué es un defecto (bug.md, no explore ni test-run), escenario de regresión por defecto (bug.md), secuencia setup-teardown (test-run, no test-data), localizar por rol (test-run, no automate). Done when de router, test-run y review sin repetir reglas. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 453,
+          "do": "nzt-ship, nzt-research y nzt-retro",
+          "status": "done",
+          "detail": "402 → 396 líneas. Fuera: contenido de deployment.md (release.md, no router), log nuevo arriba y sin reescribir (router, no release), secretos por clave (regla del router), reglas del repo ganan (router, no vcs), escrito no es verificado (Done when del router, no pipeline ni observability), terceros nunca únicos (tabla de rangos de research). Hardening del pipeline en una regla por línea. Done when de vcs, research y retro sin repetir reglas. Build 0 avisos, 240 checks, lint 0"
+        },
+        {
+          "id": 454,
+          "do": "nzt-learn con sus referencias",
+          "status": "done",
+          "detail": "535 → 529 líneas. Fuera: append-only de progress.md (plan.md lo es dueño, no el router), los cinco veredictos (assess.md, no plan.md), caso distinto cada vez (regla 3 del router, no teach/train/retain/assess), sigue in progress (regla 2 del router, no teach/train/tutor), dar la solución pedida (regla 1, tutor solo registra), pasos solved/faded/alone (teach.md, no exercises). Done when de router, tutor, retain y assess sin repetir reglas. Build 0 avisos, 240 checks, lint 0"
         }
       ]
     },
@@ -50,10 +122,22 @@
       "status": "done",
       "units": [
         {
-          "id": 412,
-          "do": "Gates del repo y una retro real sobre esta sesión que deje su md, sin tocar nada más",
+          "id": 455,
+          "do": "Puertas (build, checks, lint, scaffolds, state check), líneas antes y después, y no-pérdida de cada unidad (QT-94: sin evals)",
           "status": "done",
-          "detail": "Puertas: build, 171 checks, tope 200 OK; citas sin correr. Retro en C:/Users/ezefe/OneDrive/Escritorio/retro-2026-10-29-nzt-retro.md (R-01..R-05)"
+          "detail": "Puertas: build 0 avisos (scaffolds incluidos), lint 0 en 12 skills y 8 packs, 240 checks, state check ok, todos los paths .md que nombran los evals existen. Líneas (wc -l contra HEAD 94976a0): core 136 → 135, skills 4008 → 3970, packs 3387 → 3070. No-pérdida de 452-454: cada regla quitada se buscó y sigue en exactamente un dueño"
+        }
+      ]
+    },
+    {
+      "name": "ship",
+      "status": "done",
+      "units": [
+        {
+          "id": 456,
+          "do": "Decisión en specs/nzt-core.md, versión y cifras en README e installer/README",
+          "status": "done",
+          "detail": "D90 en specs/nzt-core.md (QT-92, 93, 94, 95, forma, cifras, versión) y §14 al día. README: packs con 75 referencias. Versión sigue 4.0.0 sin tag (no publicada, D89); installer/README ya decía 240 checks. Nada commiteado"
         }
       ]
     }
@@ -66,8 +150,8 @@
   },
   "waiting_on": null,
   "notes": [
-    "PR #10 (D86, D87 y mods M5) mergeado a main por el usuario; ramas viejas borradas, sólo queda main",
-    "v3.1.0 publicada (menor por QT-01 del usuario): workflow de release en verde, 6 binarios, 6 instaladores y SHA256SUMS",
-    "Falta correr evals/routing/retro"
+    "Rama refactor-marco-generico, nada commiteado desde 94976a0 (unidades 438-457, D90). Falta que el usuario acepte y pida el commit",
+    "Decisiones del refactor en specs/nzt-core.md D90 y Plan/mejoras/13-refactor-skills.md",
+    "Kernel instalado en ~/.claude sin reinstalar: el repo es la fuente hasta nzt-ai install"
   ]
 }

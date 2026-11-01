@@ -1,76 +1,39 @@
 # Remove a behavior
 
-Produces a behavior that is **gone**, with nothing left behind that reads as if it were
-still in use.
+Produces a behavior that is **gone**, with nothing left that reads as live. The build catches
+what you broke, never what you left.
 
-**The build catches what you broke. It does not catch what you left.** That is the whole
-reason this is a procedure and not an edit: half a removal is worse than none, because what
-stays compiles, gets maintained, and is read by the next person as live code.
+## Steps — outside in
 
-## Sweep from the outside in
+1. The entry point — screen, route, menu item, command, scene trigger.
+2. The operation it triggers, and everything only it called.
+3. Its registration — dependency injection, route table, scheduler, handlers.
+4. Its surface text — labels, translations, messages, help.
+5. Its data access — queries, mappings, indexes that existed for it.
+6. The model — fields and types that served only it.
+7. What fed it — jobs, imports, flags, configuration keys, permissions, secrets.
+8. Its tests, fixtures and test data.
 
-In this order, because each step tells you what the next one can lose:
-
-1. **The entry point** — the screen, the route, the endpoint, the menu item, the command.
-2. **The operation** it triggers, and everything only it called.
-3. **Its registration** — dependency injection, the route table, the scheduler, the
-   handlers it was wired into.
-4. **Its surface text** — labels, translations, messages, help text, error strings.
-5. **Its data access** — the queries, the mappings, the indexes that existed for it.
-6. **The model** — fields and types that existed only to serve it.
-7. **What fed it** — background jobs, imports, feature flags, configuration keys,
-   permissions, secrets.
-8. **Its tests**, and the fixtures and test data built for it.
-
-**At every step, one question: does anything else use this?** Search by name, by route, by
-string, by configuration key — not just by the symbol your editor knows about. Reflection,
-configuration and string references do not show up in a rename.
-
-- Anything shared stays, and you say so in the report.
-- Anything you are unsure about stays, named as unresolved. A doubt is not a licence.
+**At every step: does anything else use this?** Search by name, route, string and
+configuration key — reflection and configuration do not show in a rename. Shared stays;
+unsure stays, named as unresolved.
 
 ## Data is a separate decision
 
-Deleting a column, a table or the rows in it is **not** part of removing code:
+Deleting stored data is irreversible: the user decides it explicitly, told what is lost.
+Until then the code goes and the data stays. Authorised, it goes through a generated
+migration.
 
-- It is irreversible, so it is the user's decision, asked explicitly, with what is lost.
-- Until it is answered, the code goes and the data stays. Unused data is cheap; deleted
-  data is gone.
-- When it is authorised, it happens through a generated migration like any other schema
-  change, and never as a side effect of a code cleanup.
+## Documents
 
-## The documents describe what is left
-
-- The business rule that no longer applies comes **out** of `spec.md`. Its slug is not
-  reused for something else.
-- Criteria and stories that describe the removed behavior go too. The spec describes the
-  present; a criterion for behavior that does not exist can only be verified as a failure.
-- A stack document, a feature design or an architecture document naming what you removed is
-  updated in the same unit.
-- A `[remove]` marker is what authorised this, and `nzt-discovery-change` is what put it
-  there. It stays until `nzt-plan-close` sweeps it; it is not cleared by whoever implements.
-- **The criterion that proves the absence keeps its test**, even after the marker is gone.
-  Sweeping a marker never authorises deleting a regression.
-
-## Deprecating instead of removing
-
-When something outside this project depends on it, removal is staged, and both stages are
-written down: what keeps working, for how long, and who is told. **A deprecation with no
-removal date is not a plan**, it is the same code with an apology attached.
+- The rule comes out of `spec.md`; its slug is never reused. Criteria and stories of the
+  removed behavior go too. `tech.md`, designs and `architecture.md` are updated.
+- The `[remove]` marker that authorised this stays until the feature's close.
+- **The criterion that proves the absence keeps its test.**
+- Something outside the project depends on it → deprecate in two dated stages: what keeps
+  working, until when, who is told. No date is no plan.
 
 ## Done when
 
-Rehearse it: could someone read the codebase tomorrow and find no trace that suggests this
-still works?
-
-- What is affected compiles and the checks around what you removed have been run.
-- **The report says what you searched for and where.** "Nothing else uses it" is a claim;
-  the list of names, routes and keys you searched is the evidence for it.
-- Everything you deliberately left — shared code, data, a deprecated path — is in the
-  report, with why.
-
-- No entry point reaches it, at any layer.
-- Nothing is registered, scheduled, translated or configured for it.
-- Its tests and test data are gone, not skipped.
-- The documents no longer describe it.
-- What was left on purpose is named, and the data decision was asked, not assumed.
+No trace suggests it still works, and the report lists what you searched (names, routes,
+keys) and what you deliberately left, with why.

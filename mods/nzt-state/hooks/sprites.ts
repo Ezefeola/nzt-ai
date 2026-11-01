@@ -39,9 +39,9 @@ export const PALETTE: Record<string, string> = {
 const NO_HAT = ['..............', '..............', '..............', '..............']
 
 const HATS: Record<PhaseId, string[]> = {
-  analysis: ['..............', '.VVVVVVVVVVVV.', '...vvvvvvvv.y.', '....vvvvvv..y.'],
+  discovery: ['..............', '.VVVVVVVVVVVV.', '...vvvvvvvv.y.', '....vvvvvv..y.'],
   architecture: ['......BB......', '....bbBBbb....', '...bbbbbbbb...', '.bbbbbbbbbbbb.'],
-  ux: ['......p.......', '...pppppppp...', '..pppppppppppp', '...pppppppp...'],
+  design: ['......p.......', '...pppppppp...', '..pppppppppppp', '...pppppppp...'],
   build: ['...........g.g', '....aaaaaa.ggg', '...aawwwwaa.g.', '..aaaaaaaaaa.g'],
   verify: ['ll....TT......', 'll..tttttt....', '..g.tTTTTt....', '...gtttttttt..'],
   ship: ['....hhhhhh....', '....hhhhhh....', '....YYYYYY....', '..hhhhhhhhhh..'],
@@ -84,9 +84,9 @@ export const frameOf = (phase: PhaseId | undefined, tick: number): string[] => {
 export const MINI_WIDTH = 4
 
 const MINI_HATS: Record<PhaseId, string[]> = {
-  analysis: ['VVVV', '.vvy'],
+  discovery: ['VVVV', '.vvy'],
   architecture: ['.BB.', 'bbbb'],
-  ux: ['.ppp', 'pppp'],
+  design: ['.ppp', 'pppp'],
   build: ['.aa.', 'awwa'],
   verify: ['.TT.', 'tttt'],
   ship: ['.hh.', 'hYYh'],

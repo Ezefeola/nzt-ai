@@ -9,7 +9,7 @@
     <RootNamespace>Nzt.Cli</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
     <!-- De acá sale nztVersion en el manifiesto: una sola fuente (I3). -->
-    <Version>3.1.0</Version>
+    <Version>4.0.0</Version>
     <!-- El contenido canónico vive en la raíz del repositorio, tres niveles arriba. -->
     <ContentRoot>$(MSBuildProjectDirectory)\..\..\..\</ContentRoot>
   </PropertyGroup>
@@ -50,6 +50,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="$(ContentRoot)skills\**\references\*.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <!-- Los packs: lo que se instala por proyecto con `nzt-ai project`. -->
+    <EmbeddedResource Include="$(ContentRoot)packs\**\pack.json;$(ContentRoot)packs\**\*.md">
+      <LogicalName>content/packs/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
     <!-- Los subagentes (D71): un archivo por proveedor, que se elige por la extensión. -->
     <EmbeddedResource Include="$(ContentRoot)agents\*.*">

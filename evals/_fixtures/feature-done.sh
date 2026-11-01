@@ -58,7 +58,7 @@ cat > "$ws/Plan/specs/F-001-pedidos/testing/README.md" <<'MD'
 | US-012 | 2026-09-16 | pasó | ninguno |
 
 Criterios sin escenario: ninguno.
-Automatizado: nada (el stack no adoptó E2E).
+Automatizado: nada (tech.md no adoptó una herramienta end-to-end).
 MD
 
 cat > "$ws/Plan/state.json" <<'JSON'

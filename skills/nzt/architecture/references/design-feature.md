@@ -1,45 +1,20 @@
 # Feature design
 
-## Contents
-- When a feature earns a design, and how it is offered
-- Before designing
-- The file
-- Flows
-- Where each rule is enforced
-- Data and states
-- When a step fails
-- Integrations
-- Questions
-- Diagrams
-- Done when
+Produces `Plan/specs/<feature>/tech-design/design.md` — how one feature is solved across the
+existing components — and `tech-design/decisions.md`. One feature per unit.
 
-Produces `Plan/specs/<feature>/tech-design/design.md` — how this feature is solved across the
-components that already exist — and `tech-design/decisions.md`, the log of the questions that
-produced it. One feature per unit.
+**Offered, never declared.** A feature earns one when it crosses components in a way its
+stories do not settle, involves a third party, has states with meaning, has requirements
+that condition the solution, or has alternatives worth explaining. Offer it with what is
+lost: *"where each rule is enforced would be decided while writing the code"*.
 
-## When a feature earns a design, and how it is offered
+## Steps
 
-A feature earns one when it **crosses components in a way its stories do not settle**,
-involves a **third party**, has **states with meaning**, has **requirements that condition
-the solution**, or has **alternatives whose consequences must be explained**. A screen
-reading a list through the API it already uses earns none, and saying so takes one line.
-**It is offered, never declared**: a plan line saying what is lost without it — *"where
-each rule is enforced would get decided while the code is written"* — that the user can drop.
-
-## Before designing
-
-Read the feature's `spec.md` and its stories, `Docs/Architecture/architecture.md`, the stack document of
-every component you touch, and `Docs/Domain/domain-model.md` if it exists — the entities this
-feature works with already have a shape, and a design that invents a second one is where
-two models start. You are fitting this feature into a system that already made decisions;
-re-deciding them here is how two architectures start.
-
-**Then derive the questions, before writing any of the document.** Each rule and each story
-is read asking what the design has to settle for it to be buildable, and every gap becomes
-an open `QT-NN` in `decisions.md`. Only then do you say how many there are and of what
-kind, and ask the mode — chosen **per feature**, recorded in the log's first line. A rule
-that is not in the spec goes back to discovery as a question, and you design the rest
-meanwhile.
+1. Read `domain-model.md` too. You fit into decisions already made: re-deciding them here
+   starts a second architecture.
+2. The questions are what each rule and story needs settled to be buildable (the router's
+   *Steps*).
+3. Write the file.
 
 ## The file
 
@@ -47,120 +22,50 @@ meanwhile.
 # Design — F-003 Coupons at checkout
 
 ## Flow
-Applying a coupon (US-001):
-1. `Pedidos.Web` sends the code with the current order to `Pedidos.Api`.
-2. The API validates the coupon, calculates the discount and returns the new total.
-3. Nothing is persisted: the discount is only stored when the order is confirmed.
-
 Confirming an order with a coupon (US-003):
-1. The API re-validates the coupon — the browser's total is never trusted.
+1. The API re-validates the coupon — the client's total is never trusted.
 2. It writes the order and its redemption in one transaction.
-3. It sends the order to Billing. If Billing fails, the order stays confirmed and the
-   invoice is retried; the customer is not blocked.
+3. It sends the order to Billing; on failure the order stays confirmed and the invoice is retried.
 
 ## Where each rule is enforced
 | Rule | Enforced in |
 |---|---|
-| RN-cupon-vencido | `CouponValidator`, on both validation and confirmation |
-| RN-un-uso-por-cliente | unique index on (coupon, customer) plus the check before writing |
+| RN-cupon-vencido | coupon validation, on apply and on confirm |
+| RN-un-uso-por-cliente | unique constraint (coupon, customer) plus the check before writing |
 
 ## Data
-- `Redemption`: coupon, customer, order, date. Written only on confirmation.
-- The discount is stored as an amount on the order, not recalculated later: the coupon may
-  change afterwards and the order must keep what was charged.
+- The discount is stored on the order, never recalculated: the coupon may change later.
 
 ## States
-An order goes `draft → confirmed → invoiced`, and `confirmed → cancelled`. A redemption
-follows its order and is released on cancellation (RN-cancelar-libera-cupon).
+`draft → confirmed → invoiced`, and `confirmed → cancelled` (releases the coupon).
 
 ## Integrations
 | Id | We send | We expect | On failure |
 |---|---|---|---|
-| INT-01 · Billing | confirmed order | invoice id | queued and retried; order unaffected |
+| INT-01 · Billing | confirmed order | invoice id | queued and retried |
 
 ## Open questions
-Listed by id; they live and get answered in `decisions.md`: QT-04.
+QT-04 (in decisions.md).
 ```
 
-No `Decided` section here: the answers live in `decisions.md`, as
-`nzt-architecture-decisions-log` says.
+## Rules
 
-## Flows
-
-- One flow per story, numbered, naming **which component does each step**. A flow with no
-  named participants is prose, not a design.
-- **Say what is not trusted.** Anything the client sends that a rule depends on is
-  re-checked server-side; write where.
-- Follow the flow to the end, including what happens after the user's part is done:
-  background work, notifications, retries.
-
-## Where each rule is enforced
-
-Every business rule in the spec gets a row saying where it lives. This table is the single
-most useful thing in the document:
-
-- A rule with no row is a rule nobody implements.
-- A rule enforced in two places is a rule that will disagree with itself. If both are
-  needed — a database constraint plus a check for a decent error message — say so
-  explicitly, and say which one is the source of truth.
-- Enforcement in the client only is not enforcement.
-
-## Data and states
-
-- Say what is persisted, what is derived, and **what is frozen at a point in time**.
-  Recalculating later from data that has changed is the defect this line prevents.
-- An entity with business states gets its states and its legal transitions written. A
-  transition nobody wrote is a transition somebody will allow.
-- Do not invent fields, tables or configuration that no spec asked for.
-
-## When a step fails
-
-The question people skip: what happens when the second step fails after the first one
-succeeded?
-
-- For each flow with more than one effect, say what is guaranteed together and what is not.
-- Say what the user sees when it happens, and what the system does about it — retry, queue,
-  leave it inconsistent and reconcile, or refuse the whole thing.
-- An operation that can run twice says whether running it twice is safe, and what makes it
-  safe.
-
-## Integrations
-
-- **Cite the `INT-NN`** of `Docs/Architecture/architecture.md` instead of describing the system again.
-  The product-level row says what we need from it and what happens when it is not there;
-  this table says what **this flow** sends and expects.
-- Each one gets what we send, what we expect back, and **what happens when it is unavailable
-  or slow**. Timeouts and retries are part of the contract, not an implementation detail.
-- A system nobody recorded at product level gets its `INT-NN` there first, in the same unit.
-- **How it actually behaves is checked, not remembered**: `nzt-research`, with the sources
-  cited from the `QT-NN` that rests on them.
-
-## Questions
-
-- The kinds and the mode are the router's; what is specific here is that **the questions
-  come out of the rules**. A rule whose enforcement row you cannot fill without guessing is
-  a `QT-NN` you did not derive.
-- A contradiction in the spec is not resolved here. Raise it, pause what depends on it, and
-  keep designing the rest.
-
-## Diagrams
-
-Three are earned here, all of them offered: **`sequence`** for the order between
-participants, **`state`** for an entity's lifecycle, and **`flow`** for branching that lives
-inside one component. `nzt-architecture-diagrams` decides which one and offers it;
-`nzt-architecture-diagrams-behavior` draws it. Anything a numbered list already says does
-not need a picture, and a declined diagram leaves the prose carrying it.
+1. **One flow per story**, numbered, naming which component does each step, followed to the
+   end (background work, notifications, retries). Say what is not trusted and where it is
+   re-checked.
+2. **Every rule gets an enforcement row.** No row: nobody implements it. Two places: say
+   which is the source of truth. Client-only is not enforcement.
+3. **Data**: what is persisted, derived, and frozen at a point in time. An entity with
+   business states gets its states and legal transitions. No field nobody asked for.
+4. **Failure**: for every flow with more than one effect, what is guaranteed together, what
+   the user sees when a step fails, and whether running it twice is safe.
+5. **Integrations** cite their `INT-NN` (create it in `architecture.md` first if missing),
+   with what we send, expect, and do when it is down or slow. Behavior is researched, not
+   remembered.
+6. Earned diagrams: `sequence` per flow that matters, `state` for an entity's lifecycle,
+   `flow` for branching inside one component.
 
 ## Done when
 
-Rehearse it: could someone implement this feature without asking you a structural question?
-
-- Every story has its flow, with components named per step.
-- Every business rule has its enforcement row.
-- Every multi-effect flow says what happens when a step fails.
-- Every integration cites its `INT-NN` and says what happens when it is down.
-- The questions were derived and logged **before** anything was proposed, the user chose
-  the mode, and every entry says where its answer came from.
-- Nothing contradicts `Docs/Architecture/architecture.md` or a stack document; contradictions were
-  raised, not absorbed.
-- Open technical questions are `QT-NN`, not assumptions.
+Someone could implement the feature without asking a structural question, and nothing
+contradicts `architecture.md` or `tech.md`.

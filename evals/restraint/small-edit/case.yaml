@@ -2,7 +2,7 @@ schema_version: "1.1"
 name: restraint-small-edit
 description: >
   One word on one button, in a file that already exists. The kernel scales the method to
-  the request and the area routers let a small edit follow the convention next to it
+  the request and the packs let a small edit follow the convention next to it
   without reloading guidance. Loading the Blazor leaves here is the measurable form of
   over-triggering inside a phase.
 tags: [restraint]
@@ -22,7 +22,7 @@ graders:
   - name: no-blazor-reference-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build-frontend-blazor[/\\]+references[/\\]+'
+    input_match: 'nzt-blazor[/\\]+references[/\\]+'
     min: 0
     max: 0
     arm: both

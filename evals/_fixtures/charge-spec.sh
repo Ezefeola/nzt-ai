@@ -16,7 +16,7 @@ ws="${1:-$PWD}"
 
 bash "$here/project.sh" "$ws"
 
-cat > "$ws/Docs/product.md" <<'MD'
+cat > "$ws/Docs/Product/product.md" <<'MD'
 # Pedidos — producto
 Un comercio carga pedidos, los confirma y sigue su estado. Dos componentes:
 `Pedidos.Api` (backend) y `Pedidos.Web` (frontend).
@@ -26,9 +26,18 @@ Un comercio carga pedidos, los confirma y sigue su estado. Dos componentes:
   documentación, tal como la publica el proveedor, está en `Docs/integrations/pagosur.md`.
 MD
 
+cat >> "$ws/Docs/Architecture/architecture.md" <<'MD'
+
+## External systems
+| Id | System | What for | Documentation |
+|---|---|---|---|
+| INT-01 | PagoSur | card charges | `Docs/integrations/pagosur.md` (provider excerpt, 2026-09-10) |
+MD
+
 # Where the card token lives is a modelling fact, not a design question: the customer
 # already has it.
-cat > "$ws/Docs/domain-model.md" <<'MD'
+mkdir -p "$ws/Docs/Domain"
+cat > "$ws/Docs/Domain/domain-model.md" <<'MD'
 # Domain model — Pedidos
 
 update-when: an entity, a field or a relationship changes.

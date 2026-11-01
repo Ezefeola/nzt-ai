@@ -10,7 +10,7 @@ cat > "$PWD/Plan/state.json" <<'JSON'
   "updated": "2026-10-24T18:00:00Z",
   "goal": "Adoptar NZT en el detalle de pedido: specs desde el código",
   "phases": [
-    { "name": "analysis", "status": "doing", "units": [
+    { "name": "discovery", "status": "doing", "units": [
       { "id": 1, "do": "Ingeniería inversa del detalle de pedido en Pedidos.Api", "status": "todo" },
       { "id": 2, "do": "Ingeniería inversa del detalle de pedido en Pedidos.Web", "status": "todo" } ] }
   ],
