@@ -193,12 +193,13 @@ installer/
 │  ├─ Providers/Provider.cs       # un destino por proveedor
 │  ├─ Install/                    # Installer, InstructionBlock, Manifest
 │  ├─ Mods/                       # ModCatalog, ClaudePlugins (claude plugin …), ModInstaller
+│  ├─ Project/                    # ProjectTarget, ProjectFile, McpConfig, ProjectInstaller (sección 13)
 │  └─ Lint/Linter.cs
 └─ tests/Nzt.Cli.Checks/          # comprobaciones con destinos temporales y un Claude Code falso
 ```
 
-- **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md` y
-  `skills/**/references/*.md`): el
+- **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md`,
+  `skills/**/references/*.md` y, de `packs/`, cada `pack.json` y `*.md`): el
   ejecutable *es* el set, y su versión es la versión del set.
 - **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
   flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de
@@ -215,6 +216,9 @@ installer/
 
 - ~~**I1. Alcance de la capa de stack.**~~ **Cerrada por D18**: todo se instala global,
   incluida la capa de stack. No hay `--project` ni instalación parcial.
+  **[modify] 2026-11-01 (D88):** la capa de stack ya no existe. Global queda solo el marco;
+  lo de una tecnología o una arquitectura son packs que se instalan por proyecto con
+  `nzt-ai project` (sección 13).
 - **I2. Duplicación con `install/build.*`.** **Resuelta en la práctica, no eliminada.** Los
   scripts siguen siendo el loop de desarrollo —además arman `dist/` y el plugin de evals, que
   al instalador no le incumben— y el CLI es lo que instala. Lo que evita que diverjan es una
@@ -517,11 +521,77 @@ roto es un problema, con su posición.
 - opciones: A, cuando no queda nada instalado; B, siempre; C, nunca. El agente recomendó A.
 - respuesta: **A** · 2026-10-21
 
+## 13. Packs por proyecto: `nzt-ai project`
+
+Lo trae D88 (`specs/nzt-core.md`): global queda solo el marco, y lo de una tecnología, una
+arquitectura o las reglas de código del usuario son **packs** que cada proyecto elige. El
+pedido del usuario: un CLI que haga el setup del proyecto, y que el agente sepa usarlo desde
+NZT para instalar skills y habilitar MCPs.
+
+### 13.1 Qué es un pack
+
+`packs/<pack>/` con `pack.json` (`description`, `requires`, `mcp`), y opcionalmente
+`SKILL.md` y `references/`. Instala a lo sumo una skill, `nzt-<pack>`. Un MCP es remoto
+(`url`) o local (`command` por plataforma —`windows`, `macos-arm64`, `macos-x64`, `linux`—
+con `{home}`, y `args`). Packs de QT-01: `code`, `backend`, `frontend`, `ddd`, `csharp`,
+`dotnet`, `blazor`, `unity` (solo MCP).
+
+### 13.2 Comandos
+
+`project [status] | packs | add <pack>... [--provider claude-code|codex|all] | remove <pack>...
+| sync`, con `--dir` y `--dry-run`, y la acción *Preparar este proyecto* en el menú.
+
+#### RN-proj-reconciliar · [add] · origin: D88
+`add`, `remove` y `sync` son una sola operación: del estado deseado —packs pedidos y
+proveedores— a lo que hay en disco, contra `.nzt/project.json`. Los requeridos se resuelven
+cada vez y en orden de dependencia; sacar un pack saca lo que ningún otro sigue requiriendo.
+
+#### RN-proj-archivo · [add] · origin: D88
+`.nzt/project.json` guarda `nztVersion`, los packs **pedidos**, los proveedores, cada archivo
+escrito (ruta relativa a la raíz y hash) y, por proveedor, los MCP que agregó `nzt-ai`. Se
+versiona con el repo; `sync` lo reproduce en otra máquina. Sin packs ni archivos, se borra.
+
+#### RN-proj-destinos · [add] · origin: D88, QT-02
+Claude Code: skills en `.claude/skills/`, MCP en `mcpServers` de `.mcp.json`. Codex: skills en
+`.agents/skills/`, MCP en un bloque `# nzt:start` … `# nzt:end` de `.codex/config.toml` (sin
+parser TOML; una tabla `[mcp_servers.<nombre>]` fuera del bloque es del usuario). Sin
+`--provider`, los proveedores que el proyecto ya tiene, o Claude Code en uno nuevo; con él, se
+suman a los que tiene. Dejar un proveedor saca sus skills y sus MCP.
+
+#### RN-proj-proteccion · [add] · origin: D88
+Las reglas de la sección 7 valen igual: con un archivo que `nzt-ai project` no escribió no se
+escribe nada; uno editado se conserva al actualizar y al sacar el pack, y sigue anotado; las
+carpetas que quedan vacías se borran sin salir de la raíz. Un pack desconocido aborta sin
+escribir.
+
+#### RN-proj-mcp-usuario · [add] · origin: D88
+Un MCP con el mismo nombre que ya estaba es del usuario: queda como está y no se anota. Sacar
+los packs no toca los MCP del usuario, y un archivo que era solo de `nzt-ai` se borra. Un MCP
+local sin comando para la plataforma se informa y no se escribe.
+
+#### RN-proj-lint · [add] · origin: D88
+`verify` y `project add` corren el lint de packs (*Validación* en el runbook): las reglas de skill,
+`description`, skill o MCP, `requires` existentes y sin ciclos, `url` o `command` (uno solo),
+un MCP definido igual en todos los packs y ninguna skill de pack con nombre de global.
+`install/build.*` aplica las mismas reglas de archivo a `packs/`.
+
+### 13.3 Sin verificar
+
+- Que Codex lea `url = "…"` para un MCP HTTP en el `.codex/config.toml` de un proyecto.
+- Que el relay de Unity acepte el comando con la ruta absoluta que resuelve `{home}` en Windows.
+
 ## Historia
 
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. Va acá y no en
 `Docs/Product/history.md` porque este repo guarda sus documentos en `specs/` (como las specs de
 los mods).
+
+### 2026-11-01 · Packs por proyecto con `nzt-ai project`
+Type:     add
+Change:   el instalador global instala solo el marco; `nzt-ai project` instala por proyecto las skills de los packs y sus MCP, para Claude Code y Codex.
+Reason:   el usuario: lo de una tecnología o una arquitectura se instala por proyecto, igual que los MCP, y un CLI hace el setup que el agente sabe correr.
+Impact:   I1 modificada · RN-proj-reconciliar · RN-proj-archivo · RN-proj-destinos · RN-proj-proteccion · RN-proj-mcp-usuario · RN-proj-lint, todas nuevas
+Decision: D88 en `specs/nzt-core.md` (QT-01..04 de `Plan/mejoras/11-marco-generico.md`).
 
 ### 2026-10-17 · El instalador ofrece los mods en Claude Code
 Type:     add

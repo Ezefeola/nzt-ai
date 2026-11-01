@@ -1102,6 +1102,8 @@ que se tira.
   tiene la capa de stack**; **(3)** cada skill de stack se paga en todos los proyectos,
   también en los que no son .NET, así que partir una skill por cohesión ahora tiene un costo
   que antes no tenía.
+  **[modify] 2026-11-01: derogada por D88.** La capa de stack pasa a packs por proyecto; el
+  filtro de (1) sigue, ahora sobre los packs que `tech.md` lista.
 - **D19.** **La forma del árbol de backend .NET**, decidida al escribir su router de área.
   **27 hojas más el router**, y aparte **tres hojas compartidas de C#**, con cuatro cambios
   respecto de Temper y sus razones:
@@ -3052,6 +3054,49 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     de 200 líneas. **No corrido**: el chequeo de citas (no se encontró su comando). Retro real de
     esta sesión siguiendo la skill del repo: el md quedó en el escritorio del usuario, fuera de
     todo repo, con cinco propuestas (R-01 a R-05) y dos descartes; no se tocó nada más.
+- **D88.** **Global queda solo el marco genérico; lo de una tecnología, una arquitectura o las
+  reglas de código del usuario son packs que se instalan por proyecto con `nzt-ai project`, con
+  sus MCP, y el documento técnico es uno solo: `Docs/Architecture/tech.md`.** Deroga D18. Lo
+  que la forzó: el pedido del usuario (2026-11-01) de un marco que sirva para cualquier
+  producto —juego, sistema, documento—, sin redundancia y corto, con lo propio de cada
+  proyecto instalado en el proyecto igual que un MCP, y un CLI que haga el setup y que el
+  agente sepa correr. Run `marco-generico`, unidades 413–424; traspaso y mapeo de nombres en
+  `Plan/mejoras/11-marco-generico.md`.
+  - **QT-01, packs medianos:** `code`, `backend`, `frontend`, `ddd`, `csharp`, `dotnet`,
+    `blazor`, `unity`. Cada uno con `pack.json` (`description`, `requires`, `mcp`) y a lo sumo
+    una skill `nzt-<pack>`; `unity` es solo el MCP oficial de Unity. Los MCP: Microsoft Learn
+    (http) en `csharp`, `dotnet` y `blazor`; el relay de `com.unity.ai.assistant` (stdio, un
+    comando por plataforma) en `unity`.
+  - **QT-02, Claude Code y Codex:** skills en `.claude/skills/` o `.agents/skills/`, MCP en
+    `.mcp.json` o en un bloque delimitado de `.codex/config.toml`. `.nzt/project.json`
+    versiona qué se eligió y qué escribió `nzt-ai` (`specs/nzt-installer.md` sección 13).
+  - **QT-03, sin migración** desde los `<area>-stack-<componente>.md`: quien quiera, pide
+    armar `tech.md` a partir de los viejos.
+  - **QT-04, `Docs/Architecture/tech.md`:** una sección por componente con su `root`, sus
+    áreas, **sus packs**, una decisión por fila, los opt-ins (los del núcleo más los de cada
+    pack), dependencias y convenciones. Lo escribe `nzt-architecture` (`references/tech.md`):
+    deriva las decisiones de lo que es el componente, propone packs con `nzt-ai project packs`,
+    los instala con `add` tras el sí, y pregunta los `## Axes` y `## Opt-ins` del `SKILL.md`
+    de cada pack, escritos como el pack los nombra. Borradas `stack.md` y `stack-axes.md`.
+  - **El filtro de D18 sigue, sobre los packs:** el kernel (*Packs*) carga los que `tech.md`
+    lista para lo que se toca, y los que cada uno pide primero (`dotnet` lee `backend`,
+    `csharp` y `code`); instalado y no listado no aplica. Así `tech.md` lista solo el de
+    arriba. La regla genérica vive en `code`, `backend` o `frontend`, y en un pack de
+    tecnología solo lo propio, que abre nombrando su genérica.
+  - **Reescritura sin redundancia:** kernel, routers y referencias globales y de packs, con
+    pasos numerados y un *Done when* de una o dos líneas en lugar de las listas de cierre. De
+    6177 a ~3000 líneas en los packs y de 1187 a ~700 en `nzt-learn`, `nzt-research` y
+    `nzt-retro`. Quedan 12 skills globales con 60 referencias y 8 packs con 77.
+  - **Verificación:** 230 comprobaciones del instalador (20 de `project`, MCP y lint de
+    packs); `install/build.*` valida `packs/` y los copia a los fixtures de evals;
+    `check-extraction.sh` y `check-references.sh` se borraron, porque probaban migraciones
+    contra `main` que este árbol ya no tiene. Los evals pasaron a `tech.md` y a los packs
+    sembrados como skills de proyecto, con el caso nuevo `routing/pack-setup`. **Ningún eval
+    corrido** (decisión del usuario, por costo).
+  - **Sin verificar:** que Codex lea `url` para un MCP HTTP en el `config.toml` de proyecto, y
+    que el relay de Unity acepte la ruta absoluta de `{home}` en Windows.
+  - **Pendiente:** la unidad 424 (puertas y smoke de `project` en una carpeta temporal) y la
+    versión: 4.0.0 propuesta, porque cambian nombres de skills y el documento técnico.
 
 ## 13. Revisión contra Temper v3
 
@@ -4424,7 +4469,13 @@ curiosidad.
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
 
-> **Estado actual (2026-10-11), rama `capa-generica`.** Lo que sigue a este bloque es la
+> **Estado actual (2026-11-01), rama `refactor-marco-generico`.** D88: global queda solo el
+> marco —12 skills, 60 referencias—, y lo de una tecnología o una arquitectura son 8 packs
+> por proyecto (77 referencias) que instala `nzt-ai project`, con sus MCP. El documento
+> técnico es `Docs/Architecture/tech.md`. El bloque de abajo, del 2026-10-11, es historia:
+> sus cuentas y su capa de stack ya no valen.
+
+> **Estado al 2026-10-11, rama `capa-generica`.** Lo que sigue a este bloque es la
 > historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
 > como skills) ya no valen. El plan en curso y dónde quedó viven en `Plan/state.json`.
 >

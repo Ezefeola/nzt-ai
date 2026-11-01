@@ -22,7 +22,7 @@ NZT existe para evitar:
 | Escribe código antes de que nadie haya definido qué tiene que hacer | Primero el análisis funcional, y lo que no está definido **es una pregunta, no una suposición** |
 | Arranca y no para hasta que algo se rompe | Corta en unidades revisables y **frena a esperarte** al final de cada una; si querés avanzar, le das una tanda cerrada (N unidades, o hasta un hito) y frena igual pasado el 40% de contexto |
 | Se le termina el contexto y perdiste el hilo | El plan y el estado viven en `Plan/state.json`: se retoma sin volver a explicar |
-| Elige el patrón que le gusta hoy, distinto del de ayer | El documento de stack decide, y **una carpeta instalada no es una autorización** |
+| Elige el patrón que le gusta hoy, distinto del de ayer | El documento técnico (`Docs/Architecture/tech.md`) decide, y **un pack instalado no es una autorización** |
 | Te dice que funciona | Reporta lo que pasó: el test que falló, el paso que salteó, la suposición que hizo |
 
 Lo que ganás no es que escriba mejor código: es que **puedas revisar lo que hizo, retomar
@@ -30,27 +30,28 @@ donde quedaste y no descubrir a lo último que entendió otra cosa.**
 
 ## Cómo funciona
 
-Tres capas, y la de arriba está siempre cargada.
+Tres capas globales, la de arriba siempre cargada, y los packs de cada proyecto.
 
-**1. El kernel** (~180 líneas) se instala en el archivo que tu proveedor lee en toda sesión
+**1. El kernel** (~115 líneas) se instala en el archivo que tu proveedor lee en toda sesión
 —`~/.claude/CLAUDE.md` o `~/.codex/AGENTS.md`—. Trae el bucle, los frenos, el formato del
 estado y **la tabla de ruteo**. Eso último es la decisión de diseño más importante del set:
 qué skill cargar está *instruido en una tabla*, no librado a que el modelo adivine por la
 descripción.
 
-**2. Los routers.** Son las skills: uno por fase, uno por tecnología, más el de entrada
+**2. Los routers.** Son las skills: uno por fase, más el de entrada
 (`nzt`), el de investigación (`nzt-research`) y el de delegar en un subagente —lecturas, o
 unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`) y, sólo cuando lo pedís, el de
 retro (`nzt-retro`): revisa la sesión y deja propuestas de mejora en un md fuera del repo, sin
 cambiar nada. No hacen el trabajo:
-leen el pedido y el documento de stack, y dicen qué referencia leer.
+leen el pedido y el documento técnico, y dicen qué referencia leer.
 
 **3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
 `references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
-listado de skills**, que el proveedor carga en toda sesión: el set entero son 16 entradas.
+listado de skills**, que el proveedor carga en toda sesión: el set global son 12 entradas.
 
 ```
 pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
+                                         ↘ el pack que tech.md lista → su referencia
 ```
 
 El bucle que impone el kernel es siempre el mismo: **entender → proponer → ejecutar por
@@ -64,7 +65,7 @@ por tramos de una a tres historias). Eso es lo que hace que se banque el uso dia
 | Fase | De qué se ocupa |
 |---|---|
 | `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias, y el cambio a una feature que ya existe |
-| `nzt-architecture` | Cómo se resuelve: componentes, stack, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
+| `nzt-architecture` | Cómo se resuelve: componentes, documento técnico y packs del proyecto, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
 | `nzt-ux` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
 | `nzt-build` | El código, y los tests que viajan con él |
 | `nzt-verify` | Diseñar y correr pruebas —API o pantalla, y lo dice antes de correr—, **crear los datos que faltan y borrarlos después**, medir la performance que espera el usuario, registrar la evidencia, y leer código o documentos buscando lo que no cierra |
@@ -75,24 +76,36 @@ por tramos de una a tres historias). Eso es lo que hace que se banque el uso dia
 aparte, evaluación y repasos espaciados. Se dispara cuando pedís aprender, no cuando pedís
 que se haga.
 
-### La capa de stack
+### Los packs, por proyecto
 
-Arriba de eso hay skills específicas de tecnología —.NET 10 y Blazor hoy— con las
-convenciones concretas: EF Core, minimal APIs, modelo de dominio, modos de render,
-contenedores, migraciones. **Se instalan siempre y se aplican sólo si el documento de stack
-del componente las eligió.** En un proyecto que no es .NET no se cargan, y en un repositorio
-con convenciones propias las de NZT se corren a un costado y la diferencia se reporta en vez
-de aplicarse.
+Lo global es solo el marco, y sirve para cualquier producto: un sistema, un juego, una app,
+un documento. Lo que es de una tecnología, de un estilo de arquitectura o de tus reglas de
+código viene en **packs** que se instalan **en el proyecto** que los usa, con sus MCP:
 
-Debajo hay una **capa genérica**: el principio de cada práctica —arquitecturas, modelo de
-dominio, persistencia, acceso a datos, API, seguridad, reglas de código, componentes,
-formularios, rendering, performance— escrito sin nombrar ninguna tecnología. Un stack sin
-skills propias (Node, Go, React…) la recibe entera; .NET y Blazor la leen primero y después
-leen cómo se hace en su tecnología, así que **cada regla vive en un solo lugar**.
+| Pack | Trae |
+|---|---|
+| `code` | tus reglas de código para cualquier lenguaje: nombres, funciones, errores, colecciones, DTOs |
+| `backend` | backend sin tecnología: arquitecturas, modelo anémico, persistencia, casos de uso, validación, errores, API, seguridad, acceso a datos |
+| `frontend` | frontend sin tecnología: arquitectura, componentes, formularios, rendering, performance |
+| `ddd` | agregados, value objects, contextos acotados y sus diagramas |
+| `csharp` | C# moderno, con el MCP de Microsoft Learn |
+| `dotnet` | .NET: EF Core, minimal APIs o controllers, resultados, tests, contenedores, pipeline, observabilidad, con Microsoft Learn |
+| `blazor` | Blazor: modos de render, componentes, formularios, prerendering, con Microsoft Learn |
+| `unity` | solo el MCP oficial de Unity, para conectar el agente al editor |
 
-Los **ejes del stack** —arquitectura, modelo de dominio, persistencia y los propios de cada
-tecnología— se preguntan una vez, con sus opciones y lo que cuesta cada una, con la
-herramienta de preguntas del proveedor cuando la sesión la ofrece.
+Cada pack instala una skill `nzt-<pack>` y lo que requiere: `dotnet` trae `backend`,
+`csharp` y `code`, que lee primero, así **cada regla vive en un solo lugar** — la genérica en
+`backend`, `frontend` o `code`, y en la de tecnología solo lo propio.
+
+`Docs/Architecture/tech.md` es el documento técnico del producto: una sección por componente
+con sus decisiones, sus opt-ins, sus dependencias y **los packs que lo guían**. Lo escribe
+`nzt-architecture`, que propone los packs y, con tu sí, los instala con `nzt-ai project`. Los
+**ejes** de cada pack —arquitectura, modelo de dominio, persistencia, endpoints, modo de
+render…— se preguntan una vez, con lo que cuesta cada opción.
+
+**Un pack se aplica solo si `tech.md` lo lista.** Instalado y no listado no se carga, y en un
+repositorio con convenciones propias las de NZT se corren a un costado y la diferencia se
+reporta en vez de aplicarse.
 
 ## Instalación
 
@@ -148,8 +161,8 @@ Desde el repo, con .NET 10, está el instalador completo:
 dotnet run --project installer/src/Nzt.Cli
 ```
 
-El menú tiene cuatro acciones —**instalar, desinstalar, verificar el contenido y ver
-estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
+El menú tiene cinco acciones —**instalar, desinstalar, preparar este proyecto, verificar
+el contenido y ver estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
 método o solo los mods—, y **te muestra la simulación y recién
 ahí pregunta**. Instala un bloque delimitado en el archivo de instrucciones —respetando lo
 que ya tengas, con backup— y las skills en la carpeta de usuario del proveedor.
@@ -158,6 +171,24 @@ que ya tengas, con backup— y las skills en la carpeta de usuario del proveedor
 dotnet run --project installer/src/Nzt.Cli -- status
 dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
+
+### En cada proyecto
+
+Los packs se instalan desde la raíz del proyecto, y lo normal es que lo haga el agente cuando
+arma `tech.md`. A mano:
+
+```bash
+nzt-ai project packs                      # los que hay, y cuáles tiene este proyecto
+nzt-ai project add dotnet ddd             # con lo que requieren; --provider codex o all
+nzt-ai project remove ddd
+nzt-ai project sync                       # reinstala lo que dice .nzt/project.json
+```
+
+Las skills quedan en `.claude/skills/` (Codex: `.agents/skills/`) y los MCP en `.mcp.json`
+(Codex: un bloque delimitado en `.codex/config.toml`), sin pisar lo que ya tengas.
+`.nzt/project.json` anota qué se eligió y qué escribió `nzt-ai`: versionalo, y en otra
+máquina `nzt-ai project sync` deja lo mismo. Los MCP cargan en una sesión nueva. El menú del
+instalador tiene la misma acción, *Preparar este proyecto*.
 
 **No es un plugin.** Son skills sueltas y un bloque de texto: nada que tengas que aprender a
 manejar, y el mismo NZT en cada proveedor: ningún sistema de plugins carga el kernel igual
@@ -220,11 +251,11 @@ Cómo se arma un mod y qué tiene que traer está en [`specs/nzt-mods.md`](specs
 Es tan importante como lo otro:
 
 - **No restringe lo que el modelo sabe** ni lo que puede hacer. Define cómo trabaja.
-- **No delega decisiones ni usa MCP.** Una conversación que es dueña del plan, el estado y
+- **No delega decisiones.** Una conversación que es dueña del plan, el estado y
   cada decisión, y que frena en los bordes de cada unidad. Puede mandar a dos subagentes
   propios: uno lee por ella y el otro hace las unidades que el plan aprobado marcó en
   paralelo. Sin subagentes, o con `delegation` en `off`, todo corre en esta conversación,
-  una unidad tras otra.
+  una unidad tras otra. Los únicos MCP son los que trae un pack, en el proyecto que lo eligió.
 - **No garantiza que el modelo elija siempre la skill correcta.** Por eso el ruteo está
   instruido y por eso hay una suite de evals que lo mide.
 - **No decide por vos.** Prescribe el procedimiento, no el criterio técnico: NZT dice *cómo
@@ -234,7 +265,8 @@ Es tan importante como lo otro:
 
 ```
 core/        kernel.md + un adapter por proveedor
-skills/      el árbol de skills (anidado acá, plano al instalarse)
+skills/      las skills globales del marco (anidadas acá, planas al instalarse)
+packs/       los packs por proyecto: pack.json, SKILL.md y references/ de cada uno
 specs/       nzt-core.md — la spec fundacional, la del instalador, la de los mods y mods/ con una por mod
 mods/        los mods de Claude Code, uno por carpeta (opcionales)
 installer/   el CLI que instala, con sus comprobaciones
@@ -242,7 +274,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**16 skills y 140 referencias**, 30 de ellas de la capa genérica. El plan en curso y dónde
+**12 skills globales con 60 referencias, y 8 packs** —7 con skill— **con 77 referencias**. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.
