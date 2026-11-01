@@ -1,15 +1,15 @@
 ---
 name: nzt-build
-description: Use when the work product changes - code, assets or content: implementing a story, fixing a defect, refactoring, removing behavior, touching dependencies or secrets, and the tests that ship with it.
+description: Use when the work is produced or changed - implementing a story, fixing a defect, refactoring, removing behavior, touching dependencies or secrets, and the automated tests that ship with it.
 ---
 
 # Build — producing the work
 
-Turns one story into working product — code, assets, content — and marks its criteria's
-areas. **Owns** the work, its setup and the automated tests that ship with it. **Does not
-own** what to build (`nzt-discovery`), how it is structured (`nzt-architecture`), or the
-application test plan, its data and its runs (`nzt-verify`): what the enabled test levels
-cannot reach is reported as *not covered until QA*.
+Turns one story into working product and marks its criteria's areas. **Owns** the work, its
+setup and the automated tests that ship with it. **Does not own** what to build
+(`nzt-discovery`), how it is structured (`nzt-architecture`), or the test plan, its data and
+its runs (`nzt-verify`): what the enabled test levels cannot reach is reported as *not
+covered until QA*.
 
 ## References
 

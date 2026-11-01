@@ -1,16 +1,16 @@
 ---
 name: nzt-ship
-description: Use when work leaves the working copy - commits, branches, pull requests, changelog, versioning, CI, releasing or deploying to an environment, store or channel, monitoring a release, rolling back.
+description: Use when the work goes to other people - version control, changelog and versions, the release pipeline, releasing, deploying or publishing, monitoring a release, rolling back.
 ---
 
-# Ship — getting it out
+# Ship — getting it to other people
 
-Moves work from the working copy to where other people see it: a repository, an environment,
-a store, a publishing channel. Everything here is harder to undo, so it asks first. **A
-release is finished when it is verified where it landed, not when the command returns.**
+Moves work from the working copy to where other people reach it. Everything here is harder to
+undo, so it asks first. **A release is finished when it is verified where it landed, not when
+the command returns.**
 
-**Owns** version control actions, changelog and versioning, CI, releases, rollback, and the
-instrumentation that makes a release observable. **Does not own** the work (`nzt-build`) or
+**Owns** version control actions, changelog and versioning, the release pipeline, releases,
+rollback, and the instrumentation that makes a release observable. **Does not own** the work (`nzt-build`) or
 its evidence (`nzt-verify`); ship never fixes what verification found.
 
 ## References

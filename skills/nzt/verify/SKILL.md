@@ -1,6 +1,6 @@
 ---
 name: nzt-verify
-description: Use when what was made needs evidence - test plans from a story, test data, running scenarios, exploratory sessions or playtests, performance, regression, defects - or reading the work or documents for what does not hold.
+description: Use when what was made needs evidence - test plans from a story, test data, running scenarios, exploratory sessions, performance, regression, defects - or reading the work or documents for what does not hold.
 ---
 
 # Verify — evidence that it works

@@ -1,14 +1,14 @@
 ---
 name: nzt-architecture
-description: Use when technical decisions come before the work: components and boundaries, choosing technologies, tools and the project's packs, the domain model, how a feature is solved, integrations, decision records, debt, diagrams.
+description: Use when how it is made has to be decided before the work - its parts and boundaries, technologies, tools and the project's packs, the domain model, one feature's technical design, integrations, decision records, debt, diagrams.
 ---
 
 # Architecture — how it is made
 
-Decides **how** the product solves what discovery defined, records why, and sets up the
-project's packs. **Owns** components, technologies and packs (`Docs/Architecture/tech.md`),
+Decides **how** the product does what discovery agreed, records why, and sets up the
+project's packs. **Owns** its parts, technologies and packs (`Docs/Architecture/tech.md`),
 the domain model, integrations, decision records, deferred debt, diagrams, and the map of
-`Docs/`. **Does not own** business rules (`nzt-discovery`), screens (`nzt-design`) or the work
+`Docs/`. **Does not own** the rules (`nzt-discovery`), its form (`nzt-design`) or the work
 itself (`nzt-build`).
 
 ## References

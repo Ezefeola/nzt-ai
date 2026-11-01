@@ -1,13 +1,13 @@
 ---
 name: nzt-discovery
-description: Use when what to make and for whom has to be established - the product definition, vocabulary, rules, scope, feature specs, stories, changing an existing feature, or specs derived from an existing product.
+description: Use when what it must do and for whom has to be agreed - purpose, rules, scope, vocabulary, specs and stories, changing what was agreed, or reconstructing it from existing work.
 ---
 
-# Discovery — what it is and for whom
+# Discovery — what it must do and for whom
 
-Establishes **what** something is and **who** it is for, in the words of the people it is for
-(customers, players, readers), and writes it down. **Does not own** how it is solved (`nzt-architecture`), screens (`nzt-design`) or the work
-(`nzt-build`): a spec naming a class, table, engine or package has drifted.
+Establishes **what** something must do and **who** it is for, in the words of the people it is
+for, and writes it down. **Does not own** how it is made (`nzt-architecture`), its form
+(`nzt-design`) or the work (`nzt-build`): a spec naming a technology or a structure has drifted.
 
 ## References
 

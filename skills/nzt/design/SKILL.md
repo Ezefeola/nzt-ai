@@ -1,9 +1,9 @@
 ---
 name: nzt-design
-description: Use when a person will see or operate something - a screen, menu, level or page: layout, content, states and navigation, its mockup or prototype, the design system and brand, a usability review, the end user's manual.
+description: Use when the form of what a person perceives or operates has to be decided - layout, content, states and navigation, a mockup or prototype, the design system and voice, a usability review, the end user's manual.
 ---
 
-# Design — what the person sees and does
+# Design — the form of what a person perceives and operates
 
 Decides how a person accomplishes what the story describes, before anyone builds it.
 **Owns** layout, content, every state, navigation, the design system and shared components,
@@ -15,11 +15,11 @@ usability and accessibility reviews, and **the end user's manual**. **Does not o
 
 | The unit is | Read | Read with |
 |---|---|---|
-| One screen: layout, content, states, navigation | `references/screen.md` | — |
-| A mockup of a designed screen (asked for), or a prototype (offered by the plan) | `references/mockup.md` | `references/review.md`, `references/generic.md` |
+| One view a person acts in: layout, content, states, navigation | `references/screen.md` | — |
+| A mockup of a designed view (asked for), or a prototype (offered by the plan) | `references/mockup.md` | `references/review.md`, `references/generic.md` |
 | The end user's manual — on request | `references/manual.md` | `references/review.md`, `references/generic.md` |
 | The design system, shared components, visual direction, brand and voice | `references/system.md` | `references/generic.md` |
-| Judging a design, mockup or built screen against its task | `references/review.md` | `references/generic.md` |
+| Judging a design, mockup or built view against its task | `references/review.md` | `references/generic.md` |
 
 ## Steps
 
