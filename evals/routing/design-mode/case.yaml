@@ -7,7 +7,7 @@ description: >
   get resolved is the user's choice, not the agent's.
 tags: [routing]
 expected_outcome: >
-  Loads nzt-architecture and its feature design leaf, reads the spec and the stacks, and
+  Loads nzt-architecture and its feature design leaf, reads the spec and tech.md, and
   comes back with the technical questions the design has to answer written as QT-NN plus
   the choice of how to resolve them - proposals, together or dictated - instead of a design
   whose decisions are already taken.

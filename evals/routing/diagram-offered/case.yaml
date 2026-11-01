@@ -28,12 +28,12 @@ graders:
     type: tool_used
     tool: Read
     input_match: 'nzt-architecture[/\\]+references[/\\]+design-feature\.md'
-  # The project's stack document, not references/stack.md: since D50 a bare 'stack' would
-  # also match the guidance file and pass without the project's stack being read.
-  - name: read-the-stack
+  # The project's tech.md, not nzt-architecture's references/tech.md: a bare 'tech' would
+  # also match the guidance file and pass without the project's document being read.
+  - name: read-tech
     type: tool_used
     tool: Read
-    input_match: 'Docs[/\\]+\w+-stack-'
+    input_match: 'Docs[/\\]+Architecture[/\\]+tech\.md'
   - name: offers-the-diagram
     type: llm
     criteria: |

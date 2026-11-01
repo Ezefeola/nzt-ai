@@ -1,13 +1,13 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 26 cases in three groups, and each group measures one of the two failure modes.
+suite is 35 cases in three groups, and each group measures one of the two failure modes.
 
 | Group | Cases | What it measures |
 |---|---|---|
-| `routing/` | 11 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold |
-| `stack/` | 7 | **The exclusive axes, and the conventions they carry.** The stack document selects one option per axis, only that leaf loads, and its rules show up in the emitted code. Since D50 a leaf that moved to `references/` is graded as a `Read` of its file, not a `Skill` call |
-| `restraint/` | 8 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
+| `routing/` | 19 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked |
+| `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
+| `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
 detail: NZT's routing is instructed there (R2), so a run without it measures description
@@ -81,12 +81,16 @@ with D37, `entity-shape` and `result-inline` with D38 and D39, `design-mode` and
 `design-unasked` with D41, `test-levels-unasked` with D42, `qa-unasked` with D43, and `package-unasked` with D44. They are calibrated the way the others were **after** their first
 run, not before it. Expect the first run of each to be a calibration run.
 
+**No case has been run since D88.** The workspaces moved to `Docs/Architecture/tech.md`, the
+packs are seeded as project skills, `entity-shape` lost its second-part grader with the
+file, and `routing/pack-setup` is new: the first run of each is a calibration run.
+
 **`routing/retro` has not been run either** (D87). `nzt-retro` has no row in the kernel's
 routing table, so its description is its only trigger: this case is what says whether that
 is enough.
 
 **`test-levels-unasked` has no pair yet.** It measures only the restraint half of D42 —
-that no level gets built without its opt-in. That a stack being written *asks* for the
+that no level gets built without its opt-in. That a tech.md being written *asks* for the
 levels is not measured, and a set that passes this case has not been shown to do it.
 
 **`design-mode` and `design-unasked` are a pair and are read together.** One measures that

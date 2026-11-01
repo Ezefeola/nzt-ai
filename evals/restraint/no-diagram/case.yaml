@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: restraint-no-diagram
 description: >
-  A question about one endpoint's shape, answered from the stack document. The diagram
+  A question about one endpoint's shape, answered from tech.md. The diagram
   catalog is a closed set that only opens when a document earns one, so loading it here -
   or drawing anything - is the measurable form of over-triggering the new branch.
 tags: [restraint]
@@ -32,15 +32,15 @@ graders:
     pattern: 'flowchart |sequenceDiagram|stateDiagram'
     match: not_contains
     arm: both
-  - name: reads-the-stack
+  - name: reads-tech
     type: tool_used
     tool: Read
-    input_match: 'backend-stack'
+    input_match: 'Docs[/\\]+Architecture[/\\]+tech\.md'
   - name: answers-from-the-project
     type: llm
     criteria: |
       The reply is in Spanish and answers how validation errors are returned.
-      PASS if the answer comes from the project's own stack document - the result pattern
+      PASS if the answer comes from the project's own tech.md - the result pattern
       translated to HTTP with result extensions - and stays the size of the question.
       FAIL if it draws a diagram, proposes a plan or units, offers to write the product
-      architecture, or answers with a convention the stack document does not select.
+      architecture, or answers with a convention tech.md does not select.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Seeds the empty eval workspace with a small NZT project: the built kernel as
-# CLAUDE.md, two stack documents, one feature with one story, and enough source
-# for a request to be about something real.
+# CLAUDE.md, the technical document with its packs installed as project skills, one
+# feature with one story, and enough source for a request to be about something real.
 #
 # Sourced by each case's scaffold.sh. Runs as you, outside the agent's sandbox,
 # and only under `claude plugin eval --scaffold`.
@@ -14,60 +14,68 @@ ws="${1:-$PWD}"
 # description matching instead of NZT's instructed routing (R2).
 cp "$here/CLAUDE.md" "$ws/CLAUDE.md"
 
-mkdir -p "$ws/Docs" "$ws/Plan/specs/F-001-pedidos/stories" \
+mkdir -p "$ws/Docs/Product" "$ws/Docs/Architecture" "$ws/Plan/specs/F-001-pedidos/stories" \
          "$ws/src/Pedidos.Api/Features/Orders" "$ws/src/Pedidos.Web/Features/Orders"
 
-cat > "$ws/Docs/product.md" <<'MD'
+cat > "$ws/Docs/Product/product.md" <<'MD'
 # Pedidos — producto
 Un comercio carga pedidos, los confirma y sigue su estado. Dos componentes:
 `Pedidos.Api` (backend) y `Pedidos.Web` (frontend).
 MD
 
-# Both stacks leave the `Test data` opt-in unanswered on purpose: routing/test-data
-# measures that the mechanism gets asked, and an answered opt-in would skip the question.
-cat > "$ws/Docs/backend-stack-Pedidos.Api.md" <<'MD'
-# Backend stack — Pedidos.Api
-component: Pedidos.Api · area: backend
+cat > "$ws/Docs/Architecture/architecture.md" <<'MD'
+# Architecture — Pedidos
 
-| Axis | Choice | When |
+| Component | Root | Areas | What it does |
+|---|---|---|---|
+| Pedidos.Api | `src/Pedidos.Api/` | backend | the orders API and its database |
+| Pedidos.Web | `src/Pedidos.Web/` | frontend | the operator's screens |
+MD
+
+# Both components leave the `Test data` opt-in unanswered on purpose: routing/test-data
+# measures that the mechanism gets asked, and an answered opt-in would skip the question.
+# Each Test levels line is unique, so a case can rewrite one component's with sed.
+cat > "$ws/Docs/Architecture/tech.md" <<'MD'
+# Tech — Pedidos
+
+## Pedidos.Api
+root: `src/Pedidos.Api/` · areas: backend · packs: dotnet, ddd
+
+| Decision | Choice | When |
 |---|---|---|
 | Runtime | .NET 10.0.2 | — |
 | Language | C# 14 | — |
 | Database | PostgreSQL 17 | — |
 | Architecture | vertical-slice | — |
 | Domain model | ddd | entities and aggregates protect the order rules |
-| Persistence | repositories with unit of work | every write goes through the unit of work |
+| Persistence | repositories | every write goes through the unit of work |
 | ORM | EF Core 10 | every access to PostgreSQL |
 | Endpoints | minimal-apis | every HTTP endpoint |
-| Error handling | result pattern | expected failures; exceptions stay exceptional |
 | Result to HTTP | result-extensions | endpoints translate Result to payload or ProblemDetails |
-| Tests | xUnit 3 | — |
+| Test framework | xUnit 3 | — |
 
-## Opt-ins
-- **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
-- **Test levels:** unit yes · integration against the real engine: yes · ephemeral
-  containers: yes · in-process API: no
+Opt-ins
+- **Test levels:** unit yes · integration against the real engine yes · ephemeral containers yes · in-process API no
 - **Test-first:** no
-- **Automated end-to-end tests:** no
+- **End-to-end tool:** no
+- **DDD:** aggregates yes · value objects yes · domain events no · typed ids no
 
-## Packages
-| Package | What for | When to use it |
+Dependencies
+| Dependency | What for | When |
 |---|---|---|
 | Npgsql.EntityFrameworkCore.PostgreSQL 10.0.0 | EF Core provider for PostgreSQL | persistence and migrations |
 | xunit.v3 3.0.0 | test framework | every automated test |
 | Testcontainers.PostgreSql 4.6.0 | disposable PostgreSQL for tests | integration tests against the real engine |
 
-## Conventions
+Conventions
 - Secrets live outside the repository; in development, in user secrets.
 
-Versions read on 2026-09-17 from `global.json` and `Directory.Packages.props`.
-MD
+Evidence: versions read 2026-09-17 from `global.json` and `Directory.Packages.props`.
 
-cat > "$ws/Docs/frontend-stack-Pedidos.Web.md" <<'MD'
-# Frontend stack — Pedidos.Web
-component: Pedidos.Web · area: frontend
+## Pedidos.Web
+root: `src/Pedidos.Web/` · areas: frontend · packs: blazor
 
-| Axis | Choice | When |
+| Decision | Choice | When |
 |---|---|---|
 | Framework | Blazor (.NET 10.0.2) | — |
 | Architecture | vertical-slice | — |
@@ -75,14 +83,16 @@ component: Pedidos.Web · area: frontend
 | Component organisation | code-behind | every component with logic |
 | Prerendering | enabled | every page |
 
-## Opt-ins
-- **Test levels:** unit no · integration against the real engine: no · ephemeral
-  containers: no · in-process API: no
+Opt-ins
+- **Test levels:** unit no · integration against the real engine no · ephemeral containers no · in-process API no
 - **Test-first:** no
-- **Automated end-to-end tests:** no
+- **End-to-end tool:** no
 
-Versions read on 2026-09-17 from `global.json`.
+Evidence: versions read 2026-09-17 from `global.json`.
 MD
+
+# The packs tech.md lists, installed as `nzt-ai project add dotnet ddd blazor` would.
+bash "$here/packs.sh" "$ws" dotnet ddd blazor
 
 cat > "$ws/Plan/specs/F-001-pedidos/feature.md" <<'MD'
 # F-001 — Pedidos

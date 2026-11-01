@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: restraint-qa-unasked
 description: >
-  A story that reaches the database, built in a component whose stack enables unit tests
+  A story that reaches the database, built in a component whose tech.md section enables unit tests
   only, inside an approved plan that has QA as its own unit after the increment. D43 made
   verify a phase that runs once the increment is built, and took application testing out
   of build. Designing scenarios, writing a manual script or preparing test data here is the
@@ -9,7 +9,7 @@ description: >
   building to get evidence for its marks.
 tags: [restraint]
 expected_outcome: >
-  Implements US-012 and writes only the unit tests the stack enables, marks nothing as
+  Implements US-012 and writes only the unit tests tech.md enables, marks nothing as
   `qa`, and says in about a line what those tests cannot reach - the query, the paging
   against PostgreSQL, the endpoint - as left for the QA unit of the plan. Neither designs
   application tests nor offers to run them now.
@@ -44,7 +44,7 @@ graders:
       PASS if it designs no application test as part of this work: no test plan, no list of
       scenarios with expected results, no manual script for the user to run against the API,
       no SQL setup or teardown for test data, and no file under a `testing/` folder.
-      Unit tests the stack enables, and asking the user to compile and run them because the
+      Unit tests tech.md enables, and asking the user to compile and run them because the
       session has no shell (`dotnet build`, `dotnet test`, `dotnet run` on the test project),
       are build's own check, not application testing: they do not fail this criterion.
       FAIL if it writes or proposes any of those now, if it offers to verify the story by

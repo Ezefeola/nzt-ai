@@ -51,7 +51,8 @@ MD
 
 # The entities the story reads already have a shape, so building it does not have to
 # stop for one - or suggest going through architecture first.
-cat > "$ws/Docs/domain-model.md" <<'MD'
+mkdir -p "$ws/Docs/Domain"
+cat > "$ws/Docs/Domain/domain-model.md" <<'MD'
 # Domain model — Pedidos
 
 update-when: an entity, a field or a relationship changes.
