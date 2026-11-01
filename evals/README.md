@@ -5,7 +5,7 @@ suite is 35 cases in three groups, and each group measures one of the two failur
 
 | Group | Cases | What it measures |
 |---|---|---|
-| `routing/` | 19 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked |
+| `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked, and `tool-research` that choosing an agent's tools looks at the catalogue and researches too (DB-03) |
 | `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
 
@@ -83,7 +83,8 @@ run, not before it. Expect the first run of each to be a calibration run.
 
 **No case has been run since D88.** The workspaces moved to `Docs/Architecture/tech.md`, the
 packs are seeded as project skills, `entity-shape` lost its second-part grader with the
-file, and `routing/pack-setup` is new: the first run of each is a calibration run.
+file, and `routing/pack-setup` and `routing/tool-research` are new: the first run of each is
+a calibration run. The `ux-*` cases are `design-*` since D88, graded the same way.
 
 **`routing/retro` has not been run either** (D87). `nzt-retro` has no row in the kernel's
 routing table, so its description is its only trigger: this case is what says whether that

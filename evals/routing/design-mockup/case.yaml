@@ -1,5 +1,5 @@
 schema_version: "1.1"
-name: route-ux-mockup
+name: route-design-mockup
 description: >
   A mockup of a designed screen, asked for as "an HTML to see how it would look". It reads
   as building the screen (nzt-build, Blazor); it is a visual reference drawn from the screen
@@ -21,7 +21,7 @@ execution:
   timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
-  - name: ux-fired
+  - name: design-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design"'

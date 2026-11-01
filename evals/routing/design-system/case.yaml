@@ -1,8 +1,8 @@
 schema_version: "1.1"
-name: route-ux-system
+name: route-design-system
 description: >
   The design system, asked for in the words of someone who builds the frontend: colours,
-  fonts, common components. It reads as Blazor work (nzt-build); it is a cross-screen UX
+  fonts, common components. It reads as Blazor work (nzt-build); it is a cross-screen design
   decision. Before D50 only the system leaf's description carried this; since D50 it is the
   kernel row, and the guide is nzt-design's references/system.md, graded as a Read. New case,
   no baseline (sonnet judge).
@@ -21,7 +21,7 @@ execution:
   timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
-  - name: ux-fired
+  - name: design-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design"'

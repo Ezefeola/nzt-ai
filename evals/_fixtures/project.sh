@@ -67,6 +67,11 @@ Dependencies
 | xunit.v3 3.0.0 | test framework | every automated test |
 | Testcontainers.PostgreSql 4.6.0 | disposable PostgreSQL for tests | integration tests against the real engine |
 
+Agent tools
+| Tool | What for | Source | Installed by |
+|---|---|---|---|
+| Microsoft Learn MCP | .NET and Azure documentation | Microsoft Learn, read 2026-09-17 | pack dotnet |
+
 Conventions
 - Secrets live outside the repository; in development, in user secrets.
 

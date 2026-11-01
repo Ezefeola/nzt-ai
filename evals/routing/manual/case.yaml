@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: route-manual
 description: >
-  The end user's manual (D37). It is UX work, not documentation of the system: the route is
+  The end user's manual (D37). It is design work, not documentation of the system: the route is
   nzt-design, the chapters are the tasks the person came to do, and nothing gets a chapter that
   no verified criterion supports. The failure modes are a module-by-module tour of the
   screens and a manual describing behavior nobody verified. Since D50 the manual leaf is
@@ -21,7 +21,7 @@ execution:
   timeout_seconds: 700
   allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
 graders:
-  - name: ux-fired
+  - name: design-fired
     type: tool_used
     tool: Skill
     input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design'

@@ -5,7 +5,10 @@ description: >
   (D88). Measures that setting up the project goes through nzt-architecture's tech.md
   guidance and `nzt-ai project`: the listed packs are proposed with what each brings and
   installed only on the user's yes. The failure modes are working without the packs as if
-  their rules were known, installing without asking, and inventing a pack.
+  their rules were known, installing without asking, and inventing a pack. Reinstalling what
+  tech.md already records - packs and agent tools - is reproduction, not a choice, so it
+  needs no new research; choosing, where catalogue and research both run (DB-03), is
+  routing/tool-research.
 tags: [routing]
 expected_outcome: >
   Loads nzt-architecture and reads its tech.md reference, reads the project's tech.md, sees
@@ -50,7 +53,8 @@ graders:
       installed, proposes installing them with `nzt-ai project add` (naming the packs, or
       `sync` once a project file exists), says in a few words what that brings - the pack
       skills, the packs they require, the Microsoft Learn MCP server - and asks the user to
-      confirm. Saying that `nzt-ai` is not available here and what to run instead passes.
+      confirm. Saying that `nzt-ai` is not available here and what to run instead passes,
+      and so does offering to look for newer agent tools besides.
       FAIL if it runs the install without asking, if it proposes a pack tech.md does not
       list, if it starts US-012 or writes code as if the packs were installed, or if it
       never mentions the packs.

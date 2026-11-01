@@ -12,7 +12,7 @@
     },
     {
       "name": "build",
-      "status": "doing",
+      "status": "done",
       "units": [
         { "id": 414, "do": "Mover skills de tecnología y arquitectura a packs/ con pack.json y MCP", "status": "done", "detail": "8 packs; microsoft-learn y unity-mcp verificados en sus docs" },
         { "id": 415, "do": "CLI: catálogo de packs, .nzt/project.json, merge de MCP, nzt-ai project y menú, lint de packs", "status": "done", "detail": "Compila; smoke manual de add/remove ok antes de reescribir contenido" },
@@ -30,12 +30,12 @@
         { "id": 429, "do": "nzt: fases por la pregunta abierta, tamaños por lo que cambia, sin duplicados del kernel y verify, lectura del terreno genérica (P1-P4)", "status": "done", "detail": "Paso 5: cada fase por la pregunta que sigue abierta (qué y para quién, cómo se hace, la forma de lo que alguien percibe o usa, llegar a otras personas). Paso 4: tamaños por lo que cambia; los dos directos en una fila; sin pantallas ni niveles; reverse como reconstruir lo que hace, parte por parte. Fuera 'Direct: no plan, no state' (es del kernel) y 'after build finishes the slice' (es de verify). Paso 2: lo que declara de qué está hecho, no el trabajo. Build 0 avisos, 232 checks, lint 0" },
         { "id": 430, "do": "La fase analysis pasa a discovery (P5) y la tabla de ruteo del kernel por comportamiento, sin artefactos de dominio", "status": "done", "detail": "Fase discovery en nzt, plan/state.md, slices.md, delegate/units.md, verify, packs/backend/security.md, StateCheck (analysis como grafía vieja, check nuevo), evals (accompanied-default, plan-stories), presentation. nzt-state 0.13.0: id discovery, Discovery en los dos idiomas, analysis como grafía vieja, test nuevo, 64 tests y validate ok. Kernel: cada fila dice qué pregunta resuelve, sin pantallas, niveles, commits ni CI. Archivo analysis.md (la entrevista) sin tocar. Build 0 avisos, 234 checks, lint 0, state check ok" },
         { "id": 431, "do": "Descripción, encabezado e intro de cada router por comportamiento, con las mismas palabras que el kernel", "status": "done", "detail": "discovery (qué tiene que hacer y para quién), architecture (sus partes, cómo se hace), design (la forma de lo que una persona percibe o usa; filas de la tabla con 'view' en vez de 'screen'), build (sin code/assets/content), verify (sin playtests), ship (llevarlo a otras personas, el pipeline de release en vez de commits/PR/CI). Las tablas de referencias de ship y los nombres de archivo (screen.md, vcs.md) quedan: son procedimientos de software (DB-02 A). Descripciones 175-228 chars; build 0 avisos, 234 checks, lint 0" },
-        { "id": 428, "do": "Evals: casos que nombran nzt-ux, y routing/pack-setup con investigación además del catálogo, sin correrlos (DB-02, DB-03)", "status": "todo" }
+        { "id": 428, "do": "Evals: casos que nombran nzt-ux, y routing/pack-setup con investigación además del catálogo, sin correrlos (DB-02, DB-03)", "status": "done", "detail": "ux-mockup/review/system → design-* (git mv), names route-design-* y graders design-fired; manual: design-fired. pack-setup: reinstalar lo que tech.md registra no pide investigar; ofrecerlo no falla. Caso nuevo routing/tool-research: juego Unity 6 sin packs elegidos, el pedido real del usuario; catálogo e investigación juntos, fuente oficial con fecha, nada instalado sin el sí (nzt-ai project add/sync, claude/codex mcp add en 0). Fixture project.sh con bloque Agent tools. README de evals: 20 casos de routing. 36 scaffolds corren desde dist; ningún eval corrido. Docs/UX/ y ux-ui/ sin tocar (pendiente en DB-04)" }
       ]
     },
     {
       "name": "verify",
-      "status": "todo",
+      "status": "doing",
       "units": [
         { "id": 424, "do": "Gates: build, checks, lint global y de packs, smoke de project en carpeta temporal, state check", "status": "todo" }
       ]
@@ -48,6 +48,6 @@
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
     "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario; DB-04 (marco para cualquier trabajo: protocolo y flujos) abierto, solo análisis, y el resto Docs/UX/ en architecture sin decidir",
-    "Sigue la 428 (evals), después la 424. Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
+    "Sigue la 424 (gates); la fase build quedó hecha. Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
   ]
 }
