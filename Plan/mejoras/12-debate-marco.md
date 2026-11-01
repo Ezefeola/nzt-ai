@@ -160,6 +160,73 @@ en el ejemplo del usuario.
 Sigue abierta la sub-decisión: si `nzt-ai project` registra los MCP que no vienen de un pack
 (para que `sync` los reproduzca) o si esos los maneja el proveedor y `nzt-ai` no los toca.
 
+## DB-04 · ¿Es un marco para cualquier trabajo con IA, o solo para hacer productos?
+
+> Abierto el 2026-11-01, después de la unidad 431. Solo análisis: **nada decidido ni
+> cambiado.**
+
+**La duda.** El marco tiene que servir para cualquier cosa, como forma ordenada de trabajar
+con IA, no solo para hacer productos.
+
+**Qué hace hoy el marco** (leído en `core/kernel.md`, `skills/nzt/SKILL.md` y los routers).
+- **Genérico de verdad: el protocolo.** Comunicación, el loop (entender → proponer → ejecutar
+  de a una unidad → verificar → registrar y frenar), unidades y frenos, contexto, estado,
+  guardrails, `nzt-research`, `nzt-delegate`, `nzt-retro`. Sirve igual para investigar,
+  analizar datos, decidir, escribir un informe o migrar un servidor.
+- **Atado a hacer un producto:**
+  - la primera línea del kernel: "on any product — software, a game, a document, a course";
+  - las seis fases, que son el ciclo de vida de algo que se fabrica para otros;
+  - los ejemplos de unidad del kernel ("one spec, one story, one design, one test set");
+  - dos hard rules de specs en el kernel ("never write more than one spec in a unit",
+    "never write a spec for something you have not read");
+  - el guardrail "Specs are the expected behavior; the product is evidence";
+  - la tabla de tamaños de `nzt` (defectos, historias, estructura);
+  - la estructura de `Docs/` (Product, Domain, Architecture…).
+- **La salida para lo demás es una línea**: "Work that fits no flow is still done: plan it,
+  say it produces no flow artifacts". Ese trabajo se queda con el loop pero sin guía de qué
+  es verificarlo, qué documento deja ni cuándo está terminado. Ejemplos sin fase donde
+  arrancar: "investigá qué CRM le conviene a mi equipo", "analizá estas ventas y decime qué
+  pasa". `nzt-research` existe, pero como apoyo de una decisión técnica, no como el trabajo.
+- **Ya hay un segundo flujo**: `nzt-learn`, con sus propios loops y `Learn/`, entra hoy como
+  excepción del ruteo y no como modelo.
+
+**Postura del agente.**
+- De acuerdo con la dirección, con una condición: **genérico no puede ser vago.** Un marco que
+  solo dice "entendé, planificá, verificá" no agrega nada sobre Claude solo; el valor está en
+  lo concreto: qué documento queda, cuándo está terminado, dónde frena.
+- No se resuelve abstrayendo más las fases de producto, sino **separando dos capas que hoy
+  están juntas**:
+  1. **El protocolo** (kernel), sin productos, specs ni historias: una unidad es "la pieza más
+     chica que se revisa sola", con ejemplos de varios tipos de trabajo; las reglas de specs
+     bajan al flujo de producto.
+  2. **Flujos por tipo de trabajo**, cada uno con sus fases, sus documentos y su "terminado":
+     - **hacer algo** (el actual, discovery → ship), que sigue siendo el principal;
+     - **investigar o decidir**: la pregunta y para qué decisión → fuentes → análisis →
+       conclusión con su evidencia → dónde queda registrada;
+     - **cambiar algo que ya funciona** (operación, migración): diagnóstico → plan con vuelta
+       atrás → cambio → verificación;
+     - **aprender**: ya existe (`nzt-learn`).
+- Las seis preguntas (qué, cómo, qué forma, hacerlo, comprobarlo, entregarlo) casi siempre se
+  pueden aplicar a cualquier trabajo; lo que no son los **documentos** detrás de cada una. El
+  kernel se queda con las preguntas y cada flujo pone sus documentos.
+- **Se cruza con DB-01**: los frenos y el estado (que cuidan el contexto) son del protocolo y
+  se quedan siempre; los documentos que guardan el "por qué" son de cada flujo y aparecen
+  donde corresponden. Respeta las dos restricciones del usuario.
+
+**Por decidir** (ninguna elegida):
+- **A · Protocolo y flujos separados**, como arriba: el kernel sin producto, el flujo actual
+  como uno de varios, `nzt-learn` re-encuadrado como flujo.
+- **B · Solo neutralizar el kernel**: sacar "product", los ejemplos y las reglas de specs del
+  kernel, sin flujos nuevos; lo que no es producto sigue con la línea de salida, algo más
+  desarrollada.
+- **C · Probarlo antes de decidir** (recomendado como primer paso): pasar dos o tres pedidos
+  reales que no son producto por el marco y anotar dónde se rompe, como la opción C de DB-02.
+- Si se elige A, el primer flujo nuevo propuesto es **investigar o decidir**: el más común
+  después de software, con base en `nzt-research`, y fácil de probar con un caso real.
+
+**Encontrado de paso:** el "Where it lands" de `skills/nzt/architecture/SKILL.md` todavía
+lista `Docs/UX/` (resto de la 425); pendiente de decidir si pasa a `Docs/Design/`.
+
 ## Unidades propuestas (sin aprobar)
 
 | Id | Qué | De |
@@ -175,5 +242,6 @@ La 424 (puertas) quedaría después, así verifica todo junto.
 
 Retomar leyendo este archivo. Orden sugerido: DB-03 (es chico y concreto), DB-02 con la
 prueba del juego de Unity, y DB-01 al final, porque lo que se decida en las otras dos cambia
-cuánto pesa cada fase. Cada decisión se registra acá con fecha y la opción elegida, y la que
+cuánto pesa cada fase. DB-04 va antes que DB-01 o junto con ella: separar protocolo y
+flujos cambia dónde vive la ceremonia. Cada decisión se registra acá con fecha y la opción elegida, y la que
 cambie el marco se planifica como unidades nuevas en `Plan/state.json`.

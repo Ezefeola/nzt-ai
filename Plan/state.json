@@ -47,7 +47,7 @@
   "waiting_on": null,
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
-    "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario",
+    "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario; DB-04 (marco para cualquier trabajo: protocolo y flujos) abierto, solo análisis, y el resto Docs/UX/ en architecture sin decidir",
     "Sigue la 428 (evals), después la 424. Abierta la sub-decisión de DB-03: si nzt-ai project registra MCP que no vienen de un pack. Versión 4.0.0 propuesta; la decide el usuario"
   ]
 }
