@@ -1,7 +1,7 @@
 # 11 — Marco genérico, packs por proyecto y `nzt-ai project`
 
-> Run `marco-generico` · rama `refactor-marco-generico` (desde `main`, **nada commiteado**) ·
-> 2026-11-01. Documento de traspaso: con esto y `Plan/state.json` se retoma en una sesión limpia.
+> Run `marco-generico` · rama `refactor-marco-generico` (desde `main`; avance en `060f691`) ·
+> 2026-11-01. El contenido viejo está en `a31db74` (donde abajo dice `HEAD:`, leer `a31db74:`). Documento de traspaso: con esto y `Plan/state.json` se retoma en una sesión limpia.
 
 ## Pedido del usuario
 
@@ -75,23 +75,17 @@ en el usuario; `nzt-build-backend-dotnet-*` → `nzt-dotnet-*`, `nzt-build-cshar
 
 ## Pendiente (en orden)
 
-1. **SKILL.md de los packs** (la escritura se cortó acá; **ninguno quedó escrito**):
-   - `code/SKILL.md` no existe; `backend/` y `frontend/SKILL.md` siguen con el contenido viejo
-     de `practices-*` (sin frontmatter); `csharp`, `dotnet`, `blazor` tienen frontmatter y
-     nombres viejos.
-   - Forma: frontmatter `name: nzt-<pack>` + description "Use when … tech.md lists the <pack>
-     pack …"; `## Axes` (valor exacto, referencia, costo); `## Opt-ins` si aplica; tabla de
-     referencias; Done when. Sin el boilerplate que ahora vive en el kernel.
-   - `ddd`: sumar `references/aggregates.md` (la forma por agregado del domain model y la
-     prueba del límite, sacada de la `domain.md` vieja: `git show HEAD:skills/nzt/architecture/references/domain.md`).
-   - `dotnet`: axes de Endpoints (`minimal-apis`/`controllers`), Result to HTTP
-     (`result-extensions`/`result-filter`), ORM EF Core (tabla `ef-core-*` con su genérica
-     `../nzt-backend/references/data-*.md`), filas que la tarea elige, y sección **Ship** con
-     `ship-containers/migrations/pipeline/observability`. Contenido viejo:
-     `git show HEAD:skills/nzt/build/backend/dotnet/SKILL.md` y `HEAD:skills/nzt/ship/backend/dotnet/SKILL.md`.
-   - `blazor`: axes Render mode y Component organisation (`git show HEAD:skills/nzt/build/frontend/blazor/SKILL.md`).
-   - `csharp`: reglas del lenguaje (las del SKILL viejo) + filas dtos/linq leyendo antes
-     `../nzt-code/references/*`.
+1. ~~**SKILL.md de los packs**~~ — **hecho** (unidad 418): los 7 con frontmatter `nzt-<pack>`,
+   `## Axes` (valor exacto, referencia, costo sacado de la referencia), `## Opt-ins` en `ddd`
+   (las cuatro piezas con su costo), tabla de referencias y Done when; `ddd/references/aggregates.md`.
+   Criterios que quedaron:
+   - Cada pack dice qué carga primero ("Load `nzt-code` first"); el kernel *Packs* ahora carga
+     también esos, así `tech.md` lista solo el pack de arriba (`dotnet`, no `backend`/`csharp`/`code`).
+   - Los routers de tecnología no repiten la columna "Read with — first": cada referencia ya
+     abre nombrando su genérica.
+   - `csharp` dejó solo lo propio de C#: carpeta≠tipo, magic literals, reflexión y control de
+     flujo genérico viven en `nzt-code`'s `code.md`.
+   - En `dotnet` el ORM se escribe `EF Core` (con versión cualquiera), como en el `tech.md` viejo.
 2. **Reescribir las referencias de los packs** sin redundancia (hoy solo re-apuntadas):
    ~90 archivos; criterio: la regla genérica en `backend/frontend/code`, la de tecnología solo
    lo propio. Ojo con títulos viejos tipo "Load `nzt-…` before applying this".

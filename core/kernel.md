@@ -79,8 +79,8 @@ one, read again those the current unit uses.
 **Packs.** What belongs to one project — a technology, an architecture style, the user's
 code rules — comes as a pack skill (`nzt-<pack>`) installed in that project with `nzt-ai
 project`. `Docs/Architecture/tech.md` lists the packs of each component: load every pack
-skill it lists for what you touch, after the phase router. A pack installed but not listed
-does not apply. Choosing and installing packs is `nzt-architecture`'s.
+skill it lists for what you touch, after the phase router, and the packs each one says to
+load first. A pack installed but neither listed nor required does not apply. Choosing and installing packs is `nzt-architecture`'s.
 
 ## Guardrails
 

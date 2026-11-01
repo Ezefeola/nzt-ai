@@ -1,52 +1,64 @@
-# Backend practices — selection by stack axis
+---
+name: nzt-backend
+description: Use when tech.md lists the backend pack for the component, before writing or changing a service - architecture, domain model, persistence, use cases, validation, errors, results, API, security and data access, whatever the technology.
+---
 
-For a backend component with no area router, as `nzt-build` sends it here. `backend-stack.md`
-decides every row; paths are relative to `nzt-build`'s folder, and the file is read before
-acting on its row.
+# Backend — what holds in any technology
 
-## Exclusive axes — read only what the stack selected
+Load `nzt-code` first. A technology pack (`nzt-dotnet`…) reads the matching file here first
+and adds only how it is done there.
 
-| Axis | The stack says | Read | What it costs, when it is chosen |
+## Axes
+
+`tech.md` names one value per axis. Read only that row; never two of the same axis.
+
+| Axis | Value | Read | What it costs |
 |---|---|---|---|
-| Architecture | `vertical-slice` | `references/backend-architecture-vertical-slice.md` | one folder per feature, and removing it is deleting the folder; a duplicate between slices is accepted as the cheap problem |
-| | `clean-architecture` | `references/backend-architecture-clean.md` | four layers in separate units, every reference pointing inward; one feature touches several units |
-| | `hexagonal-architecture` | `references/backend-architecture-hexagonal.md` | a core with every contract, and one unit per adapter, one external system each; more units, every outside dependency isolated |
-| Domain model | `ddd` | `references/backend-domain-ddd.md` | entities and aggregates protect their own rules; more modelling up front |
-| | `anemic` | `references/backend-domain-anemic.md` | entities carry data, use cases carry the rules; cheap, and a rule two use cases need is duplicated |
-| Persistence | `repositories` | `references/backend-persistence-repositories.md` | one per aggregate root with its interface, plus a unit of work; a seam for tests, and a layer on every query |
-| | `direct` | `references/backend-persistence-direct.md` | use cases use the data access handle itself; less code, tied to that library |
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | one folder per feature, removed by deleting it; a duplicate between slices is the accepted cheap problem |
+| | `clean-architecture` | `references/architecture-clean.md` | four layers, every reference inward; one feature touches several units |
+| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | a core with every contract and one adapter per external system; more units, every dependency isolated |
+| Domain model | `ddd` | the `nzt-ddd` pack | entities protect their own rules; more modelling up front |
+| | `anemic` | `references/domain-anemic.md` | entities carry data, use cases the rules; a rule two use cases need is duplicated |
+| Persistence | `repositories` | `references/persistence-repositories.md` | one per aggregate root plus a unit of work; a seam for tests, a layer on every query |
+| | `direct` | `references/persistence-direct.md` | use cases use the data handle itself; less code, tied to that library |
 
-**Domain model and persistence are independent.** DDD does not imply repositories, and an
-anemic model does not imply direct access.
+Domain model and persistence are independent: `ddd` does not imply repositories, `anemic`
+does not imply direct.
 
-A stack that names none of these is a gap in the stack document: say so and fill it there, do
-not pick one here.
-
-## Rows the task selects
+## References
 
 | The work touches | Read | Read with |
 |---|---|---|
-| A DTO or its mapping: what an operation returns or receives | `references/code-dtos.md` | — |
-| A collection read, transformed or checked in memory | `references/code-collections.md` | — |
-| The operation and its orchestration | `references/backend-use-cases.md` | — |
-| The inputs of an operation and their validators | `references/backend-validation.md` | — |
-| Anything returning a Result from a use case | `references/backend-results.md` | — |
-| An exception that can escape a use case, or the API's error handling | `references/backend-errors.md` | `references/backend-use-cases.md` |
-| An endpoint, its binding, or how a Result reaches HTTP | `references/backend-api.md` | `references/backend-results.md` |
-| A protected resource, permissions, suspected unauthorised access | `references/backend-security.md` | — |
-| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/backend-domain-value-objects.md` | `references/backend-domain-ddd.md` |
+| The operation and its orchestration | `references/use-cases.md` | — |
+| An operation's inputs and their validator | `references/validation.md` | — |
+| Anything returning a Result | `references/results.md` | — |
+| An exception that can escape a use case, or the global handler | `references/errors.md` | `references/use-cases.md` |
+| An endpoint, its binding, or how a Result reaches HTTP | `references/api.md` | `references/results.md` |
+| A protected resource, a permission, suspected unauthorised access | `references/security.md` | — |
 
-## Data access — when the component reads or writes a database
+## Data access
 
-**Read `references/data-access.md` first, every time, whatever the row**: it carries what holds
-for every operation, and no row below repeats it.
+When the component reads or writes a database, read `references/data-access.md` first, every
+time: what holds for every operation lives there and no row repeats it.
 
 | The operation | Read | Read with |
 |---|---|---|
-| Reading data: query shape, projection, execution | `references/data-queries.md` | — |
-| Returning a page of results | `references/data-pagination.md` | `references/data-queries.md` |
+| Reading: query shape, projection, execution | `references/data-queries.md` | — |
+| A page of results | `references/data-pagination.md` | `references/data-queries.md` |
 | Staging and saving changes, write conflicts | `references/data-writes.md` | — |
 | Updating or deleting many rows by criteria | `references/data-bulk.md` | `references/data-writes.md` |
-| The handle's configuration, entity mapping, relationships, mapping an aggregate or a value object | `references/data-mapping.md` | — |
-| A schema change that needs a migration | `references/data-migrations.md` | — |
-| An index, or a uniqueness rule to enforce | `references/data-indexes.md` | — |
+| The handle's configuration, entity mapping, relationships | `references/data-mapping.md` | — |
+| A schema change | `references/data-migrations.md` | — |
+| An index or a uniqueness rule | `references/data-indexes.md` | — |
+
+## Steps
+
+1. Read the axes' values in `tech.md`. A missing one is a gap there: say so and settle it
+   with the user, never pick it here.
+2. Read the axis rows, then the rows the task selects.
+3. With a technology pack listed, read its matching file right after each one here.
+
+## Done when
+
+Every file read was selected by `tech.md` or by the task, never two of one axis, and each
+file's checklist holds.

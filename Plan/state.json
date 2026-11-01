@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-01T12:00:00Z",
+  "updated": "2026-11-01T15:00:00Z",
   "goal": "Marco genérico: skills globales cortas y sin redundancia, packs por proyecto (skills y MCP) con nzt-ai project, y Docs/Architecture/tech.md en lugar de los stack por área",
   "phases": [
     {
@@ -17,7 +17,7 @@
         { "id": 414, "do": "Mover skills de tecnología y arquitectura a packs/ con pack.json y MCP", "status": "done", "detail": "8 packs; microsoft-learn y unity-mcp verificados en sus docs" },
         { "id": 415, "do": "CLI: catálogo de packs, .nzt/project.json, merge de MCP, nzt-ai project y menú, lint de packs", "status": "done", "detail": "Compila; smoke manual de add/remove ok antes de reescribir contenido" },
         { "id": 416, "do": "Kernel y skills globales reescritas cortas y genéricas (nzt, plan, delegate, architecture, build, discovery, verify, ship, ux)", "status": "done", "detail": "architecture/references/tech.md nueva; stack.md y stack-axes.md borradas; agentes y retro re-apuntados" },
-        { "id": 418, "do": "SKILL.md de cada pack con Axes y Opt-ins, y ddd/references/aggregates.md", "status": "doing", "detail": "Cortado antes de escribir: ningún SKILL de pack quedó escrito. Ver pendiente 1 en 11-marco-generico.md" },
+        { "id": 418, "do": "SKILL.md de cada pack con Axes y Opt-ins, y ddd/references/aggregates.md", "status": "done", "detail": "7 SKILL.md (code, backend, frontend, ddd, csharp, dotnet, blazor) con Axes, Opt-ins y costos; ddd/references/aggregates.md; kernel: un pack carga primero los que pide. Lint 0 problemas" },
         { "id": 419, "do": "Reescribir las referencias de los packs sin redundancia (ya re-apuntadas por script)", "status": "todo" },
         { "id": 417, "do": "Pasada de nzt-learn (referencias), nzt-research y nzt-retro con el mismo criterio", "status": "todo" },
         { "id": 420, "do": "Comprobaciones del CLI para project, MCP y lint de packs; ajustar las existentes", "status": "todo" },
@@ -39,8 +39,8 @@
   "autonomy": { "units": [], "keep_stops": [] },
   "waiting_on": null,
   "notes": [
-    "Rama refactor-marco-generico desde main, nada commiteado: todo está en el working tree",
+    "Rama refactor-marco-generico desde main; avance commiteado en 060f691, la unidad 418 sin commitear",
     "Traspaso completo (decisiones, mapeos de nombres, pendiente en orden): Plan/mejoras/11-marco-generico.md",
-    "Contenido viejo de los routers de packs: git show HEAD:skills/nzt/build/... (ver el traspaso)"
+    "Contenido viejo de los routers de packs: git show a31db74:skills/nzt/build/... (HEAD ya no lo tiene)"
   ]
 }

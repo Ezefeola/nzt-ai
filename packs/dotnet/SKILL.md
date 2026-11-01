@@ -1,105 +1,78 @@
 ---
-name: nzt-build-backend-dotnet
-description: Use when the component's stack selects C# and .NET for the backend, before writing or changing its code: the table that turns each stack axis into the one skill to load.
+name: nzt-dotnet
+description: Use when tech.md lists the dotnet pack, before writing, testing or shipping a .NET service - endpoints, results to HTTP, EF Core, architecture, domain model, persistence, exceptions, tests, containers, migrations, CI and observability.
 ---
 
-# Backend on .NET — selection by stack axis
+# Backend on .NET
 
-This router loads nothing by itself. It reads the component's stack document and turns each
-axis into **the one reference** that axis selected. Paths are relative to this skill's folder.
-**Read the file before acting on the row** — the row is not the guidance, the file is.
+Load `nzt-backend` and `nzt-csharp` first. Each file here names the generic file it builds
+on: read that one first; a row read alone is half the guidance. Versions come from the
+project — `global.json`, `TargetFramework`, the package manifest — never from an example.
 
-`<component folder>/Docs/Architecture/backend-stack.md` decides every row below, under
-`nzt-build`'s *Read the stack first*. **Version-dependent APIs need local evidence** here:
-`TargetFramework`, the package version in the manifest, the SDK pin in `global.json`.
+## Axes
 
-## Required guidance
+`tech.md` names one value per axis; read only that row. The generic axes (Architecture,
+Domain model, Persistence) take the values of `nzt-backend`, and their file here follows it.
 
-Load `nzt-build-csharp` before applying any row here. **Reuse what is already loaded: this
-table is a selection, not an order to read every line.** A real task reads three or four.
-
-## Exclusive axes — read only what the stack selected
-
-The stack names the concept; this table turns it into a reference. Never read two rows of
-the same axis.
-
-| Axis | The stack says | Read | Read with |
+| Axis | Value | Read | What it costs |
 |---|---|---|---|
-| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | `../nzt-build/references/backend-architecture-vertical-slice.md` — first, required |
-| | `clean-architecture` | `references/architecture-clean.md` | `../nzt-build/references/backend-architecture-clean.md` — first, required |
-| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | `../nzt-build/references/backend-architecture-hexagonal.md` — first, required |
-| Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | `../nzt-build/references/backend-api.md` — first, required; `references/api.md` |
-| | `controllers` | `references/endpoints-controllers.md` | `../nzt-build/references/backend-api.md` — first, required; `references/api.md` |
-| Domain model | `ddd` | `references/domain-ddd.md` | `../nzt-build/references/backend-domain-ddd.md` — first, required; `references/domain-ddd-behaviour.md` |
-| | `anemic` | `references/domain-anemic.md` | `../nzt-build/references/backend-domain-anemic.md` — first, required |
-| Persistence | `repositories` | `references/persistence-repositories.md` | `../nzt-build/references/backend-persistence-repositories.md` — first, required |
-| | `direct` | `references/persistence-direct.md` | `../nzt-build/references/backend-persistence-direct.md` — first, required |
-| Result to HTTP | `result-extensions` | `references/results-extensions.md` | `../nzt-build/references/backend-api.md` — first, required; `references/results-pattern.md`, `../nzt-build/references/backend-results.md` |
-| | `result-filter` | `references/results-filter.md` | `../nzt-build/references/backend-api.md` — first, required; `references/results-pattern.md`, `../nzt-build/references/backend-results.md` |
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | as in `nzt-backend` |
+| | `clean-architecture` | `references/architecture-clean.md` | as in `nzt-backend` |
+| | `hexagonal-architecture` | `references/architecture-hexagonal.md` | as in `nzt-backend` |
+| Domain model | `ddd` | `references/domain-ddd.md`, `references/domain-ddd-behaviour.md` | as in `nzt-backend` |
+| | `anemic` | `references/domain-anemic.md` | as in `nzt-backend` |
+| Persistence | `repositories` | `references/persistence-repositories.md` | as in `nzt-backend` |
+| | `direct` | `references/persistence-direct.md` | as in `nzt-backend` |
+| Endpoints | `minimal-apis` | `references/endpoints-minimal.md` | an endpoint is a function: route, verb and handler in one declaration |
+| | `controllers` | `references/endpoints-controllers.md` | a class per feature with attribute routing and the MVC pipeline; more ceremony |
+| Result to HTTP | `result-extensions` | `references/results-extensions.md` | the `Result` stays inside: the payload on success, `ProblemDetails` on failure |
+| | `result-filter` | `references/results-filter.md` | the `Result` is the response contract, one shape for success and failure |
+| ORM | `EF Core` (any version) | the *EF Core* section | the context, its migrations and its tooling |
 
-**A stack that names the old skill instead of the concept resolves by that reference's
-documented meaning.** A stack that names neither is a gap in the stack document: say so and
-fill it there, do not pick one here.
+Whether use cases return `Result` is `nzt-backend`'s; how it reaches HTTP is the axis above.
 
-## Rows the task selects
+## References
 
-| The work touches | Read | Read with |
-|---|---|---|
-| The operation and its orchestration | `references/use-cases.md` | `../nzt-build/references/backend-use-cases.md` — first, required |
-| The inputs of an operation and their validators | `references/validation.md` | `../nzt-build/references/backend-validation.md` — first, required |
-| Anything returning `Result` from a use case | `references/results-pattern.md` | `../nzt-build/references/backend-results.md` — first, required |
-| API wiring: routing, model binding, pipeline | `references/api.md` | `../nzt-build/references/backend-api.md` — first, required |
-| An exception that can escape a use case, or the API's error handling | `references/exceptions.md` | `../nzt-build/references/backend-errors.md` — first, required; `references/use-cases.md` |
-| A value object, written or changed — **only if the stack's DDD line says *value objects yes*** | `references/domain-value-objects.md` | `../nzt-build/references/backend-domain-value-objects.md` — first, required |
-| A protected resource, permissions, suspected unauthorised access | `references/security.md` | `../nzt-build/references/backend-security.md` — first, required |
-| Test projects, doubles, running the suite | `references/testing.md` | `../nzt-build/references/tests.md` — first, required |
-
-Wherever a file names `nzt-build-backend-dotnet-<name>` and this folder has
-`references/<name>.md`, that is what it means
-(`nzt-build-backend-dotnet-domain-ddd` → `references/domain-ddd.md`): read that file — it is
-not a skill.
-
-Wherever a file here names `nzt-build-tests`, `nzt-build-dependencies` or
-`nzt-build-secrets`, it means `../nzt-build/references/<name>.md`
-(`nzt-build-tests` → `../nzt-build/references/tests.md`): read that file — it is not a
-skill. If `nzt-build` already had you read it in this session, do not read it again. Likewise
-`nzt-build-csharp-<name>` means `../nzt-build-csharp/references/<name>.md`.
+| The work touches | Read |
+|---|---|
+| The operation and its orchestration | `references/use-cases.md` |
+| An operation's inputs and their validator | `references/validation.md` |
+| Anything returning `Result` | `references/results-pattern.md` |
+| API wiring: routing, binding, the pipeline | `references/api.md` |
+| An exception that can escape a use case, or the global handler | `references/exceptions.md` |
+| A value object — **only with *value objects yes*** | `references/domain-value-objects.md` |
+| A protected resource, a permission, suspected unauthorised access | `references/security.md` |
+| Test projects, doubles, running the suite | `references/testing.md` |
 
 ## EF Core
 
-Only when the stack selected EF Core as the ORM. **Read
-`../nzt-build/references/data-access.md` and then `references/ef-core.md` first, every time,
-whatever the row**: they carry the rules that hold for all of it — tracking, the context's
-lifetime, what never happens in a loop — and no row below repeats them. Then read the row's
-file **and every file in its *Read with* column**, the generic one first; a row read alone is
-half the guidance.
+Read `references/ef-core.md` first, every time: what holds for every operation lives there.
 
-| The operation | Read | Read with — also required |
+| The operation | Read |
+|---|---|
+| Reading: query shape, projection, execution | `references/ef-core-queries.md` |
+| A page of results | `references/ef-core-pagination.md`, after `references/ef-core-queries.md` |
+| Staging and saving changes, write conflicts | `references/ef-core-writes.md` |
+| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` |
+| `DbContext` configuration, entity mapping, relationships | `references/ef-core-mappings.md` |
+| Mapping an aggregate or a value object | `references/ef-core-domain.md` |
+| A schema change | `references/ef-core-migrations.md` |
+| An index or a uniqueness rule | `references/ef-core-indexes.md` |
+
+## Ship
+
+With `nzt-ship`. The SDK is the one `global.json` pins (without a pin, the highest
+`TargetFramework`'s, and proposing the pin is part of the unit). Nothing is upgraded to get
+a pass: that changes `tech.md`, with the user.
+
+| The unit is | Read | Read with |
 |---|---|---|
-| Reading data: query shape, projection, execution | `references/ef-core-queries.md` | `../nzt-build/references/data-queries.md` — first |
-| Returning a page of results — a page is a query | `references/ef-core-pagination.md` | `../nzt-build/references/data-pagination.md` — first; the *Reading data* row |
-| Staging and saving changes, write conflicts | `references/ef-core-writes.md` | `../nzt-build/references/data-writes.md` — first |
-| Updating or deleting many rows by criteria | `references/ef-core-bulk.md` | `../nzt-build/references/data-bulk.md` — first |
-| DbContext configuration, entity mapping, relationships | `references/ef-core-mappings.md` | `../nzt-build/references/data-mapping.md` — first |
-| Mapping an aggregate or a value object | `references/ef-core-domain.md` | `../nzt-build/references/data-mapping.md` — first |
-| A schema change that needs a migration | `references/ef-core-migrations.md` | `../nzt-build/references/data-migrations.md` — first |
-| An index, or a uniqueness rule to enforce | `references/ef-core-indexes.md` | `../nzt-build/references/data-indexes.md` — first |
-
-## Independent axes
-
-Getting these wrong reads references that contradict each other:
-
-- **Domain model and persistence are independent.** DDD does not imply repositories, and an
-  anemic model does not imply direct access.
-- **The Result pattern and how a Result reaches HTTP are two decisions.** The first is
-  whether use cases return `Result`; the second is what translates it, and only the second
-  is an exclusive axis.
-- **Validation and the domain are not alternatives.** Input validation runs before the use
-  case; an invariant lives in the model. A rule pushed to the wrong one of the two is
-  enforced twice or never.
+| Packaging the component as a container image | `references/ship-containers.md` | `nzt-ship`'s `references/release.md` |
+| Getting migrations into an environment | `references/ship-migrations.md` | `nzt-ship`'s `references/release.md` |
+| Writing or repairing the CI gates | `references/ship-pipeline.md` | `nzt-ship`'s `references/pipeline.md` |
+| Health checks, telemetry, structured logging | `references/ship-observability.md` | `nzt-ship`'s `references/observability.md` |
 
 ## Done when
 
-Every row read was selected by the stack document, never by preference, and no two of the
-same axis; the versions used came from the manifest, and any disagreement with the stack was
-reported.
+Every file read was selected by `tech.md` or by the task, never two of one axis, the
+versions used came from the project, and a disagreement with `tech.md` was reported.

@@ -1,25 +1,37 @@
-# Frontend practices — selection by stack axis
+---
+name: nzt-frontend
+description: Use when tech.md lists the frontend pack for the component, before writing or changing a screen, a component or a form - architecture, components, forms, rendering and performance, whatever the framework.
+---
 
-For a frontend component with no area router, as `nzt-build` sends it here.
-`frontend-stack.md` decides every row; paths are relative to `nzt-build`'s folder, and the
-file is read before acting on its row.
+# Frontend — what holds in any framework
 
-## Exclusive axes — read only what the stack selected
+Load `nzt-code` first. A framework pack (`nzt-blazor`…) reads the matching file here first
+and adds only how it is done there. What a screen looks like is `Docs/UX/design-system.md` and
+`Docs/UX/ui-components.md`, never this pack.
 
-| Axis | The stack says | Read | What it costs, when it is chosen |
+## Axes
+
+| Axis | Value | Read | What it costs |
 |---|---|---|---|
-| Architecture | `vertical-slice` | `references/frontend-architecture-vertical-slice.md` | one folder per feature, with its page and its typed client |
+| Architecture | `vertical-slice` | `references/architecture-vertical-slice.md` | one folder per feature, with its page and its typed client |
 
-A stack that names another concept for the frontend is a gap in the stack document: say so and
-resolve it there, do not improvise a layout.
+Another value in `tech.md` is a gap there: say so and settle it, never improvise a layout.
 
-## Rows the task selects
+## References
 
-| The work touches | Read |
-|---|---|
-| A component or a screen: inputs, events, loading, the typed client, the three states | `references/frontend-components.md` |
-| A form, its validation or its submission | `references/frontend-forms.md`, with `references/frontend-components.md` |
-| Where the component runs, prerendering, initial state transfer — when the work touches rendering | `references/frontend-rendering.md` |
-| Lists, grids, components repeated at scale, high-frequency events — after a measurement | `references/frontend-performance.md`, with `references/frontend-components.md` |
-| A DTO a typed client sends or receives, or its mapping | `references/code-dtos.md` |
-| A collection read, transformed or checked in memory | `references/code-collections.md` |
+| The work touches | Read | Read with |
+|---|---|---|
+| A component or screen: inputs, events, loading, the typed client, the three states | `references/components.md` | — |
+| A form, its validation or its submission | `references/forms.md` | `references/components.md` |
+| Where it runs, prerendering, initial state — only when the work changes rendering | `references/rendering.md` | — |
+| Lists, grids, repeated components, frequent events — after a measurement | `references/performance.md` | `references/components.md` |
+
+## Steps
+
+1. Read the design system and the component inventory before anything visual or shared.
+2. Read the axis row, then the rows the task selects.
+3. With a framework pack listed, read its matching file right after each one here.
+
+## Done when
+
+Every file read was selected by `tech.md` or by the task, and each file's checklist holds.
