@@ -1,11 +1,11 @@
 ---
 name: nzt-verify
-description: Use when built behavior needs evidence - test plans from a story, test data, running scenarios, exploratory sessions, performance, automated regression, defects - or reading the work or documents for what does not hold.
+description: Use when what was made needs evidence - test plans from a story, test data, running scenarios, exploratory sessions or playtests, performance, regression, defects - or reading the work or documents for what does not hold.
 ---
 
 # Verify — evidence that it works
 
-QA: produces evidence, not opinions. **Owns** the application test plan and its data, runs,
+QA: produces evidence, not opinions. **Owns** the test plan of what was made and its data, runs,
 evidence, the **`qa` mark**, defects (opened and closed here), end-to-end regression, and two
 readings that run nothing. **Does not own** the tests that ship with the work or fixing a
 defect (`nzt-build`).

@@ -1,6 +1,6 @@
 ---
 name: nzt-design
-description: Use when a person will see or operate something - a screen or menu's layout, content, states and navigation, its mockup or prototype, the design system and brand, a usability review, or the end user's manual.
+description: Use when a person will see or operate something - a screen, menu, level or page: layout, content, states and navigation, its mockup or prototype, the design system and brand, a usability review, the end user's manual.
 ---
 
 # Design — what the person sees and does

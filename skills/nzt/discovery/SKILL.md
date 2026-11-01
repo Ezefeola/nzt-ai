@@ -1,12 +1,12 @@
 ---
 name: nzt-discovery
-description: Use when what to build has to be established - functional analysis, the product definition, vocabulary, business rules, scope, feature specs, user stories, changing an existing feature, or specs derived from an existing product.
+description: Use when what to make and for whom has to be established - the product definition, vocabulary, rules, scope, feature specs, stories, changing an existing feature, or specs derived from an existing product.
 ---
 
-# Discovery — what the product does
+# Discovery — what it is and for whom
 
-Establishes **what** something is and **who** it is for, in business language, and writes it
-down. **Does not own** how it is solved (`nzt-architecture`), screens (`nzt-design`) or the work
+Establishes **what** something is and **who** it is for, in the words of the people it is for
+(customers, players, readers), and writes it down. **Does not own** how it is solved (`nzt-architecture`), screens (`nzt-design`) or the work
 (`nzt-build`): a spec naming a class, table, engine or package has drifted.
 
 ## References

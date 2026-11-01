@@ -1,9 +1,9 @@
 ---
 name: nzt-architecture
-description: Use when technical decisions come before the work: components and boundaries, choosing technologies and installing the project's packs, the domain model, how a feature is solved, integrations, decision records, debt, diagrams.
+description: Use when technical decisions come before the work: components and boundaries, choosing technologies, tools and the project's packs, the domain model, how a feature is solved, integrations, decision records, debt, diagrams.
 ---
 
-# Architecture — how it is built
+# Architecture — how it is made
 
 Decides **how** the product solves what discovery defined, records why, and sets up the
 project's packs. **Owns** components, technologies and packs (`Docs/Architecture/tech.md`),

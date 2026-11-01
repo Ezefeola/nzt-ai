@@ -27,7 +27,7 @@ artifact and never proposes a plan (that is `nzt-plan`).
    | A reported defect | Direct | Reproduce, fix, check |
    | A small change or chore | Direct | The work itself |
    | An improvement, or a feature of one or two stories that fits the current architecture | Standard | Analysis of that feature |
-   | A new product, three or more stories, a new component, a technology decision, several new screens | Full | Analysis, cut into slices |
+   | A new product, three or more stories, a new component, a technology decision, several new screens or levels | Full | Analysis, cut into slices |
    | "Put this project in order" with no `Plan/specs/` | Full | Reverse engineering, module by module |
 
    Direct: no plan, no state. Standard: one plan of phases, approved once. Full: slices.
@@ -36,10 +36,11 @@ artifact and never proposes a plan (that is `nzt-plan`).
 5. **Pick the phases** that change what gets built, in this order:
    - **analysis** (`nzt-discovery`) — the request names a product, a feature, users or rules;
    - **architecture** — new components, a technology choice, cross-component interaction;
-   - **design** (`nzt-design`) — a person will look at a screen that does not exist yet;
+   - **design** (`nzt-design`) — a person will see or operate something that does not exist
+     yet: a screen, a menu, a level, a page layout;
    - **build** — always, if the product changes;
    - **verify** — always, if behavior changes, after build finishes the slice;
-   - **ship** — the user asked for a release, a pipeline or a deploy.
+   - **ship** — the user asked for a release, a pipeline, a deploy or a publication.
 
    Say in one line why each skipped phase was skipped.
 6. **Hand off**, saying in one line the situation, size and phases:
