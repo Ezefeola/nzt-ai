@@ -50,6 +50,16 @@ parte de la idea inicial y se decide **cuánto** hay que hacer.
 - Lo que no se toca sin decidirlo: la definición de terminado (el tamaño recorta ceremonia,
   nunca lo que significa "hecho").
 
+**Estado (2026-11-01): pendiente, a refinar más adelante.** El usuario todavía no sabe cómo
+llevarla, y dejó dos restricciones que cualquier propuesta tiene que respetar:
+- **El control existe para cuidar el contexto**: los frenos evitan que el agente se compacte
+  y alucine. Aliviar la ceremonia no puede costar eso.
+- **Los documentos que guardan el "por qué" (specs y similares) son muy necesarios para un
+  agente**: son su contexto entre sesiones. Aliviar no puede significar dejar de escribirlos.
+
+Así que la discusión pendiente no es "menos fases o menos documentos", sino dónde está la
+ceremonia que **no** cuida el contexto ni guarda el "por qué".
+
 ## DB-02 · ¿El marco es agnóstico de verdad?
 
 **La duda.** Quedó global `nzt`, `nzt-discovery`, `nzt-architecture`, `nzt-ux`, `nzt-build`,
@@ -93,6 +103,12 @@ ship es "commits, PR, CI, deploy"; ux es "pantallas".
   usuario) por el marco y anotar dónde se rompe. Recomendado como primer paso: decide entre A
   y B con evidencia y no con supuestos.
 
+**Decidido (2026-11-01): A.** Se neutralizan las palabras —la tabla de ruteo del kernel y la
+descripción y los encabezados de cada router en términos de cualquier producto— y `nzt-ux`
+pasa a `nzt-design`. Los procedimientos de software se quedan donde están. Lo que hace falta:
+renombrar la carpeta y el `name`, re-apuntar cada mención (kernel, routers, referencias,
+agentes, evals, README, specs) y que el lint y los checks sigan en verde.
+
 ## DB-03 · ¿Cómo sabe qué MCP instalar? ¿Lista de NZT o investigación libre?
 
 **La duda.** ¿Los MCP son una lista general de NZT o los investiga la IA? En un juego de
@@ -127,6 +143,33 @@ en el ejemplo del usuario.
 - **B · Solo investigación:** flexible, como Claude solo; no se reproduce ni se verifica igual.
 - **C · Híbrido** (recomendado): catálogo primero, investigar si falta, instalar con el sí,
   anotar en `tech.md`. Sub-decisión: si `nzt-ai` registra MCP sueltos o no.
+
+**Decidido (2026-11-01): C, con un ajuste del usuario.** No es "investigar solo si falta":
+**siempre se hacen las dos cosas.**
+1. **Se mira el catálogo** (`nzt-ai project packs`) **y se investiga**, aunque haya un pack
+   que encaje: puede haber un MCP o una herramienta mejor, más nueva u oficial que la del pack.
+2. **Siempre gana la fuente de más confianza**, y se la nombra con fecha. Orden propuesto por
+   el agente (a confirmar): la documentación oficial del fabricante de la tecnología (Unity
+   para Unity, Microsoft para .NET) → el repositorio o la documentación del mantenedor del
+   MCP → terceros, marcados como tales y nunca como única fuente.
+3. Se propone lo del catálogo y lo investigado juntos, cada uno con su fuente, lo que trae y
+   lo que cuesta (permisos, qué instala en la máquina). Si lo investigado contradice al pack
+   (otra versión, otro comando), se dice.
+4. **Se instala solo con el sí**, en el proyecto, y queda anotado en `tech.md`.
+
+Sigue abierta la sub-decisión: si `nzt-ai project` registra los MCP que no vienen de un pack
+(para que `sync` los reproduzca) o si esos los maneja el proveedor y `nzt-ai` no los toca.
+
+## Unidades propuestas (sin aprobar)
+
+| Id | Qué | De |
+|---|---|---|
+| 425 | `nzt-ux` → `nzt-design`, con cada mención re-apuntada | DB-02 |
+| 426 | Tabla de ruteo del kernel y descripción y encabezados de los routers en términos de cualquier producto | DB-02 |
+| 427 | `nzt-architecture`'s `references/tech.md` (paso 4) y `nzt-research`: catálogo **e** investigación siempre, fuente de más confianza, propuesta conjunta, anotar en `tech.md` | DB-03 |
+| 428 | Evals: casos que nombran `nzt-ux`, y `routing/pack-setup` con la investigación además del catálogo (sin correrlos) | DB-02, DB-03 |
+
+La 424 (puertas) quedaría después, así verifica todo junto.
 
 ## Cómo seguir
 

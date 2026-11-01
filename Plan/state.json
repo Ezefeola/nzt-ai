@@ -37,10 +37,10 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": { "units": [], "keep_stops": [] },
-  "waiting_on": "Debate abierto DB-01 (fases y ceremonia), DB-02 (agnosticismo, ux o design) y DB-03 (MCP: catálogo o investigación) en Plan/mejoras/12-debate-marco.md; sin decidir. La 424 espera a que el usuario diga si va antes o después",
+  "waiting_on": "Aprobar las unidades 425-428 propuestas en Plan/mejoras/12-debate-marco.md (DB-02: ux a design y palabras neutrales; DB-03: catálogo e investigación siempre, fuente de más confianza) antes de la 424. DB-01 queda pendiente",
   "notes": [
     "Rama refactor-marco-generico desde main; traspaso del run (decisiones, mapeos de nombres) en Plan/mejoras/11-marco-generico.md; contenido viejo en git show a31db74:...",
-    "Debate DB-01..03 con postura del agente y opciones en Plan/mejoras/12-debate-marco.md: leerlo antes de seguir",
+    "Debate en Plan/mejoras/12-debate-marco.md: DB-02 = A, DB-03 = híbrido con catálogo e investigación siempre (2026-11-01); DB-01 pendiente, con las restricciones del usuario",
     "Versión 4.0.0 propuesta (cambian nombres de skills y el documento técnico); la decide el usuario"
   ]
 }
