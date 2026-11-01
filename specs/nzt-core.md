@@ -3076,6 +3076,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **QT-02, Claude Code y Codex:** skills en `.claude/skills/` o `.agents/skills/`, MCP en
     `.mcp.json` o en un bloque delimitado de `.codex/config.toml`. `.nzt/project.json`
     versiona qué se eligió y qué escribió `nzt-ai` (`specs/nzt-installer.md` sección 13).
+    **[modify] 2026-11-01: D89.** El registro pasa a `.claude/nzt.json` y `.agents/nzt.json`.
   - **QT-03, sin migración** desde los `<area>-stack-<componente>.md`: quien quiera, pide
     armar `tech.md` a partir de los viejos.
   - **QT-04, `Docs/Architecture/tech.md`:** una sección por componente con su `root`, sus
@@ -3121,8 +3122,14 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     cosa, en pocas palabras, nunca los pasos: el cómo vive en el pack o en la fuente citada.
     El eval `routing/tool-research` suma el grader `explained-for-a-newcomer` (433).
   - **QT-06, MCP que no vienen de un pack: A.** Queda en el archivo de MCP del proyecto
-    (`.mcp.json` o `.codex/config.toml`) y viaja con git; `nzt-ai` no lo registra en
-    `.nzt/project.json` ni lo toca.
+    (`.mcp.json` o `.codex/config.toml`) y viaja con git; `nzt-ai` no lo registra en su
+    registro ni lo toca.
+  - **El registro de `nzt-ai project`, en la carpeta del proveedor (437):** al probar 4.0.0 en
+    local el usuario no quiso una carpeta `.nzt/` más en la raíz. `.nzt/project.json` pasa a
+    `.claude/nzt.json` y `.agents/nzt.json`, el mismo en las dos, junto a las skills que
+    describe; uno viejo se lee y el próximo `add`, `remove` o `sync` lo mueve. Se descartó
+    sacarlo del todo: sin él, actualizar pisaría una skill de pack editada sin avisar y sacar
+    un pack no distinguiría los pedidos de los requeridos. Modifica D88 (QT-02).
   - **QT-07, carpetas de diseño (434):** `Docs/UX/` pasa a `Docs/Design/` y
     `Plan/specs/<feature>/ux-ui/` a `design/`, en `nzt-design`, `nzt-architecture`,
     `plan/close`, el pack `frontend` y el eval `design-mockup`. **Un proyecto que ya tiene las

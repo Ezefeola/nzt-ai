@@ -187,13 +187,13 @@ arma `tech.md`. A mano:
 nzt-ai project packs                      # los que hay, y cuáles tiene este proyecto
 nzt-ai project add dotnet ddd             # con lo que requieren; --provider codex o all
 nzt-ai project remove ddd
-nzt-ai project sync                       # reinstala lo que dice .nzt/project.json
+nzt-ai project sync                       # reinstala lo que dice .claude/nzt.json
 ```
 
 Las skills quedan en `.claude/skills/` (Codex: `.agents/skills/`) y los MCP en `.mcp.json`
 (Codex: un bloque delimitado en `.codex/config.toml`), sin pisar lo que ya tengas.
-`.nzt/project.json` anota qué se eligió y qué escribió `nzt-ai`: versionalo, y en otra
-máquina `nzt-ai project sync` deja lo mismo. Los MCP cargan en una sesión nueva. El menú del
+`.claude/nzt.json` (Codex: `.agents/nzt.json`) anota qué se eligió y qué escribió `nzt-ai`:
+versionalo, y en otra máquina `nzt-ai project sync` deja lo mismo. Los MCP cargan en una sesión nueva. El menú del
 instalador tiene la misma acción, *Preparar este proyecto*.
 
 **No es un plugin.** Son skills sueltas y un bloque de texto: nada que tengas que aprender a

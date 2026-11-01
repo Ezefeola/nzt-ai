@@ -543,13 +543,17 @@ con `{home}`, y `args`). Packs de QT-01: `code`, `backend`, `frontend`, `ddd`, `
 
 #### RN-proj-reconciliar · [add] · origin: D88
 `add`, `remove` y `sync` son una sola operación: del estado deseado —packs pedidos y
-proveedores— a lo que hay en disco, contra `.nzt/project.json`. Los requeridos se resuelven
+proveedores— a lo que hay en disco, contra el registro (RN-proj-archivo). Los requeridos se resuelven
 cada vez y en orden de dependencia; sacar un pack saca lo que ningún otro sigue requiriendo.
 
-#### RN-proj-archivo · [add] · origin: D88
-`.nzt/project.json` guarda `nztVersion`, los packs **pedidos**, los proveedores, cada archivo
-escrito (ruta relativa a la raíz y hash) y, por proveedor, los MCP que agregó `nzt-ai`. Se
-versiona con el repo; `sync` lo reproduce en otra máquina. Sin packs ni archivos, se borra.
+#### RN-proj-archivo · [modify] · origin: D88, D89
+El registro de `nzt-ai` guarda `nztVersion`, los packs **pedidos**, los proveedores, cada
+archivo escrito (ruta relativa a la raíz y hash) y, por proveedor, los MCP que agregó `nzt-ai`.
+Vive en la carpeta de cada proveedor elegido, junto a las skills que describe:
+`.claude/nzt.json` y `.agents/nzt.json`, el mismo en las dos; dejar un proveedor borra el suyo.
+Se versiona con el repo; `sync` lo reproduce en otra máquina. Sin packs ni archivos, se borra,
+y con él la carpeta del proveedor si queda vacía. Uno en `.nzt/project.json` (antes de D89) se
+lee, y el próximo guardado lo mueve y borra `.nzt/`.
 
 #### RN-proj-destinos · [add] · origin: D88, QT-02
 Claude Code: skills en `.claude/skills/`, MCP en `mcpServers` de `.mcp.json`. Codex: skills en
@@ -585,6 +589,13 @@ un MCP definido igual en todos los packs y ninguna skill de pack con nombre de g
 Una entrada por ciclo de cambio cerrado, la más nueva arriba. Va acá y no en
 `Docs/Product/history.md` porque este repo guarda sus documentos en `specs/` (como las specs de
 los mods).
+
+### 2026-11-01 · El registro de `nzt-ai project` va en la carpeta del proveedor
+Type:     modify
+Change:   `.nzt/project.json` pasa a `.claude/nzt.json` y `.agents/nzt.json`; uno viejo se lee y se mueve.
+Reason:   el usuario, al probar 4.0.0 en local: no quiere una carpeta `.nzt/` más en la raíz del proyecto.
+Impact:   RN-proj-archivo modificada · RN-proj-reconciliar sin cambio de regla
+Decision: D89 en `specs/nzt-core.md`.
 
 ### 2026-11-01 · Packs por proyecto con `nzt-ai project`
 Type:     add

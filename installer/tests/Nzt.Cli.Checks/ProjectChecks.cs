@@ -7,7 +7,7 @@ using Nzt.Cli.Project;
 namespace Nzt.Cli.Checks;
 
 /// <summary>
-/// `nzt-ai project`: packs, `.nzt/project.json` y los archivos de MCP de cada
+/// `nzt-ai project`: packs, su registro (`.claude/nzt.json`, `.agents/nzt.json`) y los archivos de MCP de cada
 /// proveedor, siempre sobre una carpeta de proyecto temporal.
 /// </summary>
 public static partial class Program
@@ -16,6 +16,8 @@ public static partial class Program
     {
         ResolveAddsWhatEachPackRequires();
         AddInstallsTheSkillsAndTheMcp();
+        MovesTheOldRecordIntoTheProviderFolder();
+        LeavesTheUsersClaudeFolder();
         IsSecondProjectApplyIdempotent();
         RemoveTakesOutOnlyWhatNoPackNeeds();
         RemovingEveryPackLeavesNothing();
@@ -67,6 +69,36 @@ public static partial class Program
         Check("project.json guarda rutas relativas",
             project?.Files.All(f => f.Path.StartsWith(".claude/skills/", StringComparison.Ordinal)) == true);
         Check("project.json anota el MCP como de nzt-ai", project?.McpOf("claude-code") is ["microsoft-learn"]);
+        Check("el registro va en la carpeta del proveedor, sin .nzt/",
+            File.Exists(Path.Combine(dir, ".claude", "nzt.json")) && !Directory.Exists(Path.Combine(dir, ".nzt")));
+    });
+
+    private static void MovesTheOldRecordIntoTheProviderFolder() => InTemp(dir =>
+    {
+        Apply(dir, ["code"]);
+        var legacy = Path.Combine(dir, ".nzt", "project.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(legacy)!);
+        File.Move(Path.Combine(dir, ".claude", "nzt.json"), legacy);
+
+        var result = Apply(dir, ["code"]);
+
+        Check("un registro viejo en .nzt/project.json se lee: sin conflictos", !result.Aborted
+            && result.Files.All(o => o.Action == FileAction.Unchanged));
+        Check("y se mueve a .claude/nzt.json, sin dejar .nzt/",
+            File.Exists(Path.Combine(dir, ".claude", "nzt.json")) && !Directory.Exists(Path.Combine(dir, ".nzt")));
+    });
+
+    private static void LeavesTheUsersClaudeFolder() => InTemp(dir =>
+    {
+        var settings = Path.Combine(dir, ".claude", "settings.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(settings)!);
+        File.WriteAllText(settings, "{}\n");
+
+        Apply(dir, ["code"]);
+        Apply(dir, []);
+
+        Check("sacar los packs saca el registro y deja lo del usuario en .claude/",
+            !File.Exists(Path.Combine(dir, ".claude", "nzt.json")) && File.ReadAllText(settings) == "{}\n");
     });
 
     private static void IsSecondProjectApplyIdempotent() => InTemp(dir =>
@@ -152,7 +184,7 @@ public static partial class Program
     private static void SyncRestoresWhatIsMissing() => InTemp(dir =>
     {
         Apply(dir, ["dotnet"]);
-        Directory.Delete(Path.Combine(dir, ".claude"), recursive: true);
+        Directory.Delete(Path.Combine(dir, ".claude", "skills"), recursive: true);
         File.Delete(Path.Combine(dir, ".mcp.json"));
 
         var project = ProjectFile.Load(dir)!;
@@ -260,6 +292,8 @@ public static partial class Program
             && File.Exists(Path.Combine(dir, ".agents", "skills", "nzt-dotnet", "SKILL.md"))
             && File.Exists(Path.Combine(dir, ".mcp.json"))
             && File.Exists(Path.Combine(dir, ".codex", "config.toml")));
+        Check("con los dos, el registro va en la carpeta de cada uno",
+            File.Exists(Path.Combine(dir, ".claude", "nzt.json")) && File.Exists(Path.Combine(dir, ".agents", "nzt.json")));
 
         Apply(dir, ["dotnet"], [ProjectTarget.Codex]);
         Check("dejar un proveedor saca sus skills y su MCP",

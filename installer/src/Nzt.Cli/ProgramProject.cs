@@ -45,7 +45,7 @@ public static partial class Program
                     [.. current.Packs.Where(p => !names.Contains(p, StringComparer.OrdinalIgnoreCase))],
                     TargetsOf(current), catalog, dryRun);
             case "sync":
-                if (current is null) return Fail($"No hay {ProjectFile.RelativePath} en {directory}: nada que sincronizar.");
+                if (current is null) return Fail($"No hay {ProjectFile.Locations} en {directory}: nada que sincronizar.");
                 return ProjectApply(directory, current.Packs, TargetsOf(current), catalog, dryRun);
             default:
                 return Fail($"Subcomando desconocido: project {subcommand}. Son packs, add, remove, sync y status.");

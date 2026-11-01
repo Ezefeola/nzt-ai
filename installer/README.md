@@ -40,7 +40,7 @@ Los mods son plugins de Claude Code que hacen visible lo que produce el método 
 como lo harías vos**: nunca copia archivos de un mod.
 
 | | Instalar | Desinstalar |
-|---|---|---|
+|---|---|---|---|
 | Sin `--mods` | solo el método, como siempre | el método y los mods que instaló este CLI |
 | `--mods all` | el método y los mods | lo mismo que sin `--mods` |
 | `--mods none` | solo el método | solo el método |
@@ -77,19 +77,20 @@ MCP. Corre sobre la carpeta actual, o la de `--dir`.
 | `project packs` | el catálogo, con lo que trae cada pack y cuáles tiene el proyecto |
 | `project add <pack>... [--provider claude-code\|codex\|all]` | los suma a los que ya tiene; sin `--provider`, los del proyecto o Claude Code |
 | `project remove <pack>...` | los saca, y con ellos lo que ningún otro pack sigue requiriendo |
-| `project sync` | reinstala lo que dice `.nzt/project.json`: en un clon nuevo, deja lo mismo |
+| `project sync` | reinstala lo que dice el registro del proyecto: en un clon nuevo, deja lo mismo |
 
 Todos aceptan `--dry-run`. Los tres que escriben son la misma operación: del estado deseado
 —packs y proveedores— a lo que hay en disco.
 
-| Proveedor | Skills | MCP |
-|---|---|---|
-| Claude Code | `.claude/skills/nzt-<pack>/` | `mcpServers` de `.mcp.json` |
-| Codex | `.agents/skills/nzt-<pack>/` | un bloque `# nzt:start` … `# nzt:end` en `.codex/config.toml`, que Codex lee solo si el proyecto es de confianza |
+| Proveedor | Skills | MCP | Registro |
+|---|---|---|---|
+| Claude Code | `.claude/skills/nzt-<pack>/` | `mcpServers` de `.mcp.json` | `.claude/nzt.json` |
+| Codex | `.agents/skills/nzt-<pack>/` | un bloque `# nzt:start` … `# nzt:end` en `.codex/config.toml`, que Codex lee solo si el proyecto es de confianza | `.agents/nzt.json` |
 
-- **`.nzt/project.json`** anota los packs pedidos (no los requeridos), los proveedores, cada
-  archivo escrito con su hash y los MCP que agregó `nzt-ai`. Las rutas son relativas:
-  versionalo.
+- **El registro** (`nzt.json` en la carpeta de cada proveedor, el mismo en las dos) anota los
+  packs pedidos (no los requeridos), los proveedores, cada archivo escrito con su hash y los
+  MCP que agregó `nzt-ai`. Las rutas son relativas: versionalo. Uno viejo en
+  `.nzt/project.json` se lee, y el próximo `add`, `remove` o `sync` lo mueve.
 - **Las mismas reglas que la instalación global:** con un archivo que `nzt-ai` no escribió
   no se escribe nada; uno editado se conserva al actualizar y al sacar el pack; lo que sale
   se borra con sus carpetas vacías.
@@ -184,7 +185,7 @@ Claude Code, versión vieja, falla parcial, mods instalados a mano, actualizar, 
 estado; y `project`: requires, agregar, sacar y sincronizar, archivo ajeno, pack desconocido,
 ediciones, simulación, MCP del usuario en `.mcp.json` y en `config.toml`, comando por
 plataforma, cambio de proveedor y el lint de packs. La validación de esta versión da
-`PASS: 235 installer checks`.
+`PASS: 240 installer checks`.
 
 Las comprobaciones no ejecutan conversaciones en los CLIs ni miden selección de skills. Eso
 es la suite de `evals/`.
@@ -195,7 +196,7 @@ es la suite de `evals/`.
 sección 10 de `specs/nzt-installer.md`):
 
 | | Windows (`irm … \| iex`) | macOS / Linux (`curl -fsSL … \| sh`) |
-|---|---|---|
+|---|---|---|---|
 | Claude Code | `releases/latest/download/install-claude.ps1` | `releases/latest/download/install-claude.sh` |
 | Claude Code, con los mods | `releases/latest/download/install-claude-full.ps1` | `releases/latest/download/install-claude-full.sh` |
 | Codex | `releases/latest/download/install-codex.ps1` | `releases/latest/download/install-codex.sh` |

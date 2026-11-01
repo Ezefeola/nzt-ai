@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-02T03:00:00Z",
+  "updated": "2026-11-02T04:00:00Z",
   "goal": "Preparación para trabajar: el agente propone y explica lo que necesita para el trabajo, como a alguien que no sabe; además Docs/Design/ (QT-07) y la versión 4.0.0 (QT-05)",
   "phases": [
     {
@@ -24,6 +24,13 @@
       "status": "done",
       "units": [
         { "id": 436, "do": "Versión 4.0.0 en el CLI y los builds, README e installer/README con sus cifras, y la decisión en specs/nzt-core.md (QT-05)", "status": "done", "detail": "4.0.0 en Nzt.Cli.csproj e install/build.sh y .ps1 (el CLI dice 'NZT installer 4.0.0'). README: párrafo de la preparación para trabajar y MCP fuera de un pack en el archivo del proyecto (QT-06); installer/README: versión y 235 checks. nzt-core.md: D89 (432-436, QT-05/06/07), [modify] en D47, D57, D76 y D88, sección 8 con Docs/Design/ y design/, y el estado actual de la sección 14. Sin tag ni release por decisión del usuario: lo prueba en local antes. Build 0 avisos, 235 checks, lint 0, state check ok" }
+      ]
+    },
+    {
+      "name": "build",
+      "status": "done",
+      "units": [
+        { "id": 437, "do": "El registro de nzt-ai project pasa de .nzt/project.json a la carpeta de cada proveedor (.claude/nzt.json, .agents/nzt.json); uno viejo se lee y se migra; checks, spec y READMEs", "status": "done", "detail": "Pedido y aprobado por el usuario (2026-11-01): no quiere una carpeta .nzt/ más en la raíz. ProjectTarget.RecordFile; ProjectFile lee .claude/nzt.json, .agents/nzt.json y el viejo .nzt/project.json, guarda en la carpeta de cada proveedor elegido y borra los demás (y su carpeta si queda vacía). 5 checks nuevos (240): registro en .claude, migración del viejo, .claude/ del usuario intacta, los dos proveedores; el de sync borra .claude/skills en vez de .claude (borrar .claude entero ahora borra el registro). nzt-installer.md RN-proj-archivo [modify] e historia; nzt-core.md D88 [modify] y D89; README, installer/README y scaffold pack-setup. Build 0 avisos, 240 checks, lint 0. Binario local reinstalado; sync sobre una copia de test movió .nzt/project.json a .claude/nzt.json con 84 archivos sin cambios" }
       ]
     }
   ],

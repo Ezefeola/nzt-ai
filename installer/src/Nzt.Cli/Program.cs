@@ -79,7 +79,7 @@ public static partial class Program
               nzt-ai project packs                      los packs que se pueden instalar
               nzt-ai project add <pack>... [--provider <id>] [--dry-run]
               nzt-ai project remove <pack>... [--dry-run]
-              nzt-ai project sync [--dry-run]           reinstala lo que dice .nzt/project.json
+              nzt-ai project sync [--dry-run]           reinstala lo que dice .claude/nzt.json (o .agents/nzt.json)
               (--dir <carpeta> elige otro proyecto que el de la carpeta actual)
 
             Proveedores: claude-code, codex, all

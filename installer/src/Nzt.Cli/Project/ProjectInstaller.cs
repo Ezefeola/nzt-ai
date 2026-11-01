@@ -20,7 +20,7 @@ public sealed record ProjectResult(
 /// Instala en un proyecto los packs que eligió: la skill de cada uno en la carpeta
 /// de skills del proveedor, y sus MCP en el archivo de MCP del proveedor. Todo
 /// sale de un estado deseado —packs y proveedores— y se reconcilia contra
-/// `.nzt/project.json`, así agregar, sacar y sincronizar son la misma operación.
+/// su registro (<see cref="ProjectFile"/>), así agregar, sacar y sincronizar son la misma operación.
 /// Como el instalador global, nunca pisa un archivo que no escribió él.
 /// </summary>
 public static class ProjectInstaller
