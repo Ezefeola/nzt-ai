@@ -23,7 +23,7 @@ usability and accessibility reviews, and **the end user's manual**. **Does not o
 
 ## Steps
 
-1. Read the story and its criteria, `Docs/UX/design-system.md` and `Docs/UX/ui-components.md`.
+1. Read the story and its criteria, `Docs/Design/design-system.md` and `Docs/Design/ui-components.md`.
 2. Do one unit: one screen, one mockup, one review, one system document. The manual is
    several units (shell, one chapter per task, a coherence pass): **load `nzt-plan` with
    it**; the first reply is that plan.
@@ -35,12 +35,14 @@ is no interface. A request for the manual is this phase's work even then.
 
 ## Where it lands
 
-- A screen design, with its mockup beside it → `Plan/specs/<feature>/ux-ui/`
+- A screen design, with its mockup beside it → `Plan/specs/<feature>/design/`
 - A prototype → `Plan/prototype/<slug>.html`; afterwards deleted or kept in
-  `Docs/UX/prototype/` and maintained, as the user decides
-- `Docs/UX/design-system.md` · `Docs/UX/ui-components.md`
+  `Docs/Design/prototype/` and maintained, as the user decides
+- `Docs/Design/design-system.md` · `Docs/Design/ui-components.md`
 - The manual, one file per audience → `Docs/Manual/<audience>.html`, images in
   `Docs/Manual/assets/`
+- A project that already has `Docs/UX/` or `Plan/specs/<feature>/ux-ui/` is read and written
+  there until the user moves them; never both.
 
 ## Rules
 

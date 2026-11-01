@@ -1,7 +1,7 @@
 # Design system and shared components
 
-Produces, one per unit, `Docs/UX/design-system.md` (direction, brand, voice, roles — stable)
-and `Docs/UX/ui-components.md` (shared inventory — changes often).
+Produces, one per unit, `Docs/Design/design-system.md` (direction, brand, voice, roles — stable)
+and `Docs/Design/ui-components.md` (shared inventory — changes often).
 
 ## The document names; the theme defines
 

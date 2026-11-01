@@ -4,8 +4,8 @@
 set -euo pipefail
 bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../_fixtures/project.sh" "$PWD"
 
-mkdir -p "$PWD/Plan/specs/F-001-pedidos/ux-ui"
-cat > "$PWD/Plan/specs/F-001-pedidos/ux-ui/screen-historial.md" <<'MD'
+mkdir -p "$PWD/Plan/specs/F-001-pedidos/design"
+cat > "$PWD/Plan/specs/F-001-pedidos/design/screen-historial.md" <<'MD'
 ---
 update-when: cambia US-012 o el design system
 ---

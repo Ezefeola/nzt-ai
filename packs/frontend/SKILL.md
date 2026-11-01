@@ -6,8 +6,8 @@ description: Use when tech.md lists the frontend pack for the component, before 
 # Frontend — what holds in any framework
 
 Load `nzt-code` first. A framework pack (`nzt-blazor`…) reads the matching file here first
-and adds only how it is done there. What a screen looks like is `Docs/UX/design-system.md` and
-`Docs/UX/ui-components.md`, never this pack.
+and adds only how it is done there. What a screen looks like is `Docs/Design/design-system.md` and
+`Docs/Design/ui-components.md`, never this pack.
 
 ## Axes
 

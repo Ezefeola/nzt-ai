@@ -34,7 +34,7 @@ beside their tests and `Docs/`.
    folder, the pages and the route. Every screen of the section sits at the feature level,
    sharing its client and components.
 3. **No feature references another.** Shared moves up — a component to the root
-   `Components/` (recorded in `Docs/UX/ui-components.md`), state to `State/` — or is **written
+   `Components/` (recorded in `Docs/Design/ui-components.md`), state to `State/` — or is **written
    twice**: the duplicate is cheap, a shared component growing optional parameters is not.
 4. **One typed client per feature, in its folder, never shared**, even when two features call
    the same API: the second caller wants another shape. Its DTOs stay with it.

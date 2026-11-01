@@ -5,8 +5,8 @@ through a typed client and never decides a business rule. A form adds `forms.md`
 
 ## Steps
 
-1. **Read the UI documents**: `Docs/UX/design-system.md` (look, states, wording) and
-   `Docs/UX/ui-components.md` before a shared component. Reuse the component library
+1. **Read the UI documents**: `Docs/Design/design-system.md` (look, states, wording) and
+   `Docs/Design/ui-components.md` before a shared component. Reuse the component library
    `tech.md` adopted before writing a custom one.
 2. **Write it** by the rules below: file and type named after it; where the code sits (in the
    file or beside it) is `tech.md`'s, never a line count; order declarations → markup → code

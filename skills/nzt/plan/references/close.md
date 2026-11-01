@@ -32,7 +32,7 @@ Anything missing is named and the close stops.
    | a technology, version, package, area, pack or opt-in | `Docs/Architecture/tech.md` |
    | an expensive-to-reverse decision | `Docs/Architecture/adr/` |
    | objectives, users, modules or scope | `Docs/Product/product.md` |
-   | a screen, shared component or visual role | the UX documents |
+   | a screen, shared component or visual role | the design documents |
    | what the end user does, if the manual exists | `Docs/Manual/` (never created at a close) |
    | environments, pipeline, rollback | `Docs/Operations/deployment.md` |
    | work found and left | `Docs/Architecture/tech-debt.md` |

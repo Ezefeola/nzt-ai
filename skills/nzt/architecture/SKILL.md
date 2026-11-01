@@ -59,8 +59,8 @@ before its work is touched.
 
 ## Where it lands
 
-`Docs/` has one folder per subject: `Product/`, `Domain/`, `Architecture/`, `UX/`,
-`Operations/`, `Manual/`.
+`Docs/` has one folder per subject: `Product/`, `Domain/`, `Architecture/`, `Design/`,
+`Operations/`, `Manual/`. A project that already has `UX/` keeps it until the user moves it.
 
 - Components, boundaries, external systems → `Docs/Architecture/architecture.md`
 - Technologies, packs, decisions, opt-ins, dependencies and agent tools per component →

@@ -1,6 +1,6 @@
 # Mockup and prototype
 
-Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.html` beside its screen design — **only
+Produces `Plan/specs/<feature>/design/screen-<slug>.html` beside its screen design — **only
 when the user asked** — as something to look at, never code to copy. A **prototype** is the
 same kind of file used to learn before delivery 1 is built.
 
@@ -34,7 +34,7 @@ same kind of file used to learn before delivery 1 is built.
 - **It never becomes production code.**
 - When it has taught: what people did and said goes into `Docs/Product/analysis.md` as the
   answer to its `Q-NN`. Then the user decides: **delete it**, or **keep it** in
-  `Docs/UX/prototype/<slug>.html` and maintain it with its rules and screens.
+  `Docs/Design/prototype/<slug>.html` and maintain it with its rules and screens.
 
 ## Rules
 

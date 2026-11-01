@@ -1,6 +1,6 @@
 # Screen design
 
-Produces `Plan/specs/<feature>/ux-ui/screen-<slug>.md`: one screen (or menu, HUD, page)
+Produces `Plan/specs/<feature>/design/screen-<slug>.md`: one screen (or menu, HUD, page)
 described well enough to build and review, traceable to its criteria.
 
 ## Steps — each constrains the next
