@@ -16,31 +16,34 @@ artifact and never proposes a plan (that is `nzt-plan`).
    - `approved: false` → show that plan again instead of writing a new one;
    - `waiting_on` set → say what it waits on first.
 2. **Read the ground** (only without state): one cheap pass over top-level entries, `Docs/`,
-   `Plan/specs/`, README and manifest files. Not the source tree. Never classify by the
-   project's name.
+   `Plan/specs/`, the README and the files that declare what it is made of (manifests,
+   configuration) — not the work itself. Never classify by the project's name.
 3. **Route out** two kinds of request: learning a skill ("teach me", or continuing a topic in
    `Learn/`) → load `nzt-learn`; a question that is not work → answer it, NZT does not apply.
 4. **Size it** by what the work touches, never by how it was phrased:
 
    | The request | Size | Starts at |
    |---|---|---|
-   | A reported defect | Direct | Reproduce, fix, check |
-   | A small change or chore | Direct | The work itself |
-   | An improvement, or a feature of one or two stories that fits the current architecture | Standard | Analysis of that feature |
-   | A new product, three or more stories, a new component, a technology decision, several new screens or levels | Full | Analysis, cut into slices |
-   | "Put this project in order" with no `Plan/specs/` | Full | Reverse engineering, module by module |
+   | What changes | Size | Starts at |
+   |---|---|---|
+   | Something that exists is corrected or adjusted; what was agreed stays as it is | Direct | Reproducing what fails, or the change itself |
+   | Behavior is added or changed within the current structure, in one or two stories | Standard | Analysis of that change |
+   | Something new end to end, the structure (a new part or technology), or three or more stories | Full | Analysis, cut into slices |
+   | Existing work has no `Plan/specs/` and has to be put in order | Full | Reconstructing what it does, part by part |
 
-   Direct: no plan, no state. Standard: one plan of phases, approved once. Full: slices.
+   Standard: one plan of phases, approved once. Full: slices.
    In doubt, the lighter size; when the work outgrows it, say so and propose the next.
    Size cuts ceremony, never the definition of done.
-5. **Pick the phases** that change what gets built, in this order:
-   - **analysis** (`nzt-discovery`) — the request names a product, a feature, users or rules;
-   - **architecture** — new components, a technology choice, cross-component interaction;
-   - **design** (`nzt-design`) — a person will see or operate something that does not exist
-     yet: a screen, a menu, a level, a page layout;
-   - **build** — always, if the product changes;
-   - **verify** — always, if behavior changes, after build finishes the slice;
-   - **ship** — the user asked for a release, a pipeline, a deploy or a publication.
+5. **Pick the phases whose question is still open**, in this order:
+   - **analysis** (`nzt-discovery`) — what it must do, or for whom, is not agreed yet, or
+     changes;
+   - **architecture** — how it is made is not decided yet: a new part, a new technology or
+     tool, or parts that start depending on each other;
+   - **design** (`nzt-design`) — someone will perceive or operate something whose form is not
+     decided yet;
+   - **build** — always, if the work product changes;
+   - **verify** — always, if what it does changes;
+   - **ship** — the user asked for the work to reach other people.
 
    Say in one line why each skipped phase was skipped.
 6. **Hand off**, saying in one line the situation, size and phases:
