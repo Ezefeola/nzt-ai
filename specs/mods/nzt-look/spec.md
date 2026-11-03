@@ -29,7 +29,8 @@
 > en una banda de acento con Copiar al final, y anchos de columna enteros (uno decimal hacía
 > volver la tabla al dibujo de Claude Code) · **0.8.2 (2026-11-01):** *Copiar* de las tablas del
 > escritorio sale de la banda a una fila propia arriba, con `tabla · N filas`, como en el código
-> (QT-21) ·
+> (QT-21) · **0.8.3 (2026-11-03):** ninguna columna de las tablas del escritorio queda más angosta
+> que su palabra más larga, que antes se pisaba con la columna de al lado ·
 > Reemplaza a
 > `nzt-context`, ya retirado del repo y del marketplace (M4 de `specs/nzt-mods.md`, unidades 225 y
 > 226). Las reglas `RN-ctx-*` que se citan como origen están en su spec, que se lee en el tag
