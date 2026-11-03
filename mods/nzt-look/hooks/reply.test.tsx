@@ -2,7 +2,7 @@ import { expect, test } from 'claude-code/testing'
 
 import { segmentsOf } from './markdown'
 import { paletteOf } from './prefs'
-import { bandOf, fitColumns, sharesOf, wrapCell } from './reply'
+import { bandOf, fitColumns, longestWord, sharesOf, wrapCell } from './reply'
 import { start, world } from './world.test-kit'
 import type { Engine } from './world.test-kit'
 
@@ -110,6 +110,20 @@ test('each column takes a share of the row by its longest text, a short one at l
   expect(sharesOf([3, 70])).toEqual([13, 87])
   expect(sharesOf([10, 10])).toEqual([50, 50])
   expect(sharesOf([6, 13])).toEqual([32, 68])
+})
+
+test('a short column next to long ones is never narrower than its longest word, so it does not spill', async () => {
+  // Herramienta | Precio | Lo puedo manejar con | Puntos fuertes | Limitaciones: the first column used to get 6%.
+  const shares = sharesOf([11, 80, 120, 200, 150], [11, 9, 13, 22, 11])
+  expect(shares[0]).toBeGreaterThanOrEqual(17)
+  expect(shares[3]).toBeGreaterThanOrEqual(30)
+  expect(shares.reduce((sum, share) => sum + share, 0)).toBe(100)
+  expect(shares.every(Number.isInteger)).toBe(true)
+})
+
+test('the longest word of a cell counts characters, not bytes', async () => {
+  expect(longestWord('USD 19,99. También se puede')).toBe(7)
+  expect(longestWord('')).toBe(0)
 })
 
 test('a table past 14 rows folds, and ▾ shows the rest', async ($, on) => {

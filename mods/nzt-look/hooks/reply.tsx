@@ -91,11 +91,45 @@ const WIDEST_SHARE = 40
  * column keeps its words on one line, a long one takes what is left and wraps. Whole, because
  * the desktop refuses a width like `31.6%` and the whole table falls back to Claude Code's.
  */
-export const sharesOf = (sizes: readonly number[]): number[] => {
+export const sharesOf = (sizes: readonly number[], words: readonly number[] = []): number[] => {
   const asked = sizes.map(size => Math.min(Math.max(size, MIN_COLUMN), WIDEST_SHARE))
   const total = asked.reduce((sum, size) => sum + size, 0)
-  return asked.map(size => Math.round((size / total) * 100))
+  const shares = asked.map(size => (size / total) * 100)
+  // The desktop does not break a word: a column narrower than its longest one spills it over the
+  // next column. Each column gets at least that word and its padding, out of the longer columns.
+  // Floors that add up past the row shrink together, so the row stays whole.
+  const needs = sizes.map((_, i) => (((words[i] ?? 0) + CELL_PADDING) / NARROW_ROW) * 100)
+  const needed = needs.reduce((sum, need) => sum + need, 0)
+  const floors = needs.map(need => (needed > 100 ? (need / needed) * 100 : need))
+  const raised = new Set<number>()
+  for (let pass = 0; pass < sizes.length; pass++) {
+    const short = shares.findIndex((share, i) => !raised.has(i) && share < floors[i]!)
+    if (short === -1) break
+    raised.add(short)
+    const given = floors[short]! - shares[short]!
+    shares[short] = floors[short]!
+    const above = shares.map((share, i) => (raised.has(i) ? 0 : Math.max(0, share - floors[i]!)))
+    const spare = above.reduce((sum, value) => sum + value, 0)
+    if (spare > 0) shares.forEach((_, i) => (shares[i]! -= above[i]! * Math.min(1, given / spare)))
+  }
+  return wholeOf(shares)
 }
+
+/** Whole percents that keep the sum of the fractions: the remainder goes to the largest fractions. */
+const wholeOf = (shares: readonly number[]): number[] => {
+  const whole = shares.map(Math.floor)
+  const left = Math.round(shares.reduce((sum, share) => sum + share, 0)) - whole.reduce((sum, share) => sum + share, 0)
+  const byFraction = shares.map((share, i) => [share - Math.floor(share), i] as const).sort((a, b) => b[0] - a[0])
+  for (let k = 0; k < left && k < byFraction.length; k++) whole[byFraction[k]![1]]!++
+  return whole
+}
+
+/** The longest word in a text, in characters: the narrowest a desktop cell can be without spilling. */
+export const longestWord = (text: string) => Math.max(0, ...text.split(/\s+/).map(width))
+
+/** A desktop cell's side padding, in characters, and the narrowest row a reply is read in. */
+const CELL_PADDING = 4
+const NARROW_ROW = 80
 
 const JUSTIFY = { left: 'flex-start', right: 'flex-end', center: 'center' } as const
 
@@ -126,7 +160,10 @@ const drawDesktopTable = ({ Box, Text, Button }: ReplyElements, segment: Segment
   const { palette, t } = ctx
   const header = segment.header.map(plainOf)
   const rows = segment.rows.map(row => header.map((_, i) => plainOf(row[i] ?? '')))
-  const shares = sharesOf(header.map((cell, i) => Math.max(width(cell), ...rows.map(row => width(row[i]!)))))
+  const shares = sharesOf(
+    header.map((cell, i) => Math.max(width(cell), ...rows.map(row => width(row[i]!)))),
+    header.map((cell, i) => Math.max(longestWord(cell), ...rows.map(row => longestWord(row[i]!)))),
+  )
   const isFolded = ctx.canFold && rows.length > TABLE_FOLD && !ctx.isUnfolded(index)
   const shown = isFolded ? rows.slice(0, TABLE_FOLD) : rows
   const canFoldThis = ctx.canFold && rows.length > TABLE_FOLD
