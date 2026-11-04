@@ -1,53 +1,148 @@
 {
-  "version": 1,
-  "updated": "2026-11-03T15:00:00Z",
-  "goal": "Mejoras de nzt-look en la rama nzt-look-tablas: arreglo de tablas en el escritorio y las mejoras que el usuario sume",
-  "phases": [
+  "version": 2,
+  "updated": "2026-11-04T23:00:00Z",
+  "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
+  "cadence": "upfront",
+  "slices": [
     {
-      "name": "build",
+      "id": "S1",
+      "name": "Qué hace el plugin y cómo se arma",
       "status": "done",
-      "units": [
+      "phases": [
         {
-          "id": 458,
-          "do": "Tablas del escritorio: ninguna columna más angosta que su palabra más larga (el texto se pisaba con la columna de al lado)",
+          "name": "discovery",
           "status": "done",
-          "detail": "mods/nzt-look/hooks/reply.tsx: sharesOf recibe la palabra más larga de cada columna y le da un piso de (palabra + 4) / 80 del ancho, sacado de las columnas largas; si los pisos suman más de 100 se achican juntos; los % son enteros y suman 100 (wholeOf). longestWord exportada. 2 tests nuevos en reply.test.tsx; claude plugin test mods/nzt-look: 230 pass. Supuesto: fila mínima de 80 caracteres. No probado en la app"
+          "units": [
+            {
+              "id": 461,
+              "do": "Verificar en las fuentes y anotar como hechos en specs/nzt-core.md lo que el diseño supone: plugins de Codex (skills, scripts, AGENTS.md) y, en Claude Code, disable-model-invocation, ${CLAUDE_PLUGIN_ROOT} en skills y choque de nombres",
+              "status": "done",
+              "detail": "Hechos C7 (Claude Code) y C8 (Codex) en specs/nzt-core.md sección 3. Claude Code: todo lo que el diseño supone está documentado. Codex: el plugin trae skills pero no AGENTS.md, los hooks no corren sin revisión del usuario, y cómo llega una skill a su script y con qué nombre se invoca quedan sin verificar (prueba contra Codex 0.164.0)"
+            },
+            {
+              "id": 462,
+              "do": "Spec del plugin en specs/nzt-plugin.md: setup global o de proyecto, aviso de versión, desinstalación, convivencia con el instalador y lo que queda afuera",
+              "status": "done",
+              "detail": "specs/nzt-plugin.md: reglas RN-plugin-*, historias, Q-01 a Q-08 contestadas el 2026-11-04 (solo Claude Code; global o CLAUDE.md del proyecto; una sola skill de setup que instala y quita; se frena ante nzt-ai; avisa la versión; guarda en el kernel). Q-09 se contestó en la 464"
+            }
+          ]
+        },
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 463,
+              "do": "D91 en specs/nzt-core.md: revisa D24, NZT también se distribuye como plugin con skill de setup",
+              "status": "done",
+              "detail": "D91 en specs/nzt-core.md sección 12, aceptada por el usuario: cinco opciones con su costo, lo que se acepta y cómo revertirla. D24 marcada como revisada por D91; las menciones de 'no se distribuye como plugin' en nzt-core (C5 y sección 9) y nzt-installer §1 corregidas. README sin tocar hasta publicar"
+            },
+            {
+              "id": 464,
+              "do": "Diseño técnico en specs/nzt-plugin.md: variante del build con nombres nzt:, script de setup .ps1 y .sh, hook de versión y chequeo byte a byte del bloque",
+              "status": "done",
+              "detail": "Sección 'Diseño técnico' de specs/nzt-plugin.md y registro QT-96 a QT-104, modo propuestas. Usuario: rama plugin (QT-96), una línea del adaptador traduce nombres (QT-97), Q-09 avisa y aplica uno (suma RN-plugin-dos-bloques y US-007). Sin verificar: QT-98 (hook igual en los tres sistemas) y QT-103 (subagente que precarga nzt:nzt-research)"
+            }
+          ]
         }
       ]
     },
     {
-      "name": "verify",
-      "status": "doing",
-      "units": [
+      "id": "S2",
+      "name": "El plugin funcionando en Claude Code, con evals",
+      "status": "done",
+      "phases": [
         {
-          "id": 459,
-          "do": "Probar en la app, con el mod cargado desde el repo, una tabla de 5 columnas con una corta (como Herramienta | Precio | ...)",
-          "status": "todo"
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 465,
+              "do": "Prueba contra Claude Code 2.1.312 que cierra QT-98 (hook igual en Windows con y sin Git Bash, macOS y Linux) y QT-103 (subagente que precarga una skill nzt:)",
+              "status": "done",
+              "detail": "Prueba en Windows anotada en specs/nzt-plugin.md (registro, prueba de la 465). QT-103 observado: el agente precarga nzt: sin problema. QT-98, usuario: la línea doble powershell ... -File check.ps1 || sh check.sh; sin aviso en Windows sin Git Bash ni PowerShell 7"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 466,
+              "do": "Build: adaptador del plugin, kernel/CLAUDE.md con la línea nzt:plugin, chequeo byte a byte del kernel, subagentes y versión en dist/plugin",
+              "status": "done",
+              "detail": "core/adapter-claude-plugin.md (guarda, nombres nzt: salvo packs del proyecto); build.sh y build.ps1 arman kernel/CLAUDE.md con nzt:plugin <versión del csproj>, comparan su kernel con dist/CLAUDE.md, copian plugin/ y los subagentes con skills: nzt:nzt-research. Las dos salidas iguales salvo el CRLF previo de plugin.json en ps1"
+            },
+            {
+              "id": 467,
+              "do": "Scripts setup.ps1 y setup.sh (status, install, remove) con sus pruebas sobre los mismos casos",
+              "status": "done",
+              "detail": "plugin/skills/setup/scripts/setup.sh y setup.ps1 (5.1 y 7); plugin/tests/setup.test.sh: 18 casos, 54/54 en sh, pwsh y powershell en Windows. QT-105: actualizar un bloque editado también pide --force-edited. Sin probar en macOS y Linux reales"
+            },
+            {
+              "id": 468,
+              "do": "Skill /nzt:setup que pregunta, simula, confirma con No marcado y corre los scripts",
+              "status": "done",
+              "detail": "plugin/skills/setup/SKILL.md: status, pregunta acción y alcance, --dry-run, confirma con No primero, aplica; los frenos los decide el script. El build la valida y claude plugin validate 2.1.312 pasa (avisa README e ícono: van en la 472). Sin probar en vivo: que allowed-tools evite el pedido de permiso (471)"
+            },
+            {
+              "id": 469,
+              "do": "Hook SessionStart check (versión vieja y dos bloques) con sus pruebas",
+              "status": "done",
+              "detail": "plugin/hooks/hooks.json (línea doble de QT-98), check.sh y check.ps1; plugin/tests/check.test.sh: 11 casos, 33/33 en sh, pwsh y powershell, y fallan al romper el script a propósito. La línea real corre con 0 contra dist/plugin. Sin verificar: que systemMessage de SessionStart se vea (471)"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 470,
+              "do": "Evals: traducción de nombres nzt:, guarda sin el plugin y que /nzt:setup no se dispare solo",
+              "status": "done",
+              "detail": "evals/plugin: names, guard, setup-unasked, fixture plugin-block.sh, el build copia CLAUDE.plugin.md. Calibración de una corrida, US$1,00: names 1.00, setup-unasked 1.00, guard 1.00 con plugin y 0.67 sin él (avisa bien, pero responde con la forma de NZT). Anotado en evals/README.md. QT-106 (usuario, A): sin plugin cuenta avisar y no correr el ciclo; criterio de guard reescrito, sin volver a correr"
+            },
+            {
+              "id": 471,
+              "do": "Prueba en vivo con --plugin-dir: instalar global y en un proyecto, frenos, aviso de versión, dos bloques y quitar",
+              "status": "done",
+              "detail": "Preparado: build al día, nzt-ai desinstalado por el usuario (sin CLAUDE.md global, sin manifiesto, sin CLI), carpeta de prueba en el scratchpad (prueba-plugin/proyecto con un CLAUDE.md propio). Ronda 1 corrida por el usuario: bloque instalado en el proyecto, su texto intacto debajo, registro en plugins/data/nzt-inline. De ahí salieron QT-107 (sin copias: sacadas de setup.sh/ps1, tests 54/54, spec y SKILL) y QT-108 (No primero sin marca). Sin pedido de permiso y hook callado al reabrir (anotado en la spec). Ronda 2 corrida y anotada en la spec: aviso de versión visible, freno por editado, un solo NZT, aviso de dos bloques, quitar el del proyecto idéntico al original. Quitar el global no corrió en vivo (falló el clasificador del modo automático); verificado sobre una copia, y el agente borró a pedido del usuario el ~/.claude/CLAUDE.md de prueba (idéntico al bloque). Sin aclarar: si allowed-tools evita el clasificador del modo automático. nzt-ai sigue desinstalado. El freno por nzt-ai presente queda cubierto solo por plugin/tests"
+            }
+          ]
         }
       ]
     },
     {
-      "name": "ship",
-      "status": "done",
-      "units": [
+      "id": "S3",
+      "name": "Publicación",
+      "status": "todo",
+      "phases": [
         {
-          "id": 460,
-          "do": "Subir la versión de nzt-look (hoy 0.8.2), commit y PR de la rama nzt-look-tablas, cuando el usuario lo pida",
-          "status": "done",
-          "detail": "nzt-look 0.8.3 (plugin.json, README, spec y specs/nzt-mods.md); 230 tests pass; commit y push de nzt-look-tablas para que el usuario arme el PR. Hecho antes de la 459 por pedido del usuario (QT-01)"
+          "name": "ship",
+          "status": "todo",
+          "units": [
+            {
+              "id": 472,
+              "do": "Workflow de release a la rama plugin, entrada nzt en el marketplace, README y versión de NZT",
+              "status": "todo"
+            }
+          ]
         }
       ]
     }
   ],
-  "approved": false,
+  "approved": true,
   "delegation": "ask",
   "autonomy": {
     "units": [],
     "keep_stops": []
   },
-  "waiting_on": "Que el usuario arme y mergee el PR de nzt-look-tablas; la 459 (probar en la app) sigue pendiente. Lo próximo es otra rama, nzt-plugin-for-claude, desde main",
+  "waiting_on": null,
   "notes": [
-    "Rama nzt-look-tablas: los cambios se commitearon y pushearon el 2026-11-03 (QT-01: commit + versión + push sin probar en la app)",
-    "El run anterior (refactor, unidades 438-457, D90) se mergeó en el PR #11"
+    "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
+    "Nada commiteado en la rama nzt-plugin-for-claude: specs (core, installer, plugin), core/adapter-claude-plugin.md, install/build.*, plugin/ y este archivo",
+    "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente"
   ]
 }

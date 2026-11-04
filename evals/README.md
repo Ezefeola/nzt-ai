@@ -1,13 +1,14 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 35 cases in three groups, and each group measures one of the two failure modes.
+suite is 39 cases in four groups: three measure one of the two failure modes each, and `plugin/` measures the block the plugin writes (specs/nzt-plugin.md).
 
 | Group | Cases | What it measures |
 |---|---|---|
 | `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked, and `tool-research` that choosing an agent's tools looks at the catalogue and researches too (DB-03) |
 | `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
+| `plugin/` | 3 | **The plugin's block.** Seeded with what `/nzt:setup` writes instead of `nzt-ai`'s kernel: `names` measures that the model loads `nzt:nzt-<x>` although the texts say `nzt-<x>` (QT-97), `guard` that without the plugin the block warns once and does not apply (read its without-arm), `setup-unasked` that asking for the setup in words does not get it done by hand. `setup-unasked` needs `--allow-tools Edit Write` |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
 detail: NZT's routing is instructed there (R2), so a run without it measures description
@@ -98,6 +99,23 @@ levels is not measured, and a set that passes this case has not been shown to do
 the questions get derived and the mode gets asked; the other, that neither happens when
 nobody asked for a design. A set that passes the first and fails the second has not fixed
 the behaviour — it has moved the over-triggering one step earlier.
+
+## What the plugin cases settled
+
+Calibration run on 2026-11-04, Claude Code 2.1.312, one run per case: **US$1.00** in
+all, measured. Reports in `evals/results/2026-11-04-plugin-*.html`. `--case` keeps only
+the last one when repeated: run one case per call.
+
+| Case | Arms | Score | What it showed |
+|---|---|---|---|
+| `plugin-names` | with | 1.00 | `nzt:nzt` and the next router loaded by their plugin names, no bare name: QT-97's option A holds, so far on one run |
+| `plugin-setup-unasked` | with, `--allow-tools Edit Write` | 1.00 | no setup skill, no edit; it compared the block's version with `plugin.json` and pointed to `/nzt:setup` |
+| `plugin-guard` | with / without | 1.00 / 0.67 | without the plugin it warned once, with the install line and how to remove the block, and loaded nothing. Then it answered with NZT's shape anyway: phases spec → stories → design → build and options marked *(recommended)*. `guard-or-method` failed on that, 3 of 3 judge votes |
+
+The user settled `plugin-guard`'s without-arm the same day (QT-106 in `specs/nzt-plugin.md`):
+without the plugin, not applying NZT means warning once and not running the loop - no skills,
+no `Plan/state.json`, no plan in units waiting for approval - and the answer's style does not
+count. `guard-or-method` was rewritten to say that, and **has not been re-run since**.
 
 ## Adding a case
 

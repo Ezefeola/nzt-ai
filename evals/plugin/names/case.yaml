@@ -1,0 +1,54 @@
+schema_version: "1.1"
+name: plugin-names
+description: >
+  QT-97. The workspace carries the block /nzt:setup writes, whose adapter says that every
+  NZT skill named nzt-<x> is loaded as nzt:nzt-<x>. The kernel and the skills keep saying
+  nzt-plan, nzt-discovery: this case measures that the model translates the names itself
+  instead of calling a bare name that does not exist. If it fails, the fallback is
+  QT-97's option B - the build rewrites the names.
+tags: [plugin, routing]
+expected_outcome: >
+  Loads nzt:nzt and then the router of the next phase by its plugin name, with no Skill
+  call by a bare nzt or nzt-<x> name, and proposes before executing.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero sumarle al proyecto una feature de cupones de descuento. ¿Cómo seguimos?
+  max_turns: 30
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: entry-point-by-plugin-name
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"nzt:nzt"'
+  - name: next-router-by-plugin-name
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"nzt:nzt-(?:plan|discovery)"'
+  - name: no-bare-name
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"nzt(?:-[\w-]+)?"'
+    min: 0
+    max: 0
+  - name: names-resolved-in-trace
+    type: llm
+    focus: trace
+    arm: with-only
+    criteria: |
+      Look only at the Skill tool calls in the trace.
+      PASS if every Skill call names a skill with the "nzt:" prefix (for example nzt:nzt,
+      nzt:nzt-plan, nzt:nzt-discovery) and none of them returned an error saying the skill
+      was not found or does not exist.
+      FAIL if any Skill call used a bare name such as "nzt", "nzt-plan" or
+      "nzt-discovery", or if any Skill call failed because the skill was not found.
+  - name: proposes-before-executing
+    type: llm
+    criteria: |
+      The reply is written in Spanish.
+      PASS if it proposes what it would do - a plan, phases, units or steps - and leaves the
+      decision with the user.
+      FAIL if it is written in English, or if it reports having already created specs or
+      code.

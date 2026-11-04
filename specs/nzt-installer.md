@@ -16,7 +16,10 @@ las skills (`nzt:nzt-build`) rompiendo los nombres que nombran las tablas de rut
 **ningún sistema de plugins carga el kernel igual en todos los proveedores**: Codex tiene
 plugins, pero ni el de Claude Code ni el de Codex traen un archivo de instrucciones
 siempre cargado (D24, revisado el 2026-10-16). Lo que se instala son **skills sueltas en la carpeta de
-usuario** y un bloque en el archivo de instrucciones. El único plugin del repo es
+usuario** y un bloque en el archivo de instrucciones. **Desde D91 (2026-11-04)**, en Claude
+Code hay una segunda vía: un plugin con una skill de setup que escribe el mismo bloque
+(`specs/nzt-plugin.md`). Las dos no conviven: si este CLI ya instaló NZT, el setup del plugin
+se frena (RN-plugin-instalador-presente). El único plugin del repo es
 `dist/plugin/`, que existe para que `claude plugin eval` tenga un target (D23) y **no se
 instala nunca**. Los mods de `mods/` sí son plugins, una capa aparte y opcional (D63): **el
 instalador también los instala, actualiza y desinstala en Claude Code, como opción**, y el

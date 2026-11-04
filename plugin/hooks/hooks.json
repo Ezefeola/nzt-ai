@@ -1,0 +1,16 @@
+{
+  "description": "NZT: warns when the kernel block in CLAUDE.md is older than the plugin, or when two blocks are loaded (specs/nzt-plugin.md)",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${CLAUDE_PLUGIN_ROOT}/hooks/check.ps1\" || sh \"${CLAUDE_PLUGIN_ROOT}/hooks/check.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

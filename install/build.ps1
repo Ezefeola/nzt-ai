@@ -186,18 +186,87 @@ if (Test-Path $packsRoot) {
     Write-Host ("$($folders.Count) packs, ~$($script:listingChars) chars of skill listing if every one is installed")
 }
 
-# --- plugin for `claude plugin eval` -----------------------------------------
+# --- the plugin: manifest, block, setup, hook, subagents (specs/nzt-plugin.md) -----
+# NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
-$manifest = @'
+$csproj = Get-Content (Join-Path $root 'installer/src/Nzt.Cli/Nzt.Cli.csproj') -Raw
+$version = if ($csproj -match '<Version>(.+?)</Version>') { $Matches[1] } else { '' }
+if (-not $version) {
+    Write-Warning 'no <Version> in installer/src/Nzt.Cli/Nzt.Cli.csproj.'
+    $failed = $true
+}
+
+$manifest = @"
 {
   "name": "nzt",
-  "description": "NZT: the skill set under evaluation. Built output — edit skills/ in the repo, not here.",
-  "version": "4.0.0",
+  "description": "NZT: a way of working for any product. Run /nzt:setup to write its kernel into a CLAUDE.md. Built output — edit skills/ in the repo, not here.",
+  "version": "$version",
   "license": "MIT",
   "author": { "name": "NZT" }
 }
-'@
+"@
 Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value $manifest -Encoding utf8
+
+# The block /nzt:setup writes: nzt-ai's markers, a line saying the plugin wrote it, the
+# kernel and the plugin's adapter (QT-99, RN-plugin-mismo-kernel).
+New-Item -ItemType Directory -Force -Path (Join-Path $plugin 'kernel') | Out-Null
+$block = Join-Path $plugin 'kernel/CLAUDE.md'
+$pluginAdapter = (Get-Content (Join-Path $root 'core/adapter-claude-plugin.md') -Raw).TrimEnd()
+$blockBody = "<!-- nzt:start -->`n<!-- nzt:plugin $version -->`n$kernel`n`n$pluginAdapter`n<!-- nzt:end -->`n"
+Set-Content -Path $block -Value $blockBody -Encoding utf8 -NoNewline
+
+$lines = ($blockBody.TrimEnd() -split "`n").Count
+Write-Host ''
+Write-Host ("{0,-17} {1,4} lines" -f 'kernel/CLAUDE.md', $lines)
+if ($lines -gt 200) {
+    Write-Warning "kernel/CLAUDE.md is over the 200-line budget ($lines lines)."
+    $failed = $true
+}
+
+# The kernel inside the block is nzt-ai's, byte for byte: the lines between the markers'
+# header and the first '## Host:' heading, in both files.
+function Get-KernelOf([string]$path, [int]$skip) {
+    $all = (Get-Content $path -Raw) -split "`n"
+    $kept = foreach ($line in ($all | Select-Object -Skip $skip)) {
+        if ($line -match '^## Host:') { break }
+        $line
+    }
+    $kept -join "`n"
+}
+if ((Get-KernelOf (Join-Path $OutDir 'CLAUDE.md') 1) -cne (Get-KernelOf $block 2)) {
+    Write-Warning 'the kernel in kernel/CLAUDE.md differs from the one in CLAUDE.md.'
+    $failed = $true
+}
+
+# The setup skill and the hook live in plugin/ so that nzt-ai does not install them; their
+# tests (plugin/tests) stay in the repo.
+$pluginSrc = Join-Path $root 'plugin'
+if (Test-Path $pluginSrc) {
+    Get-ChildItem $pluginSrc | Where-Object Name -ne 'tests' |
+        ForEach-Object { Copy-Item $_.FullName -Destination $plugin -Recurse -Force }
+    # the plugin's own skills follow the same rules; their name is their folder's
+    $globalListing = $script:listingChars
+    foreach ($skill in (Get-ChildItem (Join-Path $pluginSrc 'skills') -Directory -ErrorAction SilentlyContinue)) {
+        $file = Join-Path $skill.FullName 'SKILL.md'
+        if (Test-Skill (Get-Item $file) "plugin/skills/$($skill.Name)" $skill.Name) { $failed = $true }
+    }
+    $script:listingChars = $globalListing
+}
+
+# Subagents: Claude Code reads their skills: list, not the model, so the build gives it
+# the plugin's names (QT-103).
+$agentsDest = Join-Path $plugin 'agents'
+New-Item -ItemType Directory -Force -Path $agentsDest | Out-Null
+$agentFiles = Get-ChildItem (Join-Path $root 'agents') -Filter '*.md'
+foreach ($agent in $agentFiles) {
+    $text = Get-Content $agent.FullName -Raw
+    $end = $text.IndexOf("`n---", 3)
+    $front = [regex]::Replace($text.Substring(0, $end), '(?m)^(\s*-\s*)nzt-', '${1}nzt:nzt-')
+    Set-Content -Path (Join-Path $agentsDest $agent.Name) -Value ($front + $text.Substring($end)) -Encoding utf8 -NoNewline
+}
+Write-Host "plugin ${version}: kernel/CLAUDE.md, $($agentFiles.Count) subagents"
+
+# --- evals for `claude plugin eval` ------------------------------------------
 
 $evalsSrc = Join-Path $root 'evals'
 if (Test-Path $evalsSrc) {
@@ -207,6 +276,8 @@ if (Test-Path $evalsSrc) {
     if (Test-Path $results) { Remove-Item $results -Recurse -Force }
     New-Item -ItemType Directory -Force -Path (Join-Path $evalsDest '_fixtures') | Out-Null
     Copy-Item (Join-Path $OutDir 'CLAUDE.md') -Destination (Join-Path $evalsDest '_fixtures/CLAUDE.md') -Force
+    # the block /nzt:setup writes, for the plugin/ cases (_fixtures/plugin-block.sh)
+    Copy-Item $block -Destination (Join-Path $evalsDest '_fixtures/CLAUDE.plugin.md') -Force
     # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
     Copy-Item $packsRoot -Destination (Join-Path $evalsDest '_fixtures/packs') -Recurse
 
