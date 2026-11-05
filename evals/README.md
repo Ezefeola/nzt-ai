@@ -8,12 +8,12 @@ suite is 40 cases in four groups: three measure one of the two failure modes eac
 | `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked, and `tool-research` that choosing an agent's tools looks at the catalogue and researches too (DB-03) |
 | `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
-| `skill/` | 4 | **The kernel inside `nzt:nzt`.** No `CLAUDE.md` in the workspace (`_fixtures/no-kernel.sh`): `nzt:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
+| `skill/` | 4 | **The kernel inside `nzt:nzt`.** No `CLAUDE.md` in the workspace, like every case since QT-111: `nzt:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
 
-Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
-detail: NZT's routing is instructed there (R2), so a run without it measures description
-matching — a different product than the one being built. `routing/kernel-loaded` is the
-smoke case that proves the kernel arrived; **if it fails, no other result means anything.**
+Since QT-111 **no case seeds `CLAUDE.md`**: the kernel reaches the run only inside the plugin's
+`nzt:nzt`, which is how NZT ships (D92). A seeded kernel would load it twice and measure the
+old product. Where a case once said "no skill", it now says "no skill but `nzt:nzt`"
+(`restraint/trivial`). `routing/kernel-loaded` is the smoke case that proves `nzt:nzt` loaded; **if it fails, no other result means anything.**
 
 ## Run it
 
@@ -21,7 +21,7 @@ The target is `dist/plugin/`, the flattened plugin the build assembles — the s
 skill names the installer writes, so the suite evaluates what actually ships (D23).
 
 ```bash
-bash install/build.sh                                    # refreshes dist/plugin and the kernel fixture
+bash install/build.sh                                    # refreshes dist/plugin and the pack fixtures
 claude plugin eval dist/plugin --scaffold --case kernel-loaded --ablation none
 claude plugin eval dist/plugin --scaffold --tag smoke
 claude plugin eval dist/plugin --scaffold --threshold 0.8

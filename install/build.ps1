@@ -258,7 +258,6 @@ if (Test-Path $evalsSrc) {
     $results = Join-Path $evalsDest 'results'
     if (Test-Path $results) { Remove-Item $results -Recurse -Force }
     New-Item -ItemType Directory -Force -Path (Join-Path $evalsDest '_fixtures') | Out-Null
-    Copy-Item (Join-Path $OutDir 'CLAUDE.md') -Destination (Join-Path $evalsDest '_fixtures/CLAUDE.md') -Force
     # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
     Copy-Item $packsRoot -Destination (Join-Path $evalsDest '_fixtures/packs') -Recurse
 
@@ -281,7 +280,7 @@ if (Test-Path $evalsSrc) {
         }
     }
 
-    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases, kernel fixture refreshed)"
+    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases, pack fixtures refreshed)"
 }
 
 Write-Host "-> $OutDir"

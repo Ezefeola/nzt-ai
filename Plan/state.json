@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-05T19:00:00Z",
+  "updated": "2026-11-05T19:33:15Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -156,7 +156,8 @@
             {
               "id": 477,
               "do": "Suite al plugin (QT-111): los fixtures dejan de sembrar CLAUDE.md, \"ninguna skill\" pasa a \"ninguna salvo nzt:nzt\", kernel-loaded mide que carga nzt:nzt; correr la suite y recalibrar",
-              "status": "todo"
+              "status": "doing",
+              "detail": "Hecho sin gastar modelo: project, kernel-only, node-project y foreign-repo ya no siembran CLAUDE.md, y el build ya no lo copia a _fixtures (sh y ps1). restraint/trivial pasa a no-skill-but-nzt (Skill que no sea nzt:nzt, max 0; regex probada en node), y kernel-loaded exige nzt:nzt exacto. READMEs de evals al día. Verificado: los 40 scaffolds corren desde dist/plugin sin dejar CLAUDE.md, las dos builds pasan y claude plugin validate pasa. Falta, por costo (usuario: no gastar más del 5% del límite de 5h): correr la suite y recalibrar. Lo mínimo sería kernel-loaded y trivial, 1 corrida cada uno"
             }
           ]
         }
@@ -190,7 +191,7 @@
   "waiting_on": null,
   "notes": [
     "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
-    "Commit db92912 en nzt-plugin-for-claude con S1 y S2 (diseño con setup, retirado por D92). De la 473 en adelante, sin commitear; la landing tiene su guía sin commitear en landing-docs-mods-palette",
+    "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",
     "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente"
   ]
 }

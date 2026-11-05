@@ -238,7 +238,6 @@ if [ -d "$root/evals" ]; then
   cp -R "$root/evals" "$plugin/evals"
   rm -rf "$plugin/evals/results"
   mkdir -p "$plugin/evals/_fixtures"
-  cp "$out/CLAUDE.md" "$plugin/evals/_fixtures/CLAUDE.md"
   # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
   cp -R "$root/packs" "$plugin/evals/_fixtures/packs"
 
@@ -259,7 +258,7 @@ if [ -d "$root/evals" ]; then
     fi
   done < <(find "$plugin/evals" -name case.yaml | sort)
 
-  echo "plugin -> $plugin  ($cases eval cases, kernel fixture refreshed)"
+  echo "plugin -> $plugin  ($cases eval cases, pack fixtures refreshed)"
 fi
 
 echo "-> $out"

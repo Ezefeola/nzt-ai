@@ -1,7 +1,8 @@
 schema_version: "1.1"
 name: kernel-loaded
 description: >
-  The smoke case. Proves the workspace's CLAUDE.md reached the run: NZT answers in the
+  The smoke case. Proves the kernel reached the run through the plugin - nzt:nzt loads, with
+  no CLAUDE.md in the workspace (QT-111): NZT answers in the
   user's language, classifies the request and proposes before executing. If this case
   fails, every other case in the suite is measuring something else.
 tags: [smoke, routing]
@@ -20,7 +21,7 @@ graders:
   - name: entry-point-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt"'
+    input_match: '"skill"\s*:\s*"nzt:nzt"'
   - name: answer-is-spanish
     type: regex
     pattern: '[áéíóúñ¿¡]|\b(?:qué|cómo|según|está|también|para el|de la)\b'

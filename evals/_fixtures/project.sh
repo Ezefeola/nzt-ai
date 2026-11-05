@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Seeds the empty eval workspace with a small NZT project: the built kernel as
-# CLAUDE.md, the technical document with its packs installed as project skills, one
+# Seeds the empty eval workspace with a small NZT project (no CLAUDE.md: the kernel
+# comes with the plugin in nzt:nzt, QT-111), the technical document with its packs installed as project skills, one
 # feature with one story, and enough source for a request to be about something real.
 #
 # Sourced by each case's scaffold.sh. Runs as you, outside the agent's sandbox,
@@ -10,9 +10,8 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ws="${1:-$PWD}"
 
-# The kernel. Without it the routing table is not in context and the run measures
-# description matching instead of NZT's instructed routing (R2).
-cp "$here/CLAUDE.md" "$ws/CLAUDE.md"
+# No CLAUDE.md (QT-111): the plugin carries the kernel inside nzt:nzt, and a seeded
+# kernel would load it twice and measure the old product.
 
 mkdir -p "$ws/Docs/Product" "$ws/Docs/Architecture" "$ws/Plan/specs/F-001-pedidos/stories" \
          "$ws/src/Pedidos.Api/Features/Orders" "$ws/src/Pedidos.Web/Features/Orders"

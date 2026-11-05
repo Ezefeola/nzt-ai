@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Seeds a workspace that is NOT a .NET project: the kernel is installed, the dotnet and
+# Seeds a workspace that is NOT a .NET project: NZT comes from the plugin, the dotnet and
 # blazor packs are installed as project skills too, and tech.md lists neither, so nothing
 # in them may fire. This is *an installed pack is not an authorisation* turned into a
 # measurement.
@@ -8,7 +8,6 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ws="${1:-$PWD}"
 
-cp "$here/CLAUDE.md" "$ws/CLAUDE.md"
 bash "$here/packs.sh" "$ws" dotnet blazor
 
 mkdir -p "$ws/Docs/Architecture" "$ws/src/orders"
