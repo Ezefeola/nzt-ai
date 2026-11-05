@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-05T19:33:15Z",
+  "updated": "2026-11-05T19:42:02Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -117,7 +117,7 @@
     {
       "id": "S2b",
       "name": "El método dentro de la skill nzt:nzt, sin setup ni hook (QT-109)",
-      "status": "doing",
+      "status": "done",
       "phases": [
         {
           "name": "build",
@@ -156,8 +156,8 @@
             {
               "id": 477,
               "do": "Suite al plugin (QT-111): los fixtures dejan de sembrar CLAUDE.md, \"ninguna skill\" pasa a \"ninguna salvo nzt:nzt\", kernel-loaded mide que carga nzt:nzt; correr la suite y recalibrar",
-              "status": "doing",
-              "detail": "Hecho sin gastar modelo: project, kernel-only, node-project y foreign-repo ya no siembran CLAUDE.md, y el build ya no lo copia a _fixtures (sh y ps1). restraint/trivial pasa a no-skill-but-nzt (Skill que no sea nzt:nzt, max 0; regex probada en node), y kernel-loaded exige nzt:nzt exacto. READMEs de evals al día. Verificado: los 40 scaffolds corren desde dist/plugin sin dejar CLAUDE.md, las dos builds pasan y claude plugin validate pasa. Falta, por costo (usuario: no gastar más del 5% del límite de 5h): correr la suite y recalibrar. Lo mínimo sería kernel-loaded y trivial, 1 corrida cada uno"
+              "status": "done",
+              "detail": "Hecho sin gastar modelo: project, kernel-only, node-project y foreign-repo ya no siembran CLAUDE.md, y el build ya no lo copia a _fixtures (sh y ps1). restraint/trivial pasa a no-skill-but-nzt (Skill que no sea nzt:nzt, max 0; regex probada en node), y kernel-loaded exige nzt:nzt exacto. READMEs de evals al día. Verificado: los 40 scaffolds corren desde dist/plugin sin dejar CLAUDE.md, las dos builds pasan y claude plugin validate pasa. Corridos los dos casos que cambiaron, 1 corrida, sin ablación, US$0,35 medidos: kernel-loaded 1.00 (nzt:nzt una vez, plan en castellano sin ejecutar) y restraint-trivial 1.00 (ninguna skill salvo nzt:nzt). Anotado en evals/README.md. Sin correr el resto de la suite contra el plugin (40 casos x 3, del orden de US$20-30), a propósito por el límite de uso: correrla antes de confiar en otros umbrales"
             }
           ]
         }

@@ -136,6 +136,22 @@ The order below was read from each run's trace, not only from the judge.
 Measured live in unit 475: after `/compact`, Claude Code restores `nzt:nzt` by itself; with the
 plugin disabled, nothing of NZT is left.
 
+## What the suite settled without a seeded kernel (QT-111)
+
+Run on 2026-11-05, unit 477: the two cases whose criterion changed, 1 run each, with-arm only,
+no `CLAUDE.md` anywhere: **US$0.35** in all, measured. Reports in
+`evals/results/2026-11-05-qt111-*.html`.
+
+| Case | Score | What it showed |
+|---|---|---|
+| `kernel-loaded` | 1.00 | `Skill(nzt:nzt)` once, 10 reads, a plan in Spanish pending approval; 16 turns, US$0.25 |
+| `restraint-trivial` | 1.00 | no skill but `nzt:nzt`, the answer in Spanish; 3 turns, US$0.10 |
+
+One run is a smoke check, not a calibration: the rest of the suite has not been run against
+the plugin yet. At the measured rate, all 40 cases at 3 runs cost on the order of US$20-30, so
+it was left out on purpose to save usage limit. Run it before trusting any other case's
+threshold.
+
 ## Adding a case
 
 One directory, one `case.yaml`, one `scaffold.sh` that calls a fixture. Give it a grader on
