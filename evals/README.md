@@ -1,14 +1,14 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 39 cases in four groups: three measure one of the two failure modes each, and `plugin/` measures the block the plugin writes (specs/nzt-plugin.md).
+suite is 40 cases in four groups: three measure one of the two failure modes each, and `skill/` measures that the plugin's `nzt:nzt`, which carries the kernel, loads first (specs/nzt-plugin.md, QT-109).
 
 | Group | Cases | What it measures |
 |---|---|---|
 | `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked, and `tool-research` that choosing an agent's tools looks at the catalogue and researches too (DB-03) |
 | `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
-| `plugin/` | 3 | **The plugin's block.** Seeded with what `/nzt:setup` writes instead of `nzt-ai`'s kernel: `names` measures that the model loads `nzt:nzt-<x>` although the texts say `nzt-<x>` (QT-97), `guard` that without the plugin the block warns once and does not apply (read its without-arm), `setup-unasked` that asking for the setup in words does not get it done by hand. `setup-unasked` needs `--allow-tools Edit Write` |
+| `skill/` | 4 | **The kernel inside `nzt:nzt`.** No `CLAUDE.md` in the workspace (`_fixtures/no-kernel.sh`): `nzt:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
 
 Every case seeds its workspace with the **built kernel as `CLAUDE.md`**. That is not a
 detail: NZT's routing is instructed there (R2), so a run without it measures description
@@ -100,7 +100,10 @@ the questions get derived and the mode gets asked; the other, that neither happe
 nobody asked for a design. A set that passes the first and fails the second has not fixed
 the behaviour — it has moved the over-triggering one step earlier.
 
-## What the plugin cases settled
+## What the plugin cases settled (retired)
+
+The three `plugin/` cases measured the block `/nzt:setup` wrote. They were removed with the
+setup design in unit 476 (QT-109); the record stays because it explains the decision.
 
 Calibration run on 2026-11-04, Claude Code 2.1.312, one run per case: **US$1.00** in
 all, measured. Reports in `evals/results/2026-11-04-plugin-*.html`. `--case` keeps only
@@ -116,6 +119,22 @@ The user settled `plugin-guard`'s without-arm the same day (QT-106 in `specs/nzt
 without the plugin, not applying NZT means warning once and not running the loop - no skills,
 no `Plan/state.json`, no plan in units waiting for approval - and the answer's style does not
 count. `guard-or-method` was rewritten to say that, and **has not been re-run since**.
+
+## What the skill cases settled
+
+Run on 2026-11-05, Claude Code 2.1.318, 3 runs per case, with-arm only, no `CLAUDE.md` in
+the workspace: **US$3.15** in all, measured. Reports in `evals/results/2026-11-05-skill-*.html`.
+The order below was read from each run's trace, not only from the judge.
+
+| Case | Score | First tool, 3 of 3 | What it did after |
+|---|---|---|---|
+| `skill-question` | 1.00 | `Skill(nzt:nzt)` | answered from the docs and the code; read `references/entry.md` in 1 of 3 |
+| `skill-small-edit` | 1.00 | `Skill(nzt:nzt)` | changed the label in 2 runs; in 1 it wrote `Plan/state.json` instead of editing |
+| `skill-implement` | 1.00 | `Skill(nzt:nzt)` | read the entry, wrote a plan as not approved and wrote no code; 1 of 3 also wrote `Docs/Architecture/architecture-decisions.md` before approval |
+| `skill-feature` | 1.00 | `Skill(nzt:nzt)` | read the entry, proposed a plan pending approval, nothing executed |
+
+Measured live in unit 475: after `/compact`, Claude Code restores `nzt:nzt` by itself; with the
+plugin disabled, nothing of NZT is left.
 
 ## Adding a case
 

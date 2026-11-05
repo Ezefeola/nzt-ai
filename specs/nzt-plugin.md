@@ -1,289 +1,138 @@
 # NZT — Plugin
 
-> Estado: **especificado y diseñado** (unidades 462 y 464) · Decisión: D91 · Depende de:
-> `specs/nzt-core.md` (C7, C8, D24, D91) y `specs/nzt-installer.md` · Sin aceptar
+> Estado: **diseñado, construido y probado** (unidades 473–476) · Decisiones: D91, revisada por
+> D92 · Depende de: `specs/nzt-core.md` (C7, C8, D24, D91, D92) y `specs/nzt-installer.md` ·
+> Sin aceptar. El primer diseño —`/nzt:setup` escribía el kernel en un `CLAUDE.md`, con un hook
+> de aviso— se construyó y probó en las unidades 462–471 y se retiró en la 476 (QT-109): queda
+> en el registro de abajo y en el commit `db92912`.
 
 ## Qué resuelve
 
 Hoy NZT en Claude Code se instala con `nzt-ai`, un CLI aparte que hay que bajar y correr.
-Quien ya usa plugins en Claude Code no tiene cómo instalar NZT desde `/plugin`, y un plugin
-solo no alcanza: un `CLAUDE.md` dentro de un plugin no se carga (C7), y el kernel tiene que
-estar siempre cargado. El plugin trae las skills de NZT y una skill de setup que, a pedido
-del usuario, escribe el kernel en su `CLAUDE.md`.
+Quien ya instala todo desde `/plugin` no tiene cómo traer NZT por ahí. Un plugin no puede
+traer un `CLAUDE.md` que se cargue (C7), y el kernel tiene que estar presente en toda la
+sesión. El plugin resuelve las dos cosas: trae las skills de NZT y lleva **el kernel dentro
+de la skill `nzt:nzt`**, que Claude carga primero en cada sesión por su descripción. No
+escribe en ningún archivo del usuario: activar o desactivar el plugin es activar o desactivar
+NZT.
 
 ## Alcance
 
 **Adentro**
 - Instalar NZT en Claude Code desde un marketplace, como plugin.
-- `/nzt:setup`: instalar el bloque del kernel, actualizarlo, quitarlo y ver su estado, global o
-  en un proyecto.
-- Avisar al empezar la sesión cuando el bloque quedó en una versión vieja.
-- Que el bloque deje de aplicar, con aviso, cuando faltan las skills del plugin.
+- Que `nzt:nzt`, con el kernel, cargue primero en toda sesión —también ante una pregunta— y
+  siga presente después de compactar.
+- Desactivar o desinstalar el plugin sin dejar nada de NZT en la máquina ni en el proyecto.
 
 **Afuera**
-- Codex: `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar —cómo una skill de plugin llega
-  a su script y con qué nombre se invoca— contra Codex 0.164.0 (Q-01). Hasta entonces, en Codex
-  NZT se instala con `nzt-ai`.
-- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24), y la que
+- Codex: `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar contra Codex 0.164.0 (Q-01).
+  En Codex NZT se instala con `nzt-ai`.
+- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24) y la que
   instala los packs de proyecto (`nzt-ai project`).
-- Pasar una instalación de `nzt-ai` al plugin: el setup se frena y dice cómo desinstalar
-  (Q-03); el pase lo hace el usuario.
-- Los mods: siguen siendo plugins aparte del mismo marketplace (D63).
-- Los subagentes `nzt-explorer` y `nzt-worker`: si van en el plugin y con qué nombre lo decide el
-  diseño técnico (unidad 464).
+- Tener `nzt-ai` y el plugin a la vez: el kernel llegaría dos veces. Nada lo impide; la guía
+  dice que se usa uno solo.
+- Los mods: plugins aparte del mismo marketplace (D63).
+- Partir NZT en partes que se instalen por separado (contexto, discovery, build…): es la
+  dirección después de lanzar este plugin completo, no parte de él.
 
 ## Glosario de esta spec
 
-- **Bloque**: el kernel de NZT y el adaptador de Claude Code, entre los marcadores de NZT,
-  dentro de un `CLAUDE.md`. Es lo mismo que escribe `nzt-ai` (sección 4 de
-  `specs/nzt-installer.md`).
-- **Global**: el bloque en `~/.claude/CLAUDE.md`; NZT aplica en todos los proyectos.
-- **De proyecto**: el bloque en el `CLAUDE.md` de la raíz de un proyecto; NZT aplica solo ahí
-  y lo recibe quien clone el repo.
-- **Versión del bloque**: la versión de NZT con que se escribió; se compara con la del plugin.
+- **Kernel**: las reglas de NZT que valen en todos los turnos (`core/kernel.md`). Es el mismo
+  texto que `nzt-ai` escribe en `CLAUDE.md`.
+- **`nzt:nzt`**: la skill de entrada del plugin. Su cuerpo es el kernel y el adaptador del
+  plugin; lo que la skill `nzt` hace en `nzt-ai` es su referencia `references/entry.md`.
+- **Entrada**: leer el estado, dimensionar el pedido, elegir las fases y pasar la posta
+  (`references/entry.md`).
 
 ## Reglas
 
-### RN-plugin-setup-una-skill · origin: Q-04
-Una sola skill, `/nzt:setup`, instala, actualiza y quita el bloque y muestra su estado. No hay
-otra skill para desinstalar.
+### RN-plugin-metodo-en-skill · origin: QT-109
+El kernel vive en el cuerpo de la skill `nzt:nzt`, arriba de todo, seguido del adaptador del
+plugin. No hay otra copia del kernel en el plugin.
 
-### RN-plugin-setup-a-pedido · origin: Q-05
-El bloque se escribe, se actualiza o se quita solo cuando el usuario corre `/nzt:setup`. Ni
-el plugin al instalarse o actualizarse ni Claude por su cuenta escriben un `CLAUDE.md`.
+### RN-plugin-carga-primero · origin: QT-109, QT-110
+`nzt:nzt` es la primera skill que se carga en una sesión nueva, antes de cualquier otra y antes
+de editar o escribir, también ante una pregunta suelta. Lo logra solo su descripción. Después
+de compactar, el kernel sigue presente: Claude Code re-adjunta las skills cargadas, y si no
+estuviera, el adaptador dice que se vuelva a cargar `nzt:nzt`.
 
-### RN-plugin-destino · origin: Q-02, Q-06
-Al instalar, el usuario elige global o el proyecto actual. Global escribe en
-`~/.claude/CLAUDE.md`; de proyecto, en el `CLAUDE.md` de la raíz del proyecto, que se versiona
-con él.
-
-### RN-plugin-mostrar-antes · origin: Q-08
-Antes de escribir o quitar, el setup muestra qué archivo toca y qué cambia, y pide
-confirmación con *No* como primera opción, sin marcarla como recomendada (QT-108). Sin
-confirmación no escribe nada.
-
-### RN-plugin-solo-el-bloque · origin: Q-08
-El setup cambia solo lo que está entre los marcadores de NZT. Si el archivo existe sin bloque,
-el bloque va arriba y el contenido previo queda igual abajo. No guarda copias: antes de
-tocar un archivo que existe avisa que no queda copia y que, si se la quiere, la haga uno
-mismo (QT-107).
-
-### RN-plugin-instalador-presente · origin: Q-03
-Si NZT ya está instalado con `nzt-ai`, el setup no escribe nada y dice cómo desinstalarlo
-(`nzt-ai uninstall --provider claude-code`) antes de volver a correrlo.
-
-### RN-plugin-un-solo-nzt · origin: Q-08
-Si ya hay un bloque global y se pide uno de proyecto, o al revés, el setup se frena y dice
-dónde está el otro: con los dos, Claude carga el kernel dos veces.
-
-### RN-plugin-aviso-agents · origin: Q-08
-Si el proyecto tiene `AGENTS.md` y no tiene `CLAUDE.md`, antes de crearlo el setup avisa que,
-desde ese momento, Claude deja de leer el `AGENTS.md` del proyecto salvo que el usuario cambie
-la opción *Project instructions*, y pide confirmación aparte.
-
-### RN-plugin-quitar · origin: Q-04, Q-08
-Quitar saca el bloque y deja el resto del archivo como estaba. Si el bloque fue editado a
-mano, lo muestra y pide confirmación antes de sacarlo.
-
-### RN-plugin-estado · origin: Q-08
-El estado dice dónde hay un bloque (global, de este proyecto, o ninguno), su versión, la del
-plugin, y si hay una instalación de `nzt-ai`. No escribe nada.
-
-### RN-plugin-aviso-version · origin: Q-05
-Al empezar, retomar o compactar una sesión, si la versión del bloque que aplica es distinta de
-la del plugin, Claude Code muestra una línea: el bloque quedó en la versión X, la del plugin
-es Y, correr `/nzt:setup`. Si son iguales, o no hay bloque, no muestra nada.
-
-### RN-plugin-guarda · origin: Q-07
-Si el bloque está cargado y las skills del plugin (`nzt:…`) no están disponibles —el plugin se desinstaló o
-se deshabilitó, o un compañero clonó el proyecto sin el plugin—, Claude no aplica NZT, avisa
-una vez en la sesión de dónde sacar el bloque o cómo instalar el plugin, y sigue trabajando
-sin el método.
-
-### RN-plugin-dos-bloques · origin: Q-09
-Si al empezar, retomar o compactar una sesión hay un bloque global y uno del proyecto, Claude
-Code muestra una línea con los dos lugares y Claude aplica solo el del proyecto.
+### RN-plugin-sin-rastros · origin: QT-109
+El plugin no escribe en archivos del usuario para funcionar. Desactivado o desinstalado, Claude
+trabaja sin NZT y no queda nada que limpiar.
 
 ### RN-plugin-mismo-kernel · origin: D24
-El kernel del bloque dice lo mismo que el que escribe `nzt-ai`. Solo cambia el adaptador de
-Claude Code: dice que las skills se cargan como `nzt:<nombre>` (C7) y trae la línea de
-RN-plugin-guarda.
+El kernel de `nzt:nzt` es, byte por byte, el que escribe `nzt-ai`; el build lo comprueba. Solo
+cambia el adaptador de Claude Code (`core/adapter-claude-skill.md`).
+
+### RN-plugin-nombres · origin: QT-97
+Las skills y subagentes del plugin se llaman `nzt:<nombre>`. Donde NZT nombra `nzt-<x>`, se
+carga `nzt:nzt-<x>`; una skill de pack instalada en el proyecto conserva su nombre.
 
 ## Requisitos no funcionales
 
-- Ninguno con número: el usuario no dio cifras. El tope de 10.000 caracteres de C7 es una
-  restricción de la plataforma para el aviso de versión, no un requisito del producto.
+- La descripción de `nzt:nzt` entra en los 250 caracteres del build (hoy 199) y la skill en las
+  200 líneas (hoy 136).
+- Después de compactar, Claude Code conserva los primeros 5.000 tokens de cada skill cargada
+  (docs de skills): el kernel tiene que quedar adentro. Hoy la skill mide 8.601 caracteres;
+  ~2.200 tokens es una estimación, no una medida.
 
 ## Historias
 
 | Historia | Qué cubre |
 |---|---|
-| US-001-instalar-global | Como usuario de Claude Code, quiero instalar el plugin y correr `/nzt:setup` para tener NZT en todos mis proyectos |
-| US-002-instalar-proyecto | Como usuario, quiero instalar NZT solo en un proyecto, para que el equipo lo reciba con el repo |
-| US-003-frenos | Como usuario con `nzt-ai` o con otro bloque, quiero que el setup se frene y me diga qué hacer, para no cargar NZT dos veces |
-| US-004-actualizar | Como usuario, quiero enterarme cuando el bloque quedó viejo y actualizarlo con `/nzt:setup` |
-| US-005-quitar | Como usuario, quiero quitar el bloque con `/nzt:setup` y que mi `CLAUDE.md` quede como estaba |
-| US-006-guarda | Como compañero sin el plugin, quiero que el bloque no aplique y me avise, para no trabajar con un método a medias |
-| US-007-dos-bloques | Como usuario con bloque global, quiero que al abrir un repo con su propio bloque se me avise y se aplique uno solo |
+| US-001-instalar | Como usuario de Claude Code, quiero instalar el plugin y trabajar con NZT desde la sesión siguiente, sin otro paso |
+| US-002-apagar | Como usuario, quiero desactivar o desinstalar el plugin y que Claude trabaje sin NZT, sin archivos que limpiar |
+| US-003-actualizar | Como usuario, quiero que actualizar el plugin actualice el método, sin tocar nada más |
+| US-004-retomar | Como usuario, quiero que el método siga aplicando después de compactar una sesión larga |
 
-## Diseño técnico (unidad 464)
-
-Modo: **propuestas** (el agente decide los detalles y los marca; el usuario objeta) ·
-2026-11-04. Las decisiones están en *Decisiones técnicas*; acá va el presente.
+## Diseño técnico (unidades 473 y 476)
 
 ### Piezas
 
 | Pieza | En el repo | En el plugin publicado |
 |---|---|---|
-| Skills de NZT | `skills/` (las mismas que copia `nzt-ai`) | `skills/nzt`, `skills/nzt-build`… → `nzt:nzt`, `nzt:nzt-build`… |
-| Skill de setup | `plugin/skills/setup/SKILL.md` | `skills/setup` → `/nzt:setup` |
-| Scripts del setup | `plugin/skills/setup/scripts/setup.ps1` y `setup.sh` | igual |
-| Hook de aviso | `plugin/hooks/hooks.json`, `check.ps1`, `check.sh` | `hooks/` |
+| Kernel | `core/kernel.md` | cuerpo de `skills/nzt/SKILL.md` → `nzt:nzt` |
+| Adaptador del plugin | `core/adapter-claude-skill.md` | después del kernel, en la misma skill |
+| Entrada | cuerpo de `skills/nzt/SKILL.md` | `skills/nzt/references/entry.md` |
+| Resto de las skills | `skills/` (las mismas que copia `nzt-ai`) | `nzt:nzt-build`, `nzt:nzt-plan`… |
 | Subagentes | `agents/nzt-explorer.md`, `nzt-worker.md` | `agents/` → `nzt:nzt-explorer`, `nzt:nzt-worker` |
-| Adaptador del plugin | `core/adapter-claude-plugin.md` | dentro del bloque |
-| Bloque a escribir | lo arma el build | `kernel/CLAUDE.md` |
 | Manifiesto | lo arma el build | `.claude-plugin/plugin.json`, `name: nzt`, versión de NZT |
 
-El setup vive fuera de `skills/` para que `nzt-ai` no lo instale. El plugin se publica en la
-rama `plugin` (QT-96) y el marketplace del repo suma la entrada `nzt` con
-`{"source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin"}`: se instala como
-`nzt@nzt`.
-
-### El bloque
-
-```
-<!-- nzt:start -->
-<!-- nzt:plugin 4.1.0 -->
-…kernel, igual al de nzt-ai…
-…adaptador del plugin…
-<!-- nzt:end -->
-```
-
-- Los marcadores son **los mismos que usa `nzt-ai`** y la segunda línea dice que lo escribió
-  el plugin, con su versión. Así `nzt-ai` ve marcadores sin su manifiesto y se frena por su
-  propia regla de colisión (`specs/nzt-installer.md` §7), y el setup separa su bloque del de
-  `nzt-ai` por esa línea (QT-99).
-- El adaptador del plugin es el de Claude Code con dos cambios: **(1)** donde un texto de NZT
-  nombra una skill o un subagente `nzt-<x>`, se carga `nzt:nzt-<x>` (QT-97), salvo un pack
-  instalado en el proyecto, que no está en el plugin y conserva su nombre `nzt-<pack>`
-  (unidad 466); **(2)** la guarda:
-  si no hay ninguna skill `nzt:nzt` disponible, no aplicar NZT, avisar una vez de dónde sacar
-  el bloque o cómo instalar el plugin, y seguir sin el método.
-
-### Flujos
-
-**Instalar, global o de proyecto (US-001, US-002, US-003).**
-1. El usuario corre `/nzt:setup`. La skill lleva `disable-model-invocation: true`, así que
-   Claude no la carga solo (C7).
-2. La skill corre `setup status` y muestra dónde hay bloques, sus versiones y si hay
-   `nzt-ai`.
-3. Pregunta la acción y, para instalar, el alcance: global o este proyecto.
-4. Corre `setup install --scope <alcance> --dry-run`. **Las reglas de frenado las aplica el
-   script, no el modelo**: sale con código 2 y el slug de la regla si hay `nzt-ai`
-   (RN-plugin-instalador-presente) o un bloque del otro alcance (RN-plugin-un-solo-nzt). Si el
-   proyecto tiene `AGENTS.md` sin `CLAUDE.md`, sale con 2 salvo `--accept-agents-md`
-   (RN-plugin-aviso-agents), y la skill hace esa pregunta aparte.
-5. Muestra el plan del script y pregunta con *No* marcado (RN-plugin-mostrar-antes).
-6. Con *Sí*, corre lo mismo sin `--dry-run` y muestra el resultado. El bloque toma efecto en
-   la sesión siguiente: el `CLAUDE.md` se carga al arrancar (inferido de
-   [memory](https://code.claude.com/docs/en/memory)).
-
-**Actualizar (US-004).** Al empezar, retomar, limpiar o compactar, el hook `SessionStart`
-corre `check`, que lee la línea `nzt:plugin` de `~/.claude/CLAUDE.md` y del `CLAUDE.md` del
-proyecto y la compara con la versión de `plugin.json`. Si difiere, devuelve `systemMessage`
-(lo ve el usuario) y `additionalContext` (lo ve Claude) con las dos versiones y
-`/nzt:setup`. Si son iguales o no hay bloque, no devuelve nada. Nunca escribe. Instalar sobre
-un bloque del plugin lo reemplaza en su lugar.
-
-**Quitar (US-005).** `setup remove --scope <alcance>` saca el bloque y deja el resto del
-archivo igual. Si el bloque no coincide con el hash que guardó al escribirlo, o no hay hash,
-sale con 2 y muestra la diferencia; la skill pregunta y repite con `--force-edited`.
-
-**Guarda (US-006).** No corre nada: es la línea del adaptador. Que el modelo la cumpla se
-prueba con un eval en S2.
-
-**Dos bloques (US-007).** El mismo `check`: si hay bloque global y bloque de proyecto,
-devuelve las dos rutas y le dice a Claude que aplique solo el del proyecto
-(RN-plugin-dos-bloques). El del proyecto gana porque es el que el equipo versionó y Claude Code
-lo lee después del global (QT-102).
-
-### Dónde se cumple cada regla
-
-| Regla | Se cumple en |
-|---|---|
-| RN-plugin-setup-una-skill | una sola skill en `plugin/skills/` |
-| RN-plugin-setup-a-pedido | `disable-model-invocation: true`; el hook nunca escribe |
-| RN-plugin-destino | `setup install --scope` |
-| RN-plugin-mostrar-antes | la skill: `--dry-run`, después la pregunta con *No* marcado |
-| RN-plugin-solo-el-bloque | el script: reemplazo entre marcadores y escritura atómica |
-| RN-plugin-instalador-presente | el script (código 2); del otro lado, la regla de colisión de `nzt-ai` |
-| RN-plugin-un-solo-nzt | el script (código 2) |
-| RN-plugin-aviso-agents | el script exige `--accept-agents-md`; la skill pregunta aparte |
-| RN-plugin-quitar | el script compara el hash y exige `--force-edited` |
-| RN-plugin-estado | `setup status`, que no escribe |
-| RN-plugin-aviso-version | el hook `check` |
-| RN-plugin-guarda | la línea del adaptador; un eval en S2 |
-| RN-plugin-dos-bloques | el hook `check` |
-| RN-plugin-mismo-kernel | el build compara el kernel del bloque con el de `dist/CLAUDE.md`, byte a byte |
-
-### Los scripts
-
-`setup.ps1` y `setup.sh` hacen lo mismo con la misma interfaz:
-`status | install | remove`, `--scope global|project`, `--project-dir`, `--data-dir`,
-`--plugin-root`, `--dry-run`, `--accept-agents-md`, `--force-edited`. Códigos de salida: 0
-hecho, 2 frenado por una regla (el mensaje dice cuál), 1 error. Las rutas las pasa la skill
-con `${CLAUDE_PROJECT_DIR}`, `${CLAUDE_PLUGIN_DATA}` y `${CLAUDE_PLUGIN_ROOT}`, que Claude Code
-reemplaza en el texto de la skill y no exporta al shell de Bash (C7). Las mismas rutas van en
-`allowed-tools`, así que corren sin pedir permiso. La skill usa `.ps1` en Windows y `.sh` en
-el resto (QT-100). Los dos se prueban contra los mismos casos en S2.
-
-Hechos en la unidad 467 (QT-105): `--claude-dir` y `--manifest-dir` aíslan `~/.claude` y el
-manifiesto de `nzt-ai` en las pruebas; la skill no los pasa. Actualizar un bloque que no
-coincide con su hash también sale con 2 y pide `--force-edited`, como quitar. Quitar un bloque
-que era todo el archivo borra el archivo. Las líneas fuera del bloque se escriben byte a byte,
-con sus finales CRLF o LF y su BOM. Las pruebas, `plugin/tests/setup.test.sh`, corren los
-mismos 18 casos contra `setup.sh`, PowerShell 7 y Windows PowerShell 5.1, y no viajan en el
-plugin.
-
-### Datos
-
-- `${CLAUDE_PLUGIN_DATA}/written.json`: por cada archivo escrito, la versión, el hash del
-  bloque y la fecha. Se escribe después del archivo.
-- Sin copias de seguridad (QT-107, deja sin efecto QT-101): nadie las limpiaba y quedaban
-  viejas. La simulación avisa que no se guarda copia.
-- **Lo que se acepta:** Claude Code borra `${CLAUDE_PLUGIN_DATA}` al desinstalar el plugin
-  (C7), así que se pierden los hashes. Un bloque quitado después de
-  reinstalar se trata como editado: pide confirmación, no se pierde nada.
-
-### Cuando algo falla
-
-- La escritura es atómica: archivo temporal y renombre. Un corte deja el archivo como estaba.
-- Instalar dos veces da lo mismo; quitar dos veces dice que no hay bloque.
-- Si el hook falla o no corre (empresas con `allowManagedHooksOnly`, C7), no hay aviso de
-  versión ni de dos bloques; el setup y la guarda siguen funcionando.
+No hay scripts, hooks ni archivos que escriba el plugin: el plugin es solo texto, así que no
+depende del sistema operativo. Se publica en la rama `plugin` (QT-96) y el marketplace del repo
+suma la entrada `nzt` con `{"source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin"}`:
+se instala como `nzt@nzt`.
 
 ### Build y release
 
-- `install/build.*` suma al `dist/plugin/` que ya arma para los evals (D23): el setup, el
-  hook, los subagentes, `kernel/CLAUDE.md` y la versión de NZT en `plugin.json`, la misma del
-  `.csproj` (D24). En los subagentes reescribe `skills: [nzt-research]` a `nzt:nzt-research`,
-  porque ese nombre lo lee Claude Code y no el modelo (QT-103).
-- El workflow de release copia `dist/plugin/` **sin `evals/`** a la rama `plugin`, en un
-  commit por versión (QT-104).
+- `install/build.*` arma `dist/plugin/` (D23): la skill `nzt` con el kernel y su entrada, las
+  demás skills, los subagentes con los nombres del plugin en su lista `skills:` (QT-103) y la
+  versión de NZT en `plugin.json`, la del `.csproj` (D24). Comprueba que el kernel de `nzt:nzt`
+  sea el de `CLAUDE.md` byte por byte. Las dos builds dan la misma salida.
+- El workflow de release copia `dist/plugin/` **sin `evals/`** a la rama `plugin`, en un commit
+  por versión (QT-104).
 
-### Sin verificar, para el comienzo de S2
+### Lo verificado
 
-- QT-98: una forma de hook que corra igual en Windows con y sin Git Bash, en macOS y en
-  Linux.
-- Que un subagente de plugin precargue una skill con su nombre `nzt:…` (QT-103).
-- Que el modelo cumpla la traducción de nombres y la guarda: evals.
+| Qué | Cómo | Resultado |
+|---|---|---|
+| `nzt:nzt` primera en sesión nueva | evals `skill/` sin `CLAUDE.md`, 4 pedidos × 3 corridas (474) | 12/12, leído de la traza |
+| El kernel tras `/compact` | en vivo (475) | Claude Code re-adjuntó `nzt:nzt` y `nzt:nzt-plan` solo |
+| Plugin desactivado | en vivo (475) | ninguna skill, escritura ni mención de NZT |
+| Nombres `nzt:nzt-<x>` | evals de la 470 y de la 474 | el modelo carga los nombres del plugin |
 
 ## Abierto
 
 - Codex `[TO-DEFINE]` (Q-01).
-- QT-98, QT-103 y los evals de la guarda y los nombres: se resuelven al empezar S2.
+- La suite de evals mide todavía con el kernel en `CLAUDE.md`: pasa a medir el plugin en la
+  unidad 477 (QT-111).
+- Desvíos del método vistos en la 474 y la 475 —no objetar una vez saltear el plan, una
+  pregunta sin id `QT`, un cambio chico que escribió estado—: son del método, no del plugin.
+- `nzt-ai` y el plugin juntos: sin medir.
 
 ## Preguntas
+
+Q-02 a Q-09 respondieron al diseño con setup, retirado por QT-109; quedan como registro.
 
 #### Q-09 · Un compañero con el plugin y su bloque global clona un proyecto que trae su propio bloque: ¿qué pasa?
 - bloquea: el caso que RN-plugin-un-solo-nzt no cubre, porque el segundo bloque no lo
@@ -429,6 +278,77 @@ build reescribe `skills:` como dice QT-103.
 
 **QT-98** → la línea doble, `powershell … -File check.ps1 || sh check.sh`. Se acepta que en un
 Windows sin Git Bash ni PowerShell 7 no haya aviso y el hook marque error. — `usuario`
+
+### 2026-11-05 · después de la 471
+
+**QT-109 · ¿Cómo se entera quien instala el plugin de que tiene que correr `/nzt:setup`?**
+> Observado: nada se lo dice. La descripción del plugin lo nombra una vez, el hook calla sin
+> bloque y Claude no ve `/nzt:setup` (`disable-model-invocation`). Además, desactivar el
+> plugin no apaga NZT: el bloque sigue en el `CLAUDE.md`. Investigado (docs de skills y
+> hooks, `explanatory-output-style` de Anthropic y Superpowers): los plugins con
+> instrucciones que valen siempre las inyectan por un hook `SessionStart`; una skill no
+> tiene forma propia de cargar siempre. Opciones debatidas: aviso del hook sin bloque;
+> kernel inyectado por hook; skill con el kernel inyectada por hook (Superpowers); hook que
+> solo dice "cargá `nzt:nzt`"; skill con el kernel que carga por su descripción.
+
+**QT-109** → el usuario no lanza el diseño con setup. El método va dentro de la skill
+`nzt:nzt` —el kernel arriba, la entrada de hoy como referencia de la misma skill— y carga
+por su descripción, sin hook: desactivar el plugin deja a Claude solo, sin archivos que
+limpiar. Se van `/nzt:setup`, el hook y los bloques. `nzt-ai` no cambia. Si la skill no carga
+de forma confiable, plan B: un hook de una línea que diga que se cargue. — `usuario`
+
+**QT-110 · ¿`nzt:nzt` carga también ante una pregunta suelta?**
+> A, sí: igual que hoy con el `CLAUDE.md`, a cambio de ~2.000 tokens donde quizá no hacían
+> falta; B, solo cuando hay trabajo. Recomendada: A.
+
+**QT-110** → A. — `usuario`
+
+**Criterio de la prueba:** en una sesión nueva y después de compactar, la primera skill
+cargada es `nzt:nzt`, antes de cualquier otra y antes de editar o escribir. Unidades 473
+(armar la variante) y 474 (evals de carga), aprobadas por el usuario; 475 (prueba en vivo:
+compactar y plugin desactivado) y 476 (decidir) quedan propuestas.
+
+**Unidades 473 y 474.** El build arma `skills/nzt/SKILL.md` del plugin con el kernel y
+`core/adapter-claude-skill.md`, y la entrada de hoy como `references/entry.md`; sin setup,
+hook ni bloque en el plugin. Evals `skill/` sin `CLAUDE.md`, 3 corridas por caso, US$3,15
+medidos: **en las 12 corridas la primera herramienta fue `Skill(nzt:nzt)`** —leído en la
+traza de cada corrida, no solo del juez— para una feature, una historia, un cambio de una
+palabra y una pregunta. Después aplicó el método: plan sin aprobar en la feature y la
+historia, sin código. Observado para mirar: en un cambio chico, 1 de 3 escribió
+`Plan/state.json` en vez de editar; en la historia, 1 de 3 escribió un documento de
+arquitectura antes de la aprobación. Sin medir: después de `/compact` y con el plugin
+desactivado (475). — `agente, observado`
+
+**Unidad 475, en vivo** (Windows, Claude Code 2.1.318, `--plugin-dir`, proyecto de los evals
+sin `CLAUDE.md` y sin `CLAUDE.md` global). **(1)** Sesión nueva, pedido de feature: primera
+herramienta `Skill(nzt:nzt)`, después `nzt:nzt-plan` y un plan sin aprobar. **(2)** Tras
+`/compact`, Claude Code mostró *Skills restored (nzt:nzt-plan, nzt:nzt)*: re-adjunta solo las
+skills cargadas, así que el kernel siguió sin recargarlo, y releyó `Plan/state.json`. Ante
+"implementá directamente, sin plan" no escribió código: revisó la API, encontró un hueco que
+cambia el resultado y preguntó con opciones. Desvíos del método, no de la carga: no objetó una
+vez saltear el plan pendiente y la pregunta no llevó id `QT-NN`. **(3)** Sin el plugin, mismo
+pedido: ninguna skill, ninguna escritura, ninguna mención de NZT. Revisado en los registros de
+las dos sesiones. — `usuario y agente, observado`
+
+### 2026-11-05 · unidad 476
+
+**QT-111 · ¿Qué hace la suite de evals ahora que `nzt:nzt` trae el kernel?**
+> Observado: todos los casos siembran el kernel en `CLAUDE.md` y corren contra `dist/plugin`,
+> donde `nzt:nzt` ya lo trae: el kernel llega dos veces, y los casos de contención que piden
+> "ninguna skill" ante una pregunta chocan con QT-110. Opciones: A, la suite deja de sembrar
+> `CLAUDE.md` y mide el plugin tal como se publica; los graders de "ninguna skill" pasan a
+> "ninguna skill salvo `nzt:nzt`", y se recalibra en una unidad aparte; B, se mantiene como
+> está, con el kernel dos veces; C, un segundo destino de evals con el `nzt` de `nzt-ai` para
+> medir los dos productos. Recomendada: A — el texto del kernel es el mismo en los dos
+> productos, y C duplica el costo de cada corrida.
+
+**QT-111** → A, en la unidad 477. — `usuario`
+
+**Unidad 476, lo hecho.** Con 473–475 a favor, el diseño de la skill queda (D92 en
+`specs/nzt-core.md`). Se retiraron del repo `plugin/` (setup, hook y sus pruebas),
+`core/adapter-claude-plugin.md`, los evals `plugin/` y el fixture `plugin-block.sh`; el build
+ya no arma el bloque. Esta spec se reescribió arriba; `specs/nzt-installer.md` y la guía de la
+landing, al día. — `agente, dentro del alcance aprobado`
 
 ### 2026-11-04 · unidad 471
 

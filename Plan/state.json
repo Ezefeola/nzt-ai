@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-04T23:00:00Z",
+  "updated": "2026-11-05T19:00:00Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -115,6 +115,54 @@
       ]
     },
     {
+      "id": "S2b",
+      "name": "El método dentro de la skill nzt:nzt, sin setup ni hook (QT-109)",
+      "status": "doing",
+      "phases": [
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 473,
+              "do": "Variante del plugin: kernel dentro de nzt:nzt (entrada como referencia), sin /nzt:setup ni hook en dist/plugin",
+              "status": "done",
+              "detail": "core/adapter-claude-skill.md nuevo; install/build.sh y build.ps1 arman dist/plugin/skills/nzt/SKILL.md = kernel + ese adaptador (136 líneas, descripción de 199 caracteres que pide cargarla primero en toda sesión y tras compactar) y references/entry.md = el cuerpo de skills/nzt. Comprueba el kernel byte a byte contra CLAUDE.md. dist/plugin ya no trae /nzt:setup, hook ni kernel/CLAUDE.md; el bloque viejo queda solo como fixture (dist/CLAUDE.plugin.md) hasta la 476, y plugin/ sigue en el repo sin construirse. Las dos builds dan lo mismo; claude plugin validate 2.1.318 pasa. Ojo: la suite vieja siembra el kernel en CLAUDE.md y ahora además lo trae nzt:nzt (kernel dos veces); se resuelve en la 476"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "doing",
+          "units": [
+            {
+              "id": 474,
+              "do": "Evals sin CLAUDE.md: nzt:nzt es la primera skill cargada, antes de otra skill y de editar, en pedidos variados y una pregunta suelta",
+              "status": "done",
+              "detail": "evals/skill (feature, implement, small-edit, question) + _fixtures/no-kernel.sh, sin CLAUDE.md. 3 corridas c/u, US$3,15 medidos: 12/12 con Skill(nzt:nzt) como primera herramienta (leído de la traza). Aplicó el método después. Para mirar: small-edit 1/3 escribió state.json en vez de editar; implement 1/3 escribió un doc de arquitectura antes de aprobar. Anotado en evals/README.md y la spec"
+            },
+            {
+              "id": 475,
+              "do": "Prueba en vivo: después de /compact el método sigue o nzt:nzt se vuelve a cargar; con el plugin desactivado no queda rastro de NZT",
+              "status": "done",
+              "detail": "En vivo, las 3 rondas como se esperaba: nzt:nzt primera en sesión nueva; tras /compact Claude Code re-adjuntó nzt:nzt y nzt:nzt-plan solo (Skills restored); sin plugin, Claude sin rastro de NZT. Desvíos del método (no de la carga): no objetó saltear el plan, pregunta sin id QT. Anotado en la spec"
+            },
+            {
+              "id": 476,
+              "do": "Decidir con los resultados: reescribir la spec y D91, retirar setup/hook/bloques y ajustar la guía de la landing, o plan B (hook de una línea)",
+              "status": "done",
+              "detail": "D92 aceptada (specs/nzt-core.md); spec del plugin reescrita arriba, registro intacto; specs/nzt-installer.md al día. Retirados plugin/, core/adapter-claude-plugin.md, evals/plugin y plugin-block.sh; el build ya no arma el bloque. Las dos builds iguales, validate pasa. Guía de la landing reescrita (unidad 31 de la landing). QT-111 (usuario, A): la suite pasa a medir el plugin en la 477"
+            },
+            {
+              "id": 477,
+              "do": "Suite al plugin (QT-111): los fixtures dejan de sembrar CLAUDE.md, \"ninguna skill\" pasa a \"ninguna salvo nzt:nzt\", kernel-loaded mide que carga nzt:nzt; correr la suite y recalibrar",
+              "status": "todo"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "S3",
       "name": "Publicación",
       "status": "todo",
@@ -142,7 +190,7 @@
   "waiting_on": null,
   "notes": [
     "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
-    "Nada commiteado en la rama nzt-plugin-for-claude: specs (core, installer, plugin), core/adapter-claude-plugin.md, install/build.*, plugin/ y este archivo",
+    "Commit db92912 en nzt-plugin-for-claude con S1 y S2 (diseño con setup, retirado por D92). De la 473 en adelante, sin commitear; la landing tiene su guía sin commitear en landing-docs-mods-palette",
     "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente"
   ]
 }

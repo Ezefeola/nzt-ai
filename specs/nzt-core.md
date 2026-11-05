@@ -864,7 +864,7 @@ y mantiene la cohesión. El instalador aplana:
 
 Lo hace el CLI de `installer/` (D24). El plugin de `dist/` existe sólo para que
 `claude plugin eval` tenga un target (D23) y no se instala. En Claude Code hay además un
-plugin para instalar, con su skill de setup (D91, `specs/nzt-plugin.md`).
+plugin para instalar, con el kernel dentro de la skill `nzt:nzt` (D91, D92, `specs/nzt-plugin.md`).
 
 ## 10. Reglas de autoría de las skills
 
@@ -3263,6 +3263,40 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     quitar el bloque, o la guarda lo anula cuando las skills desaparecen; `nzt-ai` no cambia.
   - **Reemplaza:** nada. D24 queda vigente para `nzt-ai` y para Codex; lo que cambia de D24 es
     que "NZT no se distribuye como plugin" ya no vale en Claude Code.
+  - **Revisada por D92 el 2026-11-05**: el plugin no lleva setup ni escribe el bloque; el
+    kernel va dentro de la skill `nzt:nzt`.
+- **D92.** **En el plugin de Claude Code, el kernel va dentro de la skill `nzt:nzt`, que carga
+  primero en toda sesión por su descripción: sin `/nzt:setup`, sin hook y sin escribir en
+  archivos del usuario.** Revisa D91. Estado: **aceptada** el 2026-11-05, decidida por el
+  usuario (QT-109, QT-110 en `specs/nzt-plugin.md`). Rama `nzt-plugin-for-claude`, unidades
+  473–476.
+  - **Lo que la forzó:** con el diseño de D91 nada le decía a quien instalaba el plugin que
+    tenía que correr `/nzt:setup`, y desactivar el plugin no apagaba NZT, porque el bloque
+    seguía en el `CLAUDE.md`. El usuario quería activar y desactivar NZT como cualquier plugin.
+  - **Opciones** (investigadas en las docs de skills y hooks, `explanatory-output-style` de
+    Anthropic y Superpowers):
+
+    | Opción | Por qué perdió, o qué cuesta |
+    |---|---|
+    | D91 con un aviso del hook cuando no hay bloque | Sigue sin apagado limpio: el bloque queda en el archivo |
+    | Hook `SessionStart` que inyecta el kernel (como `explanatory-output-style`) | Tope de 10.000 caracteres por texto y una pieza más que mantener; el usuario prefirió no depender de un hook |
+    | Hook que inyecta una skill con el kernel (como Superpowers) | Mismo tope y mismas piezas |
+    | **Skill `nzt:nzt` con el kernel, cargada por su descripción** (elegida) | Ver *lo que se acepta* |
+
+  - **Decisión:** el build arma `nzt:nzt` con el kernel y `core/adapter-claude-skill.md`, y
+    pasa la entrada de `skills/nzt` a su referencia `references/entry.md`. Se retiraron
+    `/nzt:setup`, el hook, el bloque, sus pruebas y sus evals (unidad 476).
+  - **Lo que se midió:** evals sin `CLAUDE.md`, 4 pedidos × 3 corridas: `nzt:nzt` fue la
+    primera herramienta en 12 de 12 (474). En vivo, tras `/compact` Claude Code re-adjuntó
+    `nzt:nzt`, y sin el plugin no quedó rastro de NZT (475).
+  - **Lo que se acepta:** **(1)** que cargue depende de la descripción, no de una garantía de
+    la plataforma: si un modelo futuro deja de cargarla primero, lo detectan los evals
+    `skill/`, y el plan B es un hook de una línea que diga que se cargue; **(2)** ~2.200 tokens
+    (estimación) en cada sesión, también para una pregunta (QT-110); **(3)** el kernel tiene que
+    seguir entrando en los 5.000 tokens que Claude Code conserva de una skill al compactar.
+  - **Revertirla:** volver a D91 desde el commit `db92912`.
+  - **Reemplaza:** la parte de D91 sobre `/nzt:setup`, el bloque y el hook. Lo demás de D91
+    —el plugin en el marketplace, los nombres `nzt:…`, `nzt-ai` como forma común— sigue.
 
 ## 13. Revisión contra Temper v3
 

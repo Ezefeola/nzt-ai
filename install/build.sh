@@ -179,7 +179,7 @@ if [ -d "$root/packs" ]; then
   listing=$global_listing
 fi
 
-# --- the plugin: manifest, block, setup, hook, subagents (specs/nzt-plugin.md) -----
+# --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---
 # NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
 version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$root/installer/src/Nzt.Cli/Nzt.Cli.csproj" | head -1)"
@@ -191,56 +191,37 @@ fi
 cat > "$plugin/.claude-plugin/plugin.json" <<JSON
 {
   "name": "nzt",
-  "description": "NZT: a way of working for any product. Run /nzt:setup to write its kernel into a CLAUDE.md. Built output — edit skills/ in the repo, not here.",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session. Built output — edit skills/ in the repo, not here.",
   "version": "$version",
   "license": "MIT",
   "author": { "name": "NZT" }
 }
 JSON
 
-# The block /nzt:setup writes: nzt-ai's markers, a line saying the plugin wrote it, the
-# kernel and the plugin's adapter (QT-99, RN-plugin-mismo-kernel).
-mkdir -p "$plugin/kernel"
-block="$plugin/kernel/CLAUDE.md"
+# The method inside the skill nzt:nzt (QT-109): the kernel and the plugin's adapter are the
+# skill's body, and what skills/nzt does today becomes its reference entry.md. Its
+# description is what makes it load first in every session; nothing else loads it.
+nzt_skill="$plugin/skills/nzt"
+mkdir -p "$nzt_skill/references"
+sed '1,/^---$/d' "$root/skills/nzt/SKILL.md" > "$nzt_skill/references/entry.md"
 {
-  echo "<!-- nzt:start -->"
-  echo "<!-- nzt:plugin $version -->"
+  echo "---"
+  echo "name: nzt"
+  echo "description: NZT's working method - the rules for every reply and where each request goes. Load it first in every session, before anything else, even for a question, and again after the conversation is compacted."
+  echo "---"
+  echo
   cat "$root/core/kernel.md"
   echo
-  cat "$root/core/adapter-claude-plugin.md"
-  echo "<!-- nzt:end -->"
-} > "$block"
+  cat "$root/core/adapter-claude-skill.md"
+} > "$nzt_skill/SKILL.md"
+check_skill "$nzt_skill/SKILL.md" "plugin skills/nzt" "nzt"
 
-lines="$(wc -l < "$block" | tr -d ' ')"
-echo
-printf '%-17s %4s lines\n' "kernel/CLAUDE.md" "$lines"
-if [ "$lines" -gt 200 ]; then
-  echo "WARNING: kernel/CLAUDE.md is over the 200-line budget ($lines lines)." >&2
-  status=1
-fi
-
-# The kernel inside the block is nzt-ai's, byte for byte: the lines between the markers'
-# header and the first '## Host:' heading, in both files.
+# The kernel inside nzt:nzt is nzt-ai's, byte for byte: the lines between the header and the
+# first '## Host:' heading.
 kernel_of() { awk -v skip="$2" 'NR > skip && /^## Host:/ { exit } NR > skip { print }' "$1"; }
-if ! cmp -s <(kernel_of "$out/CLAUDE.md" 1) <(kernel_of "$block" 2); then
-  echo "WARNING: the kernel in kernel/CLAUDE.md differs from the one in CLAUDE.md." >&2
+if ! cmp -s <(kernel_of "$out/CLAUDE.md" 1) <(kernel_of "$nzt_skill/SKILL.md" 5); then
+  echo "WARNING: the kernel in skills/nzt/SKILL.md of the plugin differs from the one in CLAUDE.md." >&2
   status=1
-fi
-
-# The setup skill and the hook live in plugin/ so that nzt-ai does not install them; their
-# tests (plugin/tests) stay in the repo.
-if [ -d "$root/plugin" ]; then
-  for item in "$root"/plugin/*; do
-    [ "$(basename "$item")" = tests ] || cp -R "$item" "$plugin/"
-  done
-  # the plugin's own skills follow the same rules; their name is their folder's
-  global_listing=$listing
-  for file in "$root"/plugin/skills/*/SKILL.md; do
-    [ -f "$file" ] || continue
-    name="$(basename "$(dirname "$file")")"
-    check_skill "$file" "plugin/skills/$name" "$name"
-  done
-  listing=$global_listing
 fi
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it
@@ -249,7 +230,7 @@ mkdir -p "$plugin/agents"
 for agent in "$root"/agents/*.md; do
   sed '2,/^---$/ s/^\([[:space:]]*-[[:space:]]*\)nzt-/\1nzt:nzt-/' "$agent" > "$plugin/agents/$(basename "$agent")"
 done
-echo "plugin $version: kernel/CLAUDE.md, $(find "$plugin/agents" -name '*.md' | wc -l | tr -d ' ') subagents"
+echo "plugin $version: skills/nzt with the kernel, $(find "$plugin/agents" -name '*.md' | wc -l | tr -d ' ') subagents"
 
 # --- evals for `claude plugin eval` ------------------------------------------
 
@@ -258,8 +239,6 @@ if [ -d "$root/evals" ]; then
   rm -rf "$plugin/evals/results"
   mkdir -p "$plugin/evals/_fixtures"
   cp "$out/CLAUDE.md" "$plugin/evals/_fixtures/CLAUDE.md"
-  # the block /nzt:setup writes, for the plugin/ cases (_fixtures/plugin-block.sh)
-  cp "$block" "$plugin/evals/_fixtures/CLAUDE.plugin.md"
   # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
   cp -R "$root/packs" "$plugin/evals/_fixtures/packs"
 
