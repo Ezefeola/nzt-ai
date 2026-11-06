@@ -1,7 +1,9 @@
 {
-  "description": "Backend en .NET: EF Core, minimal APIs o controllers, resultados, excepciones, tests, contenedores, pipeline y observabilidad",
-  "requires": ["backend", "csharp"],
+  "description": "MCP de Microsoft Learn: la documentación oficial de .NET",
   "mcp": [
-    { "name": "microsoft-learn", "url": "https://learn.microsoft.com/api/mcp" }
+    {
+      "name": "microsoft-learn",
+      "url": "https://learn.microsoft.com/api/mcp"
+    }
   ]
 }

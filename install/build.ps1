@@ -114,6 +114,26 @@ function Test-Skill([IO.FileInfo]$file, [string]$rel, [string]$expected) {
             $bad = $true
         }
     }
+    # a pack's references, one folder per pack (D93): the same budgets, and a row naming
+    # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+    foreach ($ref in Get-ChildItem $refDir -Directory | ForEach-Object { Get-ChildItem $_.FullName -File -Filter '*.md' } | Sort-Object FullName) {
+        $sub = "$($ref.Directory.Name)/$($ref.Name)"
+        $refText = Get-Content $ref.FullName -Raw
+        $refLines = ($refText.TrimEnd() -split "`n").Count
+        Write-Host ("  {0,-44} {1,4} lines" -f "references/$sub", $refLines)
+        if ($refLines -gt 200) {
+            Write-Warning "$rel/references/$sub : over the 200-line budget ($refLines lines)."
+            $bad = $true
+        }
+        if ($refLines -gt 100 -and $refText -notmatch '(?m)^## Contents') {
+            Write-Warning "$rel/references/$sub : over 100 lines and no '## Contents'."
+            $bad = $true
+        }
+        if (-not $text.Contains("``$sub``")) {
+            Write-Warning "$rel/references/$sub : no row in the skill's table."
+            $bad = $true
+        }
+    }
     return $bad
 }
 
@@ -199,10 +219,11 @@ if (-not $version) {
 $manifest = @"
 {
   "name": "nzt",
-  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session. Built output — edit skills/ in the repo, not here.",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
   "version": "$version",
   "license": "MIT",
-  "author": { "name": "NZT" }
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
 }
 "@
 Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value $manifest -Encoding utf8
@@ -258,8 +279,6 @@ if (Test-Path $evalsSrc) {
     $results = Join-Path $evalsDest 'results'
     if (Test-Path $results) { Remove-Item $results -Recurse -Force }
     New-Item -ItemType Directory -Force -Path (Join-Path $evalsDest '_fixtures') | Out-Null
-    # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
-    Copy-Item $packsRoot -Destination (Join-Path $evalsDest '_fixtures/packs') -Recurse
 
     $caseFiles = Get-ChildItem $evalsDest -Recurse -Filter 'case.yaml' | Sort-Object FullName
     foreach ($case in $caseFiles) {
@@ -280,7 +299,7 @@ if (Test-Path $evalsSrc) {
         }
     }
 
-    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases, pack fixtures refreshed)"
+    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases)"
 }
 
 Write-Host "-> $OutDir"

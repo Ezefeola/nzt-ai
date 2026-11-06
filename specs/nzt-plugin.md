@@ -27,8 +27,9 @@ NZT.
 **Afuera**
 - Codex: `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar contra Codex 0.164.0 (Q-01).
   En Codex NZT se instala con `nzt-ai`.
-- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24) y la que
-  instala los packs de proyecto (`nzt-ai project`).
+- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24), y en Codex
+  la que pone el MCP de un pack en el proyecto (`nzt-ai project`). Las reglas de los packs
+  viajan en el plugin, en `nzt-software` y `nzt-games` (D93).
 - Tener `nzt-ai` y el plugin a la vez: el kernel llegaría dos veces. Nada lo impide; la guía
   dice que se usa uno solo.
 - Los mods: plugins aparte del mismo marketplace (D63).

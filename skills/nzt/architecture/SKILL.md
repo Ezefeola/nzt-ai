@@ -85,5 +85,5 @@ before its work is touched.
 ## Done when
 
 The work can start with no open technical decision in its way: every component touched has
-its `tech.md` section and its packs installed, every consequential decision its record, and
+its `tech.md` section with its packs and tools, every consequential decision its record, and
 every open question its `QT-NN` where it will be read.

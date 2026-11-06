@@ -329,14 +329,14 @@ public static partial class Program
 
         var folders = Directory.EnumerateDirectories(Path.Combine(root, "packs"))
             .Select(Path.GetFileName).Order(StringComparer.Ordinal).ToList();
-        var references = Directory.EnumerateFiles(Path.Combine(root, "packs"), "*.md", SearchOption.AllDirectories)
-            .Count(f => Path.GetFileName(Path.GetDirectoryName(f)) == "references");
+        var markdown = Directory.EnumerateFiles(Path.Combine(root, "packs"), "*.md", SearchOption.AllDirectories).Count();
         var embedded = PackCatalog.Load();
 
         Check($"embebe los {folders.Count} packs del repo",
             folders.Count > 0 && embedded.Packs.Select(p => p.Name).SequenceEqual(folders));
-        Check($"embebe las {references} referencias de los packs",
-            references > 0 && embedded.Packs.Sum(p => p.Skill?.References.Count ?? 0) == references);
+        // D93: las reglas de un pack viven en nzt-software o nzt-games; un pack es solo su MCP
+        Check("los packs del repo traen solo MCP, sin skill",
+            markdown == 0 && embedded.Packs.All(p => p.Skill is null && p.Mcp.Count > 0));
     }
 
     private static void LintCatchesEveryBrokenPack()

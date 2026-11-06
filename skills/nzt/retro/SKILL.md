@@ -50,7 +50,7 @@ It runs only when the user asks: never offered, not a phase, no router sends you
 
    | Section | Destinations |
    |---|---|
-   | For the project | `Docs/Architecture/tech.md`, its packs (`nzt-ai project`), `Docs/` (glossary, architecture), `Docs/Architecture/tech-debt.md`, CI gates and linters, `CLAUDE.md` or `AGENTS.md` |
+   | For the project | `Docs/Architecture/tech.md`, its packs, `Docs/` (glossary, architecture), `Docs/Architecture/tech-debt.md`, CI gates and linters, `CLAUDE.md` or `AGENTS.md` |
    | For NZT | the kernel, a router, a reference, a pack, a `nzt-ai` check, a missing case in `evals/` |
 
 5. **Classify**: category — **navigation**, **automated checks**, **rules** (tech, code

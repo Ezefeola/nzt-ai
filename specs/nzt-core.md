@@ -3297,6 +3297,39 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Revertirla:** volver a D91 desde el commit `db92912`.
   - **Reemplaza:** la parte de D91 sobre `/nzt:setup`, el bloque y el hook. Lo demás de D91
     —el plugin en el marketplace, los nombres `nzt:…`, `nzt-ai` como forma común— sigue.
+- **D93.** **Las reglas de los packs viajan con el marco, en una skill por dominio:
+  `nzt-software` y `nzt-games`, cada una con todas sus referencias a un nivel de su
+  `SKILL.md`; `tech.md` sigue decidiendo qué pack aplica, y `packs/` queda como catálogo de
+  MCP.** Revisa D88. Estado: **aceptada** el 2026-11-05, decidida por el usuario en el debate
+  de la rama `nzt-plugin-for-claude`, unidades 478–484.
+  - **Lo que la forzó:** con D92 el plugin no instala packs por proyecto, y sin `nzt-ai` no
+    había cómo traerlos. Además, una historia .NET cargaba 4 o 5 skills en cadena (`dotnet` →
+    `backend`, `csharp` → `code`) y siete descripciones de pack estaban siempre en contexto.
+  - **Opciones** (hechos en las docs de plugins y en *Skill authoring best practices* de
+    Anthropic, leídas el 2026-11-05):
+
+    | Opción | Por qué perdió, o qué cuesta |
+    |---|---|
+    | Un plugin por pack, habilitado por proyecto, con `dependencies` | La misma cadena de skills y más piezas que publicar y versionar |
+    | Un plugin por tecnología con lo genérico copiado | Varios plugins para instalar; el usuario quiere uno |
+    | Dos plugins, software y juegos | La frontera no es del proyecto: un juego puede tener un backend |
+    | Una skill `nzt-stack` con un índice por pack | Tres saltos de lectura: la guía pide referencias a un nivel del `SKILL.md` |
+    | **Una skill por dominio, todo a un nivel** (elegida) | Ver *lo que se acepta* |
+
+  - **Decisión:** `skills/nzt/software/` (`code`, `backend`, `frontend`, `csharp`, `ddd`,
+    `dotnet`, `blazor`) y `skills/nzt/games/` (`unity`), con `references/<pack>/`. El orden
+    genérico → específico lo dice el `SKILL.md`; ninguna referencia manda a leer otra primero.
+    El dominio es del componente en `tech.md`: un proyecto mixto carga las dos. `packs/<pack>/`
+    queda con `pack.json` solo donde hay MCP (`dotnet`, `blazor`, `unity`), y los MCP se
+    proponen como cualquier herramienta (DB-03): en Claude Code con `claude mcp add --scope
+    project`, en Codex con `nzt-ai project`.
+  - **Lo que se acepta:** **(1)** `nzt-software` carga entero (~145 líneas; los costos de cada opción, solo al elegir, en `references/choosing.md`) en vez de solo los
+    packs listados; **(2)** las reglas de todos los packs están en toda instalación, inertes
+    hasta que `tech.md` las lista; **(3)** pasados los 500 líneas, `nzt-software` se parte por
+    dominio otra vez.
+  - **Revertirla:** devolver las referencias a `packs/<pack>/` con su `SKILL.md`.
+  - **Reemplaza:** de D88, las skills de pack instaladas por proyecto. Siguen `tech.md`, sus
+    packs por componente y "instalado no es autorización".
 
 ## 13. Revisión contra Temper v3
 

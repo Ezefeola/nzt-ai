@@ -106,6 +106,27 @@ check_skill() {
       status=1
     fi
   done < <(find "$dir" -maxdepth 1 -name '*.md' | sort)
+
+  # a pack's references, one folder per pack (D93): the same budgets, and a row naming
+  # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+  while IFS= read -r ref; do
+    local sub slines
+    sub="$(basename "$(dirname "$ref")")/$(basename "$ref")"
+    slines="$(wc -l < "$ref" | tr -d ' ')"
+    printf '  %-44s %4s lines\n' "references/$sub" "$slines"
+    if [ "$slines" -gt 200 ]; then
+      echo "WARNING: $rel/references/$sub : over the 200-line budget ($slines lines)." >&2
+      status=1
+    fi
+    if [ "$slines" -gt 100 ] && ! grep -q '^## Contents' "$ref"; then
+      echo "WARNING: $rel/references/$sub : over 100 lines and no '## Contents'." >&2
+      status=1
+    fi
+    if ! grep -qF "\`$sub\`" "$file"; then
+      echo "WARNING: $rel/references/$sub : no row in the skill's table." >&2
+      status=1
+    fi
+  done < <(find "$dir" -mindepth 2 -maxdepth 2 -name '*.md' | sort)
 }
 
 if [ -d "$root/skills" ]; then
@@ -191,10 +212,11 @@ fi
 cat > "$plugin/.claude-plugin/plugin.json" <<JSON
 {
   "name": "nzt",
-  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session. Built output — edit skills/ in the repo, not here.",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
   "version": "$version",
   "license": "MIT",
-  "author": { "name": "NZT" }
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
 }
 JSON
 
@@ -238,8 +260,6 @@ if [ -d "$root/evals" ]; then
   cp -R "$root/evals" "$plugin/evals"
   rm -rf "$plugin/evals/results"
   mkdir -p "$plugin/evals/_fixtures"
-  # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
-  cp -R "$root/packs" "$plugin/evals/_fixtures/packs"
 
   cases=0
   while IFS= read -r case; do
@@ -258,7 +278,7 @@ if [ -d "$root/evals" ]; then
     fi
   done < <(find "$plugin/evals" -name case.yaml | sort)
 
-  echo "plugin -> $plugin  ($cases eval cases, pack fixtures refreshed)"
+  echo "plugin -> $plugin  ($cases eval cases)"
 fi
 
 echo "-> $out"

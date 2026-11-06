@@ -48,7 +48,7 @@
     <EmbeddedResource Include="$(ContentRoot)skills\**\SKILL.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="$(ContentRoot)skills\**\references\*.md">
+    <EmbeddedResource Include="$(ContentRoot)skills\**\references\**\*.md">
       <LogicalName>content/skills/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
     <!-- Los packs: lo que se instala por proyecto con `nzt-ai project`. -->

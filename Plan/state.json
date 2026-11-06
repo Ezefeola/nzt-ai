@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-05T19:42:02Z",
+  "updated": "2026-11-05T21:10:20Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -133,7 +133,7 @@
         },
         {
           "name": "verify",
-          "status": "doing",
+          "status": "done",
           "units": [
             {
               "id": 474,
@@ -164,6 +164,67 @@
       ]
     },
     {
+      "id": "S2c",
+      "name": "Los packs dentro del plugin: nzt-software y nzt-games (D93)",
+      "status": "doing",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 478,
+              "do": "D93 en specs/nzt-core.md: las reglas de los packs viajan con el marco, una skill por dominio con referencias a un nivel",
+              "status": "done",
+              "detail": "Aceptada por el usuario en el debate: un solo plugin, software y juegos separados, todo a un nivel del SKILL.md (Skill authoring best practices de Anthropic, leída el 2026-11-05). Revisa D88"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "doing",
+          "units": [
+            {
+              "id": 479,
+              "do": "skills/nzt/software: SKILL.md router (tabla por tema, genérico a la izquierda) y references/<pack>/ movidas desde packs/ sin encadenarse",
+              "status": "done",
+              "detail": "git mv de las 75 referencias; quitadas las líneas Builds on/read it first y los Read architecture.md first, el orden pasa al router. Reglas de C# a csharp/rules.md. 151 líneas, descripción de 199"
+            },
+            {
+              "id": 480,
+              "do": "skills/nzt/games: SKILL.md y unity/editor.md con la conexión al editor",
+              "status": "done",
+              "detail": "Lo único que tenía unity era el MCP; editor.md lo dice por plataforma. Sin reglas de juego todavía"
+            },
+            {
+              "id": 481,
+              "do": "Kernel *Packs*, adaptador del plugin, nzt-build, nzt-ship, nzt-retro y nzt-architecture (catálogo, claude mcp add / plugin install --scope project, ejes desde la skill del dominio)",
+              "status": "done",
+              "detail": "Comandos verificados con --help de Claude Code"
+            },
+            {
+              "id": 482,
+              "do": "packs/ como catálogo de MCP (csharp, dotnet, blazor, unity, sin requires); build: chequeo de referencias en subcarpetas sin índice, sin copiar packs a fixtures; checks del instalador",
+              "status": "done",
+              "detail": "Las dos builds iguales y sin avisos; validate pasa; check de packs del instalador reescrito"
+            },
+            {
+              "id": 483,
+              "do": "Evals: graders a nzt-software/references/<pack>/, not-dotnet mide que no lee references/dotnet ni blazor, packs.sh sin efecto",
+              "status": "done",
+              "detail": "15 rutas de graders comprobadas contra disco; 40 scaffolds corren"
+            },
+            {
+              "id": 484,
+              "do": "Auditoría con gestionar-skills, specs del plugin e instalador al día, y humo de los casos stack/",
+              "status": "todo",
+              "detail": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "S3",
       "name": "Publicación",
       "status": "todo",
@@ -175,7 +236,8 @@
             {
               "id": 472,
               "do": "Workflow de release a la rama plugin, entrada nzt en el marketplace, README y versión de NZT",
-              "status": "todo"
+              "status": "todo",
+              "detail": "Con D93: publicar el plugin con nzt-software y nzt-games; el usuario mergea el PR y avisa"
             }
           ]
         }

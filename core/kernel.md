@@ -76,11 +76,11 @@ not a listed skill is a reference of the longest-prefix router (`nzt-verify-perf
 `nzt-verify`'s `references/performance.md`). References do not survive compaction: after
 one, read again those the current unit uses.
 
-**Packs.** What belongs to one project — a technology, an architecture style, the user's
-code rules — comes as a pack skill (`nzt-<pack>`) installed in that project with `nzt-ai
-project`. `Docs/Architecture/tech.md` lists the packs of each component: load every pack
-skill it lists for what you touch, after the phase router, and the packs each one says to
-load first. A pack installed but neither listed nor required does not apply. Choosing and installing packs is `nzt-architecture`'s.
+**Packs.** What holds for one technology, an architecture style or the user's code rules
+is a pack, and its rules live in its domain's skill: `nzt-software` or
+`nzt-games`. `Docs/Architecture/tech.md` lists the packs of each component: for what you
+touch, load the domain skill of the packs it lists, after the phase router. A pack neither
+listed nor required does not apply. Choosing packs and the tools they need is `nzt-architecture`'s.
 
 ## Guardrails
 

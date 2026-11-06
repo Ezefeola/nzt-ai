@@ -235,8 +235,9 @@ public static partial class Program
         var root = RepoRoot();
         if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
 
+        // también las de una carpeta por pack, `references/<pack>/` (D93)
         var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*.md", SearchOption.AllDirectories)
-            .Count(f => Path.GetFileName(Path.GetDirectoryName(f)) == "references");
+            .Count(f => f.Replace('\\', '/').Contains("/references/", StringComparison.Ordinal));
         var embedded = ContentCatalog.Load().Skills.Sum(s => s.References.Count);
 
         Check($"embebe las {onDisk} referencias del repo", onDisk > 0 && embedded == onDisk);

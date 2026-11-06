@@ -27,11 +27,11 @@ graders:
   - name: dotnet-pack-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-dotnet"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-software"'
   - name: pipeline-guidance-reached
     type: tool_used
     tool: Read
-    input_match: 'nzt-dotnet[/\\]+references[/\\]+ship-pipeline\.md'
+    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ship-pipeline\.md'
   - name: generic-pipeline-read
     type: tool_used
     tool: Read
@@ -39,7 +39,7 @@ graders:
   - name: other-rows-not-loaded
     type: tool_used
     tool: Read
-    input_match: 'nzt-dotnet[/\\]+references[/\\]+ship-observability\.md'
+    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ship-observability\.md'
     min: 0
     max: 0
   - name: gates-that-hold
