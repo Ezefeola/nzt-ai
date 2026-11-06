@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-06T01:10:18Z",
+  "updated": "2026-11-06T03:50:00Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -225,6 +225,116 @@
       ]
     },
     {
+      "id": "S2d",
+      "name": "state check como scripts de nzt-plan, para el plugin y el irm, sin depender del CLI",
+      "status": "done",
+      "phases": [
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 485,
+              "do": "skills/nzt/plan/scripts/state-check.py (macOS, Linux) y state-check.ps1 (Windows, PS 5.1 y 7, UTF-8 con BOM) con las reglas, mensajes y orden de StateCheck.cs",
+              "status": "done",
+              "detail": "Paridad en installer/tests/Nzt.Cli.Checks (CheckState corre cada estado también por los scripts; StateScriptsMatchTheCli): 69 corridas iguales al CLI con python, powershell y pwsh; 241 checks pasan. El error de JSON solo compara que lo sea (el texto es del parser)"
+            },
+            {
+              "id": 486,
+              "do": "Build e instalador llevan scripts/ de cada skill",
+              "status": "done",
+              "detail": "Build: copia los scripts igual al repo (cmp). Instalador: csproj embebe skills/**/scripts/*.*; ContentCatalog decodifica los scripts desde sus bytes (StreamReader quitaba el BOM aun sin detección: el check lo atrapó) y Manifest.Hash ignora un BOM inicial (File.ReadAllText lo quita al releer). Check InstallsTheScriptsByteForByte: embebe los 2, instala byte a byte, reinstalar sin editados, desinstalar los borra. 246 checks pasan"
+            },
+            {
+              "id": 487,
+              "do": "Kernel (core/kernel.md:111), nzt-plan SKILL.md (47, 84) y sus references state.md y parallel.md: correr el script de nzt-plan (.ps1 en Windows, .py en macOS/Linux) en vez de nzt-ai state check; sin intérprete, validar contra el contrato y avisar",
+              "status": "done",
+              "detail": "Kernel: la hard rule dice correr el state check de nzt-plan. nzt-plan SKILL.md: sección State check (powershell -NoProfile -ExecutionPolicy Bypass -File <carpeta>/scripts/state-check.ps1 en Windows, python3 .../state-check.py en macOS/Linux; sin intérprete, revisar contra references/state.md y decir que no corrió); paso 5 y Done when la nombran. state.md y parallel.md apuntan a SKILL.md. Las dos builds iguales, validate pasa, 246 checks; los dos comandos corridos desde dist/plugin dan exit 0 (python3 aquí es el alias de la Store; se probó con py). La carpeta de la skill es la que el host da al cargarla (visto en Claude Code; en Codex sin verificar). Specs (nzt-core D68, nzt-installer §12.2) quedan para D94 en la 490"
+            },
+            {
+              "id": 488,
+              "do": "Comprobación del instalador: instalar en una carpeta temporal y ver los scripts con BOM. OJO: en Windows el instalador ignora HOME/USERPROFILE (SpecialFolder.UserProfile); usar el destino que usan los otros checks",
+              "status": "done",
+              "detail": "Cubierta en la 486 por InstallsTheScriptsByteForByte: instala el catálogo real en una carpeta temporal (InTemp, Provider.ClaudeCode(home)) y compara bytes con el repo; el .ps1 sale con BOM"
+            },
+            {
+              "id": 489,
+              "do": "Verificar en las fuentes que macOS trae python3 con las Command Line Tools; anotarlo en la spec del plugin",
+              "status": "done",
+              "detail": "specs/nzt-plugin.md, 'El state check en macOS': las notas de Catalina 10.15 y 12.3 (documented) dicen que los runtimes son legado y que se quitó 2.7. Que python3 llega con las CLT por un shim en /usr/bin lo dice solo un ingeniero de Apple en el foro (rango 5). Sin verificar macOS 26 ni qué devuelve el shim sin CLT. nzt-plan SKILL.md: 'If the script cannot run (no interpreter, or macOS offers to install the Command Line Tools)'. El párrafo 'no hay scripts' de la spec, corregido. Build al día"
+            },
+            {
+              "id": 490,
+              "do": "D94 en specs/nzt-core.md (state check vive en nzt-plan como scripts; el CLI queda como instalador), commit y push",
+              "status": "done",
+              "detail": "D94 en specs/nzt-core.md (revisa D68, marcada); specs/nzt-installer.md §12.2 con la nota [modify] D94. Commit y push de S2d en nzt-plugin-for-claude"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S2e",
+      "name": "El irm instala como el plugin: kernel dentro de la skill nzt, sin CLAUDE.md ni AGENTS.md, en Claude Code y Codex (QT-113)",
+      "status": "doing",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "doing",
+          "units": [
+            {
+              "id": 491,
+              "do": "D95 en specs/nzt-core.md (revisa D92 y lo anotado: una sola vía, la skill nzt) y specs/nzt-installer.md al día: qué instala, cómo migra el bloque viejo, Codex sin verificar",
+              "status": "todo",
+              "detail": ""
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "todo",
+          "units": [
+            {
+              "id": 492,
+              "do": "Adaptadores de skill por host para el irm (Claude Code con nombres nzt-, Codex) y el build arma la skill nzt de cada uno como la del plugin",
+              "status": "todo",
+              "detail": ""
+            },
+            {
+              "id": 493,
+              "do": "Instalador: la skill nzt lleva kernel + adaptador + references/entry.md, deja de escribir CLAUDE.md/AGENTS.md, al actualizar quita el bloque viejo; checks",
+              "status": "todo",
+              "detail": ""
+            },
+            {
+              "id": 494,
+              "do": "install.ps1/install.sh, README y lo que nombre el kernel en CLAUDE.md/AGENTS.md, al día",
+              "status": "todo",
+              "detail": ""
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "todo",
+          "units": [
+            {
+              "id": 495,
+              "do": "Prueba en vivo en Claude Code con el irm: nzt primera en sesión nueva, tras /compact, actualizar desde una instalación con bloque y desinstalar",
+              "status": "todo",
+              "detail": ""
+            },
+            {
+              "id": 496,
+              "do": "Prueba en Codex con el usuario: carga nzt primero sin AGENTS.md",
+              "status": "todo",
+              "detail": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "S3",
       "name": "Publicación",
       "status": "todo",
@@ -247,13 +357,15 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": {
-    "units": [],
+    "units": [490, 491, 492, 493, 494],
     "keep_stops": []
   },
   "waiting_on": null,
   "notes": [
     "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
     "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",
-    "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente"
+    "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente",
+    "2026-11-05: el agente instaló NZT por error en el ~/.claude real (Windows ignora HOME); el usuario lo desinstaló el 2026-11-06 (verificado: sin CLAUDE.md, skills nzt* ni agentes). Sin NZT global, las guías se leen de skills/ del repo",
+    "QT-113 (usuario, 2026-11-06) revisa lo anterior: el irm instala igual que el plugin (kernel en la skill nzt, sin CLAUDE.md/AGENTS.md) en Claude Code y Codex; Codex lo prueba el usuario al final. Los chequeos viven como scripts en las skills; el CLI queda como instalador. Orden: S2d, S2e, PR y la 472"
   ]
 }

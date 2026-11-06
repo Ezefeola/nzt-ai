@@ -108,7 +108,7 @@ listed nor required does not apply. Choosing packs and the tools they need is `n
 
 - Never execute a plan the user has not approved.
 - Never write more than one spec in a unit, nor run the whole pipeline in one turn.
-- Never skip the state update at the end of a planned unit; then run `nzt-ai state check`
-  where installed and fix what it reports before the report.
+- Never skip the state update at the end of a planned unit; then run `nzt-plan`'s state
+  check and fix what it reports before the report.
 - Never write a spec for something you have not read.
 - Delegate only reading and the units an approved plan marked parallel, per `nzt-delegate`.

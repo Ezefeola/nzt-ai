@@ -505,6 +505,12 @@ Sin problemas, una línea y código 0. Con problemas, uno por línea, nombrando 
 fase, y código 1. Sin archivo lo dice y sale con 0: no todo proyecto tiene estado. Un JSON
 roto es un problema, con su posición.
 
+**[modify] D94:** el agente ya no corre este comando. Corre los scripts de `nzt-plan`
+(`skills/nzt/plan/scripts/state-check.ps1` y `.py`), que aplican las mismas reglas, mensajes
+y orden; los checks del instalador comprueban que los tres den lo mismo
+(`StateScriptsMatchTheCli`). El instalador copia `scripts/` de cada skill byte a byte, el
+`.ps1` con BOM. `nzt-ai state check` sigue, pero nada en el método lo nombra.
+
 ### 12.3 Preguntas
 
 #### QT-23 · ¿Dónde queda `nzt-ai`?

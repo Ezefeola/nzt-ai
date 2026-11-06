@@ -28,6 +28,7 @@ public static partial class Program
         InstallsReferencesInsideTheirSkill();
         RemovesOrphanReferencesAndEmptyFolders();
         EmbedsEveryReferenceOfTheRepo();
+        InstallsTheScriptsByteForByte();
         InstallsEachProviderItsOwnAgent();
         UninstallRemovesTheAgentButNotTheFolder();
         EmbedsTheAgentsOfTheRepo();
@@ -74,6 +75,7 @@ public static partial class Program
         StateCheckCatchesEveryBrokenSliceInvariant();
         StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
+        StateScriptsMatchTheCli();
         RunProjectChecks();
 
         Console.WriteLine();
@@ -206,6 +208,47 @@ public static partial class Program
         // Instrucciones + tres skills + dos referencias.
         Check("registra las referencias en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 6);
+    });
+
+    /// <summary>
+    /// Los scripts de las skills (state-check de nzt-plan) se instalan igual al repo,
+    /// byte a byte: el .ps1 lleva BOM porque PowerShell 5.1 lee sin él como ANSI. Y el
+    /// BOM no puede hacer que reinstalar o desinstalar los tome por editados.
+    /// </summary>
+    private static void InstallsTheScriptsByteForByte() => InTemp(home =>
+    {
+        var root = RepoRoot();
+        if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
+
+        var provider = Provider.ClaudeCode(home);
+        var manifests = Path.Combine(home, "manifests");
+        var catalog = ContentCatalog.Load();
+
+        var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*", SearchOption.AllDirectories)
+            .Where(f => f.Replace('\\', '/').Contains("/scripts/", StringComparison.Ordinal))
+            .ToList();
+        Check($"embebe los {onDisk.Count} scripts del repo",
+            onDisk.Count > 0 && catalog.Skills.Sum(s => s.Scripts.Count) == onDisk.Count);
+
+        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+
+        foreach (var source in onDisk)
+        {
+            var name = Path.GetFileName(source);
+            var installed = Path.Combine(provider.SkillsDirectory, "nzt-plan", "scripts", name);
+            Check($"instala {name} igual al repo, byte a byte",
+                File.Exists(installed) && File.ReadAllBytes(installed).SequenceEqual(File.ReadAllBytes(source)));
+        }
+
+        var again = Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        Check("reinstalar no toma los scripts por editados",
+            again.Count(FileAction.SkippedLocallyEdited) == 0
+            && again.Count(FileAction.Unchanged) == again.Outcomes.Count);
+
+        var removed = Installer.Uninstall(provider, manifestDirectory: manifests);
+        Check("desinstalar borra los scripts",
+            removed.Count(FileAction.SkippedLocallyEdited) == 0
+            && !Directory.Exists(Path.Combine(provider.SkillsDirectory, "nzt-plan")));
     });
 
     private static void RemovesOrphanReferencesAndEmptyFolders() => InTemp(home =>
@@ -827,8 +870,86 @@ public static partial class Program
     {
         Directory.CreateDirectory(Path.Combine(home, "Plan"));
         File.WriteAllText(Path.Combine(home, StateCheck.RelativePath), json);
-        return StateCheck.Run(home);
+        var report = StateCheck.Run(home);
+        CompareStateScripts(home, report);
+        return report;
     }
+
+    // The skill nzt-plan carries the same check as scripts, for the plugin and for whoever
+    // has no CLI: state-check.ps1 (Windows) and state-check.py (macOS, Linux). Every state
+    // above runs through each interpreter this machine has, and the output must match the CLI.
+    private static int _stateScriptRuns;
+
+    private static readonly Lazy<List<(string Label, string File, string[] Args)>> StateScripts = new(() =>
+    {
+        var found = new List<(string, string, string[])>();
+        var root = RepoRoot();
+        if (root is null) return found;
+        var scripts = Path.Combine(root, "skills", "nzt", "plan", "scripts");
+        foreach (var python in new[] { "python3", "py", "python" })
+            if (Answers(python, ["--version"]).StartsWith("Python 3", StringComparison.Ordinal))
+            {
+                found.Add(("python", python, [Path.Combine(scripts, "state-check.py")]));
+                break;
+            }
+        foreach (var shell in OperatingSystem.IsWindows() ? new[] { "powershell", "pwsh" } : ["pwsh"])
+            if (Answers(shell, ["-NoProfile", "-Command", "$PSVersionTable.PSVersion.Major"]).Trim().Length > 0)
+                found.Add((shell, shell, ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", Path.Combine(scripts, "state-check.ps1")]));
+        return found;
+    });
+
+    private static System.Diagnostics.ProcessStartInfo Start(string file, IEnumerable<string> args)
+    {
+        var start = new System.Diagnostics.ProcessStartInfo(file)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+        };
+        foreach (var a in args) start.ArgumentList.Add(a);
+        return start;
+    }
+
+    private static string Answers(string file, string[] args)
+    {
+        try
+        {
+            using var process = System.Diagnostics.Process.Start(Start(file, args))!;
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return process.ExitCode == 0 ? output : "";
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return "";
+        }
+    }
+
+    private static void CompareStateScripts(string home, StateReport report)
+    {
+        List<string> expected = report.Ok
+            ? [$"{StateCheck.RelativePath}: cumple el contrato del kernel."]
+            : [$"{StateCheck.RelativePath}: {report.Problems.Count} problema(s)", .. report.Problems.Select(p => $"  {p}")];
+        foreach (var (label, file, args) in StateScripts.Value)
+        {
+            using var process = System.Diagnostics.Process.Start(Start(file, [.. args, home]))!;
+            var actual = process.StandardOutput.ReadToEnd().Replace("\r\n", "\n").TrimEnd('\n').Split('\n').ToList();
+            process.WaitForExit();
+            _stateScriptRuns++;
+
+            // a JSON error's wording is the parser's own: only that it is one is compared
+            var same = report.Problems.Count == 1 && report.Problems[0].StartsWith("no es JSON válido", StringComparison.Ordinal)
+                ? actual.Count == 2 && actual[1].StartsWith("  no es JSON válido", StringComparison.Ordinal)
+                : actual.SequenceEqual(expected);
+            if (!same || process.ExitCode != (report.Ok ? 0 : 1))
+                Failures.Add($"state-check con {label} no da lo del CLI:\n    CLI:    {string.Join(" | ", expected)}\n    script: {string.Join(" | ", actual)}");
+        }
+    }
+
+    private static void StateScriptsMatchTheCli() =>
+        Check($"los scripts de state check dan lo del CLI ({string.Join(", ", StateScripts.Value.Select(s => s.Label))}; {_stateScriptRuns} corridas)",
+            StateScripts.Value.Count > 0 && _stateScriptRuns > 0);
 
     private static void StateCheckAcceptsAValidState() => InTemp(home =>
     {

@@ -52,6 +52,10 @@ public static class Installer
                 planned.Add(new PlannedFile(
                     Path.Combine(provider.SkillsDirectory, skill.Name, "references", reference.FileName),
                     reference.Text));
+            foreach (var script in skill.Scripts)
+                planned.Add(new PlannedFile(
+                    Path.Combine(provider.SkillsDirectory, skill.Name, "scripts", script.FileName),
+                    script.Text));
         }
 
         foreach (var agent in catalog.Agents.Where(a =>

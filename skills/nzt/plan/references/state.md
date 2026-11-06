@@ -39,5 +39,5 @@ in the artifacts.
 
 ## Done when
 
-It passes `nzt-ai state check`, and a fresh session can tell where the work stands, what
-comes next and what it is waiting on.
+It passes the state check (`SKILL.md`), and a fresh session can tell where the work stands,
+what comes next and what it is waiting on.

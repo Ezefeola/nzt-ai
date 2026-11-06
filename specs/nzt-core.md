@@ -2163,7 +2163,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     propuso expresarlo en tokens absolutos o medirlo con evals. Cambiar los números es
     decisión del usuario; queda anotado para cuando haya una medición. Unidad 306.
 - **D68.** **Después de escribir el estado, el agente corre `nzt-ai state check` donde esté
-  instalado.** Lo que la forzó: el análisis externo (2026-10-21) marcó que los invariantes de
+  instalado.** Revisada por D94: ahora corre el script de `nzt-plan`. Lo que la forzó: el análisis externo (2026-10-21) marcó que los invariantes de
   `Plan/state.json` —un `doing` por nivel, ids únicos, cerrar una fase abre la siguiente— los
   sostiene el modelo a mano y nada los revisa. El usuario eligió que lo revise el CLI, y que
   el CLI quede instalado como `nzt-ai` (sección 12 de `specs/nzt-installer.md`).
@@ -3330,6 +3330,27 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Revertirla:** devolver las referencias a `packs/<pack>/` con su `SKILL.md`.
   - **Reemplaza:** de D88, las skills de pack instaladas por proyecto. Siguen `tech.md`, sus
     packs por componente y "instalado no es autorización".
+- **D94.** **El state check vive en `nzt-plan` como scripts (`scripts/state-check.ps1` en
+  Windows, `state-check.py` en macOS y Linux), y el CLI `nzt-ai` queda como instalador.**
+  Revisa D68. Estado: **aceptada** el 2026-11-06, decidida por el usuario. Rama
+  `nzt-plugin-for-claude`, unidades 485–490 (tramo S2d).
+  - **Lo que la forzó:** con D92 el plugin no instala `nzt-ai`, así que la hard rule de D68
+    (*"donde esté instalado"*) no corría nunca en el plugin: los invariantes del estado
+    volvían a depender del modelo.
+  - **Decisión:** los dos scripts aplican las reglas, mensajes y orden de `StateCheck.cs`; la
+    paridad la comprueban los checks del instalador (`StateScriptsMatchTheCli`, 69 corridas
+    iguales con python, powershell y pwsh). La hard rule del kernel dice correr el state
+    check de `nzt-plan`; `nzt-plan` dice cómo, y que si el script no corre (sin intérprete, o
+    macOS pide las Command Line Tools) se revisa contra `references/state.md` y se avisa. El
+    build y el instalador copian `scripts/` de cada skill byte a byte (el `.ps1` con BOM,
+    porque PowerShell 5.1 lee sin él como ANSI).
+  - **Lo que se acepta:** **(1)** dos implementaciones más de las mismas reglas, sostenidas
+    por la prueba de paridad; **(2)** en un Mac sin Command Line Tools el chequeo es a mano
+    (ver *El state check en macOS* en `specs/nzt-plugin.md`); **(3)** `nzt-ai state check`
+    sigue existiendo, pero nada en el método lo nombra.
+  - **Revertirla:** volver la hard rule a `nzt-ai state check` y quitar `scripts/`.
+  - **Reemplaza:** de D68, el CLI como el que revisa. Siguen la regla en el kernel y lo que
+    revisa.
 
 ## 13. Revisión contra Temper v3
 

@@ -99,8 +99,9 @@ carga `nzt:nzt-<x>`; una skill de pack instalada en el proyecto conserva su nomb
 | Subagentes | `agents/nzt-explorer.md`, `nzt-worker.md` | `agents/` → `nzt:nzt-explorer`, `nzt:nzt-worker` |
 | Manifiesto | lo arma el build | `.claude-plugin/plugin.json`, `name: nzt`, versión de NZT |
 
-No hay scripts, hooks ni archivos que escriba el plugin: el plugin es solo texto, así que no
-depende del sistema operativo. Se publica en la rama `plugin` (QT-96) y el marketplace del repo
+No hay hooks ni archivos que escriba el plugin. El único código es el state check de
+`nzt:nzt-plan` (`skills/nzt-plan/scripts/`, S2d): lo corre el agente, no el plugin, y sin
+intérprete revisa el estado a mano (ver *El state check en macOS*). Se publica en la rama `plugin` (QT-96) y el marketplace del repo
 suma la entrada `nzt` con `{"source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin"}`:
 se instala como `nzt@nzt`.
 
@@ -121,6 +122,29 @@ se instala como `nzt@nzt`.
 | El kernel tras `/compact` | en vivo (475) | Claude Code re-adjuntó `nzt:nzt` y `nzt:nzt-plan` solo |
 | Plugin desactivado | en vivo (475) | ninguna skill, escritura ni mención de NZT |
 | Nombres `nzt:nzt-<x>` | evals de la 470 y de la 474 | el modelo carga los nombres del plugin |
+
+### El state check en macOS (unidad 489)
+
+`nzt-plan` corre `state-check.ps1` en Windows y `state-check.py` con `python3` en macOS y
+Linux. La pregunta: ¿un Mac sin nada instalado tiene `python3`? Leído el 2026-11-06:
+
+- documented: macOS incluye Python, Ruby y Perl solo por compatibilidad con software viejo,
+  y versiones futuras no los traerán por defecto; para 2.7 recomienda correr `python3`.
+  [Notas de macOS Catalina 10.15](https://developer.apple.com/documentation/macos-release-notes/macos-catalina-10_15-release-notes),
+  *Scripting Language Runtimes* (49764202, 51097165).
+- documented: macOS 12.3 quitó Python 2.7.
+  [Notas de macOS 12.3](https://developer.apple.com/documentation/macos-release-notes/macos-12_3-release-notes) (39795874).
+- Fuente de rango 5, de personal de Apple: *"Python3 has never been bundled with macOS"*, y
+  `/usr/bin/python3` es un shim que ofrece instalarlo con las Command Line Tools. Lo dice un
+  Developer Tools Engineer de Apple en el
+  [foro de desarrolladores](https://developer.apple.com/forums/thread/652014) (julio de 2020).
+  Las notas de versión no lo dicen.
+- unverified: que en macOS 26 siga igual, y qué devuelve el shim al agente sin las Command
+  Line Tools (si sale con error o espera el diálogo). Lo resuelve una corrida en un Mac limpio.
+- inferred: sin las Command Line Tools, `python3` no corre el script. Por eso `nzt-plan`
+  dice *"If the script cannot run"* (sin intérprete, o macOS ofrece instalar las Command
+  Line Tools): revisar contra `references/state.md` y decir que el script no corrió. Con
+  las Command Line Tools instaladas, corre.
 
 ## Abierto
 
@@ -350,6 +374,19 @@ las dos sesiones. — `usuario y agente, observado`
 `core/adapter-claude-plugin.md`, los evals `plugin/` y el fixture `plugin-block.sh`; el build
 ya no arma el bloque. Esta spec se reescribió arriba; `specs/nzt-installer.md` y la guía de la
 landing, al día. — `agente, dentro del alcance aprobado`
+
+### 2026-11-06 · antes de la 490
+
+**QT-113 · El `irm` pasa a instalar como el plugin: ¿hasta dónde llega el cambio?**
+> Revisa lo decidido antes (el `irm` seguía escribiendo el kernel en `CLAUDE.md`/`AGENTS.md`):
+> el usuario pide que las dos formas de instalar sean la misma vía, el kernel dentro de la
+> skill `nzt` y sin escribir `CLAUDE.md` ni `AGENTS.md`. Para Claude Code hay evidencia (474,
+> 475); para Codex no, porque C8 dejó sin verificar cómo carga una skill. Opciones: A, Claude
+> Code ya y Codex después de probarlo (recomendada); B, los dos ya; C, probar Codex primero.
+
+**QT-113** → B, los dos ya: el usuario lo prueba en Codex cuando esté hecho y verificado en
+Claude Code. Riesgo aceptado: si Codex no carga `nzt` primero, sus usuarios se quedan sin el
+método hasta corregirlo. — `usuario`
 
 ### 2026-11-04 · unidad 471
 
