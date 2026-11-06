@@ -80,11 +80,12 @@ public sealed record Manifest
 
     /// <summary>
     /// Hash sobre el contenido normalizado: un checkout con otro fin de línea no
-    /// es una edición local del usuario.
+    /// es una edición local del usuario. Tampoco el BOM: se instala como texto en los
+    /// scripts y File.ReadAllText lo quita al releerlo.
     /// </summary>
     public static string Hash(string text)
     {
-        var normalized = text.Replace("\r\n", "\n");
+        var normalized = (text.StartsWith('﻿') ? text[1..] : text).Replace("\r\n", "\n");
         return Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)));
     }
 

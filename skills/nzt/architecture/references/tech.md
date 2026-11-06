@@ -35,9 +35,10 @@ product: a web system, a game, a mobile app, a book, a course.
    need, propose in one round — written for someone who knows none of it:
    - **What you will do and what each part needs**: writing the work, running it, reading
      its documentation, seeing its output.
-   - **How each need is met — catalogue and research, always both**: `nzt-ai project
-     packs`, and the MCP servers, editor packages, CLIs or SDKs the technologies offer an
-     agent (`nzt-research`, *a tool for the agent*), even when a pack matches. Each with
+   - **How each need is met — catalogue and research, always both**: the packs of
+     `nzt-software` and `nzt-games`, and the MCP servers, plugins, editor packages, CLIs or
+     SDKs the technologies offer an agent (`nzt-research`, *a tool for the agent*), even
+     when a pack matches. Each with
      its source and date and what it brings; when the research contradicts a pack, say so.
    - **What the user does by hand**, step by step in plain words: install, approve a
      connection, create an account or a key.
@@ -45,16 +46,16 @@ product: a web system, a game, a mobile app, a book, a course.
      cannot reach — so the user knows where they are needed.
    - **What to keep in mind**: licences, costs, permissions, what it installs on the machine.
 
-   On the user's yes, install **in the project, never globally**: a pack with `nzt-ai
-   project add <pack>...` (`--provider codex` or `all` when the project uses Codex); a
-   researched MCP server in the provider's project file (`.mcp.json`, `.codex/config.toml`),
-   which `nzt-ai project` leaves untouched. Guide the user's steps. No pack and nothing
-   found, or no `nzt-ai`: say so — the work goes on with the generic routers.
-5. **Ask the packs' decisions.** Read each installed pack's `SKILL.md` (in `.claude/skills/`
-   or `.agents/skills/`) — its `## Axes` and `## Opt-ins` — and ask them in one round, each
-   option's cost as its consequence. Write the value **exactly as the pack spells it**: the
-   pack selects its references by that text. A concept no pack offers is an open `QT-NN`,
-   never an invented value.
+   A pack needs no install: listing it in `tech.md` makes it apply. On the user's yes,
+   install each tool **in the project, never globally**: in Claude Code an MCP server with
+   `claude mcp add --scope project` and a plugin with `claude plugin install --scope
+   project`; in Codex a pack's MCP server with `nzt-ai project add <pack> --provider codex`
+   and a researched one in `.codex/config.toml`. Guide the user's steps. Nothing found: say
+   so — the work goes on with the generic routers.
+5. **Ask the packs' decisions.** Read the axes and opt-ins of each chosen pack in its domain
+   skill's `references/choosing.md` and ask them in one round, each option's cost as its
+   consequence. Write the value **exactly as it is spelled there**: the skill selects its
+   references by that text. A concept no pack offers is an open `QT-NN`, never an invented value.
 6. **Ask the core opt-ins** below, every one, including the `no`s.
 7. **Write `tech.md`**, agent tools included, and tell the user that MCP servers load in a
    new session. **Check that each tool answers** before relying on it — an MCP server, in
@@ -129,4 +130,4 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
 ## Done when
 
 Someone could do correct work in any component tomorrow with only this file, the specs and
-its pack skills, and the user was told what they do by hand and what the agent cannot do.
+its packs, and the user was told what they do by hand and what the agent cannot do.

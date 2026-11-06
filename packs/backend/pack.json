@@ -1,4 +1,0 @@
-{
-  "description": "Backend sin tecnología: arquitecturas (vertical slice, clean, hexagonal), modelo anémico, persistencia, casos de uso, validación, errores, resultados, API, seguridad y acceso a datos",
-  "requires": ["code"]
-}

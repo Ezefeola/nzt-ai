@@ -13,7 +13,7 @@ public sealed class Provider
     public required string Id { get; init; }
     public required string DisplayName { get; init; }
 
-    /// <summary>El archivo que el proveedor carga en toda sesión. NZT escribe un bloque adentro.</summary>
+    /// <summary>El archivo que el proveedor carga en toda sesión. Desde D95 NZT no escribe en él: solo quita el bloque de una instalación anterior.</summary>
     public required string InstructionsFile { get; init; }
 
     public required string SkillsDirectory { get; init; }

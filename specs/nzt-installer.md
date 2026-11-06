@@ -16,9 +16,11 @@ las skills (`nzt:nzt-build`) rompiendo los nombres que nombran las tablas de rut
 **ningún sistema de plugins carga el kernel igual en todos los proveedores**: Codex tiene
 plugins, pero ni el de Claude Code ni el de Codex traen un archivo de instrucciones
 siempre cargado (D24, revisado el 2026-10-16). Lo que se instala son **skills sueltas en la carpeta de
-usuario** y un bloque en el archivo de instrucciones. El único plugin del repo es
-`dist/plugin/`, que existe para que `claude plugin eval` tenga un target (D23) y **no se
-instala nunca**. Los mods de `mods/` sí son plugins, una capa aparte y opcional (D63): **el
+usuario** y un bloque en el archivo de instrucciones. **Desde D91 (2026-11-04)**, en Claude
+Code hay una segunda vía: el plugin `nzt`, que lleva el mismo kernel dentro de la skill
+`nzt:nzt` y no escribe archivos (D92, `specs/nzt-plugin.md`). Se usa una de las dos: con las
+dos, el kernel llega dos veces, y nada lo impide. El plugin es `dist/plugin/`, el mismo que
+usa `claude plugin eval` como target (D23); se publica en la rama `plugin`. Los mods de `mods/` sí son plugins, una capa aparte y opcional (D63): **el
 instalador también los instala, actualiza y desinstala en Claude Code, como opción**, y el
 método se instala igual sin ellos. Siguen viniendo del marketplace del repo; el instalador
 no copia sus archivos (sección 11).
@@ -29,8 +31,8 @@ Instalación **global** (nivel usuario), que es el caso de uso pedido:
 
 | Proveedor | Instrucciones | Skills | Subagentes (D71, D84) |
 |---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` |
+| Claude Code | en la skill `nzt` (D95); ya no en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` |
+| Codex | en la skill `nzt` (D95); ya no en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` |
 
 Los subagentes salen de `agents/` del repo, y cada proveedor recibe los de su formato (`.md` o
 `.toml`). Cada uno es un archivo más del manifiesto: las mismas reglas de conflicto, edición local,
@@ -112,18 +114,20 @@ nzt-ai state check
 ## 4. Qué hace, paso a paso
 
 1. **Valida el set antes de tocar nada** (sección 7). Si algo falla, aborta sin escribir.
-2. **Arma el bloque de instrucciones** de cada destino: `core/kernel.md` + el adapter del
-   proveedor, entre `<!-- nzt:start -->` y `<!-- nzt:end -->`.
+2. **Arma la skill `nzt` del proveedor** (D95): `core/skill-nzt.md` (frontmatter) +
+   `core/kernel.md` + el adapter del proveedor, y el cuerpo de `skills/nzt/SKILL.md` como su
+   `references/entry.md`. Es la misma que emite el build en `dist/<proveedor>/nzt/`.
 3. **Pre-escaneo de conflictos.** Si algún archivo de destino existe y no figura en el
    manifiesto, **no se escribe nada en ese proveedor**.
-4. **Escribe las instrucciones respetando lo previo**: bloque ubicado por marcadores y
-   reemplazado en su lugar; si el archivo existe sin marcadores, el bloque va arriba y su
-   contenido queda abajo; si no existe, se crea.
+4. ~~**Escribe las instrucciones**~~ **[modify] D95:** ya no escribe `CLAUDE.md` ni
+   `AGENTS.md`.
 5. **Aplana y copia las skills**: cada carpeta con `SKILL.md` va a una carpeta plana cuyo
-   nombre es el path relativo con `/` → `-`. Su carpeta `references/` viaja adentro, sin
-   aplanar (D50): los routers la nombran por ruta relativa. Copia también los subagentes del
-   proveedor a su carpeta de agentes (sección 2).
+   nombre es el path relativo con `/` → `-`. Sus carpetas `references/` y `scripts/` viajan
+   adentro, sin aplanar (D50, D94): los routers las nombran por ruta relativa. Copia también
+   los subagentes del proveedor a su carpeta de agentes (sección 2).
 6. **Retira los huérfanos**: lo que el manifiesto anterior instaló y ya no está en el set.
+   El bloque de una instalación anterior a D95 es uno: se quita entre sus marcadores, el
+   texto del usuario queda, y si se lo editó se conserva y se informa.
 7. **Escribe el manifiesto** y **reporta**: creados, actualizados, sin cambios, eliminados,
    conservados, y el tamaño del listado en caracteres (el presupuesto de R1).
 
@@ -177,6 +181,10 @@ Son las que evitan que el instalador rompa la configuración del usuario:
 - **Backup del archivo de instrucciones** la primera vez que se lo modifica
   (`CLAUDE.md.nzt-backup`), sin pisar un backup previo.
 
+**[modify] D95:** el instalador ya no escribe el archivo de instrucciones; las reglas de
+marcadores y bloque quedan para quitar el de una instalación anterior. Marcadores sin
+manifiesto ya no se tocan ni frenan la instalación.
+
 El lint que corre antes de instalar: `name` == nombre derivado del path, `description`
 presente y ≤ 250 chars, ≤ 200 líneas por archivo, frontmatter portable (C1) y ningún nombre
 plano duplicado.
@@ -199,7 +207,7 @@ installer/
 ```
 
 - **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md`,
-  `skills/**/references/*.md` y, de `packs/`, cada `pack.json` y `*.md`): el
+  `skills/**/references/**/*.md`, `skills/**/scripts/*` y, de `packs/`, cada `pack.json`): el
   ejecutable *es* el set, y su versión es la versión del set.
 - **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
   flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de
@@ -219,11 +227,15 @@ installer/
   **[modify] 2026-11-01 (D88):** la capa de stack ya no existe. Global queda solo el marco;
   lo de una tecnología o una arquitectura son packs que se instalan por proyecto con
   `nzt-ai project` (sección 13).
+  **[modify] 2026-11-05 (D93):** las reglas de los packs vuelven al marco, en `nzt-software` y
+  `nzt-games`; `nzt-ai project` solo pone en el proyecto el MCP de un pack.
 - **I2. Duplicación con `install/build.*`.** **Resuelta en la práctica, no eliminada.** Los
   scripts siguen siendo el loop de desarrollo —además arman `dist/` y el plugin de evals, que
   al instalador no le incumben— y el CLI es lo que instala. Lo que evita que diverjan es una
   comprobación: el bloque que escribe el CLI se compara **byte a byte** con el
   `dist/CLAUDE.md` que emitió el build, y si se separan, falla.
+  **[modify] D95:** lo que se compara es la skill `nzt` de cada proveedor contra
+  `dist/claude-code/nzt/` y `dist/codex/nzt/`; el build ya no emite `CLAUDE.md` ni `AGENTS.md`.
 - ~~**I3. Versionado.**~~ **Cerrada**: sale del `<Version>` del `.csproj`, que es lo que
   termina en `nztVersion` del manifiesto y en el encabezado del CLI.
 - ~~**I5. Distribución sin .NET.**~~ **Cerrada por D46**: un comando de una línea por
@@ -501,6 +513,12 @@ Sin problemas, una línea y código 0. Con problemas, uno por línea, nombrando 
 fase, y código 1. Sin archivo lo dice y sale con 0: no todo proyecto tiene estado. Un JSON
 roto es un problema, con su posición.
 
+**[modify] D94:** el agente ya no corre este comando. Corre los scripts de `nzt-plan`
+(`skills/nzt/plan/scripts/state-check.ps1` y `.py`), que aplican las mismas reglas, mensajes
+y orden; los checks del instalador comprueban que los tres den lo mismo
+(`StateScriptsMatchTheCli`). El instalador copia `scripts/` de cada skill byte a byte, el
+`.ps1` con BOM. `nzt-ai state check` sigue, pero nada en el método lo nombra.
+
 ### 12.3 Preguntas
 
 #### QT-23 · ¿Dónde queda `nzt-ai`?
@@ -523,6 +541,11 @@ roto es un problema, con su posición.
 
 ## 13. Packs por proyecto: `nzt-ai project`
 
+**[modify] 2026-11-05 (D93):** un pack ya no trae skill: sus reglas viajan con el marco en
+`nzt-software` o `nzt-games`, y `tech.md` listándolo es lo que lo aplica. `nzt-ai project`
+queda para el MCP de un pack, sobre todo en Codex; en Claude Code el agente lo agrega con
+`claude mcp add --scope project`. Lo que sigue describe D88.
+
 Lo trae D88 (`specs/nzt-core.md`): global queda solo el marco, y lo de una tecnología, una
 arquitectura o las reglas de código del usuario son **packs** que cada proyecto elige. El
 pedido del usuario: un CLI que haga el setup del proyecto, y que el agente sepa usarlo desde
@@ -530,11 +553,11 @@ NZT para instalar skills y habilitar MCPs.
 
 ### 13.1 Qué es un pack
 
-`packs/<pack>/` con `pack.json` (`description`, `requires`, `mcp`), y opcionalmente
-`SKILL.md` y `references/`. Instala a lo sumo una skill, `nzt-<pack>`. Un MCP es remoto
+`packs/<pack>/` con `pack.json` (`description`, `mcp`); desde D93, sin `SKILL.md` ni
+`references/`. Un MCP es remoto
 (`url`) o local (`command` por plataforma —`windows`, `macos-arm64`, `macos-x64`, `linux`—
-con `{home}`, y `args`). Packs de QT-01: `code`, `backend`, `frontend`, `ddd`, `csharp`,
-`dotnet`, `blazor`, `unity` (solo MCP).
+con `{home}`, y `args`). Con MCP desde D93: `csharp`, `dotnet`, `blazor` (Microsoft Learn) y `unity` (el relay del
+editor).
 
 ### 13.2 Comandos
 

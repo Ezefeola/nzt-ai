@@ -1,8 +1,8 @@
 #requires -Version 7.0
 <#
 .SYNOPSIS
-  Builds CLAUDE.md and AGENTS.md from core/kernel.md plus each host adapter,
-  validates the skill tree, and assembles dist/plugin/ — the flattened plugin
+  Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the
+  host's adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
   that `claude plugin eval` runs against (see specs/nzt-core.md, D23).
 .PARAMETER OutDir
   Where to write the built files. Defaults to <repo>/dist.
@@ -17,30 +17,8 @@ if (-not $OutDir) { $OutDir = Join-Path $root 'dist' }
 
 $failed = $false
 
-# --- instruction files -------------------------------------------------------
-
 $kernel = (Get-Content (Join-Path $root 'core/kernel.md') -Raw).TrimEnd()
-
-$targets = @(
-    @{ File = 'CLAUDE.md'; Adapter = 'adapter-claude.md' }
-    @{ File = 'AGENTS.md'; Adapter = 'adapter-codex.md' }
-)
-
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-
-foreach ($t in $targets) {
-    $adapter = (Get-Content (Join-Path $root "core/$($t.Adapter)") -Raw).TrimEnd()
-    $body = "<!-- nzt:start -->`n$kernel`n`n$adapter`n<!-- nzt:end -->`n"
-
-    Set-Content -Path (Join-Path $OutDir $t.File) -Value $body -Encoding utf8 -NoNewline
-
-    $lines = ($body.TrimEnd() -split "`n").Count
-    Write-Host ("{0,-10} {1,4} lines" -f $t.File, $lines)
-    if ($lines -gt 200) {
-        Write-Warning "$($t.File) is over the 200-line budget ($lines lines)."
-        $failed = $true
-    }
-}
 
 # --- skill tree --------------------------------------------------------------
 
@@ -111,6 +89,26 @@ function Test-Skill([IO.FileInfo]$file, [string]$rel, [string]$expected) {
         }
         if (-not $reached) {
             Write-Warning "$rel/references/$($ref.Name) : no row in the skill's table."
+            $bad = $true
+        }
+    }
+    # a pack's references, one folder per pack (D93): the same budgets, and a row naming
+    # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+    foreach ($ref in Get-ChildItem $refDir -Directory | ForEach-Object { Get-ChildItem $_.FullName -File -Filter '*.md' } | Sort-Object FullName) {
+        $sub = "$($ref.Directory.Name)/$($ref.Name)"
+        $refText = Get-Content $ref.FullName -Raw
+        $refLines = ($refText.TrimEnd() -split "`n").Count
+        Write-Host ("  {0,-44} {1,4} lines" -f "references/$sub", $refLines)
+        if ($refLines -gt 200) {
+            Write-Warning "$rel/references/$sub : over the 200-line budget ($refLines lines)."
+            $bad = $true
+        }
+        if ($refLines -gt 100 -and $refText -notmatch '(?m)^## Contents') {
+            Write-Warning "$rel/references/$sub : over 100 lines and no '## Contents'."
+            $bad = $true
+        }
+        if (-not $text.Contains("``$sub``")) {
+            Write-Warning "$rel/references/$sub : no row in the skill's table."
             $bad = $true
         }
     }
@@ -186,18 +184,65 @@ if (Test-Path $packsRoot) {
     Write-Host ("$($folders.Count) packs, ~$($script:listingChars) chars of skill listing if every one is installed")
 }
 
-# --- plugin for `claude plugin eval` -----------------------------------------
+# --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---
+# NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
-$manifest = @'
+$csproj = Get-Content (Join-Path $root 'installer/src/Nzt.Cli/Nzt.Cli.csproj') -Raw
+$version = if ($csproj -match '<Version>(.+?)</Version>') { $Matches[1] } else { '' }
+if (-not $version) {
+    Write-Warning 'no <Version> in installer/src/Nzt.Cli/Nzt.Cli.csproj.'
+    $failed = $true
+}
+
+$manifest = @"
 {
   "name": "nzt",
-  "description": "NZT: the skill set under evaluation. Built output — edit skills/ in the repo, not here.",
-  "version": "4.0.0",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
+  "version": "$version",
   "license": "MIT",
-  "author": { "name": "NZT" }
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
 }
-'@
+"@
 Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value $manifest -Encoding utf8
+
+# The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
+# frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
+# does today becomes its reference entry.md. Its description is what makes it load first
+# in every session; nothing else loads it. nzt-ai installs the same files, byte for byte.
+$entrySrc = Get-Content (Join-Path $root 'skills/nzt/SKILL.md') -Raw
+$entryAt = $entrySrc.IndexOf("`n---`n", 3)
+$frontmatter = (Get-Content (Join-Path $root 'core/skill-nzt.md') -Raw).TrimEnd()
+function Build-Nzt([string]$dest, [string]$adapterFile, [string]$label) {
+    if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
+    New-Item -ItemType Directory -Force -Path (Join-Path $dest 'references') | Out-Null
+    Set-Content -Path (Join-Path $dest 'references/entry.md') -Value $entrySrc.Substring($entryAt + 5) -Encoding utf8 -NoNewline
+    $adapter = (Get-Content (Join-Path $root "core/$adapterFile") -Raw).TrimEnd()
+    Set-Content -Path (Join-Path $dest 'SKILL.md') -Value "$frontmatter`n`n$kernel`n`n$adapter`n" -Encoding utf8 -NoNewline
+    Test-Skill (Get-Item (Join-Path $dest 'SKILL.md')) $label 'nzt'
+}
+if (Build-Nzt (Join-Path $plugin 'skills/nzt') 'adapter-claude-skill.md' 'plugin skills/nzt') { $failed = $true }
+if (Build-Nzt (Join-Path $OutDir 'claude-code/nzt') 'adapter-claude.md' 'claude-code nzt') { $failed = $true }
+if (Build-Nzt (Join-Path $OutDir 'codex/nzt') 'adapter-codex.md' 'codex nzt') { $failed = $true }
+foreach ($old in 'CLAUDE.md', 'AGENTS.md') {
+    $path = Join-Path $OutDir $old
+    if (Test-Path $path) { Remove-Item -Force $path }
+}
+
+# Subagents: Claude Code reads their skills: list, not the model, so the build gives it
+# the plugin's names (QT-103).
+$agentsDest = Join-Path $plugin 'agents'
+New-Item -ItemType Directory -Force -Path $agentsDest | Out-Null
+$agentFiles = Get-ChildItem (Join-Path $root 'agents') -Filter '*.md'
+foreach ($agent in $agentFiles) {
+    $text = Get-Content $agent.FullName -Raw
+    $end = $text.IndexOf("`n---", 3)
+    $front = [regex]::Replace($text.Substring(0, $end), '(?m)^(\s*-\s*)nzt-', '${1}nzt:nzt-')
+    Set-Content -Path (Join-Path $agentsDest $agent.Name) -Value ($front + $text.Substring($end)) -Encoding utf8 -NoNewline
+}
+Write-Host "plugin ${version}: skills/nzt with the kernel, $($agentFiles.Count) subagents"
+
+# --- evals for `claude plugin eval` ------------------------------------------
 
 $evalsSrc = Join-Path $root 'evals'
 if (Test-Path $evalsSrc) {
@@ -206,9 +251,6 @@ if (Test-Path $evalsSrc) {
     $results = Join-Path $evalsDest 'results'
     if (Test-Path $results) { Remove-Item $results -Recurse -Force }
     New-Item -ItemType Directory -Force -Path (Join-Path $evalsDest '_fixtures') | Out-Null
-    Copy-Item (Join-Path $OutDir 'CLAUDE.md') -Destination (Join-Path $evalsDest '_fixtures/CLAUDE.md') -Force
-    # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
-    Copy-Item $packsRoot -Destination (Join-Path $evalsDest '_fixtures/packs') -Recurse
 
     $caseFiles = Get-ChildItem $evalsDest -Recurse -Filter 'case.yaml' | Sort-Object FullName
     foreach ($case in $caseFiles) {
@@ -229,7 +271,7 @@ if (Test-Path $evalsSrc) {
         }
     }
 
-    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases, kernel fixture refreshed)"
+    Write-Host "plugin -> $plugin  ($($caseFiles.Count) eval cases)"
 }
 
 Write-Host "-> $OutDir"

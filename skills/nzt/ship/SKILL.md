@@ -25,8 +25,8 @@ its evidence (`nzt-verify`); ship never fixes what verification found.
 
 1. Read `Docs/Operations/deployment.md` and the repository's own rules (contribution guide,
    commit convention, branch naming, hooks, required checks). **Repository rules win.**
-2. Load the pack skills `tech.md` lists for the component (kernel *Packs*): they add how
-   this technology ships.
+2. Load the domain skill of the packs `tech.md` lists for the component (kernel *Packs*):
+   they add how this technology ships.
 3. Nothing touches a shared environment without an authorisation naming it (`release.md`).
 4. Do one release-facing action — one pull request, pipeline change, release or rollback.
 5. Verify it where it landed, and say plainly what left and where.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Builds CLAUDE.md and AGENTS.md from core/kernel.md plus each host adapter,
-# validates the skill tree, and assembles dist/plugin/ — the flattened plugin
+# Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the host's
+# adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
 # that `claude plugin eval` runs against (see specs/nzt-core.md, D23).
 # Usage: install/build.sh [out-dir]   (default: <repo>/dist)
 set -euo pipefail
@@ -10,29 +10,6 @@ out="${1:-$root/dist}"
 mkdir -p "$out"
 
 status=0
-
-# --- instruction files -------------------------------------------------------
-
-build() {
-  local file="$1" adapter="$2" path="$out/$1" lines
-  {
-    echo "<!-- nzt:start -->"
-    cat "$root/core/kernel.md"
-    echo
-    cat "$root/core/$adapter"
-    echo "<!-- nzt:end -->"
-  } > "$path"
-
-  lines="$(wc -l < "$path" | tr -d ' ')"
-  printf '%-10s %4s lines\n' "$file" "$lines"
-  if [ "$lines" -gt 200 ]; then
-    echo "WARNING: $file is over the 200-line budget ($lines lines)." >&2
-    status=1
-  fi
-}
-
-build CLAUDE.md adapter-claude.md
-build AGENTS.md adapter-codex.md
 
 # --- skill tree --------------------------------------------------------------
 
@@ -106,6 +83,27 @@ check_skill() {
       status=1
     fi
   done < <(find "$dir" -maxdepth 1 -name '*.md' | sort)
+
+  # a pack's references, one folder per pack (D93): the same budgets, and a row naming
+  # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+  while IFS= read -r ref; do
+    local sub slines
+    sub="$(basename "$(dirname "$ref")")/$(basename "$ref")"
+    slines="$(wc -l < "$ref" | tr -d ' ')"
+    printf '  %-44s %4s lines\n' "references/$sub" "$slines"
+    if [ "$slines" -gt 200 ]; then
+      echo "WARNING: $rel/references/$sub : over the 200-line budget ($slines lines)." >&2
+      status=1
+    fi
+    if [ "$slines" -gt 100 ] && ! grep -q '^## Contents' "$ref"; then
+      echo "WARNING: $rel/references/$sub : over 100 lines and no '## Contents'." >&2
+      status=1
+    fi
+    if ! grep -qF "\`$sub\`" "$file"; then
+      echo "WARNING: $rel/references/$sub : no row in the skill's table." >&2
+      status=1
+    fi
+  done < <(find "$dir" -mindepth 2 -maxdepth 2 -name '*.md' | sort)
 }
 
 if [ -d "$root/skills" ]; then
@@ -179,25 +177,64 @@ if [ -d "$root/packs" ]; then
   listing=$global_listing
 fi
 
-# --- plugin for `claude plugin eval` -----------------------------------------
+# --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---
+# NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
-cat > "$plugin/.claude-plugin/plugin.json" <<'JSON'
+version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$root/installer/src/Nzt.Cli/Nzt.Cli.csproj" | head -1)"
+if [ -z "$version" ]; then
+  echo "WARNING: no <Version> in installer/src/Nzt.Cli/Nzt.Cli.csproj." >&2
+  status=1
+fi
+
+cat > "$plugin/.claude-plugin/plugin.json" <<JSON
 {
   "name": "nzt",
-  "description": "NZT: the skill set under evaluation. Built output — edit skills/ in the repo, not here.",
-  "version": "4.0.0",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
+  "version": "$version",
   "license": "MIT",
-  "author": { "name": "NZT" }
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
 }
 JSON
+
+# The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
+# frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
+# does today becomes its reference entry.md. Its description is what makes it load first
+# in every session; nothing else loads it. nzt-ai installs the same files, byte for byte.
+# build_nzt <dest folder> <adapter> <label>
+build_nzt() {
+  local dest="$1" adapter="$2" label="$3"
+  rm -rf "$dest"
+  mkdir -p "$dest/references"
+  sed '1,/^---$/d' "$root/skills/nzt/SKILL.md" > "$dest/references/entry.md"
+  {
+    cat "$root/core/skill-nzt.md"
+    echo
+    cat "$root/core/kernel.md"
+    echo
+    cat "$root/core/$adapter"
+  } > "$dest/SKILL.md"
+  check_skill "$dest/SKILL.md" "$label" "nzt"
+}
+build_nzt "$plugin/skills/nzt" adapter-claude-skill.md "plugin skills/nzt"
+build_nzt "$out/claude-code/nzt" adapter-claude.md "claude-code nzt"
+build_nzt "$out/codex/nzt" adapter-codex.md "codex nzt"
+rm -f "$out/CLAUDE.md" "$out/AGENTS.md"
+
+# Subagents: Claude Code reads their skills: list, not the model, so the build gives it
+# the plugin's names (QT-103).
+mkdir -p "$plugin/agents"
+for agent in "$root"/agents/*.md; do
+  sed '2,/^---$/ s/^\([[:space:]]*-[[:space:]]*\)nzt-/\1nzt:nzt-/' "$agent" > "$plugin/agents/$(basename "$agent")"
+done
+echo "plugin $version: skills/nzt with the kernel, $(find "$plugin/agents" -name '*.md' | wc -l | tr -d ' ') subagents"
+
+# --- evals for `claude plugin eval` ------------------------------------------
 
 if [ -d "$root/evals" ]; then
   cp -R "$root/evals" "$plugin/evals"
   rm -rf "$plugin/evals/results"
   mkdir -p "$plugin/evals/_fixtures"
-  cp "$out/CLAUDE.md" "$plugin/evals/_fixtures/CLAUDE.md"
-  # the packs, for fixtures that seed a project with its pack skills (_fixtures/packs.sh)
-  cp -R "$root/packs" "$plugin/evals/_fixtures/packs"
 
   cases=0
   while IFS= read -r case; do
@@ -216,7 +253,7 @@ if [ -d "$root/evals" ]; then
     fi
   done < <(find "$plugin/evals" -name case.yaml | sort)
 
-  echo "plugin -> $plugin  ($cases eval cases, kernel fixture refreshed)"
+  echo "plugin -> $plugin  ($cases eval cases)"
 fi
 
 echo "-> $out"

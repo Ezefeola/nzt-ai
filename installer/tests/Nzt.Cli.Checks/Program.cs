@@ -19,25 +19,26 @@ public static partial class Program
 
     public static int Main()
     {
-        InstallsInstructionsAndSkills();
+        InstallsTheKernelInsideTheNztSkill();
         IsSecondInstallIdempotent();
-        KeepsUserTextAroundTheBlock();
-        BacksUpAnExistingInstructionsFileOnce();
+        RemovesTheBlockOfAnOldInstall();
+        KeepsAnEditedOldBlock();
         DoesNotOverwriteALocallyEditedSkill();
         RemovesAnOrphanButNotAnEditedOne();
         InstallsReferencesInsideTheirSkill();
         RemovesOrphanReferencesAndEmptyFolders();
         EmbedsEveryReferenceOfTheRepo();
+        InstallsTheScriptsByteForByte();
         InstallsEachProviderItsOwnAgent();
         UninstallRemovesTheAgentButNotTheFolder();
         EmbedsTheAgentsOfTheRepo();
         RefusesWhenASkillFileIsNotOurs();
-        RefusesWhenMarkersExistWithoutAManifest();
+        LeavesMarkersWithoutAManifestAlone();
         DryRunWritesNothing();
         UninstallRemovesOnlyWhatItInstalled();
         UninstallKeepsEditedFilesAndTheirManifest();
         FlattensTheNestedPathIntoTheName();
-        BlockMatchesWhatTheBuildEmits();
+        NztSkillMatchesWhatTheBuildEmits();
         DoesNotTouchADamagedBlock();
         LintCatchesNamePathMismatch();
         MenuChoiceResolvesTheProvider();
@@ -74,6 +75,7 @@ public static partial class Program
         StateCheckCatchesEveryBrokenSliceInvariant();
         StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
+        StateScriptsMatchTheCli();
         RunProjectChecks();
 
         Console.WriteLine();
@@ -87,18 +89,23 @@ public static partial class Program
 
     // ── Casos ──────────────────────────────────────────────────────────────────
 
-    private static void InstallsInstructionsAndSkills() => InTemp(home =>
+    private static void InstallsTheKernelInsideTheNztSkill() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
         var result = Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        var nzt = File.ReadAllText(Path.Combine(provider.SkillsDirectory, "nzt", "SKILL.md"));
 
         Check("instala sin conflictos", !result.Aborted);
-        Check("escribe el archivo de instrucciones", File.Exists(provider.InstructionsFile));
-        Check("el bloque lleva los marcadores del build",
-            File.ReadAllText(provider.InstructionsFile).Contains(InstructionBlock.Begin));
+        Check("no escribe el archivo de instrucciones (D95)", !File.Exists(provider.InstructionsFile));
+        Check("la skill nzt lleva el frontmatter común, el kernel y el adapter",
+            nzt.StartsWith("---\nname: nzt\n", StringComparison.Ordinal)
+            && nzt.Contains("kernel de prueba") && nzt.Contains("## Claude"));
+        Check("el cuerpo de skills/nzt pasa a references/entry.md",
+            File.ReadAllText(Path.Combine(provider.SkillsDirectory, "nzt", "references", "entry.md"))
+                .Contains("cuerpo"));
         Check("aplana la skill anidada",
             File.Exists(Path.Combine(provider.SkillsDirectory, "nzt-plan", "SKILL.md")));
-        // Instrucciones + tres skills.
+        // nzt (SKILL.md y entry.md) + dos skills.
         Check("registra todo en el manifiesto",
             Manifest.Load(provider.Id, manifests)!.Files.Count == 4);
     });
@@ -113,46 +120,63 @@ public static partial class Program
         Check("reinstalar no crea de nuevo", again.Count(FileAction.Created) == 0);
     });
 
-    private static void KeepsUserTextAroundTheBlock() => InTemp(home =>
+    /// <summary>
+    /// Una instalación anterior a D95 dejó el bloque en CLAUDE.md y lo anotó en el
+    /// manifiesto. Al actualizar sale como huérfano: se quita entre sus marcadores.
+    /// </summary>
+    private static void RemovesTheBlockOfAnOldInstall() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        Directory.CreateDirectory(Path.GetDirectoryName(provider.InstructionsFile)!);
-        File.WriteAllText(provider.InstructionsFile, "# Mis notas\n\nNo me toques esto.\n");
+        OldInstall(provider, manifests, "# Mis notas\n\nNo me toques esto.\n");
 
-        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        var result = Installer.Install(provider, catalog, "0.2.0", manifestDirectory: manifests);
         var text = File.ReadAllText(provider.InstructionsFile);
 
-        Check("conserva el texto del usuario", text.Contains("No me toques esto."));
-        Check("el bloque va arriba", text.StartsWith(InstructionBlock.Begin, StringComparison.Ordinal));
+        Check("al actualizar quita el bloque viejo", !InstructionBlock.HasMarkers(text));
+        Check("deja el texto del usuario", text == "# Mis notas\n\nNo me toques esto.\n");
+        Check("lo informa como eliminado",
+            result.Outcomes.Any(o => o.TargetPath == provider.InstructionsFile && o.Action == FileAction.Removed));
+        Check("el manifiesto ya no lo anota",
+            Manifest.Load(provider.Id, manifests)!.HashOf(provider.InstructionsFile) is null);
 
-        // Una actualización reemplaza el bloque en su lugar y deja el resto igual.
-        var changed = ContentCatalog.From("# NZT v2\n", catalog.Adapters.ToDictionary(), catalog.Skills);
-        Installer.Install(provider, changed, "0.2.0", manifestDirectory: manifests);
-        var updated = File.ReadAllText(provider.InstructionsFile);
-
-        Check("al actualizar sigue el texto del usuario", updated.Contains("No me toques esto."));
-        Check("al actualizar entra el kernel nuevo", updated.Contains("# NZT v2"));
-        Check("al actualizar no duplica el bloque",
-            updated.Split(InstructionBlock.Begin).Length == 2);
+        // Sin texto del usuario, el archivo era solo el bloque: se borra.
+        var (other, _, otherManifests) = Setup(Path.Combine(home, "otro"));
+        OldInstall(other, otherManifests, "");
+        Installer.Install(other, catalog, "0.2.0", manifestDirectory: otherManifests);
+        Check("si era solo el bloque, borra el archivo", !File.Exists(other.InstructionsFile));
     });
 
-    private static void BacksUpAnExistingInstructionsFileOnce() => InTemp(home =>
+    private static void KeepsAnEditedOldBlock() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        Directory.CreateDirectory(Path.GetDirectoryName(provider.InstructionsFile)!);
-        File.WriteAllText(provider.InstructionsFile, "# Mío\n");
+        OldInstall(provider, manifests, "# Mío\n");
+        var edited = File.ReadAllText(provider.InstructionsFile).Replace("kernel viejo", "kernel que edité");
+        File.WriteAllText(provider.InstructionsFile, edited);
 
-        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
-        var backup = provider.InstructionsFile + ".nzt-backup";
+        var result = Installer.Install(provider, catalog, "0.2.0", manifestDirectory: manifests);
 
-        Check("hace backup la primera vez", File.Exists(backup));
-        Check("el backup es el archivo original", File.ReadAllText(backup) == "# Mío\n");
-
-        var changed = ContentCatalog.From("# NZT v2\n", catalog.Adapters.ToDictionary(), catalog.Skills);
-        Installer.Install(provider, changed, "0.2.0", manifestDirectory: manifests);
-
-        Check("no pisa el backup en la segunda", File.ReadAllText(backup) == "# Mío\n");
+        Check("no quita un bloque viejo editado", File.ReadAllText(provider.InstructionsFile) == edited);
+        Check("lo informa como conservado",
+            result.Outcomes.Any(o => o.TargetPath == provider.InstructionsFile
+                                     && o.Action == FileAction.SkippedLocallyEdited));
+        Check("el manifiesto lo sigue anotando",
+            Manifest.Load(provider.Id, manifests)!.HashOf(provider.InstructionsFile) is not null);
     });
+
+    /// <summary>Lo que dejaba el instalador antes de D95: el bloque arriba y el texto del usuario abajo.</summary>
+    private static void OldInstall(Provider provider, string manifests, string userText)
+    {
+        var block = InstructionBlock.Render("# NZT\n\nkernel viejo\n", "## Claude\n");
+        Directory.CreateDirectory(Path.GetDirectoryName(provider.InstructionsFile)!);
+        File.WriteAllText(provider.InstructionsFile, block + userText);
+        new Manifest
+        {
+            Provider = provider.Id,
+            Version = "0.1.0",
+            InstalledAt = DateTimeOffset.Now,
+            Files = [new ManifestEntry(provider.InstructionsFile, Manifest.Hash(block), ManagedBlock: true)]
+        }.Save(manifests);
+    }
 
     private static void DoesNotOverwriteALocallyEditedSkill() => InTemp(home =>
     {
@@ -208,6 +232,47 @@ public static partial class Program
             Manifest.Load(provider.Id, manifests)!.Files.Count == 6);
     });
 
+    /// <summary>
+    /// Los scripts de las skills (state-check de nzt-plan) se instalan igual al repo,
+    /// byte a byte: el .ps1 lleva BOM porque PowerShell 5.1 lee sin él como ANSI. Y el
+    /// BOM no puede hacer que reinstalar o desinstalar los tome por editados.
+    /// </summary>
+    private static void InstallsTheScriptsByteForByte() => InTemp(home =>
+    {
+        var root = RepoRoot();
+        if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
+
+        var provider = Provider.ClaudeCode(home);
+        var manifests = Path.Combine(home, "manifests");
+        var catalog = ContentCatalog.Load();
+
+        var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*", SearchOption.AllDirectories)
+            .Where(f => f.Replace('\\', '/').Contains("/scripts/", StringComparison.Ordinal))
+            .ToList();
+        Check($"embebe los {onDisk.Count} scripts del repo",
+            onDisk.Count > 0 && catalog.Skills.Sum(s => s.Scripts.Count) == onDisk.Count);
+
+        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+
+        foreach (var source in onDisk)
+        {
+            var name = Path.GetFileName(source);
+            var installed = Path.Combine(provider.SkillsDirectory, "nzt-plan", "scripts", name);
+            Check($"instala {name} igual al repo, byte a byte",
+                File.Exists(installed) && File.ReadAllBytes(installed).SequenceEqual(File.ReadAllBytes(source)));
+        }
+
+        var again = Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        Check("reinstalar no toma los scripts por editados",
+            again.Count(FileAction.SkippedLocallyEdited) == 0
+            && again.Count(FileAction.Unchanged) == again.Outcomes.Count);
+
+        var removed = Installer.Uninstall(provider, manifestDirectory: manifests);
+        Check("desinstalar borra los scripts",
+            removed.Count(FileAction.SkippedLocallyEdited) == 0
+            && !Directory.Exists(Path.Combine(provider.SkillsDirectory, "nzt-plan")));
+    });
+
     private static void RemovesOrphanReferencesAndEmptyFolders() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
@@ -235,8 +300,9 @@ public static partial class Program
         var root = RepoRoot();
         if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
 
+        // también las de una carpeta por pack, `references/<pack>/` (D93)
         var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*.md", SearchOption.AllDirectories)
-            .Count(f => Path.GetFileName(Path.GetDirectoryName(f)) == "references");
+            .Count(f => f.Replace('\\', '/').Contains("/references/", StringComparison.Ordinal));
         var embedded = ContentCatalog.Load().Skills.Sum(s => s.References.Count);
 
         Check($"embebe las {onDisk} referencias del repo", onDisk > 0 && embedded == onDisk);
@@ -320,18 +386,17 @@ public static partial class Program
         Check("dejó intacto el archivo ajeno", File.ReadAllText(intruder) == "una skill que ya tenía\n");
     });
 
-    private static void RefusesWhenMarkersExistWithoutAManifest() => InTemp(home =>
+    private static void LeavesMarkersWithoutAManifestAlone() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
         Directory.CreateDirectory(Path.GetDirectoryName(provider.InstructionsFile)!);
-        File.WriteAllText(provider.InstructionsFile,
-            InstructionBlock.Begin + "\nde otra instalación\n" + InstructionBlock.End + "\n");
+        var foreign = InstructionBlock.Begin + "\nde otra instalación\n" + InstructionBlock.End + "\n";
+        File.WriteAllText(provider.InstructionsFile, foreign);
 
         var result = Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
 
-        Check("marcadores sin manifiesto son colisión", result.Aborted);
-        Check("no pisa el bloque ajeno",
-            File.ReadAllText(provider.InstructionsFile).Contains("de otra instalación"));
+        Check("marcadores sin manifiesto ya no frenan la instalación", !result.Aborted);
+        Check("no toca el bloque ajeno", File.ReadAllText(provider.InstructionsFile) == foreign);
     });
 
     private static void DryRunWritesNothing() => InTemp(home =>
@@ -391,36 +456,42 @@ public static partial class Program
     /// El instalador y `install/build.*` tienen que producir el mismo bloque. Es
     /// la única defensa contra que las dos implementaciones se separen (I2).
     /// </summary>
-    private static void BlockMatchesWhatTheBuildEmits()
+    /// <summary>
+    /// La skill nzt que escribe el CLI es la que emite el build en dist/&lt;proveedor&gt;/nzt/,
+    /// byte por byte (D95): si se separan, una de las dos formas de instalar quedó vieja.
+    /// </summary>
+    private static void NztSkillMatchesWhatTheBuildEmits()
     {
         var repo = RepoRoot();
         if (repo is null) { Check("hay repo para comparar el build", false); return; }
 
-        var built = Path.Combine(repo, "dist", "CLAUDE.md");
-        if (!File.Exists(built))
+        var catalog = ContentCatalog.Load();
+        var source = catalog.Skills.Single(s => s.Name == "nzt").Text;
+        foreach (var (folder, adapter) in new[] { ("claude-code", "adapter-claude.md"), ("codex", "adapter-codex.md") })
         {
-            Console.WriteLine("  (salteado: no hay dist/CLAUDE.md — corré install/build.sh)");
-            return;
+            var built = Path.Combine(repo, "dist", folder, "nzt");
+            if (!File.Exists(Path.Combine(built, "SKILL.md")))
+            {
+                Console.WriteLine($"  (salteado: no hay dist/{folder}/nzt — corré install/build.sh)");
+                continue;
+            }
+            var (skill, entry) = Installer.NztSkill(catalog, adapter, source);
+            Check($"la skill nzt de {folder} es idéntica a la del build",
+                skill == File.ReadAllText(Path.Combine(built, "SKILL.md")).Replace("\r\n", "\n")
+                && entry == File.ReadAllText(Path.Combine(built, "references", "entry.md")).Replace("\r\n", "\n"));
         }
-
-        var kernel = File.ReadAllText(Path.Combine(repo, "core", "kernel.md"));
-        var adapter = File.ReadAllText(Path.Combine(repo, "core", "adapter-claude.md"));
-
-        Check("el bloque del CLI es idéntico al del build",
-            Manifest.Hash(InstructionBlock.Render(kernel, adapter)) == Manifest.Hash(File.ReadAllText(built)));
     }
 
     private static void DoesNotTouchADamagedBlock() => InTemp(home =>
     {
         var (provider, catalog, manifests) = Setup(home);
-        Installer.Install(provider, catalog, "0.1.0", manifestDirectory: manifests);
+        OldInstall(provider, manifests, "");
 
         // Alguien borra el marcador de cierre: el bloque deja de ser ubicable.
         var text = File.ReadAllText(provider.InstructionsFile).Replace(InstructionBlock.End, "");
         File.WriteAllText(provider.InstructionsFile, text);
 
-        var changed = ContentCatalog.From("# NZT v2\n", catalog.Adapters.ToDictionary(), catalog.Skills);
-        var result = Installer.Install(provider, changed, "0.2.0", manifestDirectory: manifests);
+        var result = Installer.Install(provider, catalog, "0.2.0", manifestDirectory: manifests);
 
         Check("no adivina sobre un bloque roto",
             result.Outcomes.Any(o => o.TargetPath == provider.InstructionsFile
@@ -691,7 +762,7 @@ public static partial class Program
         var left = Manifest.Load(provider.Id, manifests);
 
         Check("sacar solo los mods deja el método instalado",
-            File.Exists(provider.InstructionsFile) && left is { Files.Count: 4 });
+            File.Exists(Path.Combine(provider.SkillsDirectory, "nzt", "SKILL.md")) && left is { Files.Count: 4 });
         Check("y el manifiesto ya no anota mods", left?.Mods is null or []);
     });
 
@@ -730,6 +801,7 @@ public static partial class Program
             "# NZT\n\nkernel de prueba\n",
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
+                [Installer.NztFrontmatterFile] = "---\nname: nzt\ndescription: el método\n---\n",
                 ["adapter-claude.md"] = "## Claude\n",
                 ["adapter-codex.md"] = "## Codex\n"
             },
@@ -826,8 +898,86 @@ public static partial class Program
     {
         Directory.CreateDirectory(Path.Combine(home, "Plan"));
         File.WriteAllText(Path.Combine(home, StateCheck.RelativePath), json);
-        return StateCheck.Run(home);
+        var report = StateCheck.Run(home);
+        CompareStateScripts(home, report);
+        return report;
     }
+
+    // The skill nzt-plan carries the same check as scripts, for the plugin and for whoever
+    // has no CLI: state-check.ps1 (Windows) and state-check.py (macOS, Linux). Every state
+    // above runs through each interpreter this machine has, and the output must match the CLI.
+    private static int _stateScriptRuns;
+
+    private static readonly Lazy<List<(string Label, string File, string[] Args)>> StateScripts = new(() =>
+    {
+        var found = new List<(string, string, string[])>();
+        var root = RepoRoot();
+        if (root is null) return found;
+        var scripts = Path.Combine(root, "skills", "nzt", "plan", "scripts");
+        foreach (var python in new[] { "python3", "py", "python" })
+            if (Answers(python, ["--version"]).StartsWith("Python 3", StringComparison.Ordinal))
+            {
+                found.Add(("python", python, [Path.Combine(scripts, "state-check.py")]));
+                break;
+            }
+        foreach (var shell in OperatingSystem.IsWindows() ? new[] { "powershell", "pwsh" } : ["pwsh"])
+            if (Answers(shell, ["-NoProfile", "-Command", "$PSVersionTable.PSVersion.Major"]).Trim().Length > 0)
+                found.Add((shell, shell, ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", Path.Combine(scripts, "state-check.ps1")]));
+        return found;
+    });
+
+    private static System.Diagnostics.ProcessStartInfo Start(string file, IEnumerable<string> args)
+    {
+        var start = new System.Diagnostics.ProcessStartInfo(file)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+        };
+        foreach (var a in args) start.ArgumentList.Add(a);
+        return start;
+    }
+
+    private static string Answers(string file, string[] args)
+    {
+        try
+        {
+            using var process = System.Diagnostics.Process.Start(Start(file, args))!;
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return process.ExitCode == 0 ? output : "";
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            return "";
+        }
+    }
+
+    private static void CompareStateScripts(string home, StateReport report)
+    {
+        List<string> expected = report.Ok
+            ? [$"{StateCheck.RelativePath}: cumple el contrato del kernel."]
+            : [$"{StateCheck.RelativePath}: {report.Problems.Count} problema(s)", .. report.Problems.Select(p => $"  {p}")];
+        foreach (var (label, file, args) in StateScripts.Value)
+        {
+            using var process = System.Diagnostics.Process.Start(Start(file, [.. args, home]))!;
+            var actual = process.StandardOutput.ReadToEnd().Replace("\r\n", "\n").TrimEnd('\n').Split('\n').ToList();
+            process.WaitForExit();
+            _stateScriptRuns++;
+
+            // a JSON error's wording is the parser's own: only that it is one is compared
+            var same = report.Problems.Count == 1 && report.Problems[0].StartsWith("no es JSON válido", StringComparison.Ordinal)
+                ? actual.Count == 2 && actual[1].StartsWith("  no es JSON válido", StringComparison.Ordinal)
+                : actual.SequenceEqual(expected);
+            if (!same || process.ExitCode != (report.Ok ? 0 : 1))
+                Failures.Add($"state-check con {label} no da lo del CLI:\n    CLI:    {string.Join(" | ", expected)}\n    script: {string.Join(" | ", actual)}");
+        }
+    }
+
+    private static void StateScriptsMatchTheCli() =>
+        Check($"los scripts de state check dan lo del CLI ({string.Join(", ", StateScripts.Value.Select(s => s.Label))}; {_stateScriptRuns} corridas)",
+            StateScripts.Value.Count > 0 && _stateScriptRuns > 0);
 
     private static void StateCheckAcceptsAValidState() => InTemp(home =>
     {

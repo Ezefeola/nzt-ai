@@ -13,6 +13,9 @@ public sealed record SkillFile(string Name, string RepoPath, string Text)
 
     /// <summary>Los archivos de `references/` de su carpeta: viajan con la skill y no entran al listado.</summary>
     public IReadOnlyList<ReferenceFile> References { get; init; } = [];
+
+    /// <summary>Los archivos de `scripts/` de su carpeta: el agente los corre (`state-check` de nzt-plan).</summary>
+    public IReadOnlyList<ReferenceFile> Scripts { get; init; } = [];
 }
 
 public sealed record ReferenceFile(string FileName, string Text);
@@ -65,6 +68,7 @@ public sealed class ContentCatalog
         var skills = new List<SkillFile>();
         var agents = new List<AgentFile>();
         var references = new Dictionary<string, List<ReferenceFile>>(StringComparer.Ordinal);
+        var scripts = new Dictionary<string, List<ReferenceFile>>(StringComparer.Ordinal);
 
         foreach (var resource in assembly.GetManifestResourceNames())
         {
@@ -73,10 +77,24 @@ public sealed class ContentCatalog
 
             using var stream = assembly.GetManifestResourceStream(resource);
             if (stream is null) continue;
-            using var reader = new StreamReader(stream);
-            var text = reader.ReadToEnd();
-
             var relative = path["content/".Length..];
+            // a script keeps its BOM as text, so it is written back with it: PowerShell 5.1
+            // reads a .ps1 without one as ANSI. StreamReader drops the preamble even without
+            // detection, so a script is decoded from its bytes.
+            var isScript = relative.StartsWith("skills/", StringComparison.Ordinal)
+                           && relative.Contains("/scripts/", StringComparison.Ordinal);
+            string text;
+            if (isScript)
+            {
+                using var bytes = new MemoryStream();
+                stream.CopyTo(bytes);
+                text = System.Text.Encoding.UTF8.GetString(bytes.ToArray());
+            }
+            else
+            {
+                using var reader = new StreamReader(stream);
+                text = reader.ReadToEnd();
+            }
 
             if (relative.Equals("core/kernel.md", StringComparison.OrdinalIgnoreCase))
                 kernel = text;
@@ -89,6 +107,14 @@ public sealed class ContentCatalog
             {
                 var repoPath = relative["skills/".Length..^"/SKILL.md".Length];
                 skills.Add(new SkillFile(repoPath.Replace('/', '-'), repoPath, text));
+            }
+            else if (isScript)
+            {
+                var cut = relative.LastIndexOf("/scripts/", StringComparison.Ordinal);
+                var repoPath = relative["skills/".Length..cut];
+                if (!scripts.TryGetValue(repoPath, out var list))
+                    scripts[repoPath] = list = [];
+                list.Add(new ReferenceFile(relative[(cut + "/scripts/".Length)..], text));
             }
             else if (relative.StartsWith("skills/", StringComparison.Ordinal)
                      && relative.LastIndexOf("/references/", StringComparison.Ordinal) is var at and > 0)
@@ -114,6 +140,9 @@ public sealed class ContentCatalog
             [.. skills
                 .Select(s => references.TryGetValue(s.RepoPath, out var refs)
                     ? s with { References = [.. refs.OrderBy(r => r.FileName, StringComparer.Ordinal)] }
+                    : s)
+                .Select(s => scripts.TryGetValue(s.RepoPath, out var own)
+                    ? s with { Scripts = [.. own.OrderBy(r => r.FileName, StringComparer.Ordinal)] }
                     : s)
                 .OrderBy(s => s.Name, StringComparer.Ordinal)],
             [.. agents.OrderBy(a => a.FileName, StringComparer.Ordinal)]);

@@ -1,6 +1,5 @@
 {
-  "description": "Unity 6: conecta el agente al editor con el MCP oficial de Unity. Necesita el paquete com.unity.ai.assistant en el proyecto y aprobar la conexión en el editor",
-  "requires": ["code"],
+  "description": "Unity: conecta el agente al editor con el MCP oficial de Unity. Necesita el paquete com.unity.ai.assistant en el proyecto y aprobar la conexión en el editor",
   "mcp": [
     {
       "name": "unity-mcp",
@@ -10,7 +9,9 @@
         "macos-x64": "{home}/.unity/relay/relay_mac_x64.app/Contents/MacOS/relay_mac_x64",
         "linux": "{home}/.unity/relay/relay_linux"
       },
-      "args": ["--mcp"]
+      "args": [
+        "--mcp"
+      ]
     }
   ]
 }

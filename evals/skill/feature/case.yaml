@@ -1,0 +1,38 @@
+schema_version: "1.1"
+name: skill-feature
+description: >
+  QT-109. No CLAUDE.md in the workspace: the plugin carries NZT's kernel inside the skill
+  nzt:nzt, and only its description makes it load. A new feature: standard or full work. The case measures that nzt:nzt is the
+  first skill loaded, before any other skill and before any file is written (QT-110: also
+  for a question).
+tags: [skill]
+expected_outcome: >
+  The first Skill call is nzt:nzt, before any other Skill call and before any Edit or Write.
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Quiero sumarle al proyecto una feature de cupones de descuento. ¿Cómo seguimos?
+  max_turns: 25
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, TodoWrite]
+graders:
+  - name: loads-nzt
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"nzt:nzt"'
+  - name: nzt-first
+    type: llm
+    focus: trace
+    arm: with-only
+    criteria: |
+      Look at the order of the tool calls in the trace.
+      PASS only if the first Skill tool call loads the skill "nzt:nzt" (exactly that name, not
+      nzt:nzt-plan or any other), and no Edit, Write or file-changing Bash call happens before
+      it. Reads, globs and greps before it are fine.
+      FAIL if there is no Skill call to nzt:nzt at all, if another skill is loaded before it,
+      or if a file is edited or written before it.
+  - name: answers-in-spanish
+    type: regex
+    pattern: '[áéíóúñ¿¡]|\b(?:qué|cómo|según|está|también|para el|de la)\b'
+    flags: i

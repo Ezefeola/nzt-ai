@@ -1,5 +1,9 @@
 ## Host: Claude Code
 
+- **This skill is NZT's kernel.** It stays in context once loaded. If the conversation was
+  compacted and these rules are no longer in front of you, load `nzt` again first.
+- Wherever NZT says to load `nzt` — starting, resuming, an unclear phase — it is already
+  loaded: read `references/entry.md` in this skill's folder and follow it.
 - NZT skills live in `.claude/skills/<name>/SKILL.md` (project) or `~/.claude/skills/`
   (personal). Load one with the Skill tool, using the name from the routing table.
 - The user can invoke any skill directly as `/<name>`.

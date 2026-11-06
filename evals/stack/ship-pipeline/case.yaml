@@ -10,7 +10,7 @@ description: >
   --judge-model sonnet: haiku failed replies that met all four conditions.
 tags: [stack]
 expected_outcome: >
-  Goes through nzt-ship and the nzt-dotnet pack, gets the pipeline guidance, and writes a
+  Goes through nzt-ship and nzt-software's dotnet pack, gets the pipeline guidance, and writes a
   workflow whose gates hold: the pinned SDK, a restore that either has lock files or reports
   that they are missing and proposes them, separate unit and integration test steps with a
   container runtime for the integration level, and the pending model changes gate.
@@ -27,11 +27,11 @@ graders:
   - name: dotnet-pack-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-dotnet"'
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-software"'
   - name: pipeline-guidance-reached
     type: tool_used
     tool: Read
-    input_match: 'nzt-dotnet[/\\]+references[/\\]+ship-pipeline\.md'
+    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ship-pipeline\.md'
   - name: generic-pipeline-read
     type: tool_used
     tool: Read
@@ -39,7 +39,7 @@ graders:
   - name: other-rows-not-loaded
     type: tool_used
     tool: Read
-    input_match: 'nzt-dotnet[/\\]+references[/\\]+ship-observability\.md'
+    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ship-observability\.md'
     min: 0
     max: 0
   - name: gates-that-hold

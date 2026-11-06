@@ -35,5 +35,5 @@ the plan and the state.
 
 ## Done when
 
-The plan shows group, model and work branch, and the state passes `nzt-ai state check`
-with the group running.
+The plan shows group, model and work branch, and the state passes the state check
+(`SKILL.md`) with the group running.

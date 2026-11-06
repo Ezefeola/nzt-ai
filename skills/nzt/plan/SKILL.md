@@ -44,10 +44,22 @@ Turns the phases `nzt` chose into an approved plan of units, runs it, and keeps
 2. Load the router the unit needs (kernel routing table) and the packs `tech.md` lists.
 3. Do the unit; mark progress where that phase marks it.
 4. Set it `done`, advance the phase or slice it closed, update `updated`, write.
-5. Run `nzt-ai state check`, then report. Chain only into the next unit of the batch.
+5. Run the state check, then report. Chain only into the next unit of the batch.
 
 An approved plan authorises its ordinary steps: do not ask again per file. Departing from it
 is an explicit proposal — *the plan said X, I propose Y because Z* — never a substitution.
+
+## State check
+
+After every write of the state, run this skill's script from the project root. Its folder
+is the one the host gives when it loads this skill:
+
+- Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File <folder>/scripts/state-check.ps1`
+- macOS, Linux: `python3 <folder>/scripts/state-check.py`
+
+Exit 0 passes. Otherwise fix each line it prints and run it again. If the script cannot run
+(no interpreter, or macOS offers to install the Command Line Tools), check the state against
+`references/state.md` yourself and say in the report that the script did not run.
 
 ## Contradictions
 
@@ -81,5 +93,5 @@ was agreed. Ask only what is still unclear.
 
 - Nothing ran without approval, nothing chained outside `autonomy.units` or past a batch stop.
 - No unit is left `doing` without a `detail` line at the end of a turn.
-- The state passes `nzt-ai state check` and describes reality; if the plan stopped doing so,
+- The state passes the state check and describes reality; if the plan stopped doing so,
   the plan was fixed, not followed.

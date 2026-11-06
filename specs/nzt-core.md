@@ -99,7 +99,8 @@ Consecuencias directas:
   **Matiz leído el 2026-09-17**: la doc de Claude Code dice que **un plugin sí admite
   subcarpetas de skills** y que adentro de un plugin la skill se llama `plugin:skill`. No se
   verificó hasta qué profundidad ni con qué nombre quedan las de NZT, y **la decisión de
-  aplanar no depende de eso**: NZT no se distribuye como plugin (D24).
+  aplanar no depende de eso**: `nzt-ai` instala skills planas (D24), y el plugin de D91 usa
+  sus propios nombres `nzt:…` (C7).
 - **C6.** **Hay un harness de evals oficial: `claude plugin eval`** (leído y probado el
   2026-09-17 con la v2.1.274; pide ≥ 2.1.269). Lo que fija el diseño de la fase 6:
   **(1)** el target tiene que ser **un plugin** —carpeta con `.claude-plugin/plugin.json`—,
@@ -110,6 +111,55 @@ Consecuencias directas:
   literalmente *disparó o no disparó*, con `min: 0, max: 0` para *no tiene que disparar*;
   **(4)** los graders de skill no puntúan en el arm sin plugin —serían un cero garantizado—,
   salvo que se marquen `arm: both`, que es lo que usan los casos de sobre-disparo.
+- **C7.** **Lo que un plugin de Claude Code puede hacer para traer NZT** (leído el
+  2026-11-03, Claude Code 2.1.312; unidad 461). *Documentado*:
+  **(1)** un `CLAUDE.md` en la raíz del plugin **no se carga** como contexto, y
+  `claude plugin validate` avisa si lo encuentra; las instrucciones del plugin van en skills;
+  **(2)** cada componente lleva el nombre del plugin delante (`nzt:nzt-build`), y una skill
+  del plugin **no choca** con una suelta del mismo nombre en `~/.claude/skills/` o en el
+  proyecto: cargan las dos;
+  **(3)** en el contenido de una skill de plugin se reemplazan `${CLAUDE_PLUGIN_ROOT}`,
+  `${CLAUDE_PLUGIN_DATA}`, `${CLAUDE_SKILL_DIR}` y `${CLAUDE_PROJECT_DIR}`, también en
+  `allowed-tools`; con la misma ruta en los dos lugares la skill corre su script **sin pedir
+  permiso**;
+  **(4)** `disable-model-invocation: true` hace que el modelo no cargue la skill solo; queda
+  para `/nombre`;
+  **(5)** un hook `SessionStart` de plugin corre en `startup`, `resume`, `clear` y `compact`;
+  `additionalContext` tiene un tope de **10.000 caracteres por string**, sin forma de
+  subirlo; lo que lo pasa se guarda en un archivo y al modelo le llega una vista previa de
+  2.000; con `allowManagedHooksOnly` los hooks de plugins no corren;
+  **(6)** el `settings.json` de un plugin solo aplica `agent` y `subagentStatusLine`; un
+  output style con `force-for-plugin: true` se aplica solo y pisa el `outputStyle` del
+  usuario.
+  *Medido*: `dist/CLAUDE.md` tiene 7.946 caracteres. Fuentes:
+  [plugins-reference](https://code.claude.com/docs/en/plugins-reference),
+  [plugins/components](https://code.claude.com/docs/en/plugins/components),
+  [skills](https://code.claude.com/docs/en/skills),
+  [hooks](https://code.claude.com/docs/en/hooks),
+  [output-styles](https://code.claude.com/docs/en/output-styles).
+- **C8.** **Lo que un plugin de Codex puede hacer para traer NZT** (leído el 2026-11-03;
+  Codex CLI instalado: 0.164.0; las páginas no dicen versión mínima; unidad 461).
+  *Documentado*: **(1)** los plugins andan en Codex CLI y en la app de escritorio de
+  ChatGPT, **no en la extensión del IDE**; en la CLI se instalan con `/plugins` desde un
+  marketplace (`codex plugin marketplace add owner/repo`) y se usan desde una sesión nueva;
+  **(2)** un plugin trae skills, servidores MCP, assets, extensiones del navegador y hooks,
+  y **ninguna página dice que traiga `AGENTS.md` ni instrucciones siempre cargadas**;
+  **(3)** los hooks del plugin, `SessionStart` incluido, son para plugins de escritorio
+  instalados a mano, y **no se confía en ellos solo por instalar**: Codex los saltea hasta
+  que el usuario los revisa; reciben `PLUGIN_ROOT` y `PLUGIN_DATA`;
+  **(4)** `policy.allow_implicit_invocation: false` en `agents/openai.yaml` evita que Codex
+  dispare la skill solo, y `$skill` la sigue invocando; **(5)** las skills de usuario viven
+  en `~/.agents/skills`, y dos skills con el mismo `name` no se fusionan: aparecen las dos.
+  *Sin verificar*: **(6)** cómo una skill de plugin llega a un script suyo; la doc solo dice
+  que `scripts/` es "código ejecutable", sin variable ni regla de rutas. Se resuelve con una
+  prueba contra Codex 0.164.0. **(7)** El nombre con que se invoca una skill de plugin: la
+  doc dice que el nombre del plugin es su espacio de nombres, sin dar la sintaxis.
+  *Inferido de (3)*: en Codex el aviso de versión no puede depender de un hook; lo tiene que
+  dar la propia skill de setup o el bloque del kernel. Fuentes:
+  [build plugins](https://developers.openai.com/codex/plugins/build/),
+  [plugins](https://learn.chatgpt.com/docs/plugins) y
+  [build skills](https://learn.chatgpt.com/docs/build-skills) (las dos últimas son la
+  redirección 308 de `developers.openai.com/codex/plugins` y `/codex/skills`).
 
 ## 4. Arquitectura del set
 
@@ -812,8 +862,9 @@ y mantiene la cohesión. El instalador aplana:
 4. Un manifiesto por proveedor registra lo copiado, con hashes, para poder actualizar o
    desinstalar sin residuos y sin pisar lo que el usuario editó.
 
-Lo hace el CLI de `installer/` (D24). **Nada de esto se instala como plugin**: el plugin de
-`dist/` existe sólo para que `claude plugin eval` tenga un target (D23).
+Lo hace el CLI de `installer/` (D24). El plugin de `dist/` existe sólo para que
+`claude plugin eval` tenga un target (D23) y no se instala. En Claude Code hay además un
+plugin para instalar, con el kernel dentro de la skill `nzt:nzt` (D91, D92, `specs/nzt-plugin.md`).
 
 ## 10. Reglas de autoría de las skills
 
@@ -1208,6 +1259,8 @@ que se tira.
   eliminarla**: `install/build.*` sigue siendo el loop de desarrollo, el CLI es lo que
   instala, y lo que evita que diverjan es una comprobación que compara **byte a byte** el
   bloque del CLI contra el `dist/CLAUDE.md` del build.
+  **Revisada por D91 el 2026-11-04**: en Claude Code NZT también se distribuye como plugin,
+  con una skill de setup; esta decisión sigue vigente para `nzt-ai` y para Codex.
   **(2)** el contenido se **embebe al compilar**, así que el ejecutable es el set y su
   versión es la del set.
   **(3)** la regla que ordena todo el instalador: **nunca se pisa ni se borra un archivo que
@@ -2110,7 +2163,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     propuso expresarlo en tokens absolutos o medirlo con evals. Cambiar los números es
     decisión del usuario; queda anotado para cuando haya una medición. Unidad 306.
 - **D68.** **Después de escribir el estado, el agente corre `nzt-ai state check` donde esté
-  instalado.** Lo que la forzó: el análisis externo (2026-10-21) marcó que los invariantes de
+  instalado.** Revisada por D94: ahora corre el script de `nzt-plan`. Lo que la forzó: el análisis externo (2026-10-21) marcó que los invariantes de
   `Plan/state.json` —un `doing` por nivel, ids únicos, cerrar una fase abre la siguiente— los
   sostiene el modelo a mano y nada los revisa. El usuario eligió que lo revise el CLI, y que
   el CLI quede instalado como `nzt-ai` (sección 12 de `specs/nzt-installer.md`).
@@ -3171,6 +3224,159 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     packs, `state check` ok, los paths que nombran los evals existen. **Ningún eval corrido.**
   - **Versión:** sigue **4.0.0**, sin tag: el refactor entra en la misma versión que el
     usuario todavía prueba en local (D89).
+- **D91.** **NZT también se distribuye como plugin de Claude Code, con una skill de setup
+  que escribe el bloque del kernel en un `CLAUDE.md`; `nzt-ai` sigue siendo la forma común a
+  los dos proveedores.** Revisa D24 sin derogarla. Estado: **aceptada** el 2026-11-04,
+  decidida por el usuario: la idea de la skill de setup es suya (2026-11-03), aprobó el plan
+  cuya unidad 463 es esta decisión, y contestó Q-01 a Q-08 de `specs/nzt-plugin.md`. Rama
+  `nzt-plugin-for-claude`, unidades 461–464.
+  - **Lo que la forzó:** el usuario preguntó si NZT puede ser un plugin. D24 lo descartaba
+    sobre todo porque el kernel (~12.300 caracteres) no entraba en el tope de 10.000 de un
+    hook `SessionStart`. El refactor de D90 lo bajó: **`dist/CLAUDE.md` mide 7.946**
+    (medido el 2026-11-03). Lo que sigue en pie de D24: un `CLAUDE.md` dentro de un plugin no
+    se carga y las skills de un plugin llevan su nombre delante (C7).
+  - **Opciones** (hechos de plataforma en C7 y C8):
+
+    | Opción | Por qué perdió, o qué cuesta |
+    |---|---|
+    | Seguir sin plugin (D24) | Quien instala todo desde `/plugin` no tiene cómo traer NZT; el usuario pidió esa vía |
+    | Plugin cuyo hook `SessionStart` inyecta el kernel | Quedan ~2.000 caracteres de margen y, si se pasa, el modelo recibe solo una vista previa sin aviso; el kernel llega como recordatorio y no como el `CLAUDE.md` que miden las evals; en Codex no sirve, porque sus hooks no corren sin revisión del usuario |
+    | Output style con `force-for-plugin` | Pisa el estilo que eligió el usuario y saca las instrucciones de código de Claude Code salvo `keep-coding-instructions` |
+    | `agent` en el `settings.json` del plugin | Reemplaza el system prompt entero de Claude Code |
+    | **Plugin con skill de setup que escribe el bloque con un script** (elegida) | Ver *lo que se acepta* |
+
+  - **Decisión:** el plugin trae las skills de NZT con los nombres `nzt:…`, una sola skill
+    `/nzt:setup` que instala, actualiza, quita y muestra el bloque, global o en el `CLAUDE.md`
+    del proyecto, y un aviso al empezar la sesión cuando el bloque quedó viejo. **El bloque lo
+    escribe un script, no el modelo**: copiar ~8.000 caracteres a mano puede resumir o cortar
+    una línea sin que nadie lo note (propuesta del agente, aceptada con el plan). Solo Claude
+    Code: Codex queda `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar (Q-01).
+  - **Lo que se acepta:** **(1)** dos variantes del kernel que tienen que decir lo mismo salvo
+    los nombres de las skills y la línea de guarda, controladas por el build (RN-plugin-mismo-kernel);
+    **(2)** el bloque es una copia que queda vieja cuando el plugin se actualiza, hasta que el
+    usuario corre `/nzt:setup` (Q-05); **(3)** desinstalar el plugin sin quitar el bloque lo
+    deja huérfano, y la guarda del kernel lo anula con aviso (Q-07); **(4)** un bloque de
+    proyecto viaja con el repo a compañeros sin el plugin: el agente propuso
+    `CLAUDE.local.md` y el usuario eligió el `CLAUDE.md` del proyecto (Q-06); **(5)** un
+    segundo canal de distribución que se mantiene y se prueba aparte.
+  - **Revertirla:** sacar el plugin del marketplace. Quien lo tenga corre `/nzt:setup` para
+    quitar el bloque, o la guarda lo anula cuando las skills desaparecen; `nzt-ai` no cambia.
+  - **Reemplaza:** nada. D24 queda vigente para `nzt-ai` y para Codex; lo que cambia de D24 es
+    que "NZT no se distribuye como plugin" ya no vale en Claude Code.
+  - **Revisada por D92 el 2026-11-05**: el plugin no lleva setup ni escribe el bloque; el
+    kernel va dentro de la skill `nzt:nzt`.
+- **D92.** **En el plugin de Claude Code, el kernel va dentro de la skill `nzt:nzt`, que carga
+  primero en toda sesión por su descripción: sin `/nzt:setup`, sin hook y sin escribir en
+  archivos del usuario.** Revisa D91. Estado: **aceptada** el 2026-11-05, decidida por el
+  usuario (QT-109, QT-110 en `specs/nzt-plugin.md`). Rama `nzt-plugin-for-claude`, unidades
+  473–476.
+  - **Lo que la forzó:** con el diseño de D91 nada le decía a quien instalaba el plugin que
+    tenía que correr `/nzt:setup`, y desactivar el plugin no apagaba NZT, porque el bloque
+    seguía en el `CLAUDE.md`. El usuario quería activar y desactivar NZT como cualquier plugin.
+  - **Opciones** (investigadas en las docs de skills y hooks, `explanatory-output-style` de
+    Anthropic y Superpowers):
+
+    | Opción | Por qué perdió, o qué cuesta |
+    |---|---|
+    | D91 con un aviso del hook cuando no hay bloque | Sigue sin apagado limpio: el bloque queda en el archivo |
+    | Hook `SessionStart` que inyecta el kernel (como `explanatory-output-style`) | Tope de 10.000 caracteres por texto y una pieza más que mantener; el usuario prefirió no depender de un hook |
+    | Hook que inyecta una skill con el kernel (como Superpowers) | Mismo tope y mismas piezas |
+    | **Skill `nzt:nzt` con el kernel, cargada por su descripción** (elegida) | Ver *lo que se acepta* |
+
+  - **Decisión:** el build arma `nzt:nzt` con el kernel y `core/adapter-claude-skill.md`, y
+    pasa la entrada de `skills/nzt` a su referencia `references/entry.md`. Se retiraron
+    `/nzt:setup`, el hook, el bloque, sus pruebas y sus evals (unidad 476).
+  - **Lo que se midió:** evals sin `CLAUDE.md`, 4 pedidos × 3 corridas: `nzt:nzt` fue la
+    primera herramienta en 12 de 12 (474). En vivo, tras `/compact` Claude Code re-adjuntó
+    `nzt:nzt`, y sin el plugin no quedó rastro de NZT (475).
+  - **Lo que se acepta:** **(1)** que cargue depende de la descripción, no de una garantía de
+    la plataforma: si un modelo futuro deja de cargarla primero, lo detectan los evals
+    `skill/`, y el plan B es un hook de una línea que diga que se cargue; **(2)** ~2.200 tokens
+    (estimación) en cada sesión, también para una pregunta (QT-110); **(3)** el kernel tiene que
+    seguir entrando en los 5.000 tokens que Claude Code conserva de una skill al compactar.
+  - **Revertirla:** volver a D91 desde el commit `db92912`.
+  - **Reemplaza:** la parte de D91 sobre `/nzt:setup`, el bloque y el hook. Lo demás de D91
+    —el plugin en el marketplace, los nombres `nzt:…`, `nzt-ai` como forma común— sigue.
+- **D93.** **Las reglas de los packs viajan con el marco, en una skill por dominio:
+  `nzt-software` y `nzt-games`, cada una con todas sus referencias a un nivel de su
+  `SKILL.md`; `tech.md` sigue decidiendo qué pack aplica, y `packs/` queda como catálogo de
+  MCP.** Revisa D88. Estado: **aceptada** el 2026-11-05, decidida por el usuario en el debate
+  de la rama `nzt-plugin-for-claude`, unidades 478–484.
+  - **Lo que la forzó:** con D92 el plugin no instala packs por proyecto, y sin `nzt-ai` no
+    había cómo traerlos. Además, una historia .NET cargaba 4 o 5 skills en cadena (`dotnet` →
+    `backend`, `csharp` → `code`) y siete descripciones de pack estaban siempre en contexto.
+  - **Opciones** (hechos en las docs de plugins y en *Skill authoring best practices* de
+    Anthropic, leídas el 2026-11-05):
+
+    | Opción | Por qué perdió, o qué cuesta |
+    |---|---|
+    | Un plugin por pack, habilitado por proyecto, con `dependencies` | La misma cadena de skills y más piezas que publicar y versionar |
+    | Un plugin por tecnología con lo genérico copiado | Varios plugins para instalar; el usuario quiere uno |
+    | Dos plugins, software y juegos | La frontera no es del proyecto: un juego puede tener un backend |
+    | Una skill `nzt-stack` con un índice por pack | Tres saltos de lectura: la guía pide referencias a un nivel del `SKILL.md` |
+    | **Una skill por dominio, todo a un nivel** (elegida) | Ver *lo que se acepta* |
+
+  - **Decisión:** `skills/nzt/software/` (`code`, `backend`, `frontend`, `csharp`, `ddd`,
+    `dotnet`, `blazor`) y `skills/nzt/games/` (`unity`), con `references/<pack>/`. El orden
+    genérico → específico lo dice el `SKILL.md`; ninguna referencia manda a leer otra primero.
+    El dominio es del componente en `tech.md`: un proyecto mixto carga las dos. `packs/<pack>/`
+    queda con `pack.json` solo donde hay MCP (`dotnet`, `blazor`, `unity`), y los MCP se
+    proponen como cualquier herramienta (DB-03): en Claude Code con `claude mcp add --scope
+    project`, en Codex con `nzt-ai project`.
+  - **Lo que se acepta:** **(1)** `nzt-software` carga entero (~145 líneas; los costos de cada opción, solo al elegir, en `references/choosing.md`) en vez de solo los
+    packs listados; **(2)** las reglas de todos los packs están en toda instalación, inertes
+    hasta que `tech.md` las lista; **(3)** pasados los 500 líneas, `nzt-software` se parte por
+    dominio otra vez.
+  - **Revertirla:** devolver las referencias a `packs/<pack>/` con su `SKILL.md`.
+  - **Reemplaza:** de D88, las skills de pack instaladas por proyecto. Siguen `tech.md`, sus
+    packs por componente y "instalado no es autorización".
+- **D94.** **El state check vive en `nzt-plan` como scripts (`scripts/state-check.ps1` en
+  Windows, `state-check.py` en macOS y Linux), y el CLI `nzt-ai` queda como instalador.**
+  Revisa D68. Estado: **aceptada** el 2026-11-06, decidida por el usuario. Rama
+  `nzt-plugin-for-claude`, unidades 485–490 (tramo S2d).
+  - **Lo que la forzó:** con D92 el plugin no instala `nzt-ai`, así que la hard rule de D68
+    (*"donde esté instalado"*) no corría nunca en el plugin: los invariantes del estado
+    volvían a depender del modelo.
+  - **Decisión:** los dos scripts aplican las reglas, mensajes y orden de `StateCheck.cs`; la
+    paridad la comprueban los checks del instalador (`StateScriptsMatchTheCli`, 69 corridas
+    iguales con python, powershell y pwsh). La hard rule del kernel dice correr el state
+    check de `nzt-plan`; `nzt-plan` dice cómo, y que si el script no corre (sin intérprete, o
+    macOS pide las Command Line Tools) se revisa contra `references/state.md` y se avisa. El
+    build y el instalador copian `scripts/` de cada skill byte a byte (el `.ps1` con BOM,
+    porque PowerShell 5.1 lee sin él como ANSI).
+  - **Lo que se acepta:** **(1)** dos implementaciones más de las mismas reglas, sostenidas
+    por la prueba de paridad; **(2)** en un Mac sin Command Line Tools el chequeo es a mano
+    (ver *El state check en macOS* en `specs/nzt-plugin.md`); **(3)** `nzt-ai state check`
+    sigue existiendo, pero nada en el método lo nombra.
+  - **Revertirla:** volver la hard rule a `nzt-ai state check` y quitar `scripts/`.
+  - **Reemplaza:** de D68, el CLI como el que revisa. Siguen la regla en el kernel y lo que
+    revisa.
+- **D95.** **Una sola vía de instalación: también con `nzt-ai` (el `irm`), el kernel va
+  dentro de la skill `nzt`, en Claude Code y en Codex, y nada se escribe en `CLAUDE.md` ni
+  en `AGENTS.md`.** Revisa D92 y la nota del 2026-11-06 que dejaba el `irm` con el bloque.
+  Estado: **aceptada** el 2026-11-06, decidida por el usuario (QT-113 en
+  `specs/nzt-plugin.md`). Rama `nzt-plugin-for-claude`, unidades 491–496 (tramo S2e).
+  - **Lo que la forzó:** el usuario quiere que las dos formas de instalar funcionen por la
+    misma vía. Con el bloque, el `irm` y el plugin cargaban el método distinto, se medían
+    distinto (las evals ya miden la skill, QT-111) y el `irm` escribía en archivos del usuario.
+  - **Decisión:** la skill `nzt` es, en las tres formas, el mismo frontmatter
+    (`core/skill-nzt.md`, la descripción que la hace cargar primero), el kernel y el
+    adaptador del host: `adapter-claude-skill.md` en el plugin (nombres `nzt:`),
+    `adapter-claude.md` en Claude Code y `adapter-codex.md` en Codex con el `irm` (nombres
+    `nzt-`). El cuerpo de `skills/nzt` pasa a su `references/entry.md`. El build arma las
+    tres (`dist/plugin/skills/nzt/`, `dist/claude-code/nzt/`, `dist/codex/nzt/`) y el
+    instalador compone la misma, comprobada byte a byte contra el build. El instalador ya no
+    planea el archivo de instrucciones: un bloque de una instalación anterior sale como
+    huérfano (se quita entre sus marcadores y queda el texto del usuario), y un bloque
+    editado se conserva y se informa, como antes.
+  - **Lo que se acepta:** **(1)** en Codex no hay evidencia de que una skill cargue primero
+    sin `AGENTS.md` (C8): si no carga, sus usuarios se quedan sin el método hasta corregirlo;
+    el usuario lo probó en la 496 (2026-11-06) y cargó bien; **(2)** en Claude Code vale lo que D92 aceptó: que cargue
+    depende de la descripción; **(3)** un `CLAUDE.md`/`AGENTS.md` con marcadores y sin
+    manifiesto ya no se toca: si alguien lo tiene, el kernel llega dos veces.
+  - **Revertirla:** volver a planear el bloque en el instalador desde el commit `2680c14`.
+  - **Reemplaza:** de D92, que el bloque siga siendo la forma de `nzt-ai`. Siguen la skill
+    con el kernel, su descripción y lo medido en 474 y 475.
 
 ## 13. Revisión contra Temper v3
 

@@ -9,7 +9,6 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ws="${1:-$PWD}"
 
-cp "$here/CLAUDE.md" "$ws/CLAUDE.md"
 bash "$here/packs.sh" "$ws" dotnet
 
 mkdir -p "$ws/Legacy.Billing/Services" "$ws/Legacy.Billing/Controllers"
