@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-06T05:50:00Z",
+  "updated": "2026-11-06T06:30:00Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -321,8 +321,8 @@
             {
               "id": 495,
               "do": "Prueba en vivo en Claude Code con el irm: nzt primera en sesión nueva, tras /compact, actualizar desde una instalación con bloque y desinstalar",
-              "status": "todo",
-              "detail": ""
+              "status": "dropped",
+              "detail": "Usuario, 2026-11-06: no se corre; Claude Code ya quedó probado con el plugin (474, 475). Sin probar en vivo lo propio del irm: la skill en ~/.claude/skills con el nombre nzt, y quitar un bloque viejo real (cubierto solo por los checks)"
             },
             {
               "id": 496,
@@ -360,7 +360,7 @@
     "units": [490, 491, 492, 493, 494],
     "keep_stops": []
   },
-  "waiting_on": "Prueba en vivo 495 en Claude Code: la corre el usuario (el instalador escribe en su ~/.claude real; Windows ignora HOME)",
+  "waiting_on": "Prueba 496 en Codex: la corre el usuario con el irm de esta rama (dotnet run --project installer/src/Nzt.Cli -- install --provider codex --mods none) y avisa si Codex carga nzt primero",
   "notes": [
     "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
     "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",
