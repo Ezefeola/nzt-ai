@@ -3371,7 +3371,7 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     editado se conserva y se informa, como antes.
   - **Lo que se acepta:** **(1)** en Codex no hay evidencia de que una skill cargue primero
     sin `AGENTS.md` (C8): si no carga, sus usuarios se quedan sin el método hasta corregirlo;
-    lo prueba el usuario en la 496; **(2)** en Claude Code vale lo que D92 aceptó: que cargue
+    el usuario lo probó en la 496 (2026-11-06) y cargó bien; **(2)** en Claude Code vale lo que D92 aceptó: que cargue
     depende de la descripción; **(3)** un `CLAUDE.md`/`AGENTS.md` con marcadores y sin
     manifiesto ya no se toca: si alguien lo tiene, el kernel llega dos veces.
   - **Revertirla:** volver a planear el bloque en el instalador desde el commit `2680c14`.

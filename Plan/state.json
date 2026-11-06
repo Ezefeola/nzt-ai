@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-06T06:30:00Z",
+  "updated": "2026-11-06T06:50:00Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -276,7 +276,7 @@
     {
       "id": "S2e",
       "name": "El irm instala como el plugin: kernel dentro de la skill nzt, sin CLAUDE.md ni AGENTS.md, en Claude Code y Codex (QT-113)",
-      "status": "doing",
+      "status": "done",
       "phases": [
         {
           "name": "architecture",
@@ -316,7 +316,7 @@
         },
         {
           "name": "verify",
-          "status": "doing",
+          "status": "done",
           "units": [
             {
               "id": 495,
@@ -327,8 +327,8 @@
             {
               "id": 496,
               "do": "Prueba en Codex con el usuario: carga nzt primero sin AGENTS.md",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "Usuario, 2026-11-06: lo probó con el irm de esta rama y Codex cargó nzt bien. Observado por el usuario, sin traza revisada por el agente"
             }
           ]
         }
@@ -345,9 +345,9 @@
           "units": [
             {
               "id": 472,
-              "do": "Workflow de release a la rama plugin, entrada nzt en el marketplace, README y versión de NZT",
+              "do": "Release v5: versión 5.0.0 de NZT, workflow de release a la rama plugin, entrada nzt en el marketplace y README",
               "status": "todo",
-              "detail": "Con D93: publicar el plugin con nzt-software y nzt-games; el usuario mergea el PR y avisa"
+              "detail": "Con D93, D94 y D95: el plugin con nzt-software y nzt-games, y el irm con el método en la skill nzt. Se hace cuando el usuario avise que mergeó el PR de nzt-plugin-for-claude"
             }
           ]
         }
@@ -357,12 +357,12 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": {
-    "units": [490, 491, 492, 493, 494],
+    "units": [],
     "keep_stops": []
   },
-  "waiting_on": "Prueba 496 en Codex: la corre el usuario con el irm de esta rama (dotnet run --project installer/src/Nzt.Cli -- install --provider codex --mods none) y avisa si Codex carga nzt primero",
+  "waiting_on": "El usuario arma el PR de nzt-plugin-for-claude, lo mergea y avisa; después la 472 (release v5)",
   "notes": [
-    "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
+    "Codex: D95 probado por el usuario (496). Evals: el usuario decidió no correr la suite completa por costo (2026-11-06); se prueba en uso",
     "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",
     "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente",
     "2026-11-05: el agente instaló NZT por error en el ~/.claude real (Windows ignora HOME); el usuario lo desinstaló el 2026-11-06 (verificado: sin CLAUDE.md, skills nzt* ni agentes). Sin NZT global, las guías se leen de skills/ del repo",

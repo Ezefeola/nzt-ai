@@ -148,7 +148,7 @@ Linux. La pregunta: ¿un Mac sin nada instalado tiene `python3`? Leído el 2026-
 
 ## Abierto
 
-- Codex `[TO-DEFINE]` (Q-01).
+- Codex: el plugin de Codex sigue `[TO-DEFINE]` (Q-01); el `irm` con la skill `nzt` (D95) lo probó el usuario el 2026-11-06 y cargó bien (496).
 - La suite de evals mide todavía con el kernel en `CLAUDE.md`: pasa a medir el plugin en la
   unidad 477 (QT-111).
 - Desvíos del método vistos en la 474 y la 475 —no objetar una vez saltear el plan, una
