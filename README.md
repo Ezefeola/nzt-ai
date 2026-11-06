@@ -32,8 +32,9 @@ donde quedaste y no descubrir a lo último que entendió otra cosa.**
 
 Tres capas globales, la de arriba siempre cargada, y los packs de cada proyecto.
 
-**1. El kernel** (~115 líneas) se instala en el archivo que tu proveedor lee en toda sesión
-—`~/.claude/CLAUDE.md` o `~/.codex/AGENTS.md`—. Trae el bucle, los frenos, el formato del
+**1. El kernel** (~115 líneas) va dentro de la skill `nzt`, que el proveedor carga primero en
+toda sesión: no se escribe nada en tu `CLAUDE.md` ni en tu `AGENTS.md`, igual con el plugin
+que con la línea de instalación. Trae el bucle, los frenos, el formato del
 estado y **la tabla de ruteo**. Eso último es la decisión de diseño más importante del set:
 qué skill cargar está *instruido en una tabla*, no librado a que el modelo adivine por la
 descripción.
@@ -156,8 +157,9 @@ curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-c
 ```
 
 Cada línea baja el instalador a una carpeta temporal, verifica su SHA256, instala NZT en ese
-proveedor —el bloque en `CLAUDE.md` o `AGENTS.md` y las skills, y los mods si es la línea
-`install-claude-full`—, deja una copia como `nzt-ai` (en `%LOCALAPPDATA%\nzt\bin`, que entra
+proveedor —las skills, con el kernel dentro de `nzt`, y los mods si es la línea
+`install-claude-full`; si una versión anterior dejó un bloque en `CLAUDE.md` o `AGENTS.md`,
+lo quita y deja tu texto—, deja una copia como `nzt-ai` (en `%LOCALAPPDATA%\nzt\bin`, que entra
 al PATH del usuario, o en `~/.local/bin`) y borra la carpeta temporal. **Para actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
 `$env:NZT_UNINSTALL='1'; irm … | iex` en Windows o `curl … | NZT_UNINSTALL=1 sh` en el resto.
 

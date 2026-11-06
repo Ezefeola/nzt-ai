@@ -1,8 +1,8 @@
 #requires -Version 7.0
 <#
 .SYNOPSIS
-  Builds CLAUDE.md and AGENTS.md from core/kernel.md plus each host adapter,
-  validates the skill tree, and assembles dist/plugin/ — the flattened plugin
+  Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the
+  host's adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
   that `claude plugin eval` runs against (see specs/nzt-core.md, D23).
 .PARAMETER OutDir
   Where to write the built files. Defaults to <repo>/dist.
@@ -17,30 +17,8 @@ if (-not $OutDir) { $OutDir = Join-Path $root 'dist' }
 
 $failed = $false
 
-# --- instruction files -------------------------------------------------------
-
 $kernel = (Get-Content (Join-Path $root 'core/kernel.md') -Raw).TrimEnd()
-
-$targets = @(
-    @{ File = 'CLAUDE.md'; Adapter = 'adapter-claude.md' }
-    @{ File = 'AGENTS.md'; Adapter = 'adapter-codex.md' }
-)
-
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-
-foreach ($t in $targets) {
-    $adapter = (Get-Content (Join-Path $root "core/$($t.Adapter)") -Raw).TrimEnd()
-    $body = "<!-- nzt:start -->`n$kernel`n`n$adapter`n<!-- nzt:end -->`n"
-
-    Set-Content -Path (Join-Path $OutDir $t.File) -Value $body -Encoding utf8 -NoNewline
-
-    $lines = ($body.TrimEnd() -split "`n").Count
-    Write-Host ("{0,-10} {1,4} lines" -f $t.File, $lines)
-    if ($lines -gt 200) {
-        Write-Warning "$($t.File) is over the 200-line budget ($lines lines)."
-        $failed = $true
-    }
-}
 
 # --- skill tree --------------------------------------------------------------
 
@@ -228,33 +206,27 @@ $manifest = @"
 "@
 Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value $manifest -Encoding utf8
 
-# The method inside the skill nzt:nzt (QT-109): the kernel and the plugin's adapter are the
-# skill's body, and what skills/nzt does today becomes its reference entry.md. Its
-# description is what makes it load first in every session; nothing else loads it.
-$nztSkill = Join-Path $plugin 'skills/nzt'
-New-Item -ItemType Directory -Force -Path (Join-Path $nztSkill 'references') | Out-Null
+# The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
+# frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
+# does today becomes its reference entry.md. Its description is what makes it load first
+# in every session; nothing else loads it. nzt-ai installs the same files, byte for byte.
 $entrySrc = Get-Content (Join-Path $root 'skills/nzt/SKILL.md') -Raw
 $entryAt = $entrySrc.IndexOf("`n---`n", 3)
-Set-Content -Path (Join-Path $nztSkill 'references/entry.md') -Value $entrySrc.Substring($entryAt + 5) -Encoding utf8 -NoNewline
-$skillAdapter = (Get-Content (Join-Path $root 'core/adapter-claude-skill.md') -Raw).TrimEnd()
-$nztDescription = "NZT's working method - the rules for every reply and where each request goes. Load it first in every session, before anything else, even for a question, and again after the conversation is compacted."
-$nztBody = "---`nname: nzt`ndescription: $nztDescription`n---`n`n$kernel`n`n$skillAdapter`n"
-Set-Content -Path (Join-Path $nztSkill 'SKILL.md') -Value $nztBody -Encoding utf8 -NoNewline
-if (Test-Skill (Get-Item (Join-Path $nztSkill 'SKILL.md')) 'plugin skills/nzt' 'nzt') { $failed = $true }
-
-# The kernel inside nzt:nzt is nzt-ai's, byte for byte: the lines between the header and the
-# first '## Host:' heading.
-function Get-KernelOf([string]$path, [int]$skip) {
-    $all = (Get-Content $path -Raw) -split "`n"
-    $kept = foreach ($line in ($all | Select-Object -Skip $skip)) {
-        if ($line -match '^## Host:') { break }
-        $line
-    }
-    $kept -join "`n"
+$frontmatter = (Get-Content (Join-Path $root 'core/skill-nzt.md') -Raw).TrimEnd()
+function Build-Nzt([string]$dest, [string]$adapterFile, [string]$label) {
+    if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }
+    New-Item -ItemType Directory -Force -Path (Join-Path $dest 'references') | Out-Null
+    Set-Content -Path (Join-Path $dest 'references/entry.md') -Value $entrySrc.Substring($entryAt + 5) -Encoding utf8 -NoNewline
+    $adapter = (Get-Content (Join-Path $root "core/$adapterFile") -Raw).TrimEnd()
+    Set-Content -Path (Join-Path $dest 'SKILL.md') -Value "$frontmatter`n`n$kernel`n`n$adapter`n" -Encoding utf8 -NoNewline
+    Test-Skill (Get-Item (Join-Path $dest 'SKILL.md')) $label 'nzt'
 }
-if ((Get-KernelOf (Join-Path $OutDir 'CLAUDE.md') 1) -cne (Get-KernelOf (Join-Path $nztSkill 'SKILL.md') 5)) {
-    Write-Warning 'the kernel in skills/nzt/SKILL.md of the plugin differs from the one in CLAUDE.md.'
-    $failed = $true
+if (Build-Nzt (Join-Path $plugin 'skills/nzt') 'adapter-claude-skill.md' 'plugin skills/nzt') { $failed = $true }
+if (Build-Nzt (Join-Path $OutDir 'claude-code/nzt') 'adapter-claude.md' 'claude-code nzt') { $failed = $true }
+if (Build-Nzt (Join-Path $OutDir 'codex/nzt') 'adapter-codex.md' 'codex nzt') { $failed = $true }
+foreach ($old in 'CLAUDE.md', 'AGENTS.md') {
+    $path = Join-Path $OutDir $old
+    if (Test-Path $path) { Remove-Item -Force $path }
 }
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it

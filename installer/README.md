@@ -1,7 +1,7 @@
 # Instalador de NZT — .NET 10
 
-Versión 4.0.0. Instala NZT **globalmente**, y el método no es un plugin: el kernel como
-bloque en el archivo de instrucciones que el proveedor ya lee en toda sesión, y las 12
+Versión 4.0.0. Instala NZT **globalmente**, por la misma vía que el plugin (D95): el kernel
+dentro de la skill `nzt`, que el proveedor carga primero en toda sesión, y las
 skills, con sus referencias, aplanadas en su carpeta de skills de usuario. Los **packs** se
 instalan aparte, **en cada proyecto** (sección *Packs por proyecto*). En Claude Code
 puede instalar además **los mods**, que sí son plugins (sección *Mods de Claude Code*). El
@@ -102,16 +102,19 @@ Todos aceptan `--dry-run`. Los tres que escriben son la misma operación: del es
 
 ## Dónde queda instalado
 
-| Proveedor | Instrucciones | Skills | Subagentes | Cómo se activa |
+| Proveedor | Kernel | Skills | Subagentes | Cómo se activa |
 |---|---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/SKILL.md` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` | abrir `claude` en cualquier proyecto |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/SKILL.md` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` | iniciar `codex` |
+| Claude Code | en la skill `~/.claude/skills/nzt/` | `~/.claude/skills/<nombre>/SKILL.md` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` | abrir `claude` en cualquier proyecto |
+| Codex | en la skill `~/.agents/skills/nzt/` | `~/.agents/skills/<nombre>/SKILL.md` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` | iniciar `codex` |
+
+Desde D95 el kernel no se escribe en `CLAUDE.md` ni en `AGENTS.md`: va dentro de la skill
+`nzt`, igual que en el plugin, y su descripción le pide al modelo cargarla primero.
 
 Son dos, y a los dos los manda `nzt-delegate`: el explorador de solo lectura recibe las lecturas
 largas, y el worker, las unidades que el plan aprobado marcó en paralelo (D84). Desinstalar
 los saca y deja tus otros agentes.
 
-`CODEX_HOME` es `~/.codex` por defecto. Cambiarlo mueve las instrucciones, **no** las skills.
+`CODEX_HOME` es `~/.codex` por defecto. Cambiarlo mueve los subagentes, **no** las skills.
 
 Dos advertencias que el CLI también imprime:
 
@@ -119,8 +122,8 @@ Dos advertencias que el CLI también imprime:
   `~/.agents/skills`. Si esa otra carpeta existe en la máquina, el instalador lo avisa antes
   de escribir: es el primer lugar a mirar si Codex no ve las skills.
 - **Instalar global significa que NZT aplica a todos los proyectos.** Es lo pedido, y es
-  tolerable porque el kernel se escala solo hacia abajo y un `CLAUDE.md` de proyecto se lee
-  después del global.
+  tolerable porque el kernel se escala solo hacia abajo y el `CLAUDE.md` o `AGENTS.md` de
+  un proyecto sigue aplicando.
 
 No se crea ningún plugin ni otro subagente que los dos de la tabla, y la instalación global
 no toca `config.toml`. Instalar skills no garantiza que el modelo siempre seleccione la correcta: eso
@@ -128,24 +131,16 @@ es lo que miden los evals.
 
 ## Convivencia
 
-NZT es dueño de un bloque y de nada más:
+NZT es dueño de los archivos de su manifiesto y de nada más. Tu `CLAUDE.md` y tu `AGENTS.md`
+no se tocan (D95). Una comprobación verifica que la skill `nzt` que escribe el CLI sea
+idéntica byte a byte a la que emite el build en `dist/claude-code/nzt/` y `dist/codex/nzt/`.
 
-```markdown
-<!-- nzt:start -->
-... kernel + adapter del proveedor ...
-<!-- nzt:end -->
-```
-
-Son **los mismos marcadores que emite `install/build.*`**, y una comprobación verifica que el
-bloque que escribe el CLI sea idéntico byte a byte al `dist/CLAUDE.md` del build.
-
-- El bloque se agrega **arriba** del contenido personal existente; al actualizar se reemplaza
-  en su lugar y el texto de alrededor queda intacto.
-- La primera vez que se toca un archivo de instrucciones que ya existía se guarda
-  `CLAUDE.md.nzt-backup`. No se pisa un backup previo.
-- **Marcadores presentes sin manifiesto son una colisión**: el instalador no asume que son
-  suyos, corta antes de escribir y lo informa.
-- Un bloque editado o roto se conserva y se informa, tantas reinstalaciones como haga falta.
+- **Una instalación anterior** dejó el kernel en un bloque entre `<!-- nzt:start -->` y
+  `<!-- nzt:end -->`. Al actualizar, el bloque se quita y el texto de alrededor queda
+  intacto; si era todo el archivo, el archivo se borra. Un bloque editado o roto se conserva
+  y se informa.
+- **Marcadores sin manifiesto no se tocan**: no se sabe de quién son. Si tenés uno, el kernel
+  te llega dos veces hasta que lo saques.
 
 ## Protección de archivos
 

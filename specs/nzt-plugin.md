@@ -39,7 +39,7 @@ NZT.
 ## Glosario de esta spec
 
 - **Kernel**: las reglas de NZT que valen en todos los turnos (`core/kernel.md`). Es el mismo
-  texto que `nzt-ai` escribe en `CLAUDE.md`.
+  texto que `nzt-ai` pone en su skill `nzt` (D95).
 - **`nzt:nzt`**: la skill de entrada del plugin. Su cuerpo es el kernel y el adaptador del
   plugin; lo que la skill `nzt` hace en `nzt-ai` es su referencia `references/entry.md`.
 - **Entrada**: leer el estado, dimensionar el pedido, elegir las fases y pasar la posta
@@ -109,8 +109,8 @@ se instala como `nzt@nzt`.
 
 - `install/build.*` arma `dist/plugin/` (D23): la skill `nzt` con el kernel y su entrada, las
   demás skills, los subagentes con los nombres del plugin en su lista `skills:` (QT-103) y la
-  versión de NZT en `plugin.json`, la del `.csproj` (D24). Comprueba que el kernel de `nzt:nzt`
-  sea el de `CLAUDE.md` byte por byte. Las dos builds dan la misma salida.
+  versión de NZT en `plugin.json`, la del `.csproj` (D24). La skill `nzt` del plugin, la de
+  Claude Code y la de Codex salen del mismo armado (D95). Las dos builds dan la misma salida.
 - El workflow de release copia `dist/plugin/` **sin `evals/`** a la rama `plugin`, en un commit
   por versión (QT-104).
 

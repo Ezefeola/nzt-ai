@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-06T03:50:00Z",
+  "updated": "2026-11-06T05:50:00Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -280,43 +280,43 @@
       "phases": [
         {
           "name": "architecture",
-          "status": "doing",
+          "status": "done",
           "units": [
             {
               "id": 491,
               "do": "D95 en specs/nzt-core.md (revisa D92 y lo anotado: una sola vía, la skill nzt) y specs/nzt-installer.md al día: qué instala, cómo migra el bloque viejo, Codex sin verificar",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "D95 en specs/nzt-core.md: frontmatter común en core/skill-nzt.md, kernel + adaptador por host, entry como referencia, dist/claude-code/nzt y dist/codex/nzt, el bloque viejo sale como huérfano; acepta Codex sin evidencia y marcadores sin manifiesto sin tocar. specs/nzt-installer.md §2, §4, §7, §8, §9 I2 con [modify] D95"
             }
           ]
         },
         {
           "name": "build",
-          "status": "todo",
+          "status": "done",
           "units": [
             {
               "id": 492,
               "do": "Adaptadores de skill por host para el irm (Claude Code con nombres nzt-, Codex) y el build arma la skill nzt de cada uno como la del plugin",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "core/skill-nzt.md (frontmatter común); adapter-claude.md y adapter-codex.md reescritos como adaptadores de skill (esta skill es el kernel, entry.md, recargar tras compactar). build.sh y build.ps1: build_nzt arma dist/plugin/skills/nzt, dist/claude-code/nzt y dist/codex/nzt y borran dist/CLAUDE.md y AGENTS.md; sale el chequeo kernel_of (ahora es el mismo armado). Builds iguales, skill del plugin idéntica a la anterior, validate pasa"
             },
             {
               "id": 493,
               "do": "Instalador: la skill nzt lleva kernel + adaptador + references/entry.md, deja de escribir CLAUDE.md/AGENTS.md, al actualizar quita el bloque viejo; checks",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "Installer.NztSkill compone frontmatter + kernel + adapter y entry.md; Plan ya no planea CLAUDE.md/AGENTS.md; sin la escritura del bloque, su pre-scan ni el backup; el bloque viejo sale por la lógica de huérfanos. Checks nuevos: InstallsTheKernelInsideTheNztSkill, RemovesTheBlockOfAnOldInstall, KeepsAnEditedOldBlock, LeavesMarkersWithoutAManifestAlone, NztSkillMatchesWhatTheBuildEmits (claude-code y codex idénticos al build), DoesNotTouchADamagedBlock sobre una instalación vieja. 248 pasan. Dry-run real: 156 archivos por proveedor, ninguno de instrucciones"
             },
             {
               "id": 494,
               "do": "install.ps1/install.sh, README y lo que nombre el kernel en CLAUDE.md/AGENTS.md, al día",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "README (kernel en la skill nzt, el bloque viejo se quita), installer/README (tabla, convivencia, advertencias), comentarios de install.sh/ps1, glosario y build de specs/nzt-plugin.md, evals/README. Build, 248 checks y validate pasan. La guía de la landing (otra rama) no se tocó"
             }
           ]
         },
         {
           "name": "verify",
-          "status": "todo",
+          "status": "doing",
           "units": [
             {
               "id": 495,
@@ -360,7 +360,7 @@
     "units": [490, 491, 492, 493, 494],
     "keep_stops": []
   },
-  "waiting_on": null,
+  "waiting_on": "Prueba en vivo 495 en Claude Code: la corre el usuario (el instalador escribe en su ~/.claude real; Windows ignora HOME)",
   "notes": [
     "Codex queda [TO-DEFINE] (Q-01): sin tramo hasta probar lo que C8 deja sin verificar",
     "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",

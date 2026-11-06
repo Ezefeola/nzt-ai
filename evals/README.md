@@ -31,7 +31,7 @@ claude plugin eval dist/plugin --scaffold --threshold 0.8
   runner refuses to run one unless you pass it. These scripts are in this repository and
   run as you — read them once before you trust them.
 - **Rebuild before every run.** `dist/plugin/` is generated, and `install/build.*` copies
-  this directory and the freshly built `CLAUDE.md` into it. A stale build evaluates a stale
+  this directory into it. A stale build evaluates a stale
   kernel.
 - **`--ablation none` halves the cost** by skipping the no-plugin arm. Use it while
   iterating on a case; use the default when you want to know what NZT contributed.

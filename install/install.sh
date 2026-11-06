@@ -12,7 +12,7 @@
 #
 # Instala NZT en un proveedor, no el CLI: lo baja a una carpeta temporal,
 # verifica su SHA256, corre `install --provider` una vez y lo borra. Todo lo que
-# se escribe en CLAUDE.md, AGENTS.md o las carpetas de skills lo hace el CLI con
+# se escribe en las carpetas de skills (y el bloque viejo que quita) lo hace el CLI con
 # sus propias reglas.
 #
 # Variables: NZT_UNINSTALL, NZT_DRY_RUN, NZT_VERSION, NZT_DOWNLOAD_BASE (tabla en

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Builds CLAUDE.md and AGENTS.md from core/kernel.md plus each host adapter,
-# validates the skill tree, and assembles dist/plugin/ — the flattened plugin
+# Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the host's
+# adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
 # that `claude plugin eval` runs against (see specs/nzt-core.md, D23).
 # Usage: install/build.sh [out-dir]   (default: <repo>/dist)
 set -euo pipefail
@@ -10,29 +10,6 @@ out="${1:-$root/dist}"
 mkdir -p "$out"
 
 status=0
-
-# --- instruction files -------------------------------------------------------
-
-build() {
-  local file="$1" adapter="$2" path="$out/$1" lines
-  {
-    echo "<!-- nzt:start -->"
-    cat "$root/core/kernel.md"
-    echo
-    cat "$root/core/$adapter"
-    echo "<!-- nzt:end -->"
-  } > "$path"
-
-  lines="$(wc -l < "$path" | tr -d ' ')"
-  printf '%-10s %4s lines\n' "$file" "$lines"
-  if [ "$lines" -gt 200 ]; then
-    echo "WARNING: $file is over the 200-line budget ($lines lines)." >&2
-    status=1
-  fi
-}
-
-build CLAUDE.md adapter-claude.md
-build AGENTS.md adapter-codex.md
 
 # --- skill tree --------------------------------------------------------------
 
@@ -220,31 +197,29 @@ cat > "$plugin/.claude-plugin/plugin.json" <<JSON
 }
 JSON
 
-# The method inside the skill nzt:nzt (QT-109): the kernel and the plugin's adapter are the
-# skill's body, and what skills/nzt does today becomes its reference entry.md. Its
-# description is what makes it load first in every session; nothing else loads it.
-nzt_skill="$plugin/skills/nzt"
-mkdir -p "$nzt_skill/references"
-sed '1,/^---$/d' "$root/skills/nzt/SKILL.md" > "$nzt_skill/references/entry.md"
-{
-  echo "---"
-  echo "name: nzt"
-  echo "description: NZT's working method - the rules for every reply and where each request goes. Load it first in every session, before anything else, even for a question, and again after the conversation is compacted."
-  echo "---"
-  echo
-  cat "$root/core/kernel.md"
-  echo
-  cat "$root/core/adapter-claude-skill.md"
-} > "$nzt_skill/SKILL.md"
-check_skill "$nzt_skill/SKILL.md" "plugin skills/nzt" "nzt"
-
-# The kernel inside nzt:nzt is nzt-ai's, byte for byte: the lines between the header and the
-# first '## Host:' heading.
-kernel_of() { awk -v skip="$2" 'NR > skip && /^## Host:/ { exit } NR > skip { print }' "$1"; }
-if ! cmp -s <(kernel_of "$out/CLAUDE.md" 1) <(kernel_of "$nzt_skill/SKILL.md" 5); then
-  echo "WARNING: the kernel in skills/nzt/SKILL.md of the plugin differs from the one in CLAUDE.md." >&2
-  status=1
-fi
+# The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
+# frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
+# does today becomes its reference entry.md. Its description is what makes it load first
+# in every session; nothing else loads it. nzt-ai installs the same files, byte for byte.
+# build_nzt <dest folder> <adapter> <label>
+build_nzt() {
+  local dest="$1" adapter="$2" label="$3"
+  rm -rf "$dest"
+  mkdir -p "$dest/references"
+  sed '1,/^---$/d' "$root/skills/nzt/SKILL.md" > "$dest/references/entry.md"
+  {
+    cat "$root/core/skill-nzt.md"
+    echo
+    cat "$root/core/kernel.md"
+    echo
+    cat "$root/core/$adapter"
+  } > "$dest/SKILL.md"
+  check_skill "$dest/SKILL.md" "$label" "nzt"
+}
+build_nzt "$plugin/skills/nzt" adapter-claude-skill.md "plugin skills/nzt"
+build_nzt "$out/claude-code/nzt" adapter-claude.md "claude-code nzt"
+build_nzt "$out/codex/nzt" adapter-codex.md "codex nzt"
+rm -f "$out/CLAUDE.md" "$out/AGENTS.md"
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it
 # the plugin's names (QT-103).

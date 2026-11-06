@@ -5,7 +5,7 @@ namespace Nzt.Cli.Install;
 
 public enum FileAction { Created, Updated, Unchanged, SkippedLocallyEdited, Removed }
 
-public sealed record PlannedFile(string TargetPath, string Content, bool ManagedBlock = false);
+public sealed record PlannedFile(string TargetPath, string Content);
 
 public sealed record FileOutcome(string TargetPath, FileAction Action);
 
@@ -30,14 +30,31 @@ public sealed record UninstallResult(
 
 public static class Installer
 {
+    /// <summary>El frontmatter de la skill `nzt`, el mismo en el plugin y en cada proveedor (D95).</summary>
+    public const string NztFrontmatterFile = "skill-nzt.md";
+
+    /// <summary>
+    /// La skill `nzt` de un proveedor (D95), byte por byte lo que emite el build en
+    /// `dist/&lt;proveedor&gt;/nzt/`: el frontmatter común, el kernel y el adapter son su
+    /// `SKILL.md`, y el cuerpo de `skills/nzt/SKILL.md` pasa a `references/entry.md`.
+    /// </summary>
+    public static (string Skill, string Entry) NztSkill(ContentCatalog catalog, string adapterFile, string entrySource)
+    {
+        static string Lf(string text) => text.Replace("\r\n", "\n");
+        var skill = Lf(catalog.Adapter(NztFrontmatterFile)).TrimEnd() + "\n\n"
+                    + Lf(catalog.Kernel).TrimEnd() + "\n\n"
+                    + Lf(catalog.Adapter(adapterFile)).TrimEnd() + "\n";
+        var source = Lf(entrySource);
+        var close = source.IndexOf("\n---\n", 3, StringComparison.Ordinal);
+        var entry = close < 0 ? source : source[(close + "\n---\n".Length)..];
+        return (skill, entry);
+    }
+
     public static IReadOnlyList<PlannedFile> Plan(Provider provider, ContentCatalog catalog)
     {
-        var planned = new List<PlannedFile>
-        {
-            new(provider.InstructionsFile,
-                InstructionBlock.Render(catalog.Kernel, catalog.Adapter(provider.AdapterFile)),
-                ManagedBlock: true)
-        };
+        // Desde D95 nada va a CLAUDE.md ni AGENTS.md: el kernel viaja en la skill `nzt`.
+        // El bloque de una instalación anterior sale como huérfano.
+        var planned = new List<PlannedFile>();
 
         // El nombre plano es toda la ruta relativa a skills/ unida con guiones (9.1).
         // Es la misma identidad que valida el build y que nombran los routers.
@@ -45,9 +62,17 @@ public static class Installer
         // routers las nombran por ruta relativa.
         foreach (var skill in catalog.Skills)
         {
-            planned.Add(new PlannedFile(
-                Path.Combine(provider.SkillsDirectory, skill.Name, "SKILL.md"),
-                skill.Text));
+            if (skill.Name == "nzt")
+            {
+                var (text, entry) = NztSkill(catalog, provider.AdapterFile, skill.Text);
+                planned.Add(new PlannedFile(Path.Combine(provider.SkillsDirectory, "nzt", "SKILL.md"), text));
+                planned.Add(new PlannedFile(
+                    Path.Combine(provider.SkillsDirectory, "nzt", "references", "entry.md"), entry));
+            }
+            else
+                planned.Add(new PlannedFile(
+                    Path.Combine(provider.SkillsDirectory, skill.Name, "SKILL.md"),
+                    skill.Text));
             foreach (var reference in skill.References)
                 planned.Add(new PlannedFile(
                     Path.Combine(provider.SkillsDirectory, skill.Name, "references", reference.FileName),
@@ -81,15 +106,8 @@ public static class Installer
         {
             if (!File.Exists(file.TargetPath)) continue;
             if (manifest?.HashOf(file.TargetPath) is not null) continue;
-            // Un CLAUDE.md propio del usuario no es conflicto: le agregamos el
-            // bloque y le dejamos su texto. Sí lo es si ya tiene marcadores
-            // nuestros sin manifiesto, porque entonces no sabemos de quién son.
-            if (file.ManagedBlock && !InstructionBlock.HasMarkers(File.ReadAllText(file.TargetPath))) continue;
-
             conflicts.Add(new Conflict(file.TargetPath,
-                file.ManagedBlock
-                    ? "tiene marcadores nzt pero no figura en el manifiesto — no lo instaló este CLI"
-                    : "ya existe y no figura en el manifiesto — no lo instaló este CLI"));
+                "ya existe y no figura en el manifiesto — no lo instaló este CLI"));
         }
 
         if (conflicts.Count > 0)
@@ -102,45 +120,6 @@ public static class Installer
         foreach (var file in planned)
         {
             var newHash = Manifest.Hash(file.Content);
-
-            if (file.ManagedBlock)
-            {
-                var exists = File.Exists(file.TargetPath);
-                var current = exists ? File.ReadAllText(file.TargetPath) : "";
-                var previous = manifest?.Files.FirstOrDefault(f =>
-                    string.Equals(f.Path, file.TargetPath, StringComparison.OrdinalIgnoreCase));
-
-                // Primera vez sobre un archivo del usuario: el bloque va arriba y
-                // su contenido queda abajo, intacto.
-                var replacement = file.Content + current;
-
-                if (exists && previous is not null)
-                {
-                    if (!previous.ManagedBlock
-                        || !InstructionBlock.Matches(current, previous.Sha256, out var start, out var length))
-                    {
-                        // Lo editaron o lo rompieron: se conserva y se informa.
-                        outcomes.Add(new FileOutcome(file.TargetPath, FileAction.SkippedLocallyEdited));
-                        entries.Add(previous);
-                        continue;
-                    }
-                    replacement = current.Remove(start, length).Insert(start, file.Content);
-                }
-
-                var action = !exists ? FileAction.Created
-                    : replacement == current ? FileAction.Unchanged : FileAction.Updated;
-
-                if (!dryRun && action != FileAction.Unchanged)
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(file.TargetPath)!);
-                    Backup(file.TargetPath, exists, previous is null);
-                    File.WriteAllText(file.TargetPath, replacement);
-                }
-
-                outcomes.Add(new FileOutcome(file.TargetPath, action));
-                entries.Add(new ManifestEntry(file.TargetPath, newHash, ManagedBlock: true));
-                continue;
-            }
 
             if (!File.Exists(file.TargetPath))
             {
@@ -286,17 +265,6 @@ public static class Installer
         }
         if (!dryRun) InstructionBlock.Remove(entry.Path, current, start, length);
         outcomes.Add(new FileOutcome(entry.Path, FileAction.Removed));
-    }
-
-    /// <summary>
-    /// Copia de seguridad la primera vez que se toca un archivo de instrucciones
-    /// que ya existía y no es nuestro. Una sola: no se pisa un backup previo.
-    /// </summary>
-    private static void Backup(string path, bool exists, bool firstTime)
-    {
-        if (!exists || !firstTime) return;
-        var backup = path + ".nzt-backup";
-        if (!File.Exists(backup)) File.Copy(path, backup);
     }
 
     /// <summary>

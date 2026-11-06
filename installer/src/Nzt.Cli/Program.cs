@@ -343,7 +343,6 @@ public static partial class Program
             return false;
         }
 
-        Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
         Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
         Summary(result.Outcomes);
@@ -586,7 +585,6 @@ public static partial class Program
 
         Console.WriteLine($"  versión        {manifest.Version}");
         Console.WriteLine($"  instalado      {manifest.InstalledAt:yyyy-MM-dd HH:mm}");
-        Console.WriteLine($"  instrucciones  {provider.InstructionsFile}");
         Console.WriteLine($"  skills         {provider.SkillsDirectory}");
         Console.WriteLine($"  agentes        {provider.AgentsDirectory}");
         Console.WriteLine($"  archivos       {manifest.Files.Count}"

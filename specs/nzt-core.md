@@ -3351,6 +3351,32 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Revertirla:** volver la hard rule a `nzt-ai state check` y quitar `scripts/`.
   - **Reemplaza:** de D68, el CLI como el que revisa. Siguen la regla en el kernel y lo que
     revisa.
+- **D95.** **Una sola vía de instalación: también con `nzt-ai` (el `irm`), el kernel va
+  dentro de la skill `nzt`, en Claude Code y en Codex, y nada se escribe en `CLAUDE.md` ni
+  en `AGENTS.md`.** Revisa D92 y la nota del 2026-11-06 que dejaba el `irm` con el bloque.
+  Estado: **aceptada** el 2026-11-06, decidida por el usuario (QT-113 en
+  `specs/nzt-plugin.md`). Rama `nzt-plugin-for-claude`, unidades 491–496 (tramo S2e).
+  - **Lo que la forzó:** el usuario quiere que las dos formas de instalar funcionen por la
+    misma vía. Con el bloque, el `irm` y el plugin cargaban el método distinto, se medían
+    distinto (las evals ya miden la skill, QT-111) y el `irm` escribía en archivos del usuario.
+  - **Decisión:** la skill `nzt` es, en las tres formas, el mismo frontmatter
+    (`core/skill-nzt.md`, la descripción que la hace cargar primero), el kernel y el
+    adaptador del host: `adapter-claude-skill.md` en el plugin (nombres `nzt:`),
+    `adapter-claude.md` en Claude Code y `adapter-codex.md` en Codex con el `irm` (nombres
+    `nzt-`). El cuerpo de `skills/nzt` pasa a su `references/entry.md`. El build arma las
+    tres (`dist/plugin/skills/nzt/`, `dist/claude-code/nzt/`, `dist/codex/nzt/`) y el
+    instalador compone la misma, comprobada byte a byte contra el build. El instalador ya no
+    planea el archivo de instrucciones: un bloque de una instalación anterior sale como
+    huérfano (se quita entre sus marcadores y queda el texto del usuario), y un bloque
+    editado se conserva y se informa, como antes.
+  - **Lo que se acepta:** **(1)** en Codex no hay evidencia de que una skill cargue primero
+    sin `AGENTS.md` (C8): si no carga, sus usuarios se quedan sin el método hasta corregirlo;
+    lo prueba el usuario en la 496; **(2)** en Claude Code vale lo que D92 aceptó: que cargue
+    depende de la descripción; **(3)** un `CLAUDE.md`/`AGENTS.md` con marcadores y sin
+    manifiesto ya no se toca: si alguien lo tiene, el kernel llega dos veces.
+  - **Revertirla:** volver a planear el bloque en el instalador desde el commit `2680c14`.
+  - **Reemplaza:** de D92, que el bloque siga siendo la forma de `nzt-ai`. Siguen la skill
+    con el kernel, su descripción y lo medido en 474 y 475.
 
 ## 13. Revisión contra Temper v3
 

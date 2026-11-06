@@ -31,8 +31,8 @@ Instalación **global** (nivel usuario), que es el caso de uso pedido:
 
 | Proveedor | Instrucciones | Skills | Subagentes (D71, D84) |
 |---|---|---|---|
-| Claude Code | bloque en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` |
-| Codex | bloque en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` |
+| Claude Code | en la skill `nzt` (D95); ya no en `~/.claude/CLAUDE.md` | `~/.claude/skills/<nombre>/` | `~/.claude/agents/nzt-explorer.md`, `nzt-worker.md` |
+| Codex | en la skill `nzt` (D95); ya no en `$CODEX_HOME/AGENTS.md` | `~/.agents/skills/<nombre>/` | `$CODEX_HOME/agents/nzt-explorer.toml`, `nzt-worker.toml` |
 
 Los subagentes salen de `agents/` del repo, y cada proveedor recibe los de su formato (`.md` o
 `.toml`). Cada uno es un archivo más del manifiesto: las mismas reglas de conflicto, edición local,
@@ -114,18 +114,20 @@ nzt-ai state check
 ## 4. Qué hace, paso a paso
 
 1. **Valida el set antes de tocar nada** (sección 7). Si algo falla, aborta sin escribir.
-2. **Arma el bloque de instrucciones** de cada destino: `core/kernel.md` + el adapter del
-   proveedor, entre `<!-- nzt:start -->` y `<!-- nzt:end -->`.
+2. **Arma la skill `nzt` del proveedor** (D95): `core/skill-nzt.md` (frontmatter) +
+   `core/kernel.md` + el adapter del proveedor, y el cuerpo de `skills/nzt/SKILL.md` como su
+   `references/entry.md`. Es la misma que emite el build en `dist/<proveedor>/nzt/`.
 3. **Pre-escaneo de conflictos.** Si algún archivo de destino existe y no figura en el
    manifiesto, **no se escribe nada en ese proveedor**.
-4. **Escribe las instrucciones respetando lo previo**: bloque ubicado por marcadores y
-   reemplazado en su lugar; si el archivo existe sin marcadores, el bloque va arriba y su
-   contenido queda abajo; si no existe, se crea.
+4. ~~**Escribe las instrucciones**~~ **[modify] D95:** ya no escribe `CLAUDE.md` ni
+   `AGENTS.md`.
 5. **Aplana y copia las skills**: cada carpeta con `SKILL.md` va a una carpeta plana cuyo
-   nombre es el path relativo con `/` → `-`. Su carpeta `references/` viaja adentro, sin
-   aplanar (D50): los routers la nombran por ruta relativa. Copia también los subagentes del
-   proveedor a su carpeta de agentes (sección 2).
+   nombre es el path relativo con `/` → `-`. Sus carpetas `references/` y `scripts/` viajan
+   adentro, sin aplanar (D50, D94): los routers las nombran por ruta relativa. Copia también
+   los subagentes del proveedor a su carpeta de agentes (sección 2).
 6. **Retira los huérfanos**: lo que el manifiesto anterior instaló y ya no está en el set.
+   El bloque de una instalación anterior a D95 es uno: se quita entre sus marcadores, el
+   texto del usuario queda, y si se lo editó se conserva y se informa.
 7. **Escribe el manifiesto** y **reporta**: creados, actualizados, sin cambios, eliminados,
    conservados, y el tamaño del listado en caracteres (el presupuesto de R1).
 
@@ -179,6 +181,10 @@ Son las que evitan que el instalador rompa la configuración del usuario:
 - **Backup del archivo de instrucciones** la primera vez que se lo modifica
   (`CLAUDE.md.nzt-backup`), sin pisar un backup previo.
 
+**[modify] D95:** el instalador ya no escribe el archivo de instrucciones; las reglas de
+marcadores y bloque quedan para quitar el de una instalación anterior. Marcadores sin
+manifiesto ya no se tocan ni frenan la instalación.
+
 El lint que corre antes de instalar: `name` == nombre derivado del path, `description`
 presente y ≤ 250 chars, ≤ 200 líneas por archivo, frontmatter portable (C1) y ningún nombre
 plano duplicado.
@@ -201,7 +207,7 @@ installer/
 ```
 
 - **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md`,
-  `skills/**/references/**/*.md` y, de `packs/`, cada `pack.json`): el
+  `skills/**/references/**/*.md`, `skills/**/scripts/*` y, de `packs/`, cada `pack.json`): el
   ejecutable *es* el set, y su versión es la versión del set.
 - **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
   flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de
@@ -228,6 +234,8 @@ installer/
   al instalador no le incumben— y el CLI es lo que instala. Lo que evita que diverjan es una
   comprobación: el bloque que escribe el CLI se compara **byte a byte** con el
   `dist/CLAUDE.md` que emitió el build, y si se separan, falla.
+  **[modify] D95:** lo que se compara es la skill `nzt` de cada proveedor contra
+  `dist/claude-code/nzt/` y `dist/codex/nzt/`; el build ya no emite `CLAUDE.md` ni `AGENTS.md`.
 - ~~**I3. Versionado.**~~ **Cerrada**: sale del `<Version>` del `.csproj`, que es lo que
   termina en `nztVersion` del manifiesto y en el encabezado del CLI.
 - ~~**I5. Distribución sin .NET.**~~ **Cerrada por D46**: un comando de una línea por
