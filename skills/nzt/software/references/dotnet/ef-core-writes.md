@@ -4,7 +4,7 @@
 
 1. **Insert with `Add`/`AddRange`**, no `DetectChanges`.
 2. **Update a tracked entity by changing its properties — never `Update`**, which writes
-   every column.
+   every column. Read it tracked: never `AsNoTracking()` on what you will save.
 3. **Delete with `Remove`.**
 4. **An explicit transaction is `await using` plus a commit**: disposal rolls back, so no
    catch for `RollbackAsync`.

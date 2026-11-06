@@ -7,6 +7,10 @@
 2. **`OnModelCreating` only applies the configurations.**
 3. **One `<Entity>Configuration : IEntityTypeConfiguration<T>` per entity**, in its own file.
 4. **No data annotations.**
+5. **The `DbContext` is registered scoped.**
+6. **No lazy-loading proxies.**
+7. **Tracking stays EF's default**: never `NoTracking` globally — an unmarked update would
+   silently not save.
 
 ```csharp
 protected override void OnModelCreating(ModelBuilder modelBuilder)

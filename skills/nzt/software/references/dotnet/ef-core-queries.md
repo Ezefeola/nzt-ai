@@ -7,8 +7,8 @@
 2. **Loading entities**: `AsNoTracking()` and `Include` only what is used. `AsSplitQuery()`
    when sibling-collection duplication warrants it; nested `ThenInclude` chains are not
    automatically the same cross product.
-3. **A non-translatable helper runs client-side only in the final projection**; in a filter it
-   throws.
+3. **A non-translatable helper runs client-side only in the final projection**, receiving
+   columns, never the entity; in a filter it throws.
 4. **Raw SQL** (`FromSql`, `SqlQuery`, `ExecuteSqlAsync`) in the interpolated forms, which
    parameterise the holes.
 

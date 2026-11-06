@@ -3,7 +3,7 @@ name: stack-not-dotnet
 description: >
   A pack can sit in a project whose tech.md does not list it (D88), so the guard against
   applying it where it does not belong is a rule and not a packaging decision. Here the
-  dotnet and blazor packs are installed in a TypeScript project, and the work is the same
+  dotnet and blazor packs come with nzt-software in a TypeScript project, and the work is the same
   shape as the .NET cases - a paginated listing.
 tags: [stack, restraint]
 expected_outcome: >
@@ -40,7 +40,10 @@ graders:
   - name: builds-with-the-projects-technologies
     type: llm
     criteria: |
-      The reply is in Spanish and delivers a paginated order listing.
+      The reply is in Spanish and shows the code of a paginated order listing. This case gives
+      no tool to write files, so showing the code without applying it is the expected way to
+      deliver it, and saying so is not a failure.
       PASS if the code is TypeScript using the project's own technologies - Fastify and Prisma - and
       follows the conventions of the file it is changing.
-      FAIL if it proposes C#, EF Core or .NET patterns, or if it suggests adopting them here.
+      FAIL if it shows no code, if it proposes C#, EF Core or .NET patterns, or if it suggests
+      adopting them here.
