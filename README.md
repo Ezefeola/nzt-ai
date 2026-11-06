@@ -81,7 +81,8 @@ que se haga.
 
 Lo global es solo el marco, y sirve para cualquier producto: un sistema, un juego, una app,
 un documento. Lo que es de una tecnología, de un estilo de arquitectura o de tus reglas de
-código viene en **packs** que se instalan **en el proyecto** que los usa, con sus MCP:
+código viene en **packs**. Las reglas viajan en las skills `nzt-software` y `nzt-games`.
+Cada proyecto elige las que usa en `tech.md` y habilita sus MCP si los necesita:
 
 | Pack | Trae |
 |---|---|
@@ -94,13 +95,12 @@ código viene en **packs** que se instalan **en el proyecto** que los usa, con s
 | `blazor` | Blazor: modos de render, componentes, formularios, prerendering, con Microsoft Learn |
 | `unity` | solo el MCP oficial de Unity, para conectar el agente al editor |
 
-Cada pack instala una skill `nzt-<pack>` y lo que requiere: `dotnet` trae `backend`,
-`csharp` y `code`, que lee primero, así **cada regla vive en un solo lugar** — la genérica en
-`backend`, `frontend` o `code`, y en la de tecnología solo lo propio.
+`nzt-software` reúne las reglas y sus dependencias. `nzt-ai project` configura los MCP de
+`csharp`, `dotnet`, `blazor` y `unity` en el proyecto.
 
 `Docs/Architecture/tech.md` es el documento técnico del producto: una sección por componente
 con sus decisiones, sus opt-ins, sus dependencias y **los packs que lo guían**. Lo escribe
-`nzt-architecture`, que propone los packs y, con tu sí, los instala con `nzt-ai project`. Los
+`nzt-architecture`, que propone los packs y, con tu sí, configura los MCP que hagan falta con `nzt-ai project`. Los
 **ejes** de cada pack —arquitectura, modelo de dominio, persistencia, endpoints, modo de
 render…— se preguntan una vez, con lo que cuesta cada opción.
 
@@ -116,9 +116,24 @@ reporta en vez de aplicarse.
 
 ## Instalación
 
-Global, para toda la máquina, con **una línea por proveedor**. No hace falta clonar el repo
-ni tener .NET: queda NZT en Claude Code o en Codex, y el comando `nzt-ai`, que el agente usa
-para revisar `Plan/state.json`.
+### Plugin para Claude Code
+
+En Claude Code, agregá el marketplace e instalá el método:
+
+```text
+/plugin marketplace add Ezefeola/nzt-ai
+/plugin install nzt@nzt
+```
+
+Abrí una sesión nueva. El plugin incluye los subagentes y los packs `nzt-software` y
+`nzt-games`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
+al plugin, quitá primero el método con `nzt-ai uninstall --provider claude-code --mods none`.
+
+### Instalador para Claude Code y Codex
+
+Para actualizar desde v4, repetí la línea de tu proveedor. El instalador retira el bloque
+que administraba en tu archivo de instrucciones y conserva tu texto. El método ahora vive
+en la skill `nzt`, y el chequeo de estado se ejecuta desde los scripts de `nzt-plan`.
 
 **Claude Code**
 
@@ -172,8 +187,7 @@ dotnet run --project installer/src/Nzt.Cli
 El menú tiene cinco acciones —**instalar, desinstalar, preparar este proyecto, verificar
 el contenido y ver estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
 método o solo los mods—, y **te muestra la simulación y recién
-ahí pregunta**. Instala un bloque delimitado en el archivo de instrucciones —respetando lo
-que ya tengas, con backup— y las skills en la carpeta de usuario del proveedor.
+ahí pregunta**. Instala las skills y los subagentes en las carpetas de usuario del proveedor.
 
 ```bash
 dotnet run --project installer/src/Nzt.Cli -- status
@@ -187,20 +201,18 @@ arma `tech.md`. A mano:
 
 ```bash
 nzt-ai project packs                      # los que hay, y cuáles tiene este proyecto
-nzt-ai project add dotnet ddd             # con lo que requieren; --provider codex o all
-nzt-ai project remove ddd
+nzt-ai project add dotnet unity             # con lo que requieren; --provider codex o all
+nzt-ai project remove unity
 nzt-ai project sync                       # reinstala lo que dice .claude/nzt.json
 ```
 
-Las skills quedan en `.claude/skills/` (Codex: `.agents/skills/`) y los MCP en `.mcp.json`
+Las reglas ya están en las skills de NZT. Los MCP quedan en `.mcp.json`
 (Codex: un bloque delimitado en `.codex/config.toml`), sin pisar lo que ya tengas.
 `.claude/nzt.json` (Codex: `.agents/nzt.json`) anota qué se eligió y qué escribió `nzt-ai`:
 versionalo, y en otra máquina `nzt-ai project sync` deja lo mismo. Los MCP cargan en una sesión nueva. El menú del
 instalador tiene la misma acción, *Preparar este proyecto*.
 
-**No es un plugin.** Son skills sueltas y un bloque de texto: nada que tengas que aprender a
-manejar, y el mismo NZT en cada proveedor: ningún sistema de plugins carga el kernel igual
-en todos. El detalle está en
+Más detalles en
 [`installer/README.md`](installer/README.md).
 
 ## Mods

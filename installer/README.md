@@ -1,6 +1,6 @@
 # Instalador de NZT — .NET 10
 
-Versión 4.0.0. Instala NZT **globalmente**, por la misma vía que el plugin (D95): el kernel
+Versión 5.0.0. Instala NZT **globalmente**, por la misma vía que el plugin (D95): el kernel
 dentro de la skill `nzt`, que el proveedor carga primero en toda sesión, y las
 skills, con sus referencias, aplanadas en su carpeta de skills de usuario. Los **packs** se
 instalan aparte, **en cada proyecto** (sección *Packs por proyecto*). En Claude Code
