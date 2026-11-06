@@ -6,7 +6,7 @@ description: >
   from the first version instead of only the happy path.
 tags: [stack]
 expected_outcome: >
-  Loads the nzt-blazor pack, reads its components and auto render references, and writes a
+  Loads nzt-software, reads the blazor pack's its components and auto render references, and writes a
   component that calls the feature's typed client and renders loading, empty and error.
 context:
   scaffold_script: scaffold.sh

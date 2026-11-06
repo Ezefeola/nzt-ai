@@ -6,7 +6,7 @@ suite is 40 cases in four groups: three measure one of the two failure modes eac
 | Group | Cases | What it measures |
 |---|---|---|
 | `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `pack-setup` measures that a fresh clone gets its listed packs proposed, not installed unasked, and `tool-research` that choosing an agent's tools looks at the catalogue and researches too (DB-03) |
-| `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. The packs are installed in the workspace as project skills (`.claude/skills/nzt-<pack>/`, D88), so a reference is graded as a `Read` of its file there |
+| `stack/` | 7 | **The packs' exclusive axes, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference of the pack loads, and its rules show up in the emitted code. Since D93 the packs come with the plugin in `nzt-software`, so a reference is graded as a `Read` of `nzt-software/references/<pack>/<file>` |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
 | `skill/` | 4 | **The kernel inside `nzt:nzt`.** No `CLAUDE.md` in the workspace, like every case since QT-111: `nzt:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
 
@@ -83,7 +83,7 @@ with D37, `entity-shape` and `result-inline` with D38 and D39, `design-mode` and
 run, not before it. Expect the first run of each to be a calibration run.
 
 **No case has been run since D88.** The workspaces moved to `Docs/Architecture/tech.md`, the
-packs are seeded as project skills, `entity-shape` lost its second-part grader with the
+packs were seeded as project skills (until D93, when they moved into `nzt-software`), `entity-shape` lost its second-part grader with the
 file, and `routing/pack-setup` and `routing/tool-research` are new: the first run of each is
 a calibration run. The `ux-*` cases are `design-*` since D88, graded the same way.
 

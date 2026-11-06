@@ -10,7 +10,7 @@ description: >
   --judge-model sonnet: haiku failed replies that met all four conditions.
 tags: [stack]
 expected_outcome: >
-  Goes through nzt-ship and the nzt-dotnet pack, gets the pipeline guidance, and writes a
+  Goes through nzt-ship and nzt-software's dotnet pack, gets the pipeline guidance, and writes a
   workflow whose gates hold: the pinned SDK, a restore that either has lock files or reports
   that they are missing and proposes them, separate unit and integration test steps with a
   container runtime for the integration level, and the pending model changes gate.

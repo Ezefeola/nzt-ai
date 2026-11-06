@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-05T21:10:20Z",
+  "updated": "2026-11-06T01:00:10Z",
   "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
   "cadence": "upfront",
   "slices": [
@@ -166,7 +166,7 @@
     {
       "id": "S2c",
       "name": "Los packs dentro del plugin: nzt-software y nzt-games (D93)",
-      "status": "doing",
+      "status": "done",
       "phases": [
         {
           "name": "architecture",
@@ -182,7 +182,7 @@
         },
         {
           "name": "build",
-          "status": "doing",
+          "status": "done",
           "units": [
             {
               "id": 479,
@@ -217,8 +217,8 @@
             {
               "id": 484,
               "do": "Auditoría con gestionar-skills, specs del plugin e instalador al día, y humo de los casos stack/",
-              "status": "todo",
-              "detail": ""
+              "status": "done",
+              "detail": "Dry-run del instalador: 155 archivos (14 skills + 137 referencias + CLAUDE.md + 2 agentes + manifiesto). Specs del instalador y descripciones de evals al día; routing/pack-setup reescrito: mide proponer el MCP con claude mcp add --scope project, no instalar packs. Humo con modelo, 1 corrida, sin ablación, ~US$2,5 en total: stack-ef-listado 0.89 (carga nzt-software y lee paginación, consultas y DTOs; nunca lee dotnet/ef-core.md, ni con la fila every time ni nombrándolo en cada fila: va directo a los específicos) y stack-not-dotnet 0.75 (no lee nada de dotnet ni blazor; el juez falla porque frenó a preguntar el contrato de la paginación). Sin línea base desde D88 para saber si ef-core-base-read fallaba antes"
             }
           ]
         }

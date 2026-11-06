@@ -70,11 +70,9 @@ imply repositories, `anemic` does not imply direct.
 
 ### Data access
 
-When the component reads or writes a database, read `backend/data-access.md` first, every
-time, and with `dotnet`, `dotnet/ef-core.md` right after it.
-
 | The operation | `backend` | `dotnet` |
 |---|---|---|
+| Any read or write to a database, every time, before its row | `backend/data-access.md` | `dotnet/ef-core.md` |
 | Reading: query shape, projection, execution | `backend/data-queries.md` | `dotnet/ef-core-queries.md` |
 | A page of results | `backend/data-queries.md`, `backend/data-pagination.md` | `dotnet/ef-core-queries.md`, `dotnet/ef-core-pagination.md` |
 | Staging and saving changes, write conflicts | `backend/data-writes.md` | `dotnet/ef-core-writes.md` |

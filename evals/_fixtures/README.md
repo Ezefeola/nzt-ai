@@ -6,7 +6,7 @@ so `claude plugin eval` ignores this directory when it collects cases.
 | File | Seeds |
 |---|---|
 | `project.sh` | the NZT project: `Docs/Architecture/tech.md` (.NET backend + Blazor frontend) with its packs installed, F-001 with US-012, a little source |
-| `packs.sh` | packs as project skills, the way `nzt-ai project add` lays them out for Claude Code: `.claude/skills/nzt-<pack>/` for each pack named and each one it requires |
+| `packs.sh` | nothing since D93: a pack's rules come with the plugin in `nzt-software` or `nzt-games`; kept so the fixtures still name their packs |
 | `story-built.sh` | `project.sh` with US-012 built and not yet tested: backend and frontend marked, the listing's code, the plan's next unit is testing it. What verify starts from |
 | `story-specified.sh` | `project.sh` with US-012 fully specified and not built: maximum `pageSize`, empty-state message, ordering tie-break. For cases that measure what the agent does not do |
 | `stack-ready.sh` | `story-specified.sh` with every story, field and package the .NET and Blazor cases need, so they measure the pack and not a gap |

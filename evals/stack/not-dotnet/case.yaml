@@ -8,7 +8,7 @@ description: >
 tags: [stack, restraint]
 expected_outcome: >
   Reads tech.md, builds the listing with Fastify and Prisma, and loads neither
-  the nzt-dotnet nor the nzt-blazor pack.
+  the dotnet nor the blazor references of nzt-software.
 context:
   scaffold_script: scaffold.sh
 execution:

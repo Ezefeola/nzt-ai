@@ -201,7 +201,7 @@ installer/
 ```
 
 - **El contenido se embebe al compilar** (`core/**/*.md`, `skills/**/SKILL.md`,
-  `skills/**/references/*.md` y, de `packs/`, cada `pack.json` y `*.md`): el
+  `skills/**/references/**/*.md` y, de `packs/`, cada `pack.json`): el
   ejecutable *es* el set, y su versión es la versión del set.
 - **Una sola dependencia, y es del menú: `Spectre.Console`.** Hasta que el menú se navegó con
   flechas, la salida era lo bastante simple como para no pagar ninguna. Un selector deja de
@@ -221,6 +221,8 @@ installer/
   **[modify] 2026-11-01 (D88):** la capa de stack ya no existe. Global queda solo el marco;
   lo de una tecnología o una arquitectura son packs que se instalan por proyecto con
   `nzt-ai project` (sección 13).
+  **[modify] 2026-11-05 (D93):** las reglas de los packs vuelven al marco, en `nzt-software` y
+  `nzt-games`; `nzt-ai project` solo pone en el proyecto el MCP de un pack.
 - **I2. Duplicación con `install/build.*`.** **Resuelta en la práctica, no eliminada.** Los
   scripts siguen siendo el loop de desarrollo —además arman `dist/` y el plugin de evals, que
   al instalador no le incumben— y el CLI es lo que instala. Lo que evita que diverjan es una
@@ -525,6 +527,11 @@ roto es un problema, con su posición.
 
 ## 13. Packs por proyecto: `nzt-ai project`
 
+**[modify] 2026-11-05 (D93):** un pack ya no trae skill: sus reglas viajan con el marco en
+`nzt-software` o `nzt-games`, y `tech.md` listándolo es lo que lo aplica. `nzt-ai project`
+queda para el MCP de un pack, sobre todo en Codex; en Claude Code el agente lo agrega con
+`claude mcp add --scope project`. Lo que sigue describe D88.
+
 Lo trae D88 (`specs/nzt-core.md`): global queda solo el marco, y lo de una tecnología, una
 arquitectura o las reglas de código del usuario son **packs** que cada proyecto elige. El
 pedido del usuario: un CLI que haga el setup del proyecto, y que el agente sepa usarlo desde
@@ -532,11 +539,11 @@ NZT para instalar skills y habilitar MCPs.
 
 ### 13.1 Qué es un pack
 
-`packs/<pack>/` con `pack.json` (`description`, `requires`, `mcp`), y opcionalmente
-`SKILL.md` y `references/`. Instala a lo sumo una skill, `nzt-<pack>`. Un MCP es remoto
+`packs/<pack>/` con `pack.json` (`description`, `mcp`); desde D93, sin `SKILL.md` ni
+`references/`. Un MCP es remoto
 (`url`) o local (`command` por plataforma —`windows`, `macos-arm64`, `macos-x64`, `linux`—
-con `{home}`, y `args`). Packs de QT-01: `code`, `backend`, `frontend`, `ddd`, `csharp`,
-`dotnet`, `blazor`, `unity` (solo MCP).
+con `{home}`, y `args`). Con MCP desde D93: `csharp`, `dotnet`, `blazor` (Microsoft Learn) y `unity` (el relay del
+editor).
 
 ### 13.2 Comandos
 
