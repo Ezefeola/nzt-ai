@@ -1,0 +1,8 @@
+{
+  "name": "nzt",
+  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
+  "version": "5.0.0",
+  "license": "MIT",
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
+}
