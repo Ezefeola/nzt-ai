@@ -360,7 +360,7 @@
     "units": [],
     "keep_stops": []
   },
-  "waiting_on": "El usuario arma el PR de nzt-plugin-for-claude, lo mergea y avisa; después la 472 (release v5)",
+  "waiting_on": "PR #13 mergeado. La 472 queda pendiente de revisar el PR de release y autorizar el tag v5.0.0.",
   "notes": [
     "Codex: D95 probado por el usuario (496). Evals: el usuario decidió no correr la suite completa por costo (2026-11-06); se prueba en uso",
     "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",

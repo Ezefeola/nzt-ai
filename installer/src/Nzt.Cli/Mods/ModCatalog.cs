@@ -41,7 +41,7 @@ public sealed class ModCatalog
 
         if (document.RootElement.TryGetProperty("plugins", out var plugins))
             foreach (var plugin in plugins.EnumerateArray())
-                if (plugin.TryGetProperty("name", out var name) && name.GetString() is { Length: > 0 } value)
+                if (plugin.TryGetProperty("name", out var name) && name.GetString() is { Length: > 0 } value && value != "nzt")
                     names.Add(value);
 
         return new ModCatalog(names);

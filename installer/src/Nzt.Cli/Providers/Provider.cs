@@ -59,7 +59,7 @@ public sealed class Provider
             AgentsDirectory = Path.Combine(root, "agents"),
             AgentExtension = ".md",
             AdapterFile = "adapter-claude.md",
-            Usage = "Abrí claude en cualquier proyecto: el CLAUDE.md de usuario se carga solo."
+            Usage = "Abrí claude en cualquier proyecto: la skill nzt contiene el método."
         };
     }
 
@@ -89,7 +89,7 @@ public sealed class Provider
             AgentsDirectory = Path.Combine(root, "agents"),
             AgentExtension = ".toml",
             AdapterFile = "adapter-codex.md",
-            Usage = "Iniciá codex: el hilo principal carga NZT desde el AGENTS.md global.",
+            Usage = "Iniciá codex: la skill nzt contiene el método.",
             // Hay guías de terceros que ubican las skills en ~/.codex/skills. Si esa
             // carpeta existe en la máquina, el usuario tiene que saber cuál elegimos.
             PathWarning = Directory.Exists(legacy)

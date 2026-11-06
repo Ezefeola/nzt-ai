@@ -204,7 +204,7 @@ $manifest = @"
   "repository": "https://github.com/Ezefeola/nzt-ai"
 }
 "@
-Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value $manifest -Encoding utf8
+Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value ($manifest.Replace("`r`n", "`n") + "`n") -Encoding utf8 -NoNewline
 
 # The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
 # frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
