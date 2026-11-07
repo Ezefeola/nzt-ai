@@ -64,8 +64,7 @@ encuentren sus fixtures.
 
 ## Otras notas guardadas
 
-- `specs/propuesta-nucleo-generico.md` (sin commitear, escrita en `revision-post-v5`): el
-  análisis de qué del núcleo sigue atado a software y cómo hacerlo genérico. Quedó en pausa
-  por complejo; el punto 1 es la parte que el usuario quiere conservar.
+- Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;
+  el punto 1 es la parte que el usuario quiere conservar.
 - `nzt-games` en `main` solo conecta el editor de Unity (`references/unity/editor.md`). Es una
   pieza aislada para completar cuando toque.
