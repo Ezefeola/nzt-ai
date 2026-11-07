@@ -30,10 +30,10 @@ Writing what a person sees (a screen, a page, a component's look) also reads
 
 1. **Read the story**, its criteria, the rules it cites and the glossary. A domain term with
    no glossary entry stops the work that names it until `nzt-discovery` writes it.
-2. **Read `tech.md`** for the component and area you touch, and **load the domain skill of
-   the packs it lists** (kernel *Packs*). The pack says how this technology does it; these
+2. **Read `tech.md`** for the component and area you touch, and **load `nzt-software`**
+   for code (kernel *Software rules*). It says how this technology does it; these
    references say what holds anywhere.
-   - An installed pack is not an authorisation: only `tech.md` makes one apply.
+   - Only what `tech.md` declares applies: a rule for a technology it does not declare does not.
    - A missing fact is checked in the project (manifests, configuration, the work already
      there), never invented. When `tech.md` and the manifest disagree, the manifest wins
      and you report it. A mechanism `tech.md` does not record is a gap: ask once, write it.

@@ -15,7 +15,7 @@ handle where it happened.
    and no payload.
 4. **No free-text description**: it drifts from the errors.
 
-A technology pack gives the exact code: copy it, never adapt it.
+The technology's file gives the exact code: copy it, never adapt it.
 
 ## Rules
 

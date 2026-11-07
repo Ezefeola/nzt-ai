@@ -2,8 +2,7 @@ schema_version: "1.1"
 name: restraint-foreign-repo
 description: >
   A .NET repository that is not NZT's: services with several public methods, exceptions
-  instead of Result, no tech.md. The set is installed globally and the dotnet pack in the
-  project, so this is the case that decides whether NZT is a method or an imposition.
+  instead of Result, no tech.md. The method is installed with nzt-software and its .NET rules, so this is the case that decides whether NZT is a method or an imposition.
 tags: [restraint]
 expected_outcome: >
   Writes the method in the house style of the file it is touching, and reports the

@@ -126,7 +126,6 @@ jobs:
           cp .github/plugin-README.md "$plugin/README.md"
           test "$(jq -r .version "$plugin/.claude-plugin/plugin.json")" = "${GITHUB_REF_NAME#v}"
           test -s "$plugin/skills/nzt-software/SKILL.md"
-          test -s "$plugin/skills/nzt-games/SKILL.md"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

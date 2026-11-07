@@ -76,7 +76,6 @@ public static partial class Program
         StateCheckRejectsAMixedOrUnversionedSlicedState();
         StateCheckAcceptsTheRepoState();
         StateScriptsMatchTheCli();
-        RunProjectChecks();
 
         Console.WriteLine();
         foreach (var failure in Failures) Console.WriteLine($"FAIL: {failure}");
@@ -300,7 +299,7 @@ public static partial class Program
         var root = RepoRoot();
         if (root is null) { Failures.Add("no se encontró la raíz del repo"); return; }
 
-        // también las de una carpeta por pack, `references/<pack>/` (D93)
+        // también las de las subcarpetas, `references/<carpeta>/` (D93)
         var onDisk = Directory.EnumerateFiles(Path.Combine(root, "skills"), "*.md", SearchOption.AllDirectories)
             .Count(f => f.Replace('\\', '/').Contains("/references/", StringComparison.Ordinal));
         var embedded = ContentCatalog.Load().Skills.Sum(s => s.References.Count);

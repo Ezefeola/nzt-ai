@@ -84,8 +84,8 @@ check_skill() {
     fi
   done < <(find "$dir" -maxdepth 1 -name '*.md' | sort)
 
-  # a pack's references, one folder per pack (D93): the same budgets, and a row naming
-  # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+  # references in subfolders (`dotnet/`, `ddd/`…): the same budgets, and a row naming
+  # `<folder>/<file>` in the skill itself — one level deep, never through an index.
   while IFS= read -r ref; do
     local sub slines
     sub="$(basename "$(dirname "$ref")")/$(basename "$ref")"
@@ -133,48 +133,6 @@ if [ -d "$root/skills" ]; then
   if [ "$listing" -gt 8000 ]; then
     echo "WARNING: skill listing is over the 8000-char floor. See R1 in specs/nzt-core.md." >&2
   fi
-fi
-
-# --- packs -------------------------------------------------------------------
-# What `nzt-ai project` installs per project (D88): a pack.json with a description and
-# requires that exist, and, when it brings a skill, the same rules as the global ones.
-# Their listing is not added to the global one: a project carries only the packs it chose.
-
-if [ -d "$root/packs" ]; then
-  echo
-  packs=0
-  global_listing=$listing
-  listing=0
-  while IFS= read -r folder; do
-    packs=$((packs + 1))
-    pack="$(basename "$folder")"
-    json="$folder/pack.json"
-    if [ ! -f "$json" ]; then
-      echo "WARNING: packs/$pack : no pack.json." >&2
-      status=1
-      continue
-    fi
-    if ! grep -qE '"description"[[:space:]]*:[[:space:]]*"[^"]+' "$json"; then
-      echo "WARNING: packs/$pack : pack.json has no description." >&2
-      status=1
-    fi
-    while IFS= read -r required; do
-      if [ -n "$required" ] && [ ! -d "$root/packs/$required" ]; then
-        echo "WARNING: packs/$pack : requires '$required', which is not a pack." >&2
-        status=1
-      fi
-    done < <(sed -n 's/.*"requires"[[:space:]]*:[[:space:]]*\[\(.*\)\].*/\1/p' "$json" | tr ',' '\n' | tr -d '" ')
-    if [ -f "$folder/SKILL.md" ]; then
-      check_skill "$folder/SKILL.md" "packs/$pack" "nzt-$pack"
-    elif ! grep -q '"mcp"' "$json"; then
-      echo "WARNING: packs/$pack : brings neither a skill nor an MCP server." >&2
-      status=1
-    fi
-  done < <(find "$root/packs" -mindepth 1 -maxdepth 1 -type d | sort)
-
-  echo
-  echo "$packs packs, ~$listing chars of skill listing if every one is installed"
-  listing=$global_listing
 fi
 
 # --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---

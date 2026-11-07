@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Seeds a workspace that is NOT a .NET project: NZT comes from the plugin with every pack
-# (nzt-software carries dotnet and blazor), and tech.md lists none of them, so nothing
-# of them may fire. The story is specified and the code complete, so the work can be done
-# without a question. This is *an installed pack is not an authorisation* turned into a
+# Seeds a workspace that is NOT a .NET project: NZT comes from the plugin with nzt-software,
+# which carries .NET and Blazor rules, and tech.md declares neither, so none of them may
+# fire. The story is specified and the code complete, so the work can be done
+# without a question. This is *only what tech.md declares applies* turned into a
 # measurement.
 set -euo pipefail
 
@@ -15,7 +15,7 @@ cat > "$ws/Docs/Architecture/tech.md" <<'MD'
 # Tech — orders-api
 
 ## orders-api
-root: `./` · areas: backend · packs: —
+root: `./` · areas: backend
 
 | Decision | Choice | When |
 |---|---|---|

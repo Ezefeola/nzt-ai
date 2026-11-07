@@ -27,9 +27,9 @@ NZT.
 **Afuera**
 - Codex: `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar contra Codex 0.164.0 (Q-01).
   En Codex NZT se instala con `nzt-ai`.
-- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24), y en Codex
-  la que pone el MCP de un pack en el proyecto (`nzt-ai project`). Las reglas de los packs
-  viajan en el plugin, en `nzt-software` y `nzt-games` (D93).
+- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24). Las reglas de
+  software viajan en el plugin, en `nzt-software` (D93); desde D96 no hay packs, `nzt-games`
+  ni `nzt-ai project`.
 - Tener `nzt-ai` y el plugin a la vez: el kernel llegaría dos veces. Nada lo impide; la guía
   dice que se usa uno solo.
 - Los mods: plugins aparte del mismo marketplace (D63).
@@ -67,7 +67,7 @@ cambia el adaptador de Claude Code (`core/adapter-claude-skill.md`).
 
 ### RN-plugin-nombres · origin: QT-97
 Las skills y subagentes del plugin se llaman `nzt:<nombre>`. Donde NZT nombra `nzt-<x>`, se
-carga `nzt:nzt-<x>`; una skill de pack instalada en el proyecto conserva su nombre.
+carga `nzt:nzt-<x>`.
 
 ## Requisitos no funcionales
 

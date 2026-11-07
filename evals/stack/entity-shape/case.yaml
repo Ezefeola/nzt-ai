@@ -8,7 +8,7 @@ description: >
   that uses it.
 tags: [stack]
 expected_outcome: >
-  Loads nzt-software and reads the dotnet pack's its domain-ddd.md (since D88 one file, without the
+  Loads nzt-software and reads its dotnet/domain-ddd.md (since D88 one file, without the
   old behaviour part), and writes an entity with an empty
   private constructor, Rules and Errors at the top, every property together, and Create
   building through an object initializer.

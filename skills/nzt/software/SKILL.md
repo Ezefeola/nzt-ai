@@ -1,33 +1,35 @@
 ---
 name: nzt-software
-description: Use when Docs/Architecture/tech.md lists a software pack - code, backend, frontend, csharp, ddd, dotnet, blazor - for the component you touch, before designing, writing, testing or shipping its code.
+description: Use for the code of a component Docs/Architecture/tech.md declares - its language, framework and practices (C#, .NET, Blazor, DDD, backend, frontend) - before designing, writing, testing or shipping it.
 ---
 
-# Software packs
+# Software rules
 
-The rules each software pack holds to. Every path below is under `references/`.
+The rules for each technology and practice a component declares. Every path below is under
+`references/`; each table's columns are those technologies and practices.
 
 ## Steps
 
-1. Read the component's packs and axis values in `Docs/Architecture/tech.md`. A value missing
-   there is a gap in `tech.md`: ask it with `references/choosing.md`, never pick one here.
-2. Add the packs each listed one requires.
+1. Read the component's areas, technology rows and axis values in
+   `Docs/Architecture/tech.md`. A value missing there is a gap in `tech.md`: ask it with
+   `references/choosing.md`, never pick one here.
+2. Take the columns that apply, by the table below. A column whose condition `tech.md` does
+   not meet is never read.
 3. Read the axis rows, then the rows the task selects. In each row, read left to right: the
-   generic file first, then the file of each technology pack listed. A column of a pack
-   `tech.md` does not list is never read.
+   generic file first, then the file of each technology column that applies.
 4. Take versions from the project — `global.json`, `TargetFramework`, the package manifest —
    never from an example.
 5. Report any disagreement between `tech.md` and the code: the code wins.
 
-| Pack | Requires | What it is |
+| Column | Applies when `tech.md` declares | What it is |
 |---|---|---|
-| `code` | — | the user's rules for any language |
-| `backend` | `code` | services, whatever the technology |
-| `frontend` | `code` | screens, components and forms, whatever the framework; how they look is the design system's |
-| `csharp` | `code` | the C# language |
-| `ddd` | — | aggregates, contexts and value objects |
-| `dotnet` | `backend`, `csharp` | services on .NET |
-| `blazor` | `frontend`, `csharp` | screens on Blazor |
+| `code` | any code | the user's rules for any language |
+| `backend` | the area `backend`, or `dotnet` applies | services, whatever the technology |
+| `frontend` | the area `frontend`, or `blazor` applies | screens, components and forms, whatever the framework; how they look is the design system's |
+| `csharp` | *Language* C# | the C# language |
+| `ddd` | *Domain model* `ddd` | aggregates, contexts and value objects |
+| `dotnet` | *Framework* ASP.NET Core, or a service on .NET | services on .NET |
+| `blazor` | *Framework* Blazor | screens on Blazor |
 
 ## Code
 

@@ -1,8 +1,8 @@
-# Choosing a pack's values
+# Choosing the software values
 
 What each value of an axis, and each DDD piece, costs. Read it to ask the user the axes of
-the packs a component lists — each option's cost as its consequence — and write the value in
-`tech.md` exactly as spelled here.
+the technologies a component declares — each option's cost as its consequence — and write
+the value in `tech.md` exactly as spelled here.
 
 ## Backend
 
@@ -46,5 +46,5 @@ Each piece is answered `yes` or `no` in `tech.md`.
 
 ## Done when
 
-Every axis of the listed packs, and every DDD piece, has a value in `tech.md` spelled as
-here, and the user heard each option's cost.
+Every axis of the declared technologies, and every DDD piece, has a value in `tech.md`
+spelled as here, and the user heard each option's cost.

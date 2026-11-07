@@ -8,7 +8,7 @@
     {
       "name": "nzt",
       "source": { "source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin" },
-      "description": "The NZT method, its agents and the software and games packs"
+      "description": "The NZT method, its agents and its software rules"
     },
     {
       "name": "nzt-state",

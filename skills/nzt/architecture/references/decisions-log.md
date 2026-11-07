@@ -1,8 +1,8 @@
 # Decisions log
 
 The append-only log of technical questions: every `QT-NN`, its answer, its date and where the
-answer came from. `Docs/Architecture/architecture-decisions.md` for the product (the packs'
-decisions included), `Plan/specs/<feature>/tech-design/decisions.md` for a feature.
+answer came from. `Docs/Architecture/architecture-decisions.md` for the product (the
+software decisions included), `Plan/specs/<feature>/tech-design/decisions.md` for a feature.
 
 The design is the present and gets rewritten; the log is the conversation that produced it
 and is never overwritten. So designs list open questions by id and never restate answers.

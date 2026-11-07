@@ -1,7 +1,7 @@
 # Collections in memory
 
 A collection read, transformed or checked in memory. A query the database runs is the data
-pack's. Use the one style of collection operations the codebase already uses.
+access files'. Use the one style of collection operations the codebase already uses.
 
 ## Rules
 

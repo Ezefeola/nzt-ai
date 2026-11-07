@@ -1,6 +1,6 @@
 # NZT para Claude Code
 
-NZT aporta un método de trabajo para planificar, construir y verificar cambios. Incluye las skills de cada fase, dos subagentes y los packs de software y juegos. El método vive en la skill `nzt:nzt`.
+NZT aporta un método de trabajo para planificar, construir y verificar cambios. Incluye las skills de cada fase, dos subagentes y las reglas de software. El método vive en la skill `nzt:nzt`.
 
 En Claude Code, ejecutá `/plugin marketplace add Ezefeola/nzt-ai`, luego `/plugin install nzt@nzt` y abrí una sesión nueva.
 

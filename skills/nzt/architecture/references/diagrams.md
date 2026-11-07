@@ -13,7 +13,8 @@ Decides which diagram is earned and holds the rules every one obeys. Drawing is
 
 ## The catalog
 
-Closed. Packs may add their own (the `ddd` pack adds `bounded-contexts` and `aggregates`).
+Closed. `nzt-software` may add its own (its `ddd` column adds `bounded-contexts` and
+`aggregates`).
 
 | Diagram | Answers | Lives in | Earned when |
 |---|---|---|---|

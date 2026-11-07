@@ -2,10 +2,9 @@
 
 Versión 5.0.0. Instala NZT **globalmente**, por la misma vía que el plugin (D95): el kernel
 dentro de la skill `nzt`, que el proveedor carga primero en toda sesión, y las
-skills, con sus referencias, aplanadas en su carpeta de skills de usuario. Los **packs** se
-instalan aparte, **en cada proyecto** (sección *Packs por proyecto*). En Claude Code
-puede instalar además **los mods**, que sí son plugins (sección *Mods de Claude Code*). El
-contenido de `core/`, `skills/`, `packs/` y el catálogo de mods se **embebe al compilar**, así que el
+skills, con sus referencias, aplanadas en su carpeta de skills de usuario. En Claude Code puede
+instalar además **los mods**, que sí son plugins (sección *Mods de Claude Code*). El
+contenido de `core/`, `skills/` y el catálogo de mods se **embebe al compilar**, así que el
 ejecutable es el set: un solo artefacto y nada que resolver en tiempo de ejecución.
 
 ## Uso
@@ -20,11 +19,10 @@ dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code --d
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code
 dotnet run --project installer/src/Nzt.Cli -- install --provider claude-code --mods all
 dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
-dotnet run --project installer/src/Nzt.Cli -- project add dotnet --dir ../pedidos --dry-run
 ```
 
-Sin argumentos abre el menú: **instalar, desinstalar, preparar este proyecto, verificar el
-contenido y ver estado**,
+Sin argumentos abre el menú: **instalar, desinstalar, verificar el contenido y ver
+estado**,
 en un bucle hasta que elegís salir. **Se navega con ↑ ↓ y se elige con Enter** — no se
 escribe nada, ni números ni `s/n`. Primero la acción, después el destino y, si el destino
 incluye Claude Code, **qué instalar: Todo NZT, solo el método o solo los mods**. Las dos que
@@ -65,40 +63,11 @@ como lo harías vos**: nunca copia archivos de un mod.
 Elegir *solo los mods* con *Todos los proveedores* no instala nada en Codex: Codex no tiene
 mods, y el método no se pidió.
 
-## Packs por proyecto
+## Herramientas del agente por proyecto
 
-`nzt-ai project` (o `dotnet run --project installer/src/Nzt.Cli -- project …`) instala
-packs en un proyecto: la skill `nzt-<pack>` de cada uno, la de los packs que requiere, y sus
-MCP. Corre sobre la carpeta actual, o la de `--dir`.
-
-| Comando | Qué hace |
-|---|---|
-| `project` / `project status` | los packs del proyecto, sus proveedores y qué está editado o falta |
-| `project packs` | el catálogo, con lo que trae cada pack y cuáles tiene el proyecto |
-| `project add <pack>... [--provider claude-code\|codex\|all]` | los suma a los que ya tiene; sin `--provider`, los del proyecto o Claude Code |
-| `project remove <pack>...` | los saca, y con ellos lo que ningún otro pack sigue requiriendo |
-| `project sync` | reinstala lo que dice el registro del proyecto: en un clon nuevo, deja lo mismo |
-
-Todos aceptan `--dry-run`. Los tres que escriben son la misma operación: del estado deseado
-—packs y proveedores— a lo que hay en disco.
-
-| Proveedor | Skills | MCP | Registro |
-|---|---|---|---|
-| Claude Code | `.claude/skills/nzt-<pack>/` | `mcpServers` de `.mcp.json` | `.claude/nzt.json` |
-| Codex | `.agents/skills/nzt-<pack>/` | un bloque `# nzt:start` … `# nzt:end` en `.codex/config.toml`, que Codex lee solo si el proyecto es de confianza | `.agents/nzt.json` |
-
-- **El registro** (`nzt.json` en la carpeta de cada proveedor, el mismo en las dos) anota los
-  packs pedidos (no los requeridos), los proveedores, cada archivo escrito con su hash y los
-  MCP que agregó `nzt-ai`. Las rutas son relativas: versionalo. Uno viejo en
-  `.nzt/project.json` se lee, y el próximo `add`, `remove` o `sync` lo mueve.
-- **Las mismas reglas que la instalación global:** con un archivo que `nzt-ai` no escribió
-  no se escribe nada; uno editado se conserva al actualizar y al sacar el pack; lo que sale
-  se borra con sus carpetas vacías.
-- **Un MCP del usuario no se toca.** Si ya hay uno con ese nombre —en `.mcp.json` o fuera del
-  bloque de `config.toml`—, queda como está y no se anota como de `nzt-ai`.
-- **Un MCP local** (`unity-mcp`) trae un comando por plataforma con `{home}` resuelto al
-  instalar; sin comando para esta plataforma se informa y no se escribe.
-- **Los MCP cargan en una sesión nueva.**
+Desde D96 el CLI no instala nada por proyecto: no hay packs ni `nzt-ai project`. Los MCP y
+plugins que un proyecto necesita los ofrece el agente en la sesión, buscados en las fuentes
+oficiales, y los instala en el proyecto con tu sí (`nzt-research`, `references/tools.md`).
 
 ## Dónde queda instalado
 
@@ -161,11 +130,7 @@ Los manifiestos son uno por proveedor, en `%LOCALAPPDATA%/nzt/manifests` en Wind
 
 El instalador **corre el lint antes de escribir** y aborta si el set no valida: name del
 frontmatter == nombre derivado del path, `description` presente y ≤ 250 chars, ≤ 200 líneas
-por archivo, frontmatter portable (C1) y ningún nombre plano duplicado. Los packs pasan las
-mismas reglas en su skill, y además: `description` en `pack.json`, skill o MCP, `requires`
-que existen y sin ciclos, cada MCP con `url` o `command` (uno solo) y definido igual en todos
-los packs, y ninguna skill de pack con el nombre de una global. También informa el
-tamaño del listado contra el piso de 8.000 de Codex (R1).
+por archivo, frontmatter portable (C1) y ningún nombre plano duplicado. También informa el tamaño del listado contra el piso de 8.000 de Codex (R1).
 
 ```powershell
 dotnet run --project installer/tests/Nzt.Cli.Checks
@@ -177,10 +142,7 @@ plugins**. Cubre instalación, idempotencia, convivencia con texto personal, bac
 de ediciones, huérfanos, colisiones, simulación, desinstalación, bloque roto, aplanado de
 nombres, paridad con el build, las reglas del lint y los mods: catálogo, marketplace, sin
 Claude Code, versión vieja, falla parcial, mods instalados a mano, actualizar, desinstalar y
-estado; y `project`: requires, agregar, sacar y sincronizar, archivo ajeno, pack desconocido,
-ediciones, simulación, MCP del usuario en `.mcp.json` y en `config.toml`, comando por
-plataforma, cambio de proveedor y el lint de packs. La validación de esta versión da
-`PASS: 240 installer checks`.
+estado. La validación de esta versión da `PASS: 184 installer checks`.
 
 Las comprobaciones no ejecutan conversaciones en los CLIs ni miden selección de skills. Eso
 es la suite de `evals/`.

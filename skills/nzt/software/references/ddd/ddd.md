@@ -2,7 +2,7 @@
 
 **The entity protects its own invariants**: what must always be true about a thing is enforced
 by the thing. Persistence (repositories or direct) is another axis and works with all of this;
-mapping is the data pack's, folders the architecture's.
+mapping is the data access files', folders the architecture's.
 
 **`tech.md`'s DDD line decides how far this goes.** A piece not `yes` is not built, and a
 missing line builds none: no value object (the field stays primitive, checked by the entity),
@@ -24,7 +24,7 @@ no domain event (a reaction elsewhere is the use case's), no id wrapper.
    - A rule about a value the entity does not store (a password behind a hash) is still the
      entity's; a failure naming no business concept is the operation's.
 6. **Between aggregates, only the id**: `Order` carries `CustomerId`, no `Customer`; data from
-   another aggregate is a second read (the mapping: the data pack's).
+   another aggregate is a second read (the mapping: the data access files').
 7. **Layout, in order**: what closes construction from outside · `Rules` · `Errors` ·
    properties · the creation entry · behaviour.
 8. **Create through one entry that validates, then builds**, returning the errors and the

@@ -3377,6 +3377,52 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Revertirla:** volver a planear el bloque en el instalador desde el commit `2680c14`.
   - **Reemplaza:** de D92, que el bloque siga siendo la forma de `nzt-ai`. Siguen la skill
     con el kernel, su descripción y lo medido en 474 y 475.
+- **D96.** **Sin packs: el agente ofrece las herramientas que el trabajo necesita, en
+  cualquier fase, buscándolas en las fuentes oficiales; `tech.md` nombra solo tecnologías y
+  prácticas; se van `packs/`, `nzt-games` y `nzt-ai project`.** Revisa D88, D89 y D93.
+  Estado: **aceptada** el 2026-11-07, decidida por el usuario (QT-114 a QT-118). Rama
+  `pendientes-post-v5`, unidades 497–507 (tramo S1), punto 1 de `specs/pendientes.md`.
+  - **Lo que la forzó:** desde D93, `packs/` era solo un catálogo de cuatro MCP (Microsoft
+    Learn en `csharp`, `dotnet` y `blazor`; el relay de Unity) que instalaba `nzt-ai
+    project`: no instalaba skills y era una lista fija que envejece. Recomendar herramientas
+    vivía solo en el paso 4 de `architecture/references/tech.md`, atado a elegir
+    tecnologías, y ninguna regla decía cuándo usar la herramienta instalada ni qué gana si
+    contradice una decisión. La línea `packs:` de `tech.md` repetía lo que ya dicen sus filas
+    de tecnología y práctica. Y el usuario decidió que NZT queda para software (QT-114):
+    `nzt-games` solo explicaba cómo conectar el MCP de Unity.
+  - **Decisión:**
+    - **El kernel tiene el *cuándo*** (sección *Agent tools*): `Docs/agent-tools.md` lista
+      las herramientas del proyecto (MCP, plugins o ambos) y para qué sirve cada una. Si una
+      cubre el trabajo de la unidad, se trabaja a través de ella. NZT y `Docs/` dicen lo
+      decidido: ante una contradicción gana la decisión y se avisa. Cuando el trabajo, en
+      cualquier fase, iría mejor con una herramienta que no está, el agente la **ofrece**,
+      buscada en las fuentes oficiales y nunca de una lista de NZT; una rechazada no se
+      vuelve a ofrecer.
+    - **`nzt-research`'s `references/tools.md` tiene el *cómo*:** mirar lo instalado,
+      buscar en fuentes oficiales, proponer con lo que hace y lo que instala, instalar en el
+      proyecto con el sí del usuario (nunca con alcance de usuario ni global), comprobar que
+      responde y registrarlo en `Docs/agent-tools.md` (*Use it for* / *Not for* /
+      *Declined*).
+    - **`tech.md` sin `packs:`.** La tarjeta declara áreas, tecnologías, las decisiones de
+      arquitectura, las prácticas (*opt-ins*), dependencias y convenciones. Las *Agent tools*
+      salen a `Docs/agent-tools.md`. `nzt-software` elige sus columnas por esas filas
+      (`csharp` por *Language*, `dotnet` y `blazor` por *Framework*, `backend` y `frontend`
+      por las áreas, `ddd` por *Domain model*), y el kernel pasa de *Packs* a *Software
+      rules*.
+    - **Se borran** `packs/`, `skills/nzt/games/` y el subcomando `nzt-ai project` (QT-115)
+      con su catálogo, sus checks y el recurso embebido. En Codex, el agente escribe el MCP
+      en `.codex/config.toml`, como ya hacía con los que investigaba.
+  - **QT del run:** QT-114 · `nzt-games` se borra: NZT queda para software. QT-115 · `nzt-ai
+    project` se va con los packs. QT-116 · todo el método pasa a un plugin `nzt-software`,
+    y un `nzt-games` futuro sería otro plugin entero. QT-117 · se instala como
+    `nzt-software` (skills `nzt-software:…`). QT-118 · primero este tramo; el reempaquetado
+    (QT-116, QT-117) es el tramo S2.
+  - **Lo que se acepta:** **(1)** sin catálogo, que el agente encuentre la herramienta
+    depende de su búsqueda: nada la garantiza; **(2)** `routing/pack-setup` pasa a
+    `routing/tool-setup` y su historial no es comparable; **(3)** los evals se arman pero no
+    se corren (decisión del usuario, por costo).
+  - **Revertirla:** volver `core/`, `skills/`, `agents/`, `packs/`, `installer/`,
+    `install/` y `evals/` al commit `fcdbb4f`.
 
 ## 13. Revisión contra Temper v3
 

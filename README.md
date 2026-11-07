@@ -22,7 +22,7 @@ NZT existe para evitar:
 | Escribe código antes de que nadie haya definido qué tiene que hacer | Primero el análisis funcional, y lo que no está definido **es una pregunta, no una suposición** |
 | Arranca y no para hasta que algo se rompe | Corta en unidades revisables y **frena a esperarte** al final de cada una; si querés avanzar, le das una tanda cerrada (N unidades, o hasta un hito) y frena igual pasado el 40% de contexto |
 | Se le termina el contexto y perdiste el hilo | El plan y el estado viven en `Plan/state.json`: se retoma sin volver a explicar |
-| Elige el patrón que le gusta hoy, distinto del de ayer | El documento técnico (`Docs/Architecture/tech.md`) decide, y **un pack instalado no es una autorización** |
+| Elige el patrón que le gusta hoy, distinto del de ayer | El documento técnico (`Docs/Architecture/tech.md`) decide, y **solo aplica lo que ese documento declara** |
 | Te dice que funciona | Reporta lo que pasó: el test que falló, el paso que salteó, la suposición que hizo |
 
 Lo que ganás no es que escriba mejor código: es que **puedas revisar lo que hizo, retomar
@@ -30,7 +30,7 @@ donde quedaste y no descubrir a lo último que entendió otra cosa.**
 
 ## Cómo funciona
 
-Tres capas globales, la de arriba siempre cargada, y los packs de cada proyecto.
+Tres capas, la de arriba siempre cargada, y las reglas de software que el proyecto declara.
 
 **1. El kernel** (~115 líneas) va dentro de la skill `nzt`, que el proveedor carga primero en
 toda sesión: no se escribe nada en tu `CLAUDE.md` ni en tu `AGENTS.md`, igual con el plugin
@@ -52,7 +52,7 @@ listado de skills**, que el proveedor carga en toda sesión: el set global son 1
 
 ```
 pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
-                                         ↘ el pack que tech.md lista → su referencia
+                                         ↘ lo que tech.md declara → su referencia de nzt-software
 ```
 
 El bucle que impone el kernel es siempre el mismo: **entender → proponer → ejecutar por
@@ -66,7 +66,7 @@ por tramos de una a tres historias). Eso es lo que hace que se banque el uso dia
 | Fase | De qué se ocupa |
 |---|---|
 | `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias, y el cambio a una feature que ya existe |
-| `nzt-architecture` | Cómo se resuelve: componentes, documento técnico y packs del proyecto, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
+| `nzt-architecture` | Cómo se resuelve: componentes, documento técnico, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
 | `nzt-design` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
 | `nzt-build` | El código, y los tests que viajan con él |
 | `nzt-verify` | Diseñar y correr pruebas —API o pantalla, y lo dice antes de correr—, **crear los datos que faltan y borrarlos después**, medir la performance que espera el usuario, registrar la evidencia, y leer código o documentos buscando lo que no cierra |
@@ -77,42 +77,35 @@ por tramos de una a tres historias). Eso es lo que hace que se banque el uso dia
 aparte, evaluación y repasos espaciados. Se dispara cuando pedís aprender, no cuando pedís
 que se haga.
 
-### Los packs, por proyecto
+### Las reglas de software y las herramientas del agente
 
-Lo global es solo el marco, y sirve para cualquier producto: un sistema, un juego, una app,
-un documento. Lo que es de una tecnología, de un estilo de arquitectura o de tus reglas de
-código viene en **packs**. Las reglas viajan en las skills `nzt-software` y `nzt-games`.
-Cada proyecto elige las que usa en `tech.md` y habilita sus MCP si los necesita:
+Lo que es de una tecnología, de un estilo de arquitectura o de tus reglas de código vive en la
+skill `nzt-software`, que viene con el método:
 
-| Pack | Trae |
+| Reglas | Traen |
 |---|---|
 | `code` | tus reglas de código para cualquier lenguaje: nombres, funciones, errores, colecciones, DTOs |
 | `backend` | backend sin tecnología: arquitecturas, modelo anémico, persistencia, casos de uso, validación, errores, API, seguridad, acceso a datos |
 | `frontend` | frontend sin tecnología: arquitectura, componentes, formularios, rendering, performance |
 | `ddd` | agregados, value objects, contextos acotados y sus diagramas |
-| `csharp` | C# moderno, con el MCP de Microsoft Learn |
-| `dotnet` | .NET: EF Core, minimal APIs o controllers, resultados, tests, contenedores, pipeline, observabilidad, con Microsoft Learn |
-| `blazor` | Blazor: modos de render, componentes, formularios, prerendering, con Microsoft Learn |
-| `unity` | solo el MCP oficial de Unity, para conectar el agente al editor |
-
-`nzt-software` reúne las reglas y sus dependencias. `nzt-ai project` configura los MCP de
-`csharp`, `dotnet`, `blazor` y `unity` en el proyecto.
+| `csharp` | C# moderno |
+| `dotnet` | .NET: EF Core, minimal APIs o controllers, resultados, tests, contenedores, pipeline, observabilidad |
+| `blazor` | Blazor: modos de render, componentes, formularios, prerendering |
 
 `Docs/Architecture/tech.md` es el documento técnico del producto: una sección por componente
-con sus decisiones, sus opt-ins, sus dependencias y **los packs que lo guían**. Lo escribe
-`nzt-architecture`, que propone los packs y, con tu sí, configura los MCP que hagan falta con `nzt-ai project`. Los
-**ejes** de cada pack —arquitectura, modelo de dominio, persistencia, endpoints, modo de
-render…— se preguntan una vez, con lo que cuesta cada opción.
+con sus áreas, sus tecnologías (lenguaje, runtime, framework), sus decisiones, sus prácticas
+—DDD, niveles de test…—, sus dependencias y sus convenciones. Lo escribe `nzt-architecture`, y
+los **ejes** —arquitectura, modelo de dominio, persistencia, endpoints, modo de render…— se
+preguntan una vez, con lo que cuesta cada opción. **Una regla de `nzt-software` se aplica solo
+si `tech.md` declara su tecnología o su práctica**, y en un repositorio con convenciones
+propias las de NZT se corren a un costado y la diferencia se reporta en vez de aplicarse.
 
-**Antes de trabajar, el agente prepara el trabajo con vos**, como a alguien que no sabe nada:
-qué va a hacer y qué necesita (packs, MCP, herramientas), de dónde lo sacó —el catálogo y una
-investigación, con fuente y fecha—, lo que tenés que hacer vos a mano, paso a paso, lo que él
-no puede hacer y qué tener en cuenta. Con tu sí instala, te guía en lo tuyo y comprueba que
-cada herramienta responda.
-
-**Un pack se aplica solo si `tech.md` lo lista.** Instalado y no listado no se carga, y en un
-repositorio con convenciones propias las de NZT se corren a un costado y la diferencia se
-reporta en vez de aplicarse.
+**El agente te ofrece las herramientas que el trabajo necesita, en cualquier fase**: un MCP, un
+plugin o los dos, para leer la documentación de una tecnología, manejar un editor, ver la
+pantalla. NZT no trae una lista: las busca en las fuentes oficiales y te dice de dónde las sacó
+y con qué fecha, qué instalan, a qué acceden, lo que tenés que hacer vos a mano y lo que él no
+puede hacer. Con tu sí las instala **en el proyecto**, nunca global, comprueba que respondan y
+las anota en `Docs/agent-tools.md`. Una que rechazás no te la vuelve a ofrecer.
 
 ## Instalación
 
@@ -125,8 +118,7 @@ En Claude Code, agregá el marketplace e instalá el método:
 /plugin install nzt@nzt
 ```
 
-Abrí una sesión nueva. El plugin incluye los subagentes y los packs `nzt-software` y
-`nzt-games`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
+Abrí una sesión nueva. El plugin incluye los subagentes y las reglas de `nzt-software`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
 al plugin, quitá primero el método con `nzt-ai uninstall --provider claude-code --mods none`.
 
 ### Instalador para Claude Code y Codex
@@ -184,8 +176,8 @@ Desde el repo, con .NET 10, está el instalador completo:
 dotnet run --project installer/src/Nzt.Cli
 ```
 
-El menú tiene cinco acciones —**instalar, desinstalar, preparar este proyecto, verificar
-el contenido y ver estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
+El menú tiene cuatro acciones —**instalar, desinstalar, verificar el contenido y ver
+estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
 método o solo los mods—, y **te muestra la simulación y recién
 ahí pregunta**. Instala las skills y los subagentes en las carpetas de usuario del proveedor.
 
@@ -193,24 +185,6 @@ ahí pregunta**. Instala las skills y los subagentes en las carpetas de usuario 
 dotnet run --project installer/src/Nzt.Cli -- status
 dotnet run --project installer/src/Nzt.Cli -- uninstall --provider claude-code
 ```
-
-### En cada proyecto
-
-Los packs se instalan desde la raíz del proyecto, y lo normal es que lo haga el agente cuando
-arma `tech.md`. A mano:
-
-```bash
-nzt-ai project packs                      # los que hay, y cuáles tiene este proyecto
-nzt-ai project add dotnet unity             # con lo que requieren; --provider codex o all
-nzt-ai project remove unity
-nzt-ai project sync                       # reinstala lo que dice .claude/nzt.json
-```
-
-Las reglas ya están en las skills de NZT. Los MCP quedan en `.mcp.json`
-(Codex: un bloque delimitado en `.codex/config.toml`), sin pisar lo que ya tengas.
-`.claude/nzt.json` (Codex: `.agents/nzt.json`) anota qué se eligió y qué escribió `nzt-ai`:
-versionalo, y en otra máquina `nzt-ai project sync` deja lo mismo. Los MCP cargan en una sesión nueva. El menú del
-instalador tiene la misma acción, *Preparar este proyecto*.
 
 Más detalles en
 [`installer/README.md`](installer/README.md).
@@ -274,8 +248,8 @@ Es tan importante como lo otro:
   cada decisión, y que frena en los bordes de cada unidad. Puede mandar a dos subagentes
   propios: uno lee por ella y el otro hace las unidades que el plan aprobado marcó en
   paralelo. Sin subagentes, o con `delegation` en `off`, todo corre en esta conversación,
-  una unidad tras otra. No instala MCP globales: los de un pack van al proyecto que lo
-  eligió, y otro que haga falta, al archivo de MCP del proyecto, que viaja con git.
+  una unidad tras otra. No instala MCP globales: los que te ofrece y aceptás van al archivo de MCP
+  del proyecto, que viaja con git.
 - **No garantiza que el modelo elija siempre la skill correcta.** Por eso el ruteo está
   instruido y por eso hay una suite de evals que lo mide.
 - **No decide por vos.** Prescribe el procedimiento, no el criterio técnico: NZT dice *cómo
@@ -286,7 +260,6 @@ Es tan importante como lo otro:
 ```
 core/        kernel.md + un adapter por proveedor
 skills/      las skills globales del marco (anidadas acá, planas al instalarse)
-packs/       los packs por proyecto: pack.json, SKILL.md y references/ de cada uno
 specs/       nzt-core.md — la spec fundacional, la del instalador, la de los mods y mods/ con una por mod
 mods/        los mods de Claude Code, uno por carpeta (opcionales)
 installer/   el CLI que instala, con sus comprobaciones
@@ -294,7 +267,7 @@ evals/       la suite que mide si dispara la skill correcta
 install/     build.sh / build.ps1 — el loop de desarrollo; install.ps1 / install.sh / variants.sh — los comandos de una línea
 ```
 
-**12 skills globales con 60 referencias, y 8 packs** —7 con skill— **con 75 referencias**. El plan en curso y dónde
+**13 skills con 137 referencias**, 76 de ellas en `nzt-software`. El plan en curso y dónde
 quedó están en [`Plan/state.json`](Plan/state.json); las decisiones tomadas y su historia, en
 [`specs/nzt-core.md`](specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.

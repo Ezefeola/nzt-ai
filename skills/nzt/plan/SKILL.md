@@ -41,7 +41,7 @@ Turns the phases `nzt` chose into an approved plan of units, runs it, and keeps
 ## Execute
 
 1. Take the first `todo` unit of the current phase (and slice). Set it `doing`, write.
-2. Load the router the unit needs (kernel routing table) and the packs `tech.md` lists.
+2. Load the router the unit needs (kernel routing table) and, for code, `nzt-software`.
 3. Do the unit; mark progress where that phase marks it.
 4. Set it `done`, advance the phase or slice it closed, update `updated`, write.
 5. Run the state check, then report. Chain only into the next unit of the batch.

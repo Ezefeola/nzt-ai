@@ -4,13 +4,13 @@ description: >
   The D50 pilot case. The CI gates of a .NET component are asked for, and the .NET pipeline
   guidance is what makes the difference: the project pins its SDK and enables two test
   levels, but has no lock files, so a locked-mode restore would be a gate that always passes.
-  Since D88 the guidance is the dotnet pack's references/ship-pipeline.md, installed in
-  the project, which its SKILL.md's Ship table sends the agent to read. Baseline before D50,
+  Since D93 the guidance is nzt-software's references/dotnet/ship-pipeline.md, which its
+  SKILL.md's Ship table sends the agent to read. Baseline before D50,
   with the leaf graders on Skill and --judge-model sonnet: 0.75 (2026-10-03). Run it with
   --judge-model sonnet: haiku failed replies that met all four conditions.
 tags: [stack]
 expected_outcome: >
-  Goes through nzt-ship and nzt-software's dotnet pack, gets the pipeline guidance, and writes a
+  Goes through nzt-ship and nzt-software's dotnet rules, gets the pipeline guidance, and writes a
   workflow whose gates hold: the pinned SDK, a restore that either has lock files or reports
   that they are missing and proposes them, separate unit and integration test steps with a
   container runtime for the integration level, and the pending model changes gate.

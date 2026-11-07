@@ -1,6 +1,6 @@
 # LINQ
 
-In memory only: a query a database runs is its data pack's (`references/dotnet/ef-core*.md`).
+In memory only: a query a database runs is the data access files' (`references/dotnet/ef-core*.md`).
 
 ## Rules
 

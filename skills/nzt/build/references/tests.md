@@ -1,7 +1,7 @@
 # Tests that ship with the work
 
 What makes an automated test worth keeping, whatever the technology. How this project writes
-one — framework, layout, runner — is its pack's.
+one — framework, layout, runner — is `nzt-software`'s, by what `tech.md` declares.
 
 ## Steps
 

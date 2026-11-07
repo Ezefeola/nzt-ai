@@ -8,7 +8,7 @@ Written **after the specs it models** (fields come from the criteria) and grown 
 feature. Offer it when the first feature's specs close: without it, each story reinvents the
 model.
 
-If `tech.md` lists the `ddd` pack for the component, its skill sets the shape (aggregates,
+If `tech.md` declares *Domain model* `ddd` for the component, `nzt-software` sets the shape (aggregates,
 contexts); this file still holds for everything else.
 
 ## The file

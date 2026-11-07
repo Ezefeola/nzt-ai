@@ -9,6 +9,11 @@ sirva de ahí se trae por partes.
 
 ## 1 · NZT trabaja con cualquier plugin o MCP, en cualquier fase
 
+**Hecho en esta rama: D96** (`specs/nzt-core.md`, unidades 497–507). Sin packs, sin
+`nzt-games` y sin `nzt-ai project`; el kernel tiene *Agent tools*, `nzt-research` tiene
+`references/tools.md` y `tech.md` declara solo tecnologías y prácticas. Lo que sigue es lo que
+se planteó antes de hacerlo.
+
 **Qué quiere el usuario.** Que NZT deje usar cualquier herramienta del agente (MCP, plugin, o
 ambos) y que el agente **ofrezca** la que necesita para trabajar mejor, en **cualquier fase**:
 investigar, diseñar, construir, verificar, publicar. Es genérico: sirve para cualquier producto
@@ -54,7 +59,6 @@ Ver si se puede ordenar, y solo si hace falta. Observaciones de partida, sin dec
 | `install/` y `installer/` | dos carpetas con casi el mismo nombre: los scripts de build e instalación y el CLI `nzt-ai` |
 | `core/` y `skills/nzt/` | el kernel y los adapters viven fuera de la skill que los usa; el build los junta |
 | `skills/nzt/<fase>/` | en el repo las fases están anidadas dentro de `nzt`; el plugin las aplana a `nzt-<fase>` |
-| `packs/` | desde D93 es solo un catálogo de MCP (`pack.json`), y las reglas viven en `skills/nzt/software` y `skills/nzt/games` |
 | `Plan/mejoras/` | notas de trabajo de runs viejos dentro del repo publicado |
 | `specs/nzt-core.md` | 5401 líneas: todas las decisiones en un solo archivo |
 | `presentation/` | una demo web suelta en la raíz |
@@ -66,5 +70,5 @@ encuentren sus fixtures.
 
 - Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;
   el punto 1 es la parte que el usuario quiere conservar.
-- `nzt-games` en `main` solo conecta el editor de Unity (`references/unity/editor.md`). Es una
-  pieza aislada para completar cuando toque.
+- `nzt-games` se borró en D96 (QT-114): NZT queda para software. Un juego futuro sería otro
+  plugin entero, como el `nzt-software` del tramo S2.

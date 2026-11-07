@@ -2,7 +2,7 @@ schema_version: "1.1"
 name: restraint-small-edit
 description: >
   One word on one button, in a file that already exists. The kernel scales the method to
-  the request and the packs let a small edit follow the convention next to it
+  the request and nzt-software lets a small edit follow the convention next to it
   without reloading guidance. Loading the Blazor leaves here is the measurable form of
   over-triggering inside a phase.
 tags: [restraint]

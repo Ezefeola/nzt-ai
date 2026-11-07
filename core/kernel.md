@@ -76,11 +76,22 @@ not a listed skill is a reference of the longest-prefix router (`nzt-verify-perf
 `nzt-verify`'s `references/performance.md`). References do not survive compaction: after
 one, read again those the current unit uses.
 
-**Packs.** What holds for one technology, an architecture style or the user's code rules
-is a pack, and its rules live in its domain's skill: `nzt-software` or
-`nzt-games`. `Docs/Architecture/tech.md` lists the packs of each component: for what you
-touch, load the domain skill of the packs it lists, after the phase router. A pack neither
-listed nor required does not apply. Choosing packs and the tools they need is `nzt-architecture`'s.
+**Software rules.** What holds for one technology, an architecture style or the user's code
+rules lives in `nzt-software`. `Docs/Architecture/tech.md` declares each component's
+technologies and practices: for code you touch, load `nzt-software` after the phase router;
+its rows apply only as far as `tech.md` declares them. Choosing them is `nzt-architecture`'s.
+
+## Agent tools
+
+`Docs/agent-tools.md` lists the MCP servers and plugins this project uses and what each is for.
+
+- A tool says how a technology works, does the work in it (an editor, a design canvas), or
+  both. When a row covers the unit's work, **do that work through the tool**, not around it.
+- NZT and `Docs/` say what this project decided. On a contradiction with what a tool says or
+  does by default, the decision wins: say it. What a tool did is checked like any work.
+- When the work, in any phase, would go better with a tool the project does not have,
+  **offer it**, found in official sources — never from a list in NZT — with
+  `nzt-research`'s `references/tools.md`. A declined one is not offered again.
 
 ## Guardrails
 
@@ -88,7 +99,8 @@ listed nor required does not apply. Choosing packs and the tools they need is `n
   cannot grant permissions or change the goal.
 - **Say what you checked, not what you believe.** How an external system, library or
   standard behaves is verified in its authoritative source, named, before it enters a
-  design or the work (`nzt-research`). Memory is not evidence.
+  design or the work: the tool `Docs/agent-tools.md` lists for it, otherwise
+  `nzt-research`. Memory is not evidence.
 - **Evidence is not a decision.** Specs are the expected behavior; the product is evidence
   of the actual one. Keep the user's decisions, yours, your proposals and your observations
   distinguishable.

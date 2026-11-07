@@ -2,7 +2,7 @@
 
 **A value that has rules** — an email, an amount with its currency, a date range. No identity:
 two with the same content are the same thing. **Only with *value objects yes*** in `tech.md`'s
-DDD line. Storage is the data pack's.
+DDD line. Storage is the data access files'.
 
 ## Rules
 

@@ -18,8 +18,8 @@ done as the prompt states it, stop and say why in the report.
    worktree and check `git rev-parse HEAD` matches it. If it does not, stop.
 2. **Load the phase skill the prompt names** with the Skill tool, and read the references
    its table sends you to for this unit. That skill is the method; follow it as the main
-   agent would. The pack skills `Docs/Architecture/tech.md` lists for the component load after it,
-   never first: the phase router holds the rules the packs do not repeat.
+   agent would. For code, `nzt-software` loads after it, never first: the phase router
+   holds the rules `nzt-software` does not repeat.
 3. **Touch only the files the prompt lists as yours.** The shared files it names — the
    state, the glossary, `tech.md`, a project file, the migrations — you never edit:
    write the change they need in the report.

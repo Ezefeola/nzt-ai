@@ -92,8 +92,8 @@ function Test-Skill([IO.FileInfo]$file, [string]$rel, [string]$expected) {
             $bad = $true
         }
     }
-    # a pack's references, one folder per pack (D93): the same budgets, and a row naming
-    # `<pack>/<file>` in the skill itself — one level deep, never through an index.
+    # references in subfolders (`dotnet/`, `ddd/`…): the same budgets, and a row naming
+    # `<folder>/<file>` in the skill itself — one level deep, never through an index.
     foreach ($ref in Get-ChildItem $refDir -Directory | ForEach-Object { Get-ChildItem $_.FullName -File -Filter '*.md' } | Sort-Object FullName) {
         $sub = "$($ref.Directory.Name)/$($ref.Name)"
         $refText = Get-Content $ref.FullName -Raw
@@ -140,48 +140,6 @@ if (Test-Path $skillsRoot) {
     if ($script:listingChars -gt 8000) {
         Write-Warning 'Skill listing is over the 8000-char floor. See R1 in specs/nzt-core.md.'
     }
-}
-
-# --- packs -------------------------------------------------------------------
-# What `nzt-ai project` installs per project (D88): a pack.json with a description and
-# requires that exist, and, when it brings a skill, the same rules as the global ones.
-# Their listing is not added to the global one: a project carries only the packs it chose.
-
-$packsRoot = Join-Path $root 'packs'
-if (Test-Path $packsRoot) {
-    Write-Host ''
-    $script:listingChars = 0
-    $folders = Get-ChildItem $packsRoot -Directory | Sort-Object Name
-    foreach ($folder in $folders) {
-        $pack = $folder.Name
-        $json = Join-Path $folder.FullName 'pack.json'
-        if (-not (Test-Path $json)) {
-            Write-Warning "packs/$pack : no pack.json."
-            $failed = $true
-            continue
-        }
-        $definition = Get-Content $json -Raw | ConvertFrom-Json
-        if (-not $definition.description) {
-            Write-Warning "packs/$pack : pack.json has no description."
-            $failed = $true
-        }
-        foreach ($required in @($definition.requires)) {
-            if ($required -and -not (Test-Path (Join-Path $packsRoot $required))) {
-                Write-Warning "packs/$pack : requires '$required', which is not a pack."
-                $failed = $true
-            }
-        }
-        $skill = Join-Path $folder.FullName 'SKILL.md'
-        if (Test-Path $skill) {
-            if (Test-Skill (Get-Item $skill) "packs/$pack" "nzt-$pack") { $failed = $true }
-        } elseif (-not $definition.mcp) {
-            Write-Warning "packs/$pack : brings neither a skill nor an MCP server."
-            $failed = $true
-        }
-    }
-
-    Write-Host ''
-    Write-Host ("$($folders.Count) packs, ~$($script:listingChars) chars of skill listing if every one is installed")
 }
 
 # --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---

@@ -9,6 +9,12 @@ Produces labelled claims with their sources and the consequence for the decision
 them. Any phase can need it; no router owns it — the kernel's rule on external facts sends
 you here. Memory tells you what to look for, never what is true.
 
+## References
+
+| The unit is | Read |
+|---|---|
+| Finding, proposing, installing and registering a tool for the agent (kernel *Agent tools*) | `references/tools.md` |
+
 ## Steps
 
 1. **Write the question and the decision it serves** before searching — *how do we receive
@@ -37,8 +43,8 @@ you here. Memory tells you what to look for, never what is true.
    the maker of the technology it serves (Unity for Unity, Microsoft for .NET) → the tool's
    maintainer (its repository and documentation) → third parties (rank 5). Report what it does for the agent, its version and last release, how it
    connects (a local process or a URL), what it installs on the machine and what it can
-   reach (files, network, credentials). A pack's tool is checked the same way. Reading about
-   a tool never installs it: that is the user's yes.
+   reach (files, network, credentials). Reading about a tool never installs it: that is the
+   user's yes.
 6. **Label every claim**:
 
    | Label | Means | Carries |
@@ -73,8 +79,8 @@ you here. Memory tells you what to look for, never what is true.
 - **The conversation**: the answer, its labelled claims, and what it means for the decision,
   with the options when there is a real trade-off.
 - **A technical decision**: its `QT-NN` cites the sources it rests on.
-- **A tool for the agent**: proposed with its source; once installed, its row in `tech.md`'s
-  *Agent tools*.
+- **A tool for the agent**: proposed with its source; once installed, its row in
+  `Docs/agent-tools.md`.
 - **An integration**: the external systems table of `Docs/Architecture/architecture.md` and
   the feature's design **link** the provider's documentation, never transcribe it.
 - A provider's capability is not a business rule: what the product promises is agreed in

@@ -27,7 +27,7 @@ Anything missing is named and the close stops.
    | If the feature changed | Update |
    |---|---|
    | a term | `Docs/Domain/glossary.md` |
-   | an entity, field or relationship | `Docs/Domain/domain-model.md` (and the DDD pack's documents, if listed) |
+   | an entity, field or relationship | `Docs/Domain/domain-model.md` (and the DDD documents, if `tech.md` declares `ddd`) |
    | a component, boundary or external system | `Docs/Architecture/architecture.md` |
    | a technology, version, package, area, pack or opt-in | `Docs/Architecture/tech.md` |
    | an expensive-to-reverse decision | `Docs/Architecture/adr/` |

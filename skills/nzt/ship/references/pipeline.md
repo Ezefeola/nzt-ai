@@ -12,7 +12,7 @@ none.**
 | Format and lint | the diff is about the change |
 | Build in release configuration | it builds the way it ships |
 | Tests **at the levels `tech.md` enables** | the rules behave, the parts agree |
-| Technology checks (from the packs) | e.g. model changes have their migration |
+| Technology checks (from `nzt-software`) | e.g. model changes have their migration |
 | End-to-end regression, **if `tech.md` names a tool** | approved scenarios still pass |
 | Versioned artifact, **built once** | what ships is what was verified |
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Seeds the empty eval workspace with a small NZT project (no CLAUDE.md: the kernel
-# comes with the plugin in nzt:nzt, QT-111), the technical document with its packs installed as project skills, one
+# comes with the plugin in nzt:nzt, QT-111), the technical document, one
 # feature with one story, and enough source for a request to be about something real.
 #
 # Sourced by each case's scaffold.sh. Runs as you, outside the agent's sandbox,
@@ -38,12 +38,13 @@ cat > "$ws/Docs/Architecture/tech.md" <<'MD'
 # Tech — Pedidos
 
 ## Pedidos.Api
-root: `src/Pedidos.Api/` · areas: backend · packs: dotnet, ddd
+root: `src/Pedidos.Api/` · areas: backend
 
 | Decision | Choice | When |
 |---|---|---|
-| Runtime | .NET 10.0.2 | — |
 | Language | C# 14 | — |
+| Runtime | .NET 10.0.2 | — |
+| Framework | ASP.NET Core 10 | every HTTP endpoint |
 | Database | PostgreSQL 17 | — |
 | Architecture | vertical-slice | — |
 | Domain model | ddd | entities and aggregates protect the order rules |
@@ -66,21 +67,17 @@ Dependencies
 | xunit.v3 3.0.0 | test framework | every automated test |
 | Testcontainers.PostgreSql 4.6.0 | disposable PostgreSQL for tests | integration tests against the real engine |
 
-Agent tools
-| Tool | What for | Source | Installed by |
-|---|---|---|---|
-| Microsoft Learn MCP | .NET and Azure documentation | Microsoft Learn, read 2026-09-17 | pack dotnet |
-
 Conventions
 - Secrets live outside the repository; in development, in user secrets.
 
 Evidence: versions read 2026-09-17 from `global.json` and `Directory.Packages.props`.
 
 ## Pedidos.Web
-root: `src/Pedidos.Web/` · areas: frontend · packs: blazor
+root: `src/Pedidos.Web/` · areas: frontend
 
 | Decision | Choice | When |
 |---|---|---|
+| Language | C# 14 | — |
 | Framework | Blazor (.NET 10.0.2) | — |
 | Architecture | vertical-slice | — |
 | Render mode | auto | every interactive page |
@@ -94,9 +91,6 @@ Opt-ins
 
 Evidence: versions read 2026-09-17 from `global.json`.
 MD
-
-# The packs tech.md lists, installed as `nzt-ai project add dotnet ddd blazor` would.
-bash "$here/packs.sh" "$ws" dotnet ddd blazor
 
 cat > "$ws/Plan/specs/F-001-pedidos/feature.md" <<'MD'
 # F-001 — Pedidos

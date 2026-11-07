@@ -1,69 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-bash "$here/../../_fixtures/kernel-only.sh" "$PWD"
+bash "$here/../../_fixtures/story-built.sh" "$PWD"
 
-# A Unity 6 game whose engine is decided and whose packs and agent tools are not: the moment
-# DB-03 is about. The catalogue has a unity pack; research may find something newer or more
-# official, and both are proposed together.
-mkdir -p "$PWD/Docs/Product" "$PWD/Docs/Architecture" "$PWD/ProjectSettings" "$PWD/Packages" \
-  "$PWD/Assets/Scripts"
+# US-012 is built and verify is next. The project has one agent tool, for documentation;
+# nothing that drives a browser. D96: a tool is offered in any phase, not only when the
+# technologies are chosen - here, verify needs to drive the screen.
+cat > "$PWD/Docs/agent-tools.md" <<'MD'
+# Agent tools
 
-cat > "$PWD/Docs/Product/product.md" <<'MD'
-# Producto — Cosecha
+| Tool | Kind | Use it for | Not for | Source | Installed |
+|---|---|---|---|---|---|
+| Microsoft Learn | MCP, URL | .NET, C# and Blazor documentation of the versions in `tech.md` | what this project decided | Microsoft Learn, read 2026-10-30 | project, `.mcp.json` |
 
-Juego de granja para PC, de una sola persona. El jugador siembra, riega y vende lo que
-cosecha para ampliar la granja. Entrega 1: un día completo de juego con tres cultivos.
+## Declined
 MD
 
-cat > "$PWD/Docs/Architecture/architecture.md" <<'MD'
-# Arquitectura — Cosecha
-
-| Componente | Qué es | Áreas |
-|---|---|---|
-| Cosecha | el juego, en Unity | gameplay, ui |
-MD
-
-cat > "$PWD/Docs/Architecture/tech.md" <<'MD'
-# Tech — Cosecha
-
-## Cosecha
-root: `./` · areas: gameplay, ui · packs: — (QT-04)
-
-| Decision | Choice | When |
-|---|---|---|
-| Engine | Unity 6000.0.58f2 | — |
-| Scripting | C# | every script |
-| Target platform | Windows | — |
-| Input | Input System 1.14 | every control |
-
-Opt-ins
-- **Test levels:** QT-05
-- **Test-first:** no
-- **End-to-end tool:** no
-
-Evidence: versions read 2026-10-30 from `ProjectSettings/ProjectVersion.txt` and
-`Packages/manifest.json`.
-MD
-
-cat > "$PWD/ProjectSettings/ProjectVersion.txt" <<'TXT'
-m_EditorVersion: 6000.0.58f2
-TXT
-
-cat > "$PWD/Packages/manifest.json" <<'JSON'
-{
-  "dependencies": {
-    "com.unity.inputsystem": "1.14.0",
-    "com.unity.ugui": "2.0.0"
-  }
-}
+cat > "$PWD/.mcp.json" <<'JSON'
+{ "mcpServers": { "microsoft-learn": { "type": "http", "url": "https://learn.microsoft.com/api/mcp" } } }
 JSON
-
-cat > "$PWD/Assets/Scripts/Crop.cs" <<'CS'
-using UnityEngine;
-
-public class Crop : MonoBehaviour
-{
-    public int daysToGrow = 3;
-}
-CS

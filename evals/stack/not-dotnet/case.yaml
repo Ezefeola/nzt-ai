@@ -1,9 +1,9 @@
 schema_version: "1.1"
 name: stack-not-dotnet
 description: >
-  A pack can sit in a project whose tech.md does not list it (D88), so the guard against
-  applying it where it does not belong is a rule and not a packaging decision. Here the
-  dotnet and blazor packs come with nzt-software in a TypeScript project, and the work is the same
+  nzt-software carries rules for technologies a project may not declare, so the guard
+  against applying them where they do not belong is a rule and not a packaging decision.
+  Here its dotnet and blazor rules come with the plugin in a TypeScript project, and the work is the same
   shape as the .NET cases - a paginated listing.
 tags: [stack, restraint]
 expected_outcome: >

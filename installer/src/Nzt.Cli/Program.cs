@@ -3,7 +3,6 @@ using Nzt.Cli.Content;
 using Nzt.Cli.Install;
 using Nzt.Cli.Lint;
 using Nzt.Cli.Mods;
-using Nzt.Cli.Project;
 using Nzt.Cli.Providers;
 using Nzt.Cli.State;
 using Spectre.Console;
@@ -51,7 +50,6 @@ public static partial class Program
             "install" => Install(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.MethodOnly),
             "uninstall" => Uninstall(ProvidersFrom(args), dryRun, manifestDir, mods ?? ModsChoice.All),
             "status" => Status(manifestDir),
-            "project" => ProjectCommand(args, dryRun),
             "lint" or "verify" => Lint(detailed: false),
             "state" => SubcommandOf(args) == "check"
                 ? State(Directory.GetCurrentDirectory())
@@ -75,13 +73,6 @@ public static partial class Program
               nzt-ai lint | verify
               nzt-ai state check                        revisa Plan/state.json de esta carpeta
 
-              nzt-ai project                            los packs de este proyecto
-              nzt-ai project packs                      los packs que se pueden instalar
-              nzt-ai project add <pack>... [--provider <id>] [--dry-run]
-              nzt-ai project remove <pack>... [--dry-run]
-              nzt-ai project sync [--dry-run]           reinstala lo que dice .claude/nzt.json (o .agents/nzt.json)
-              (--dir <carpeta> elige otro proyecto que el de la carpeta actual)
-
             Proveedores: claude-code, codex, all
             Mods (solo Claude Code): all = el método y los mods, none = solo el método,
             only = solo los mods. Instalar sin --mods es none; desinstalar sin --mods es all.
@@ -90,7 +81,7 @@ public static partial class Program
     }
 
     /// <summary>Las acciones del menú principal, en el orden en que se ofrecen.</summary>
-    public enum MenuAction { Install, Uninstall, Project, Verify, Status, Exit }
+    public enum MenuAction { Install, Uninstall, Verify, Status, Exit }
 
     /// <summary>Los destinos que ofrecen instalar y desinstalar. `Back` no elige ninguno.</summary>
     public enum ProviderChoice { ClaudeCode, Codex, All, Back }
@@ -120,7 +111,7 @@ public static partial class Program
         while (true)
         {
             var action = Ask("¿Qué querés hacer?", MenuLabel,
-                MenuAction.Install, MenuAction.Uninstall, MenuAction.Project, MenuAction.Verify,
+                MenuAction.Install, MenuAction.Uninstall, MenuAction.Verify,
                 MenuAction.Status, MenuAction.Exit);
 
             Console.WriteLine();
@@ -129,7 +120,6 @@ public static partial class Program
             {
                 case MenuAction.Install: MenuInstall(); break;
                 case MenuAction.Uninstall: MenuUninstall(); break;
-                case MenuAction.Project: MenuProject(); break;
                 case MenuAction.Verify: Lint(detailed: true); break;
                 case MenuAction.Status: Status(null); break;
                 default: return 0;
@@ -253,7 +243,6 @@ public static partial class Program
     {
         MenuAction.Install => "Instalar",
         MenuAction.Uninstall => "Desinstalar",
-        MenuAction.Project => "Preparar este proyecto (packs)",
         MenuAction.Verify => "Verificar el contenido",
         MenuAction.Status => "Ver estado",
         _ => "Salir"
@@ -625,14 +614,7 @@ public static partial class Program
         if (report.OverListingFloor)
             Warn($"el listado pasa el piso de {LintReport.CodexFloor} (R1).");
 
-        var packs = PackCatalog.Load();
-        var packReport = Linter.RunPacks(packs, catalog);
-        foreach (var issue in packReport.Issues)
-            Console.WriteLine($"  {issue.Where}: {issue.Message}");
-        Console.WriteLine($"{packs.Packs.Count} packs · {packReport.SkillCount} skills de proyecto"
-            + $" · {packReport.Issues.Count} problema(s)");
-
-        return report.Ok && packReport.Ok ? 0 : 1;
+        return report.Ok ? 0 : 1;
     }
 
     /// <summary>

@@ -1,8 +1,8 @@
 # The technical document
 
 Produces `Docs/Architecture/tech.md`: one card per component with what every phase needs to
-do the work correctly — its technologies, the packs that guide it, the decisions those packs
-ask, the opt-ins, the dependencies and the conventions. Read in a minute; it works for any
+do the work correctly — its technologies, the decisions and practices they ask, the
+opt-ins, the dependencies and the conventions. Read in a minute; it works for any
 product: a web system, a game, a mobile app, a book, a course.
 
 ## Contents
@@ -35,31 +35,25 @@ product: a web system, a game, a mobile app, a book, a course.
    need, propose in one round — written for someone who knows none of it:
    - **What you will do and what each part needs**: writing the work, running it, reading
      its documentation, seeing its output.
-   - **How each need is met — catalogue and research, always both**: the packs of
-     `nzt-software` and `nzt-games`, and the MCP servers, plugins, editor packages, CLIs or
-     SDKs the technologies offer an agent (`nzt-research`, *a tool for the agent*), even
-     when a pack matches. Each with
-     its source and date and what it brings; when the research contradicts a pack, say so.
+   - **How each need is met**: the MCP servers, plugins, editor packages, CLIs or SDKs the
+     technologies offer an agent, found in official sources and proposed as
+     `nzt-research`'s `references/tools.md` says (kernel *Agent tools*), each with its
+     source and date and what it brings.
    - **What the user does by hand**, step by step in plain words: install, approve a
      connection, create an account or a key.
    - **What you cannot do even with all of it** — judge how it feels, try it where you
      cannot reach — so the user knows where they are needed.
    - **What to keep in mind**: licences, costs, permissions, what it installs on the machine.
 
-   A pack needs no install: listing it in `tech.md` makes it apply. On the user's yes,
-   install each tool **in the project, never globally**: in Claude Code an MCP server with
-   `claude mcp add --scope project` and a plugin with `claude plugin install --scope
-   project`; in Codex a pack's MCP server with `nzt-ai project add <pack> --provider codex`
-   and a researched one in `.codex/config.toml`. Guide the user's steps. Nothing found: say
-   so — the work goes on with the generic routers.
-5. **Ask the packs' decisions.** Read the axes and opt-ins of each chosen pack in its domain
-   skill's `references/choosing.md` and ask them in one round, each option's cost as its
-   consequence. Write the value **exactly as it is spelled there**: the skill selects its
-   references by that text. A concept no pack offers is an open `QT-NN`, never an invented value.
+   Each tool is installed and registered as `references/tools.md` says, on the user's yes.
+   Nothing found: say so — the work goes on without it.
+5. **Ask the software decisions.** Read `nzt-software`'s `references/choosing.md` for the
+   technologies the component declares, and ask its axes and opt-ins in one round, each
+   option's cost as its consequence. Write the value **exactly as it is spelled there**:
+   `nzt-software` selects its references by that text. A concept it does not offer is an
+   open `QT-NN`, never an invented value.
 6. **Ask the core opt-ins** below, every one, including the `no`s.
-7. **Write `tech.md`**, agent tools included, and tell the user that MCP servers load in a
-   new session. **Check that each tool answers** before relying on it — an MCP server, in
-   that session; what does not answer is said with what is missing.
+7. **Write `tech.md`.**
 
 ## The file
 
@@ -67,11 +61,13 @@ product: a web system, a game, a mobile app, a book, a course.
 # Tech — Pedidos
 
 ## Pedidos.Api
-root: `Pedidos.Api/` · areas: backend · packs: dotnet, ddd
+root: `Pedidos.Api/` · areas: backend
 
 | Decision | Choice | When |
 |---|---|---|
+| Language | C# 14 | — |
 | Runtime | .NET 10 | — |
+| Framework | ASP.NET Core 10 | — |
 | Database | PostgreSQL 17 | — |
 | Architecture | vertical-slice | — |
 | Domain model | ddd | the order rules |
@@ -89,11 +85,6 @@ Dependencies
 |---|---|---|
 | Npgsql.EntityFrameworkCore.PostgreSQL 10.0.0 | PostgreSQL provider | persistence and migrations |
 
-Agent tools
-| Tool | What for | Source | Installed by |
-|---|---|---|---|
-| Microsoft Learn MCP | .NET and Azure documentation | Microsoft Learn, read 2026-09-16 | pack dotnet |
-
 Conventions
 - A request without a session answers `401`, never a redirect.
 
@@ -103,7 +94,9 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
 ## Rules
 
 1. **One section per component**, named as in `architecture.md`, with its `root` (the folder
-   holding all of it; `./` when it is the only one), its **areas** and its **packs**. The
+   holding all of it; `./` when it is the only one), and its **areas**. Its technologies use
+   the row names `Language`, `Runtime` and `Framework` where they apply: `nzt-software`
+   recognises the component by them. The
    areas across all sections are the closed list acceptance criteria mark (`backend ✓ ·
    frontend —`); `qa` is never an area.
 2. **One choice per decision.** An undecided one cites its open `QT-NN`. Two options in use
@@ -115,19 +108,17 @@ Evidence: versions read 2026-09-16 from `global.json` and `Directory.Packages.pr
    - *End-to-end tool* — named, or `no`;
    - *Test data* — how a test gets the data it needs.
 
-   Packs add their own opt-ins in the same block.
+   `nzt-software`'s opt-ins for the declared technologies go in the same block.
 4. **Dependencies are the user's**: one enters only after the user confirmed it (here or via
-   `nzt-build`'s `dependencies.md`), with its version. Transitive ones are not listed.
-   **Agent tools** too: only installed ones, with their source and date, and `pack <name>`
-   or who installed it in a few words (*the user, in the editor*) — never the steps: they
-   live in the pack or the source.
+   `nzt-build`'s `dependencies.md`), with its version. Transitive ones are not listed. The
+   agent's tools are not dependencies: they live in `Docs/agent-tools.md`.
 5. **The evidence line names where each version came from** (pins, manifests, lock files). What could not be determined says so and what would settle it.
 6. **A convention is one line** the agent cannot deduce from the rest. Longer is a decision
    for the decisions log. Sources, history and folder trees go there too, never here.
-7. **Kept current in the same unit** that changes a version, a dependency, a pack or a
-   decision. Only what is in place is written.
+7. **Kept current in the same unit** that changes a version, a dependency or a decision.
+   Only what is in place is written.
 
 ## Done when
 
 Someone could do correct work in any component tomorrow with only this file, the specs and
-its packs, and the user was told what they do by hand and what the agent cannot do.
+`nzt-software`, and the user was told what they do by hand and what the agent cannot do.

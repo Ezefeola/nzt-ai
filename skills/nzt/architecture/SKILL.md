@@ -1,12 +1,12 @@
 ---
 name: nzt-architecture
-description: Use when how it is made has to be decided before the work - its parts and boundaries, technologies, tools and the project's packs, the domain model, one feature's technical design, integrations, decision records, debt, diagrams.
+description: Use when how it is made has to be decided before the work - its parts and boundaries, technologies and practices, the agent's tools, the domain model, one feature's technical design, integrations, decision records, debt, diagrams.
 ---
 
 # Architecture — how it is made
 
-Decides **how** the product does what discovery agreed, records why, and sets up the
-project's packs. **Owns** its parts, technologies and packs (`Docs/Architecture/tech.md`),
+Decides **how** the product does what discovery agreed, records why, and prepares the
+work. **Owns** its parts, technologies and practices (`Docs/Architecture/tech.md`),
 the domain model, integrations, decision records, deferred debt, diagrams, and the map of
 `Docs/`. **Does not own** the rules (`nzt-discovery`), its form (`nzt-design`) or the work
 itself (`nzt-build`).
@@ -16,7 +16,7 @@ itself (`nzt-build`).
 | The unit is | Read | Read with |
 |---|---|---|
 | The product's structure: components, boundaries, external systems | `references/design-product.md` | `references/decisions-log.md`, `references/diagrams.md` |
-| Technologies, packs, decisions and opt-ins of each component; what the agent needs to do the work | `references/tech.md` | `references/decisions-log.md` |
+| Technologies, practices, decisions and opt-ins of each component; what the agent needs to do the work | `references/tech.md` | `references/decisions-log.md` |
 | One feature's technical design | `references/design-feature.md` | `references/decisions-log.md`, `references/diagrams.md` |
 | The business entities and their relationships | `references/domain.md` | — |
 | A consequential decision with alternatives | `references/adr.md` | — |
@@ -63,8 +63,8 @@ before its work is touched.
 `Operations/`, `Manual/`. A project that already has `UX/` keeps it until the user moves it.
 
 - Components, boundaries, external systems → `Docs/Architecture/architecture.md`
-- Technologies, packs, decisions, opt-ins, dependencies and agent tools per component →
-  `Docs/Architecture/tech.md`
+- Technologies, practices, decisions, opt-ins and dependencies per component →
+  `Docs/Architecture/tech.md`; the agent's tools → `Docs/agent-tools.md`
 - Technical questions → `Docs/Architecture/architecture-decisions.md` (product) or
   `Plan/specs/<feature>/tech-design/decisions.md` (feature). Append-only
 - Entities → `Docs/Domain/domain-model.md`
@@ -85,5 +85,5 @@ before its work is touched.
 ## Done when
 
 The work can start with no open technical decision in its way: every component touched has
-its `tech.md` section with its packs and tools, every consequential decision its record, and
-every open question its `QT-NN` where it will be read.
+its `tech.md` section with its technologies and practices, every consequential decision
+its record, and every open question its `QT-NN` where it will be read.

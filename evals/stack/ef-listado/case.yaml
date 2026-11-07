@@ -6,7 +6,7 @@ description: >
   code, ordering that ends in a unique column included.
 tags: [stack]
 expected_outcome: >
-  Loads nzt-software and reads the dotnet pack's EF Core references it selects, and writes a projected,
+  Loads nzt-software and reads the dotnet EF Core references it selects, and writes a projected,
   ordered, paginated query through the repository tech.md adopted.
 context:
   scaffold_script: scaffold.sh

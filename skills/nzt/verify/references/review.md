@@ -3,7 +3,8 @@
 Produces findings ordered by what breaks worst, each with when it fails and what the work
 does. Changes nothing unless the request was to repair. It finds what is broken **even where
 no criterion speaks** — where long-lived defects hide. **A defect is behavior, not form**: do
-not load the packs that say how this project writes code, so style never enters the report.
+not read `nzt-software`'s code rules (its `code` and language columns), so style never
+enters the report.
 
 ## Where to look
 
