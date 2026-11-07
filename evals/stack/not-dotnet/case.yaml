@@ -22,14 +22,14 @@ graders:
   - name: no-dotnet-reference
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+'
     min: 0
     max: 0
     arm: both
   - name: no-blazor-reference
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+blazor[/\\]+'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+blazor[/\\]+'
     min: 0
     max: 0
     arm: both

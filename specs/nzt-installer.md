@@ -12,13 +12,13 @@ plano que exigen los proveedores, y **escribir el archivo de instrucciones** de 
 sin pisar lo que el usuario ya tenía.
 
 **Sin plugins.** Un plugin es un mecanismo que el usuario tendría que conocer, namespacea
-las skills (`nzt:nzt-build`) rompiendo los nombres que nombran las tablas de ruteo, y
+las skills (`nzt:nzt-build`; desde D97 el plugin las nombra `nzt-software:build`) rompiendo los nombres que nombran las tablas de ruteo, y
 **ningún sistema de plugins carga el kernel igual en todos los proveedores**: Codex tiene
 plugins, pero ni el de Claude Code ni el de Codex traen un archivo de instrucciones
 siempre cargado (D24, revisado el 2026-10-16). Lo que se instala son **skills sueltas en la carpeta de
 usuario** y un bloque en el archivo de instrucciones. **Desde D91 (2026-11-04)**, en Claude
-Code hay una segunda vía: el plugin `nzt`, que lleva el mismo kernel dentro de la skill
-`nzt:nzt` y no escribe archivos (D92, `specs/nzt-plugin.md`). Se usa una de las dos: con las
+Code hay una segunda vía: el plugin `nzt-software` (`nzt` hasta la v5, D97), que lleva el mismo kernel dentro de la skill
+`nzt-software:nzt` y no escribe archivos (D92, `specs/nzt-plugin.md`). Se usa una de las dos: con las
 dos, el kernel llega dos veces, y nada lo impide. El plugin es `dist/plugin/`, el mismo que
 usa `claude plugin eval` como target (D23); se publica en la rama `plugin`. Los mods de `mods/` sí son plugins, una capa aparte y opcional (D63): **el
 instalador también los instala, actualiza y desinstala en Claude Code, como opción**, y el

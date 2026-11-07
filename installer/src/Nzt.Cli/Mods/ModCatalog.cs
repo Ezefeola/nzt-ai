@@ -16,6 +16,9 @@ public sealed class ModCatalog
     /// <summary>De donde se agrega el marketplace si no está: el repo publicado, su rama por defecto.</summary>
     public const string MarketplaceSource = "Ezefeola/nzt-ai";
 
+    /// <summary>El plugin del método (D97), que no es un mod: se instala aparte como `nzt-software@nzt`.</summary>
+    public const string MethodPluginName = "nzt-software";
+
     private const string ResourceName = "content/marketplace.json";
 
     public IReadOnlyList<string> Names { get; }
@@ -41,7 +44,7 @@ public sealed class ModCatalog
 
         if (document.RootElement.TryGetProperty("plugins", out var plugins))
             foreach (var plugin in plugins.EnumerateArray())
-                if (plugin.TryGetProperty("name", out var name) && name.GetString() is { Length: > 0 } value && value != "nzt")
+                if (plugin.TryGetProperty("name", out var name) && name.GetString() is { Length: > 0 } value && value != MethodPluginName)
                     names.Add(value);
 
         return new ModCatalog(names);

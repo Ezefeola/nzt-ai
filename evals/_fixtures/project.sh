@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Seeds the empty eval workspace with a small NZT project (no CLAUDE.md: the kernel
-# comes with the plugin in nzt:nzt, QT-111), the technical document, one
+# comes with the plugin in nzt-software:nzt, QT-111), the technical document, one
 # feature with one story, and enough source for a request to be about something real.
 #
 # Sourced by each case's scaffold.sh. Runs as you, outside the agent's sandbox,
@@ -10,7 +10,7 @@ set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ws="${1:-$PWD}"
 
-# No CLAUDE.md (QT-111): the plugin carries the kernel inside nzt:nzt, and a seeded
+# No CLAUDE.md (QT-111): the plugin carries the kernel inside nzt-software:nzt, and a seeded
 # kernel would load it twice and measure the old product.
 
 mkdir -p "$ws/Docs/Product" "$ws/Docs/Architecture" "$ws/Plan/specs/F-001-pedidos/stories" \

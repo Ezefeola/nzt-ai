@@ -23,7 +23,7 @@ graders:
   - name: build-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build'
+    input_match: '"skill"\s*:\s*"nzt-software:build'
   - name: reads-tech
     type: tool_used
     tool: Read

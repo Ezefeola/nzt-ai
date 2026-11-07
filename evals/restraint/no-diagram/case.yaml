@@ -23,7 +23,7 @@ graders:
   - name: no-diagram-skill
     type: tool_used
     tool: Read
-    input_match: 'nzt-architecture[/\\]+references[/\\]+diagrams'
+    input_match: 'skills[/\\]+architecture[/\\]+references[/\\]+diagrams'
     min: 0
     max: 0
     arm: both

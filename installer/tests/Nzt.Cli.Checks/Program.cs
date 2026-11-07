@@ -543,7 +543,7 @@ public static partial class Program
         var repo = ModCatalog.Parse(File.ReadAllText(Path.Combine(root, ".claude-plugin", "marketplace.json")));
         var embedded = ModCatalog.Load();
 
-        Check("el método se distribuye aparte de los mods", !embedded.Names.Contains("nzt"));
+        Check("el método se distribuye aparte de los mods", !embedded.Names.Contains(ModCatalog.MethodPluginName));
         Check("el marketplace embebido tiene mods", embedded.Names.Count > 0);
         Check("el marketplace embebido es el del repo, en su orden", embedded.Names.SequenceEqual(repo.Names));
     }

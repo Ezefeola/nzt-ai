@@ -20,11 +20,11 @@ graders:
   - name: selected-endpoint-reference-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+endpoints-minimal\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+endpoints-minimal\.md'
   - name: other-side-of-the-axis-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+endpoints-controllers\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+endpoints-controllers\.md'
     min: 0
     max: 0
     arm: both

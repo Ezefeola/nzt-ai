@@ -3423,6 +3423,39 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
     se corren (decisión del usuario, por costo).
   - **Revertirla:** volver `core/`, `skills/`, `agents/`, `packs/`, `installer/`,
     `install/` y `evals/` al commit `fcdbb4f`.
+- **D97.** **El plugin de Claude Code pasa a llamarse `nzt-software`, y dentro de él las
+  skills y los subagentes pierden el prefijo `nzt-`: `nzt-software:build`,
+  `nzt-software:software`, `nzt-software:explorer`; el kernel queda `nzt-software:nzt`.**
+  Revisa D91 y D92 (los nombres `nzt:…`). Estado: **aceptada** el 2026-11-07, decidida por
+  el usuario (QT-116, QT-117 y la aprobación del plan del tramo S2). Rama
+  `pendientes-post-v5`, unidades 509–515.
+  - **Lo que la forzó:** QT-116 y QT-117 ya decidieron que el método se instala como un
+    plugin `nzt-software`, para que un `nzt-games` futuro sea otro plugin. Con el prefijo,
+    las skills quedarían `nzt-software:nzt-build` y la de reglas de código
+    `nzt-software:nzt-software`: el nombre del plugin repetido en cada una.
+  - **Decisión:**
+    - **Solo cambia el plugin.** En el repo, en `dist/claude-code/` y `dist/codex/`, y en
+      lo que instala `nzt-ai`, las skills siguen llamándose `nzt-<fase>`: ahí no hay
+      espacio de nombres que las separe de las de otros. El método sigue nombrándolas
+      `nzt-<x>`, y la regla del prefijo más largo para las references no cambia.
+    - **El build hace el cambio** al armar `dist/plugin/`: la carpeta y el `name:` de cada
+      skill `nzt-<x>` pasan a `<x>`, el `nzt` del kernel se queda como está, y el `skills:`
+      de cada subagente apunta a `nzt-software:<x>`. Los subagentes se renombran igual
+      (`explorer`, `worker`).
+    - **El adapter del plugin traduce:** donde NZT nombra una skill o un subagente
+      `nzt-<x>`, se carga `nzt-software:<x>`; `nzt` es `nzt-software:nzt`. El usuario
+      invoca `/nzt-software:<name>`.
+    - **El marketplace sigue llamándose `nzt`** y los mods (`nzt-state`, `nzt-changes`,
+      `nzt-files`, `nzt-look`) mantienen su nombre: se instala `nzt-software@nzt`.
+    - **Versión 6.0.0.** Cambia cómo se instala: quien tiene `nzt@nzt` lo desinstala e
+      instala `nzt-software@nzt`; las notas de la v6.0.0 lo dicen.
+  - **Lo que se acepta:** **(1)** el nombre de una skill en el plugin ya no es el del repo:
+    al leer un log del plugin hay que traducir `verify` a `nzt-verify`; **(2)** los evals
+    que esperan `nzt:nzt-…` se reescriben y su historial deja de ser comparable por nombre;
+    no se corren (decisión del usuario, por costo); **(3)** quien no migre se queda en la
+    v5 hasta que lo haga.
+  - **Revertirla:** volver `install/`, `core/adapter-claude-skill.md`,
+    `.claude-plugin/`, `installer/src/Nzt.Cli/Mods/` y `evals/` al commit `bc7ae46`.
 
 ## 13. Revisión contra Temper v3
 

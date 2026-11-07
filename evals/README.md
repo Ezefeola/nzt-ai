@@ -1,19 +1,23 @@
 # NZT trigger evals
 
 Phase 6 of the roadmap: **does the right skill fire, and does nothing else fire**. The
-suite is 40 cases in four groups: three measure one of the two failure modes each, and `skill/` measures that the plugin's `nzt:nzt`, which carries the kernel, loads first (specs/nzt-plugin.md, QT-109).
+suite is 40 cases in four groups: three measure one of the two failure modes each, and `skill/` measures that the plugin's `nzt-software:nzt`, which carries the kernel, loads first (specs/nzt-plugin.md, QT-109).
 
 | Group | Cases | What it measures |
 |---|---|---|
 | `routing/` | 20 | **Under-triggering.** A request phrased the way a user phrases it reaches the right phase router, and the kernel's stops hold; `tool-setup` measures that a fresh clone gets the tools its technologies offer an agent proposed from official sources, not installed unasked, and `tool-research` that verify offers the browser tool it lacks, researched, in its own phase (D96) |
 | `stack/` | 7 | **The exclusive axes of `nzt-software`, and the conventions they carry.** `Docs/Architecture/tech.md` selects one value per axis, only that reference loads, and its rules show up in the emitted code. Since D93 the rules come with the plugin in `nzt-software`, so a reference is graded as a `Read` of `nzt-software/references/<folder>/<file>` |
 | `restraint/` | 9 | **Over-triggering.** A question, a one-word edit, a diagram nobody earned, a design nobody asked for, a test level nobody enabled, QA in the middle of building, a package nobody confirmed and a repository that is not ours must load nothing |
-| `skill/` | 4 | **The kernel inside `nzt:nzt`.** No `CLAUDE.md` in the workspace, like every case since QT-111: `nzt:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
+| `skill/` | 4 | **The kernel inside `nzt-software:nzt`.** No `CLAUDE.md` in the workspace, like every case since QT-111: `nzt-software:nzt` has to be the first skill loaded, before any other and before any edit, for a feature, a story, a one-word change and a question (QT-110). `implement` and `small-edit` need `--allow-tools Edit Write` |
 
 Since QT-111 **no case seeds `CLAUDE.md`**: the kernel reaches the run only inside the plugin's
-`nzt:nzt`, which is how NZT ships (D92). A seeded kernel would load it twice and measure the
-old product. Where a case once said "no skill", it now says "no skill but `nzt:nzt`"
-(`restraint/trivial`). `routing/kernel-loaded` is the smoke case that proves `nzt:nzt` loaded; **if it fails, no other result means anything.**
+`nzt-software:nzt`, which is how NZT ships (D92). A seeded kernel would load it twice and measure the
+old product. Where a case once said "no skill", it now says "no skill but `nzt-software:nzt`"
+(`restraint/trivial`). `routing/kernel-loaded` is the smoke case that proves `nzt-software:nzt` loaded; **if it fails, no other result means anything.**
+
+Since D97 the graders match the plugin's names: a skill is `nzt-software:<x>` and a reference
+is read under `skills/<x>/references/`, without the `nzt-` prefix the repo uses. The results
+below were measured before D97, under the plugin `nzt`, and keep the names they had then.
 
 ## Run it
 

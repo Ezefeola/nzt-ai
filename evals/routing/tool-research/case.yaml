@@ -29,15 +29,15 @@ graders:
   - name: verify-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify"'
+    input_match: '"skill"\s*:\s*"nzt-software:verify"'
   - name: tools-guidance-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-research[/\]+references[/\]+tools\.md'
+    input_match: 'skills[/\\]+research[/\\]+references[/\\]+tools\.md'
   - name: read-agent-tools
     type: tool_used
     tool: Read
-    input_match: 'Docs[/\]+agent-tools\.md'
+    input_match: 'Docs[/\\]+agent-tools\.md'
   - name: no-install-without-yes
     type: tool_used
     tool: Bash

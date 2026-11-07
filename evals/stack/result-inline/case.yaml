@@ -23,7 +23,7 @@ graders:
   - name: use-case-reference-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+use-cases\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+use-cases\.md'
   - name: no-private-method-returning-a-result
     type: regex
     pattern: 'private\s+(static\s+)?(async\s+)?(Task<)?Result<'

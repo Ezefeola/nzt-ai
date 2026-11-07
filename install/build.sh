@@ -116,16 +116,19 @@ if [ -d "$root/skills" ]; then
     expected="${rel//\//-}"
     check_skill "$file" "$rel" "$expected"
 
-    # flattened copy, exactly as the installer lays it out (9.1): the skill's own
-    # files, plus sibling asset folders — never a child skill's folder.
+    # flattened copy, as the installer lays it out (9.1): the skill's own files, plus
+    # sibling asset folders — never a child skill's folder. In the plugin the skill drops
+    # its nzt- prefix, folder and name: (D97): nzt-build is nzt-software:build.
     src="$(dirname "$file")"
-    mkdir -p "$plugin/skills/$expected"
-    find "$src" -mindepth 1 -maxdepth 1 -type f -exec cp {} "$plugin/skills/$expected/" ';'
+    short="${expected#nzt-}"
+    mkdir -p "$plugin/skills/$short"
+    find "$src" -mindepth 1 -maxdepth 1 -type f -exec cp {} "$plugin/skills/$short/" ';'
     while IFS= read -r dir; do
       if [ -z "$(find "$dir" -name SKILL.md -print -quit)" ]; then
-        cp -R "$dir" "$plugin/skills/$expected/"
+        cp -R "$dir" "$plugin/skills/$short/"
       fi
     done < <(find "$src" -mindepth 1 -maxdepth 1 -type d)
+    sed "1,/^---\$/ s/^name:[[:space:]]*$expected\$/name: $short/" "$file" > "$plugin/skills/$short/SKILL.md"
   done < <(find "$root/skills" -name SKILL.md | sort)
 
   echo
@@ -135,7 +138,7 @@ if [ -d "$root/skills" ]; then
   fi
 fi
 
-# --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---
+# --- the plugin: manifest, the method inside nzt-software:nzt, subagents (specs/nzt-plugin.md) ---
 # NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
 version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$root/installer/src/Nzt.Cli/Nzt.Cli.csproj" | head -1)"
@@ -146,8 +149,8 @@ fi
 
 cat > "$plugin/.claude-plugin/plugin.json" <<JSON
 {
-  "name": "nzt",
-  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
+  "name": "nzt-software",
+  "description": "NZT for software: a way of working. Its method lives in the nzt skill, which loads first in every session.",
   "version": "$version",
   "license": "MIT",
   "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
@@ -180,10 +183,14 @@ build_nzt "$out/codex/nzt" adapter-codex.md "codex nzt"
 rm -f "$out/CLAUDE.md" "$out/AGENTS.md"
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it
-# the plugin's names (QT-103).
+# the plugin's names (QT-103), and each drops its nzt- prefix like the skills (D97):
+# nzt-explorer is nzt-software:explorer and loads nzt-software:research.
 mkdir -p "$plugin/agents"
 for agent in "$root"/agents/*.md; do
-  sed '2,/^---$/ s/^\([[:space:]]*-[[:space:]]*\)nzt-/\1nzt:nzt-/' "$agent" > "$plugin/agents/$(basename "$agent")"
+  short="$(basename "$agent")"
+  short="${short#nzt-}"
+  sed -e '2,/^---$/ s/^\([[:space:]]*-[[:space:]]*\)nzt-/\1nzt-software:/' \
+      -e '2,/^---$/ s/^name:[[:space:]]*nzt-/name: /' "$agent" > "$plugin/agents/$short"
 done
 echo "plugin $version: skills/nzt with the kernel, $(find "$plugin/agents" -name '*.md' | wc -l | tr -d ' ') subagents"
 

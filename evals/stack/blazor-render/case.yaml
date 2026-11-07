@@ -21,19 +21,19 @@ graders:
   - name: blazor-area-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-software"'
+    input_match: '"skill"\s*:\s*"nzt-software:software"'
   - name: selected-render-leaf-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+blazor[/\\]+render-auto\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+blazor[/\\]+render-auto\.md'
   - name: components-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+blazor[/\\]+components\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+blazor[/\\]+components\.md'
   - name: other-render-modes-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+blazor[/\\]+render-(?:server|webassembly|static)\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+blazor[/\\]+render-(?:server|webassembly|static)\.md'
     min: 0
     max: 0
     arm: both

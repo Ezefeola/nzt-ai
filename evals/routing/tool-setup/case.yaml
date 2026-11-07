@@ -28,11 +28,11 @@ graders:
   - name: tools-guidance-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-research[/\]+references[/\]+tools\.md|nzt-architecture[/\]+references[/\]+tech\.md'
+    input_match: 'skills[/\\]+research[/\\]+references[/\\]+tools\.md|skills[/\\]+architecture[/\\]+references[/\\]+tech\.md'
   - name: read-tech
     type: tool_used
     tool: Read
-    input_match: 'Docs[/\]+Architecture[/\]+tech\.md'
+    input_match: 'Docs[/\\]+Architecture[/\\]+tech\.md'
   - name: no-add-without-yes
     type: tool_used
     tool: Bash

@@ -123,9 +123,11 @@ if (Test-Path $skillsRoot) {
         $expected = ($rel -split '[\\/]') -join '-'
         if (Test-Skill $file $rel $expected) { $failed = $true }
 
-        # flattened copy, exactly as the installer lays it out (9.1): the skill's own
-        # files, plus sibling asset folders — never a child skill's folder.
-        $dest = Join-Path $plugin "skills/$expected"
+        # flattened copy, as the installer lays it out (9.1): the skill's own files, plus
+        # sibling asset folders — never a child skill's folder. In the plugin the skill drops
+        # its nzt- prefix, folder and name: (D97): nzt-build is nzt-software:build.
+        $short = $expected -replace '^nzt-', ''
+        $dest = Join-Path $plugin "skills/$short"
         New-Item -ItemType Directory -Force -Path $dest | Out-Null
         Get-ChildItem $file.Directory -File | Copy-Item -Destination $dest
         foreach ($dir in Get-ChildItem $file.Directory -Directory) {
@@ -133,6 +135,10 @@ if (Test-Path $skillsRoot) {
                 Copy-Item $dir.FullName -Destination $dest -Recurse
             }
         }
+        $skillText = Get-Content $file.FullName -Raw
+        $skillEnd = $skillText.IndexOf("`n---", 3)
+        $skillFront = [regex]::Replace($skillText.Substring(0, $skillEnd), "(?m)^name:[ \t]*$([regex]::Escape($expected))[ \t]*`$", "name: $short")
+        Set-Content -Path (Join-Path $dest 'SKILL.md') -Value ($skillFront + $skillText.Substring($skillEnd)) -Encoding utf8 -NoNewline
     }
 
     Write-Host ''
@@ -142,7 +148,7 @@ if (Test-Path $skillsRoot) {
     }
 }
 
-# --- the plugin: manifest, the method inside nzt:nzt, subagents (specs/nzt-plugin.md) ---
+# --- the plugin: manifest, the method inside nzt-software:nzt, subagents (specs/nzt-plugin.md) ---
 # NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
 
 $csproj = Get-Content (Join-Path $root 'installer/src/Nzt.Cli/Nzt.Cli.csproj') -Raw
@@ -154,8 +160,8 @@ if (-not $version) {
 
 $manifest = @"
 {
-  "name": "nzt",
-  "description": "NZT: a way of working for any product. Its method lives in the nzt skill, which loads first in every session.",
+  "name": "nzt-software",
+  "description": "NZT for software: a way of working. Its method lives in the nzt skill, which loads first in every session.",
   "version": "$version",
   "license": "MIT",
   "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
@@ -188,15 +194,17 @@ foreach ($old in 'CLAUDE.md', 'AGENTS.md') {
 }
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it
-# the plugin's names (QT-103).
+# the plugin's names (QT-103), and each drops its nzt- prefix like the skills (D97):
+# nzt-explorer is nzt-software:explorer and loads nzt-software:research.
 $agentsDest = Join-Path $plugin 'agents'
 New-Item -ItemType Directory -Force -Path $agentsDest | Out-Null
 $agentFiles = Get-ChildItem (Join-Path $root 'agents') -Filter '*.md'
 foreach ($agent in $agentFiles) {
     $text = Get-Content $agent.FullName -Raw
     $end = $text.IndexOf("`n---", 3)
-    $front = [regex]::Replace($text.Substring(0, $end), '(?m)^(\s*-\s*)nzt-', '${1}nzt:nzt-')
-    Set-Content -Path (Join-Path $agentsDest $agent.Name) -Value ($front + $text.Substring($end)) -Encoding utf8 -NoNewline
+    $front = [regex]::Replace($text.Substring(0, $end), '(?m)^([ \t]*-[ \t]*)nzt-', '${1}nzt-software:')
+    $front = [regex]::Replace($front, '(?m)^name:[ \t]*nzt-', 'name: ')
+    Set-Content -Path (Join-Path $agentsDest ($agent.Name -replace '^nzt-', '')) -Value ($front + $text.Substring($end)) -Encoding utf8 -NoNewline
 }
 Write-Host "plugin ${version}: skills/nzt with the kernel, $($agentFiles.Count) subagents"
 

@@ -24,7 +24,7 @@ graders:
   - name: no-design-leaf
     type: tool_used
     tool: Read
-    input_match: 'nzt-architecture[/\\]+references[/\\]+design-'
+    input_match: 'skills[/\\]+architecture[/\\]+references[/\\]+design-'
     min: 0
     max: 0
     arm: both

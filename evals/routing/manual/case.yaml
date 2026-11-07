@@ -24,11 +24,11 @@ graders:
   - name: design-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-design'
+    input_match: '"skill"\s*:\s*"nzt-software:design'
   - name: manual-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-design[/\\]+references[/\\]+manual\.md'
+    input_match: 'skills[/\\]+design[/\\]+references[/\\]+manual\.md'
   - name: organised-by-task
     type: llm
     criteria: |

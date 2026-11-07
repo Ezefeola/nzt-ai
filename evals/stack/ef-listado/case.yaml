@@ -21,23 +21,23 @@ graders:
   - name: area-router-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-software"'
+    input_match: '"skill"\s*:\s*"nzt-software:software"'
   - name: ef-core-pagination-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ef-core-pagination\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+ef-core-pagination\.md'
   - name: ef-core-queries-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+dotnet[/\\]+ef-core-queries\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+dotnet[/\\]+ef-core-queries\.md'
   - name: dtos-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+csharp[/\\]+dtos\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+csharp[/\\]+dtos\.md'
   - name: wrong-persistence-axis-not-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-software[/\\]+references[/\\]+backend[/\\]+persistence-direct\.md'
+    input_match: 'skills[/\\]+software[/\\]+references[/\\]+backend[/\\]+persistence-direct\.md'
     min: 0
     max: 0
     arm: both

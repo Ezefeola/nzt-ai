@@ -15,4 +15,4 @@ so `claude plugin eval` ignores this directory when it collects cases.
 | `no-kernel.sh` | removes a `CLAUDE.md` from the workspace. Since QT-111 no fixture writes one, so it is a guard kept for the `skill/` cases |
 
 No fixture writes `CLAUDE.md` (QT-111): NZT's kernel reaches the run inside the plugin's
-`nzt:nzt`, the way it ships (D92). Seeding it too would load the kernel twice.
+`nzt-software:nzt`, the way it ships (D92). Seeding it too would load the kernel twice.

@@ -2,12 +2,12 @@ schema_version: "1.1"
 name: skill-question
 description: >
   QT-109. No CLAUDE.md in the workspace: the plugin carries NZT's kernel inside the skill
-  nzt:nzt, and only its description makes it load. A question that is not work: under QT-110 nzt:nzt still loads first. The case measures that nzt:nzt is the
+  nzt-software:nzt, and only its description makes it load. A question that is not work: under QT-110 nzt-software:nzt still loads first. The case measures that nzt-software:nzt is the
   first skill loaded, before any other skill and before any file is written (QT-110: also
   for a question).
 tags: [skill, smoke]
 expected_outcome: >
-  The first Skill call is nzt:nzt, before any other Skill call and before any Edit or Write.
+  The first Skill call is nzt-software:nzt, before any other Skill call and before any Edit or Write.
 context:
   scaffold_script: scaffold.sh
 execution:
@@ -21,17 +21,17 @@ graders:
   - name: loads-nzt
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"nzt:nzt"'
+    input_match: '"skill"\s*:\s*"nzt-software:nzt"'
   - name: nzt-first
     type: llm
     focus: trace
     arm: with-only
     criteria: |
       Look at the order of the tool calls in the trace.
-      PASS only if the first Skill tool call loads the skill "nzt:nzt" (exactly that name, not
-      nzt:nzt-plan or any other), and no Edit, Write or file-changing Bash call happens before
+      PASS only if the first Skill tool call loads the skill "nzt-software:nzt" (exactly that name, not
+      nzt-software:plan or any other), and no Edit, Write or file-changing Bash call happens before
       it. Reads, globs and greps before it are fine.
-      FAIL if there is no Skill call to nzt:nzt at all, if another skill is loaded before it,
+      FAIL if there is no Skill call to nzt-software:nzt at all, if another skill is loaded before it,
       or if a file is edited or written before it.
   - name: answers-in-spanish
     type: regex

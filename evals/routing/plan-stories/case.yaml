@@ -23,7 +23,7 @@ graders:
   - name: plan-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan"'
+    input_match: '"skill"\s*:\s*"nzt-software:plan"'
   - name: discovery-names-stories
     type: llm
     criteria: |

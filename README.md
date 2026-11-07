@@ -115,11 +115,20 @@ En Claude Code, agregá el marketplace e instalá el método:
 
 ```text
 /plugin marketplace add Ezefeola/nzt-ai
-/plugin install nzt@nzt
+/plugin install nzt-software@nzt
 ```
 
-Abrí una sesión nueva. El plugin incluye los subagentes y las reglas de `nzt-software`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
+Abrí una sesión nueva. El plugin incluye los subagentes y las reglas de software. Dentro del
+plugin las skills van sin el prefijo `nzt-`: `/nzt-software:nzt`, `/nzt-software:build`,
+`/nzt-software:verify`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
 al plugin, quitá primero el método con `nzt-ai uninstall --provider claude-code --mods none`.
+
+Si tenés el plugin `nzt` de la v5, desinstalalo antes de instalar `nzt-software`, para que el
+kernel no llegue dos veces:
+
+```text
+/plugin uninstall nzt@nzt
+```
 
 ### Instalador para Claude Code y Codex
 

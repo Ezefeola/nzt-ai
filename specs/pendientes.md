@@ -71,4 +71,8 @@ encuentren sus fixtures.
 - Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;
   el punto 1 es la parte que el usuario quiere conservar.
 - `nzt-games` se borró en D96 (QT-114): NZT queda para software. Un juego futuro sería otro
-  plugin entero, como el `nzt-software` del tramo S2.
+  plugin entero, como `nzt-software`.
+- **Hecho en esta rama: D97** (unidades 509–515, tramo S2). El plugin se llama
+  `nzt-software` y dentro de él las skills y subagentes van sin prefijo
+  (`nzt-software:build`); en el repo, Codex y `nzt-ai` siguen siendo `nzt-<x>`. Versión 6.0.0,
+  sin publicar.

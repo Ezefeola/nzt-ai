@@ -28,11 +28,11 @@ graders:
   - name: build-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build'
+    input_match: '"skill"\s*:\s*"nzt-software:build'
   - name: verify-not-loaded
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-verify'
+    input_match: '"skill"\s*:\s*"nzt-software:verify'
     min: 0
     max: 0
     arm: both

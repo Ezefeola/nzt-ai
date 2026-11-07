@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "updated": "2026-11-07T21:30:00Z",
-  "goal": "Punto 1 de specs/pendientes.md: sin packs, sin nzt-games y sin nzt-ai project; el agente ofrece MCP o plugins buscando en fuentes oficiales, en cualquier fase; tech.md nombra solo tecnologías y prácticas (rama pendientes-post-v5)",
+  "updated": "2026-11-07T23:00:00Z",
+  "goal": "Punto 1 de specs/pendientes.md (S1: sin packs, sin nzt-games, herramientas del agente en cualquier fase) y S2: el plugin pasa a llamarse nzt-software con skills y agentes sin prefijo nzt- (rama pendientes-post-v5)",
   "cadence": "upfront",
   "slices": [
     {
@@ -44,23 +44,43 @@
     {
       "id": "S2",
       "name": "NZT como paquete nzt-software",
-      "status": "todo",
+      "status": "done",
       "phases": [
         {
           "name": "architecture",
-          "status": "todo",
-          "units": []
+          "status": "done",
+          "units": [
+            { "id": 509, "do": "D97 en specs/nzt-core.md: plugin nzt-software; skills y agentes sin prefijo nzt- solo en el plugin (kernel nzt-software:nzt); repo y Codex igual; mods y marketplace nzt con su nombre; v6.0.0 y cómo migra quien tiene nzt", "status": "done" }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            { "id": 510, "do": "install/build.sh y build.ps1: plugin.json nzt-software; en dist/plugin carpetas y name: de skills y agentes sin nzt-, y el skills: de los agentes como nzt-software:<x>", "status": "done", "detail": "build.sh y build.ps1 dan el mismo dist/plugin: 13 skills y 2 agentes sin prefijo, plugin.json nzt-software" },
+            { "id": 511, "do": "core/adapter-claude-skill.md: donde NZT nombra nzt-<x> se carga nzt-software:<x>, el kernel es nzt-software:nzt y se invoca /nzt-software:<name>", "status": "done" },
+            { "id": 512, "do": "Instalación: .claude-plugin/marketplace.json, install/install.sh y .ps1, installer (Installer.cs, CliCommand.cs, Manifest.cs, ModCatalog.cs y sus checks) y release.yml con nzt-software; quitar nzt si está instalado", "status": "done", "detail": "nzt-ai no instala el plugin del método: cambian marketplace.json, ModCatalog.MethodPluginName, su check y la ruta skills/software en release.yml; la migración queda en los documentos" },
+            { "id": 513, "do": "evals: casos y fixtures que esperan nzt:nzt-… pasan a nzt-software:…; no se corren", "status": "done", "detail": "44 archivos: skills nzt-software:<x> y rutas skills/<x>/references; se arregló el [/\\]+ roto de tool-research y tool-setup" },
+            { "id": 514, "do": "Documentos: README.md, .github/plugin-README.md, installer/README.md, READMEs de mods, specs/nzt-plugin.md y nzt-installer.md, specs/pendientes.md; versión 6.0.0 en Nzt.Cli.csproj y .github/releases/v6.0.0.md", "status": "done", "detail": "installer/README.md y los README de mods no nombraban el plugin del método: sin cambios" }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            { "id": 515, "do": "Correr build.sh y build.ps1 y los checks del installer, revisar nombres y descriptions en dist/plugin, y buscar nzt:nzt- o nzt@nzt que haya quedado", "status": "done", "detail": "build.sh y build.ps1 sin warnings y con el mismo dist/plugin (6.0.0, nzt-software, 13 skills, 2 subagentes); 184 checks del installer pasan; lo que queda de nzt:nzt es historia o la migración" }
+          ]
         }
       ]
     }
   ],
   "approved": true,
   "delegation": "ask",
-  "autonomy": { "units": [497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507], "keep_stops": [] },
-  "waiting_on": "el usuario: revisar el tramo S1 (sin commitear) y planificar el tramo S2",
+  "autonomy": { "units": [509, 510, 511, 512, 513, 514, 515], "keep_stops": [] },
+  "waiting_on": "el usuario: revisar el tramo S2 (sin commitear); el merge y el release v6.0.0 quedan para después",
   "notes": [
-    "QT-114: nzt-games se borra; NZT queda para software. QT-115: nzt-ai project se va con los packs.",
-    "QT-116 y QT-117 para S2: todo el método va en un plugin nzt-software (skills nzt-software:...); un nzt-games futuro es otro plugin. QT-118: S1 primero.",
-    "El run anterior (plugin para Claude Code, unidades hasta 496) está cerrado en main como v5.0.0."
+    "QT-114 a QT-118 (D96): nzt-games se borra, nzt-ai project se va; todo el método pasa a un plugin nzt-software, un nzt-games futuro es otro plugin.",
+    "Para S2 el usuario decidió (2026-11-07): sin prefijo nzt- solo en el plugin (nzt-software:build, :software, :explorer); el kernel queda nzt-software:nzt.",
+    "S1 está commiteado en bc7ae46. El run anterior (hasta la unidad 496) es v5.0.0 en main."
   ]
 }

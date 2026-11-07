@@ -24,15 +24,15 @@ graders:
   - name: build-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"'
+    input_match: '"skill"\s*:\s*"nzt-software:build"'
   - name: implement-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-build[/\\]+references[/\\]+implement\.md'
+    input_match: 'skills[/\\]+build[/\\]+references[/\\]+implement\.md'
   - name: router-before-leaf
     type: tool_order
-    before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-build"' }
-    after: { tool: Read, input_match: 'nzt-build[/\\]+references[/\\]+implement\.md' }
+    before: { tool: Skill, input_match: '"skill"\s*:\s*"nzt-software:build"' }
+    after: { tool: Read, input_match: 'skills[/\\]+build[/\\]+references[/\\]+implement\.md' }
   - name: read-the-story
     type: tool_used
     tool: Read

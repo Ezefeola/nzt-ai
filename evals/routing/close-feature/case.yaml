@@ -22,11 +22,11 @@ graders:
   - name: close-fired
     type: tool_used
     tool: Read
-    input_match: 'nzt-plan[/\\]+references[/\\]+close\.md'
+    input_match: 'skills[/\\]+plan[/\\]+references[/\\]+close\.md'
   - name: router-before-leaf
     type: tool_order
-    before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-plan"' }
-    after: { tool: Read, input_match: 'nzt-plan[/\\]+references[/\\]+close\.md' }
+    before: { tool: Skill, input_match: '"skill"\s*:\s*"nzt-software:plan"' }
+    after: { tool: Read, input_match: 'skills[/\\]+plan[/\\]+references[/\\]+close\.md' }
   - name: read-the-spec
     type: tool_used
     tool: Read

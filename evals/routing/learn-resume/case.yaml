@@ -23,19 +23,19 @@ graders:
   - name: learn-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-learn"'
+    input_match: '"skill"\s*:\s*"nzt-software:learn"'
   - name: tutor-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-learn[/\\]+references[/\\]+tutor\.md'
+    input_match: 'skills[/\\]+learn[/\\]+references[/\\]+tutor\.md'
   - name: router-before-tutor
     type: tool_order
-    before: { tool: Skill, input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-learn"' }
-    after: { tool: Read, input_match: 'nzt-learn[/\\]+references[/\\]+tutor\.md' }
+    before: { tool: Skill, input_match: '"skill"\s*:\s*"nzt-software:learn"' }
+    after: { tool: Read, input_match: 'skills[/\\]+learn[/\\]+references[/\\]+tutor\.md' }
   - name: did-not-route-to-build-or-verify
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-(?:build|verify)'
+    input_match: '"skill"\s*:\s*"nzt-software:(?:build|verify)'
     min: 0
     max: 0
     arm: both

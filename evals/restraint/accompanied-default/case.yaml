@@ -21,7 +21,7 @@ graders:
   - name: discovery-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-discovery"'
+    input_match: '"skill"\s*:\s*"nzt-software:discovery"'
   - name: no-web-code-read
     type: tool_used
     tool: Read

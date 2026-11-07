@@ -23,11 +23,11 @@ graders:
   - name: architecture-fired
     type: tool_used
     tool: Skill
-    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?nzt-architecture"'
+    input_match: '"skill"\s*:\s*"nzt-software:architecture"'
   - name: design-feature-read
     type: tool_used
     tool: Read
-    input_match: 'nzt-architecture[/\\]+references[/\\]+design-feature\.md'
+    input_match: 'skills[/\\]+architecture[/\\]+references[/\\]+design-feature\.md'
   # The project's tech.md, not nzt-architecture's references/tech.md: a bare 'tech' would
   # also match the guidance file and pass without the project's document being read.
   - name: read-tech
