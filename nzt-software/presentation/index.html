@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Presentación de NZT: método de trabajo para agentes de código, con demo guiada de punta a punta.">
+  <title>NZT — De la idea al producto</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#deck">Ir a la presentación</a>
+
+  <header class="topbar" aria-label="Controles de presentación">
+    <div class="brand" aria-label="NZT">
+      <span class="brand-mark">N</span>
+      <span>NZT</span>
+    </div>
+    <div class="section-label" id="sectionLabel">APERTURA</div>
+    <div class="topbar-actions">
+      <button class="icon-button" id="overviewButton" type="button" aria-label="Vista general" title="Vista general (O)">▦</button>
+      <button class="icon-button" id="notesButton" type="button" aria-label="Notas del presentador" title="Notas (S)">≡</button>
+      <button class="icon-button" id="fullscreenButton" type="button" aria-label="Pantalla completa" title="Pantalla completa (F)">⛶</button>
+      <button class="icon-button" id="motionButton" type="button" aria-label="Pausar animaciones ambientales" aria-pressed="false" title="Pausar animaciones ambientales">Ⅱ</button>
+      <button class="timer" id="timerButton" type="button" title="Iniciar o pausar cronómetro">
+        <span class="timer-dot"></span><span id="timerText">00:00</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="deck" class="deck" tabindex="-1">
+    <section class="slide slide-cover is-active" data-section="Apertura" data-title="NZT" data-minutes="0.5">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
+      <div class="cover-grid">
+        <div>
+          <p class="eyebrow" data-reveal>NZT · MÉTODO PARA AGENTES DE CÓDIGO</p>
+          <h1 class="display" data-reveal>De la idea<br><span class="gradient-text">al producto.</span></h1>
+          <p class="lead" data-reveal>NZT organiza el recorrido: de entender qué necesita el usuario a construir, verificar y entregar el producto.</p>
+          <div class="cover-meta" data-reveal>
+            <span>Presentación + demo en vivo</span>
+            <span class="dot-separator"></span>
+            <span>35 minutos</span>
+          </div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true" data-reveal>
+          <div class="orbit orbit-a"><span>Definir</span><span>Construir</span><span>Entregar</span></div>
+          <div class="orbit orbit-b"><span>Diseñar</span><span>Verificar</span><span>Aprender</span></div>
+          <div class="core-pill">NZT</div>
+        </div>
+      </div>
+      <aside class="speaker-notes">
+        <strong>Objetivo (30 s).</strong> Presentá NZT como una forma de acompañar la construcción de un producto: entender la necesidad, definirlo, diseñarlo, construirlo y ponerlo en manos de alguien. Evitá explicar todavía las skills.
+      </aside>
+    </section>
+
+    <section class="slide" data-section="El problema" data-title="Velocidad sin dirección" data-minutes="1">
+      <div class="slide-inner">
+        <p class="eyebrow" data-reveal>CUANDO FALTA UN PROCESO CLARO</p>
+        <h2 data-reveal>Un agente puede llegar muy rápido<br><span class="muted">al lugar equivocado.</span></h2>
+        <div class="failure-stream" data-reveal>
+          <div class="failure"><span>01</span><p>Escribe antes de entender.</p></div>
+          <div class="failure"><span>02</span><p>Completa vacíos con supuestos.</p></div>
+          <div class="failure"><span>03</span><p>Cambia de patrón entre sesiones.</p></div>
+          <div class="failure"><span>04</span><p>Confunde “compila” con “funciona”.</p></div>
+          <div class="failure"><span>05</span><p>Pierde el hilo cuando cambia el contexto.</p></div>
+        </div>
+        <p class="takeaway" data-reveal>Sin requisitos claros, puntos de revisión y evidencia, los errores pueden aparecer recién al final.</p>
+      </div>
+      <aside class="speaker-notes"><strong>1 min.</strong> Pedí una señal rápida: “¿Cuál de estas cinco ya les pasó?”. No abras debate; usalo para conectar la experiencia del equipo con la propuesta.</aside>
+    </section>
+
+    <section class="slide" data-section="El problema" data-title="Qué cambia" data-minutes="0.5">
+      <div class="slide-inner">
+        <p class="eyebrow" data-reveal>ANTES / DESPUÉS</p>
+        <h2 data-reveal>La misma capacidad del modelo.<br><span class="accent-text">Un mejor sistema de trabajo.</span></h2>
+        <div class="comparison" data-reveal>
+          <article class="compare-card before">
+            <header><span class="status-dot"></span>Sin método</header>
+            <ul>
+              <li>Pedido ambiguo → implementación</li>
+              <li>Sesión = memoria</li>
+              <li>Un gran salto difícil de revisar</li>
+              <li>“Parece funcionar”</li>
+            </ul>
+          </article>
+          <div class="transform-arrow" aria-hidden="true">→</div>
+          <article class="compare-card after">
+            <header><span class="status-dot"></span>Con NZT</header>
+            <ul>
+              <li>Pregunta o supuesto explícito</li>
+              <li><code>Plan/state.json</code> = memoria</li>
+              <li>Unidades pequeñas + frenos</li>
+              <li>Evidencia ejecutada</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Remarcá que “más documentos” no es la meta. Cada artefacto existe para una decisión, una continuidad o una prueba. El método se escala: un cambio de una línea no dispara todo.</aside>
+    </section>
+
+
+
+    <section class="slide" data-section="Cómo funciona" data-title="El ciclo" data-minutes="1">
+      <div class="slide-inner">
+        <p class="eyebrow" data-reveal>EL CICLO</p>
+        <h2 data-reveal>Un mismo ritmo, escalado al pedido.</h2>
+        <div class="loop" data-reveal>
+          <div class="loop-step"><b>01</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Entender</span><small>Qué y para qué</small></div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step"><b>02</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/></svg><span>Proponer</span><small>Unidades y alcance</small></div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step"><b>03</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><span>Ejecutar</span><small>Una unidad</small></div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step"><b>04</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6Z"/><path d="m8 12 3 3 5-6"/></svg><span>Verificar</span><small>Evidencia real</small></div>
+          <div class="loop-arrow">→</div>
+          <div class="loop-step"><b>05</b><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 3h13l4 4v14H3V3ZM7 3v6h10V3M7 21v-8h10v8"/></svg><span>Registrar</span><small>Estado persistente</small></div>
+        </div>
+        <p class="takeaway" data-reveal>El cierre no es “terminé de escribir”. Es: guardé un punto seguro, actualicé el estado y dije qué sigue.</p>
+      </div>
+      <aside class="speaker-notes"><strong>1 min.</strong> Ejemplo de escala: corregir un typo puede ser una sola unidad; crear un producto activa varias fases. El ciclo permanece, cambia la profundidad.</aside>
+    </section>
+
+    <section class="slide" data-section="Cómo funciona" data-title="Los frenos" data-minutes="0.5">
+      <div class="slide-inner split stop-layout">
+        <div>
+          <p class="eyebrow" data-reveal>LOS FRENOS SON UNA FEATURE</p>
+          <h2 data-reveal>Autonomía no significa<br>movimiento perpetuo.</h2>
+          <p class="body-copy" data-reveal>Por defecto, cada unidad termina en un borde revisable. El usuario puede autorizar un lote, pero los frenos materiales siguen existiendo.</p>
+        </div>
+        <div class="stop-stack" data-reveal>
+          <div class="stop-card"><span>STOP 01</span><strong>Plan sin aprobar</strong><small>No se ejecuta.</small></div>
+          <div class="stop-card"><span>STOP 02</span><strong>Fin de unidad</strong><small>Estado → reporte → espera.</small></div>
+          <div class="stop-card"><span>STOP 03</span><strong>Riesgo material</strong><small>Se nombra el ambiente y la consecuencia.</small></div>
+        </div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Diferenciá acompañado (default) de lote autorizado. Aprobar el plan no equivale a aprobar autonomía. Producción jamás queda implícita.</aside>
+    </section>
+
+    <section class="slide" data-section="Cómo funciona" data-title="Memoria persistente" data-minutes="1">
+      <div class="slide-inner split code-layout">
+        <div>
+          <p class="eyebrow" data-reveal>LA SESIÓN ES DESCARTABLE</p>
+          <h2 data-reveal>El estado no.</h2>
+          <p class="body-copy" data-reveal><code>Plan/state.json</code> guarda objetivo, aprobación, unidades, autonomía, bloqueos y el próximo punto de entrada.</p>
+          <ul class="check-list" data-reveal>
+            <li>Retomar sin reconstruir el chat</li>
+            <li>Una sola unidad en curso</li>
+            <li>Lo pendiente queda visible</li>
+          </ul>
+        </div>
+        <pre class="code-card" data-reveal><code>{
+  <span class="code-key">"goal"</span>: <span class="code-string">"Crear Radar"</span>,
+  <span class="code-key">"phases"</span>: [
+    { <span class="code-key">"name"</span>: <span class="code-string">"discovery"</span>, <span class="code-key">"status"</span>: <span class="code-string">"done"</span>, <span class="code-key">"units"</span>: [
+      { <span class="code-key">"id"</span>: 3, <span class="code-key">"status"</span>: <span class="code-string">"done"</span> } ] },
+    { <span class="code-key">"name"</span>: <span class="code-string">"build"</span>, <span class="code-key">"status"</span>: <span class="code-string">"doing"</span>, <span class="code-key">"units"</span>: [
+      { <span class="code-key">"id"</span>: 4, <span class="code-key">"status"</span>: <span class="code-string">"todo"</span> } ] }
+  ],
+  <span class="code-key">"approved"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"waiting_on"</span>: <span class="code-null">null</span>
+}</code></pre>
+      </div>
+      <aside class="speaker-notes"><strong>1 min.</strong> Frase clave: “Este archivo tiene que poder ser entendido por una sesión que no vio nada de esta conversación”. No es un log; es plan + estado actual.</aside>
+    </section>
+
+    <section class="slide" data-section="Cómo funciona" data-title="Siete fases" data-minutes="1">
+      <div class="slide-inner">
+        <p class="eyebrow" data-reveal>EL MAPA COMPLETO</p>
+        <h2 data-reveal>Siete fases. No siete pasos obligatorios.</h2>
+        <div class="phase-rail" data-reveal>
+          <article style="--phase:#73f7c7"><span>01</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><h3>Discovery</h3><p>Qué construir, para quién y bajo qué reglas.</p></article>
+          <article style="--phase:#68d8ff"><span>02</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="2" width="8" height="6" rx="1"/><rect x="2" y="16" width="7" height="6" rx="1"/><rect x="15" y="16" width="7" height="6" rx="1"/><path d="M12 8v4M5.5 16v-4h13v4"/></svg><h3>Architecture</h3><p>Cómo resolverlo, con qué límites y stack.</p></article>
+          <article style="--phase:#b7a2ff"><span>03</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="3" width="20" height="17" rx="2"/><path d="M2 8h20M8 8v12M12 12h6M12 16h4"/></svg><h3>UX</h3><p>Pantallas, flujos, sistema y manual.</p></article>
+          <article style="--phase:#ffd166"><span>04</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><h3>Build</h3><p>Código y tests que viajan con él.</p></article>
+          <article style="--phase:#ff8fab"><span>05</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6Z"/><path d="m8 12 3 3 5-6"/></svg><h3>Verify</h3><p>Escenarios, datos, ejecución y evidencia.</p></article>
+          <article style="--phase:#ffad66"><span>06</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 16V2m-5 5 5-5 5 5M3 14v7h18v-7"/></svg><h3>Ship</h3><p>Versionado, pipeline, deploy y observación.</p></article>
+          <article style="--phase:#e4f46b"><span>07</span><svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 6C9 3 5 3 2 4v15c4-1 7-1 10 2 3-3 6-3 10-2V4c-3-1-7-1-10 2Zm0 0v15"/></svg><h3>Learn</h3><p>La persona adquiere la habilidad.</p></article>
+        </div>
+        <p class="takeaway" data-reveal>Una fase entra sólo si cambia lo que se va a construir. Omitir es normal; omitir en silencio, no.</p>
+      </div>
+      <aside class="speaker-notes"><strong>1 min.</strong> Recorré una frase por fase. Learn es un modo alternativo: el agente deja de producir por la persona y pasa a diagnosticar, enseñar, practicar, evaluar y programar repasos.</aside>
+    </section>
+
+
+
+    <section class="slide" data-section="Cómo funciona" data-title="Artefactos útiles" data-minutes="0.5">
+      <div class="slide-inner">
+        <p class="eyebrow" data-reveal>LA TRAZA QUE QUEDA</p>
+        <h2 data-reveal>Decisiones y evidencia persistidos fuera de la sesion</h2>
+        <div class="artifact-flow" data-reveal>
+          <div class="artifact"><span>DISCOVERY</span><strong>Spec + historias</strong><small>Qué tiene que pasar</small></div>
+          <i>→</i><div class="artifact"><span>ARCHITECTURE</span><strong>Stack + diseño</strong><small>Cómo se resolverá</small></div>
+          <i>→</i><div class="artifact"><span>UX</span><strong>Pantalla + estados</strong><small>Qué vive el usuario</small></div>
+          <i>→</i><div class="artifact"><span>VERIFY</span><strong>Casos + evidencia</strong><small>Qué ocurrió realmente</small></div>
+        </div>
+        <div class="file-strip" data-reveal><code>Docs/</code><code>Plan/specs/</code><code>Plan/state.json</code><code>Docs/releases.md</code></div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Los documentos afectados se mantienen junto con el cambio. Los opcionales se ofrecen diciendo qué se pierde si no se crean.</aside>
+    </section>
+
+    <section class="slide" data-section="Confianza" data-title="Qué no hace" data-minutes="0.5">
+      <div class="slide-inner">
+        <div class="not-card" data-reveal>
+          <p class="eyebrow">QUÉ NO HACE</p>
+          <h3>NZT no decide por vos.</h3>
+          <p>No limita el conocimiento del modelo, no garantiza acierto perfecto, no usa MCP ni subagentes y no reemplaza el criterio técnico o de negocio.</p>
+          <div class="not-formula"><span>NZT</span><b>=</b><span>cómo trabajar</span><b>≠</b><span>qué decidir</span></div>
+        </div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Este slide evita vender magia. La confianza viene de poder inspeccionar el proceso y la evidencia, no de prometer infalibilidad.</aside>
+    </section>
+
+    <section class="slide slide-transition" data-section="Demo" data-title="Del método a la práctica" data-minutes="0.5">
+      <div class="transition-aura" aria-hidden="true"></div>
+      <div class="slide-inner center">
+        <p class="eyebrow" data-reveal>HASTA ACÁ, LA IDEA</p>
+        <h2 class="display-small" data-reveal>Del método<br><span class="gradient-text">a la práctica.</span></h2>
+        <p class="lead" data-reveal>Veamos cómo NZT guía la construcción de un producto.</p>
+        <div class="demo-badge" data-reveal><span class="live-dot"></span> DEMO EN VIVO · 25 MIN</div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Cambiá de ventana sólo después de explicar el caso. Dejá esta slide visible mientras preparás la terminal.</aside>
+    </section>
+
+    <section class="slide" data-section="Demo" data-title="El producto: Radar" data-minutes="0.5">
+      <div class="slide-inner split">
+        <div>
+          <p class="eyebrow" data-reveal>PRODUCTO DE DEMOSTRACIÓN</p>
+          <h2 data-reveal>Radar</h2>
+          <p class="lead compact" data-reveal>Un tablero mínimo para que un equipo vea quién está bien, quién necesita atención y quién está bloqueado.</p>
+          <div class="scope-tags" data-reveal><span>1 pantalla</span><span>1 formulario</span><span>1 lista</span><span>1 regla real</span></div>
+        </div>
+        <div class="pulse-ui" data-reveal aria-label="Mockup de Radar">
+          <div class="pulse-head"><div><small>RADAR DEL EQUIPO</small><strong>Hoy, 09:42</strong></div><button>+ Registrar</button></div>
+          <div class="pulse-row red"><i></i><div><strong>Arnold</strong><small>Bloqueado por acceso a staging</small></div><span>ROJO</span></div>
+          <div class="pulse-row yellow"><i></i><div><strong>María</strong><small>Necesita revisar el alcance</small></div><span>AMARILLO</span></div>
+          <div class="pulse-row green"><i></i><div><strong>Ana</strong><small>Sin bloqueos</small></div><span>VERDE</span></div>
+        </div>
+      </div>
+      <aside class="speaker-notes"><strong>30 s.</strong> Regla de negocio para disparar análisis y tests: amarillo o rojo exige una nota de 1–140 caracteres; verde puede ir sin nota. Un nuevo estado reemplaza el actual de esa persona. El equipo es fijo (Ana, María y Arnold) y, sin login, cualquiera cambia el estado de cualquiera.</aside>
+    </section>
+
+    <section class="slide slide-demo" data-section="Demo" data-title="Cabina de demo" data-minutes="25">
+      <div class="slide-inner">
+        <div class="demo-header">
+          <div><p class="eyebrow" data-reveal>CABINA DE DEMO</p><h2 data-reveal>Copiar, ejecutar, observar.</h2></div>
+          <div class="demo-clock" data-reveal><span>OBJETIVO</span><strong>25:00</strong></div>
+        </div>
+        <div class="prompt-grid" data-reveal>
+          <article class="prompt-card">
+            <header><span>01 · INICIO</span><button class="copy-button" type="button" data-copy-target="promptStart">Copiar</button></header>
+            <p id="promptStart">Quiero crear desde cero “Radar”, un tablero web para registrar el estado verde, amarillo o rojo de cada integrante.</p>
+          </article>
+          <article class="prompt-card">
+            <header><span>02 · APROBACIÓN</span><button class="copy-button" type="button" data-copy-target="promptApprove">Copiar</button></header>
+            <p id="promptApprove">Apruebo el plan. Mantené modo acompañado y frená al terminar cada unidad.</p>
+          </article>
+          <article class="prompt-card">
+            <header><span>03 · DEFINICIÓN FUNCIONAL</span><button class="copy-button" type="button" data-copy-target="promptAnswers">Copiar</button></header>
+            <p id="promptAnswers">Este es el requerimiento completo y no hay nada más: no agregues reglas, pantallas ni capacidades que no estén acá; lo que no esté escrito queda fuera de alcance. Sin login: el equipo son siempre las mismas tres personas, Ana, María y Arnold, que ya están cargadas al iniciar; no se agregan ni se quitan. Cualquiera puede registrar o cambiar el estado de cualquiera de las tres, sin importar quién sea. Amarillo y rojo requieren una nota de 1 a 140 caracteres; en verde la nota es opcional. Cada persona tiene un único estado vigente y uno nuevo reemplaza al anterior, sin historial. Mostrar primero rojo, después amarillo, después verde y al final quienes todavía no tienen estado; dentro de cada grupo, por nombre. La pantalla cubre carga, error y vacío (nadie registró todavía). El tablero muestra el cambio apenas se guarda; otra pestaña lo ve al recargar. Los estados no se conservan: al reiniciar la aplicación, las tres vuelven sin estado.</p>
+          </article>
+          <article class="prompt-card">
+            <header><span>04 · ARQUITECTURA</span><button class="copy-button" type="button" data-copy-target="promptStack">Copiar</button></header>
+            <p id="promptStack">Estas son todas las decisiones técnicas; no agregues nada más, tiene que ser una aplicación mínima. Dos componentes separados, ambos en .NET 10: una API ASP.NET Core y un front Blazor Web App con render interactivo en servidor. API: vertical slice, minimal APIs, dominio anémico, EF Core directo con el proveedor en memoria y data seeding de Ana, María y Arnold al iniciar (sin base de datos ni migraciones) y Result convertido a HTTP con extensiones. Front: vertical slice, componentes inline, MudBlazor como librería de componentes; llama a la API con un cliente HTTP tipado cuya URL base apunta a la API local. Tests: unitarios con xUnit para las reglas de negocio; sin integración, sin test-first y sin end-to-end. Sin autenticación, Docker ni paquetes extra: se levanta en local con un dotnet run por proyecto.</p>
+          </article>
+          <article class="prompt-card">
+            <header><span>05 · BUILD</span><button class="copy-button" type="button" data-copy-target="promptBuild">Copiar</button></header>
+            <p id="promptBuild">Implementá todo.</p>
+          </article>
+          <article class="prompt-card">
+            <header><span>06 · VERIFICACIÓN</span><button class="copy-button" type="button" data-copy-target="promptVerify">Copiar</button></header>
+            <p id="promptVerify">Diseñá la verificación de la historia principal. Quiero probar la API y la pantalla. Mostrame primero el plan de pruebas, los datos necesarios y qué podés conducir desde esta sesión. No ejecutes hasta que lo apruebe.</p>
+          </article>
+        </div>
+        <div class="watch-strip" data-reveal><strong>Mirar:</strong><span>skill elegida</span><span>archivo de estado</span><span>stop real</span><span>evidencia ≠ opinión</span></div>
+      </div>
+      <aside class="speaker-notes"><strong>25 min en ventana externa.</strong> El guion completo está en <code>nzt-software/presentation/demo/prompts.md</code>. No intentes ejecutar todas las fases si el modelo tarda: mostrales el estado y saltá al checkpoint siguiente. El segundo prompt va recién cuando todos vieron el plan con <code>approved: false</code>; el cuarto, cuando arranque la unidad de arquitectura. El sexto debe producir un plan de pruebas y esperar; aprobarlo recién cuando todos hayan visto el freno.</aside>
+    </section>
+
+    <section class="slide" data-section="Cierre" data-title="Qué nos llevamos" data-minutes="1">
+      <div class="slide-inner center closing">
+        <p class="eyebrow" data-reveal>LA IDEA EN UNA FRASE</p>
+        <h2 class="display-small" data-reveal>La ventaja no es que el agente<br>escriba más rápido.</h2>
+        <p class="closing-line" data-reveal>Es poder <span>entender</span>, <span>revisar</span>, <span>retomar</span> y <span>confiar</span> en cómo llegó.</p>
+        <div class="closing-actions" data-reveal>
+          <div><small>MAÑANA</small><strong>Probarlo en una tarea pequeña</strong></div>
+          <div><small>DESPUÉS</small><strong>Comparar proceso y evidencia</strong></div>
+          <div><small>DECIDIR</small><strong>Qué frenos adopta el equipo</strong></div>
+        </div>
+        <p class="questions" data-reveal>Preguntas · objeciones · casos reales</p>
+      </div>
+      <aside class="speaker-notes"><strong>1 min.</strong> Cerrá con una invitación concreta: elegir una feature pequeña real del equipo y probarla en modo acompañado. No proponer adopción total antes de comparar una experiencia.</aside>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+    <button class="nav-button" id="prevButton" type="button" aria-label="Diapositiva anterior">←</button>
+    <div class="slide-counter"><span id="currentSlide">01</span><i>/</i><span id="totalSlides">13</span></div>
+    <div class="slide-title" id="slideTitle">NZT</div>
+    <button class="nav-button" id="nextButton" type="button" aria-label="Diapositiva siguiente">→</button>
+  </footer>
+
+  <aside class="notes-panel" id="notesPanel" aria-live="polite" aria-label="Notas del presentador">
+    <div class="notes-head"><strong>Notas</strong><button id="closeNotes" type="button" aria-label="Cerrar notas">×</button></div>
+    <div id="notesContent"></div>
+  </aside>
+
+  <div class="overview" id="overview" aria-hidden="true">
+    <div class="overview-head"><div><p class="eyebrow">MAPA DE LA PRESENTACIÓN</p><h2>Elegí una diapositiva</h2></div><button id="closeOverview" type="button" aria-label="Cerrar vista general">×</button></div>
+    <div class="overview-grid" id="overviewGrid"></div>
+  </div>
+
+  <dialog id="shortcutsDialog">
+    <button class="dialog-close" type="button" aria-label="Cerrar">×</button>
+    <p class="eyebrow">ATAJOS</p><h3>Controlá el deck sin buscar botones.</h3>
+    <div class="shortcut-grid"><span><kbd>←</kbd><kbd>→</kbd> navegar</span><span><kbd>O</kbd> vista general</span><span><kbd>S</kbd> notas</span><span><kbd>F</kbd> pantalla completa</span><span><kbd>T</kbd> cronómetro</span><span><kbd>?</kbd> ayuda</span></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Copiado</div>
+  <script src="app.js"></script>
+</body>
+</html>

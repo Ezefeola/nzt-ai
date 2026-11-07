@@ -1,8 +1,8 @@
-# Salida del build: se regenera con install/build.sh
-dist/
+# Salida del build: se regenera con nzt-software/build/build.sh
+nzt-software/dist/
 
 # Resultados de corridas de evals (el HTML y el JSON de cada corrida)
-evals/results/
+nzt-software/evals/results/
 
 # .NET
 [Bb]in/

@@ -1,0 +1,179 @@
+# Release de nzt-software (D46, Plan/specs/nzt-installer.md sección 10.1; rutas de D98).
+#
+# Un tag vX.Y.Z publica los seis binarios self-contained, SHA256SUMS y los
+# seis comandos de una línea: install-claude, install-claude-full e install-codex, en .ps1 y .sh. Antes corren las mismas puertas que en local: si una
+# falla, no hay release.
+
+name: release
+
+on:
+  pull_request:
+    branches: [main]
+    # Solo lo que toca a nzt-software: otro producto del repo no corre estas puertas.
+    paths:
+      - 'nzt-software/**'
+      - '.claude-plugin/**'
+      - 'Plan/state.json'
+      - '.github/workflows/nzt-software-release.yml'
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # I3: el tag y el <Version> del .csproj son la misma versión.
+      - if: github.event_name == 'push'
+        name: Tag coincide con la versión del CLI
+        run: |
+          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' nzt-software/cli/src/Nzt.Cli/Nzt.Cli.csproj)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "El tag es $GITHUB_REF_NAME y el .csproj dice $version." >&2
+            exit 1
+          fi
+
+      - name: Build del set
+        run: bash nzt-software/build/build.sh
+
+      - name: Comprobaciones del instalador
+        run: dotnet run --project nzt-software/cli/tests/Nzt.Cli.Checks
+
+      - name: Lint del contenido embebido
+        run: dotnet run --project nzt-software/cli/src/Nzt.Cli -- verify
+
+      - name: Probar instalación limpia y migración desde v4 en un perfil descartable
+        run: |
+          git fetch --depth=1 origin tag v4.0.0
+          git worktree add --detach "$RUNNER_TEMP/v4" v4.0.0
+          dotnet build "$RUNNER_TEMP/v4/installer/src/Nzt.Cli"
+          v4="$RUNNER_TEMP/v4/installer/src/Nzt.Cli/bin/Debug/net10.0/nzt.dll"
+          v5="$PWD/nzt-software/cli/src/Nzt.Cli/bin/Debug/net10.0/nzt.dll"
+          export HOME="$(mktemp -d)"
+          dotnet "$v5" install --provider codex
+          test -s "$HOME/.agents/skills/nzt/SKILL.md"
+          test ! -e "$HOME/.codex/AGENTS.md"
+          mkdir -p "$HOME/.claude"
+          echo 'Instrucciones propias' > "$HOME/.claude/CLAUDE.md"
+          dotnet "$v4" install --provider claude-code
+          grep -Fq '<!-- nzt:start -->' "$HOME/.claude/CLAUDE.md"
+          dotnet "$v5" install --provider claude-code
+          test "$(cat "$HOME/.claude/CLAUDE.md")" = 'Instrucciones propias'
+          cmp nzt-software/dist/claude-code/nzt/SKILL.md "$HOME/.claude/skills/nzt/SKILL.md"
+
+  publish:
+    if: github.event_name == 'push'
+    needs: gates
+    strategy:
+      matrix:
+        include:
+          - { rid: win-x64, os: ubuntu-latest, ext: .exe }
+          - { rid: win-arm64, os: ubuntu-latest, ext: .exe }
+          - { rid: linux-x64, os: ubuntu-latest, ext: '' }
+          - { rid: linux-arm64, os: ubuntu-latest, ext: '' }
+          # En macOS: ahí el SDK firma ad-hoc el ejecutable, que Apple Silicon exige.
+          - { rid: osx-x64, os: macos-latest, ext: '' }
+          - { rid: osx-arm64, os: macos-latest, ext: '' }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publicar ${{ matrix.rid }}
+        run: |
+          dotnet publish nzt-software/cli/src/Nzt.Cli/Nzt.Cli.csproj -c Release -r ${{ matrix.rid }} -o out
+          mkdir -p assets
+          mv "out/nzt${{ matrix.ext }}" "assets/nzt-${{ matrix.rid }}${{ matrix.ext }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nzt-${{ matrix.rid }}
+          path: assets/*
+          if-no-files-found: error
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          pattern: nzt-*
+          merge-multiple: true
+
+      # Un comando por proveedor, generado de las dos fuentes de nzt-software/cli/install/.
+      - name: Hashes y comandos por proveedor
+        run: |
+          cd assets
+          sha256sum nzt-* > SHA256SUMS
+          cat SHA256SUMS
+          sh ../nzt-software/cli/install/variants.sh .
+
+      - name: Publicar el plugin de este tag
+        run: |
+          bash nzt-software/build/build.sh
+          plugin="$RUNNER_TEMP/nzt-plugin"
+          mkdir "$plugin"
+          rsync -a --exclude=/evals/ nzt-software/dist/plugin/ "$plugin/"
+          cp LICENSE "$plugin/"
+          cp nzt-software/release/plugin-README.md "$plugin/README.md"
+          test "$(jq -r .version "$plugin/.claude-plugin/plugin.json")" = "${GITHUB_REF_NAME#v}"
+          test -s "$plugin/skills/software/SKILL.md"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git_dir="$(git rev-parse --absolute-git-dir)"
+          export GIT_INDEX_FILE="$RUNNER_TEMP/plugin.index"
+          git -C "$plugin" --git-dir="$git_dir" --work-tree=. add --force .
+          tree="$(git write-tree)"
+          parents=()
+          if test -n "$(git ls-remote --heads origin refs/heads/plugin-nzt-software)"; then
+            git fetch origin refs/heads/plugin-nzt-software
+            previous="$(git rev-parse FETCH_HEAD)"
+            if test "$(git rev-parse "$previous^{tree}")" = "$tree"; then
+              echo "El plugin de este tag ya está publicado."
+              exit 0
+            fi
+            old="$(git show "$previous:.claude-plugin/plugin.json" | jq -r .version)"
+            new="${GITHUB_REF_NAME#v}"
+            test "$old" != "$new"
+            test "$(printf '%s\n' "$old" "$new" | sort -V | tail -1)" = "$new"
+            parents=(-p "$previous")
+          fi
+          commit="$(git commit-tree "$tree" "${parents[@]}" -m "NZT $GITHUB_REF_NAME")"
+          git push origin "$commit:refs/heads/plugin-nzt-software"
+          test "$(git ls-remote origin refs/heads/plugin-nzt-software | cut -f1)" = "$commit"
+
+      - name: Publicar el release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=()
+          if test -f "nzt-software/release/notes/$GITHUB_REF_NAME.md"; then
+            notes=(--notes-file "nzt-software/release/notes/$GITHUB_REF_NAME.md")
+          fi
+          gh release create "$GITHUB_REF_NAME" assets/* --verify-tag --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
+  notify-landing:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: repository_dispatch a nzt-ai-landing
+        env:
+          GH_TOKEN: ${{ secrets.LANDING_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/Ezefeola/nzt-ai-landing/dispatches \
+            -f event_type=nzt-ai-release \
+            -f "client_payload[tag]=$GITHUB_REF_NAME"
