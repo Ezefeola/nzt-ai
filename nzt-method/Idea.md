@@ -52,6 +52,9 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 - **Vive en el monorepo `nzt-ai`** y se despliega por su cuenta: su pipeline corre solo si se
   tocó su carpeta, como pasa hoy con `nzt-software`.
 - **No se mergea** a `pendientes-post-v5` ni a `main` mientras sea exploración.
+- **`nzt-software` se puede mirar como referencia, pero no se modifica.**
+- **Al escribir las skills del método** se usan las skills `gestionar-skills` y
+  `skill-creator` (pedido del usuario, 2026-11-08).
 
 ## Preguntas abiertas
 
@@ -74,7 +77,9 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 Si se limpia el contexto, una sesión nueva retoma así:
 
 1. Leer este archivo y `README.md` de esta carpeta. Lo de esta carpeta es la única fuente:
-   no hay `Plan/state.json` ni NZT activo.
+   no hay `Plan/state.json` ni NZT activo. Según el estado, seguir con `Principios.md`
+   (principios y sus decisiones), `Paquetes.md` (paquetes de dominio) e
+   `Investigacion.md` (métodos parecidos revisados).
 2. Mirar **Estado actual** (abajo) y los últimos commits de la rama `metodo-generico`.
 3. Seguir desde el próximo paso, sin decidir nada que figure como abierto sin consultarlo.
 
@@ -86,10 +91,28 @@ Si se limpia el contexto, una sesión nueva retoma así:
 - **2026-11-08:** hecha la investigación de BMAD-Method, Spec Kit, Agent OS y Shape Up en
   `Investigacion.md`: se confirma que ninguno es genérico, y al final hay ideas para tomar.
 - **2026-11-08, decisión del usuario:** el método genérico se hace **aparte y primero**.
-  `nzt-software` no se toca ni se usa como base a desmontar; después se verá si se integra
+  `nzt-software` **no se modifica**, pero **se puede mirar como referencia**, igual que los
+  métodos de `Investigacion.md`; no es una base a desmontar. Después se verá si se integra
   con paquetes por dominio (software y otros).
   **Próximo paso:** debatir con el usuario los principios del método genérico, partiendo de
   las conclusiones de `Investigacion.md`, antes de escribir su estructura.
+- **2026-11-08:** empezó el debate. Borrador en `Principios.md`: 11 principios propuestos y
+  5 preguntas (P1–P5). **Próximo paso:** recoger las respuestas del usuario y pasar lo
+  aceptado a **Decididos** en ese archivo.
+- **2026-11-08:** decididas P2 (un solo archivo de estado) y P3 (proponer herramientas solo
+  si falta algo). P1, P4 y P5 siguen **En charla** en `Principios.md`. Los 11 principios
+  todavía no fueron revisados uno por uno.
+- **2026-11-08:** decididas P1 (tres tamaños), P4 (criterio de hecho siempre, en proporción)
+  y P5 (diseñar los paquetes ya). Borrador de paquetes en `Paquetes.md` con 4 preguntas
+  (PQ1–PQ4). **Próximo paso:** las respuestas del usuario a PQ1–PQ4; después revisar los 11
+  principios uno por uno.
+- **2026-11-08:** decididas PQ1, PQ2 (paquetes en el archivo de herramientas del agente, no
+  en el estado) y PQ4 (se arman con el agente, ayudados por una retro). En charla en
+  `Paquetes.md`: PQ3 y si los documentos tienen forma genérica o dependen de paquetes.
+- **2026-11-08:** decididas PQ3 (cada paquete es un plugin aparte) y que el núcleo trae un
+  default genérico para escribir cualquier documento. Quedan abiertos: el nombre y el lugar
+  del archivo de estado y del de herramientas, y qué dice el default de documentos.
+  **Próximo paso:** revisar con el usuario los 11 principios de `Principios.md` uno por uno.
 
 ## Primer paso sugerido
 
