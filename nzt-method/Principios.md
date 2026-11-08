@@ -56,9 +56,12 @@ se decidió cada cosa.
    tareas o memoria, el agente los usa en vez de inventar los suyos. Pero lo necesario para
    retomar siempre queda en los archivos del trabajo.
 
-10. **Las herramientas se proponen, no se imponen.** Al empezar, el agente evalúa si le falta
-    algo para hacer el trabajo de manera excelente; **solo si le falta**, propone qué
-    necesitaría y pregunta si quiere que lo investigue. Con un sí, busca en fuentes oficiales
+10. **Las herramientas se proponen, no se imponen.** **Antes de empezar a trabajar**, el
+    agente revisa qué necesita el trabajo y qué tiene ya disponible, para saber de entrada si
+    tiene todo. Propone una herramienta **solo si la necesita para algo y no la tiene**, y
+    pregunta si quiere que la investigue. Si en medio del trabajo aparece una falta que no se
+    vio al empezar, la plantea en la parada, sin cortar lo que está haciendo; si lo bloquea,
+    para y pregunta ahí. Con un sí, busca en fuentes oficiales
     y presenta qué encontró, de dónde, a qué accede, qué cuesta y qué hay que hacer a mano.
     Instala solo con otro sí, **en el alcance más chico que sirva** (el trabajo antes que todo
     el equipo), comprueba que responde y lo anota en el **archivo de herramientas del
@@ -79,10 +82,8 @@ se decidió cada cosa.
 
 ## Abierto
 
-- El nombre y el lugar del **archivo de estado** y del **archivo de herramientas**.
-- Qué dice el **default genérico de documentos** (ver `Paquetes.md`).
-- Si el agente también propone herramientas cuando la falta aparece **en medio** del
-  trabajo, no solo al empezar.
+Nada en los principios. Los archivos están decididos en `Archivos.md` y el default de
+documentos en `Documentos.md`.
 
 ## Historial de decisiones
 
@@ -107,3 +108,6 @@ se decidió cada cosa.
   - R7, retro cuando se pide → principio 13;
   - R8, parar antes de quedarse sin contexto → principio 7;
   - R9, tiempo fijo y alcance variable → principio 14.
+- **Herramientas, antes y durante (2026-11-08):** el agente revisa antes de empezar a
+  trabajar si tiene todo, y propone solo lo que necesita y no tiene; si una falta aparece en
+  medio, la plantea en la parada, o para si lo bloquea. → principio 10.

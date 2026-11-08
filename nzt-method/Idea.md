@@ -78,7 +78,8 @@ Si se limpia el contexto, una sesión nueva retoma así:
 
 1. Leer este archivo y `README.md` de esta carpeta. Lo de esta carpeta es la única fuente:
    no hay `Plan/state.json` ni NZT activo. Según el estado, seguir con `Principios.md`
-   (principios y sus decisiones), `Paquetes.md` (paquetes de dominio) e
+   (principios y sus decisiones), `Paquetes.md` (paquetes de dominio), `Archivos.md`
+   (archivos de estado y de herramientas), `Documentos.md` (default de documentos) e
    `Investigacion.md` (métodos parecidos revisados).
 2. Mirar **Estado actual** (abajo) y los últimos commits de la rama `metodo-generico`.
 3. Seguir desde el próximo paso, sin decidir nada que figure como abierto sin consultarlo.
@@ -122,6 +123,20 @@ Si se limpia el contexto, una sesión nueva retoma así:
   lo abierto (nombre y lugar del archivo de estado y del de herramientas, y el default
   genérico de documentos) y después la estructura del método (qué skills y archivos tiene),
   usando `gestionar-skills` y `skill-creator` al escribir las skills.
+- **2026-11-08:** borradores de lo abierto: `Archivos.md` (dónde van y qué tienen
+  `estado.md` y `herramientas.md`, preguntas A1–A3), `Documentos.md` (el default genérico,
+  preguntas D1–D2) y, en `Principios.md` → *Abierto*, la propuesta de herramientas en medio
+  del trabajo. **Próximo paso:** las respuestas del usuario; después, la estructura del
+  método.
+- **2026-11-08:** decididos A1 (archivos y skills del método en inglés), A2, A3 (sin carpeta
+  del método) y D2 (Markdown). Pendientes: dónde van los archivos sin carpeta del método
+  (`Archivos.md`), qué regla falta o sobra en D1 (`Documentos.md`) y la propuesta de
+  herramientas en medio del trabajo (`Principios.md` → *Abierto*).
+- **2026-11-08:** decididos el lugar de los archivos (`Plan/state.md` y
+  `Docs/agent-tools.md`), D1 (sin cambios) y las herramientas antes y durante el trabajo
+  (principio 10). **No queda nada abierto en principios, paquetes, archivos ni documentos.**
+  **Próximo paso:** proponer la estructura del método (qué skills y archivos tiene, en
+  inglés), usando `gestionar-skills` y `skill-creator` al escribir las skills.
 
 ## Primer paso sugerido
 
