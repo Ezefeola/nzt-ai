@@ -48,8 +48,8 @@ left off, and not find out at the end that it understood something else.**
 Three layers, the top one always loaded, plus the software rules the project declares.
 
 **1. The kernel** (~115 lines) lives inside the `nzt` skill, which the provider loads first in
-every session: nothing is written to your `CLAUDE.md` or your `AGENTS.md`, the same with the
-plugin as with the one-line installer. It carries the loop, the stops, the state format and
+every session: nothing is written to your `CLAUDE.md` or your `AGENTS.md`, in Claude Code
+and in Codex alike. It carries the loop, the stops, the state format and
 **the routing table**. That last one is the most important design decision of the set: which
 skill to load is *instructed in a table*, not left to the model guessing from descriptions.
 
@@ -123,95 +123,37 @@ it in `Docs/agent-tools.md`. One you decline is not offered again.
 
 ## Installation
 
-### Plugin for Claude Code
+NZT installs one way: as the `nzt-software` plugin, in Claude Code and in Codex.
 
-In Claude Code, add the marketplace and install the method:
+**Claude Code**
 
 ```text
 /plugin marketplace add Ezefeola/nzt-ai
 /plugin install nzt-software@nzt
 ```
 
-Open a new session. The plugin includes the subagents and the software rules. Inside the
-plugin the skills have no `nzt-` prefix: `/nzt-software:nzt`, `/nzt-software:build`,
-`/nzt-software:verify`. Choose a single way to install the method. If you come from the
-installer and want to switch to the plugin, first remove the method with
-`nzt-ai uninstall --provider claude-code --mods none`.
-
-If you have the v5 `nzt` plugin, uninstall it before installing `nzt-software`, so the
-kernel does not load twice:
-
-```text
-/plugin uninstall nzt@nzt
-```
-
-### Installer for Claude Code and Codex
-
-To update from v4, run your provider's line again. The installer removes the block it
-managed in your instructions file and keeps your text. The method now lives in the `nzt`
-skill, and the state check runs from `nzt-plan`'s scripts.
-
-**Claude Code**
-
-```powershell
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.ps1 | iex"
-```
-
-```bash
-# macOS and Linux
-curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.sh | sh
-```
-
 **Codex**
 
-```powershell
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.ps1 | iex"
-```
-
 ```bash
-# macOS and Linux
-curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh | sh
+codex plugin marketplace add Ezefeola/nzt-ai
+codex plugin add nzt-software@nzt
 ```
 
-**Claude Code with the mods** — the method and the [mods](#mods), without asking anything
+Open a new session. Inside the plugin the skills have no `nzt-` prefix: `nzt-software:nzt`,
+`nzt-software:build`, `nzt-software:verify`. You do not need to call them —the kernel picks
+the phase— but you can: `/nzt-software:<skill>` in Claude Code, `$nzt-software:<skill>` in
+Codex. The two subagents come with the plugin in Claude Code; Codex plugins bring none, so in
+Codex everything runs in the conversation.
 
-```powershell
-# Windows
-powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.ps1 | iex"
-```
+**To update:** in Claude Code, `claude plugin update nzt-software@nzt`; in Codex,
+`codex plugin marketplace upgrade nzt`. Then open a new session.
 
-```bash
-# macOS and Linux
-curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.sh | sh
-```
+**Coming from an earlier version?** Remove what you had first, so the method does not load
+twice:
 
-Each line downloads the installer to a temporary folder, verifies its SHA256, installs NZT
-for that provider —the skills, with the kernel inside `nzt`, and the mods if it is the
-`install-claude-full` line; if an earlier version left a block in `CLAUDE.md` or `AGENTS.md`,
-it removes it and keeps your text—, leaves a copy as `nzt-ai` (in `%LOCALAPPDATA%\nzt\bin`,
-which is added to the user's PATH, or in `~/.local/bin`) and deletes the temporary folder.
-**To update, run the same line again.** To uninstall, the same line with
-`$env:NZT_UNINSTALL='1'; irm … | iex` on Windows or `curl … | NZT_UNINSTALL=1 sh` elsewhere.
-
-From the repo, with .NET 10, there is the full installer:
-
-```bash
-dotnet run --project nzt-software/cli/src/Nzt.Cli
-```
-
-The menu has four actions —**install, uninstall, verify the content and show status**—, lets
-you pick Claude Code, Codex or both —and in Claude Code, all of NZT, only the method or only
-the mods—, and **shows you the dry run before it asks**. It installs the skills and the
-subagents in the provider's user folders.
-
-```bash
-dotnet run --project nzt-software/cli/src/Nzt.Cli -- status
-dotnet run --project nzt-software/cli/src/Nzt.Cli -- uninstall --provider claude-code
-```
-
-More details in [`nzt-software/cli/README.md`](cli/README.md).
+- The v5 `nzt` plugin in Claude Code: `/plugin uninstall nzt@nzt`.
+- The `nzt-ai` installer, retired in v6: run `nzt-ai uninstall --provider claude-code --mods none`
+  or `nzt-ai uninstall --provider codex` with the copy you already have.
 
 ## Mods
 
@@ -231,17 +173,10 @@ method to show something.
 
 ### Installing them
 
-- **With the installer.** The `install-claude-full` line installs the method and every mod.
-  From the repo, `dotnet run --project nzt-software/cli/src/Nzt.Cli -- install --provider
-  claude-code --mods all` does the same, `--mods only` installs only the mods, and the menu
-  asks what you want. It needs the `claude` command in the terminal, version 2.1.287 or
-  later; without it, it installs the method and tells you how to add the mods by hand.
-- **By hand, one at a time.** The line from the table, in a Claude Code session in the
-  terminal. The first time it asks whether to add the marketplace: answer `y` and choose the
-  **user** scope to have it in every project.
-
-Both ways use the same `nzt` marketplace, which comes from this repo's `main` branch: the
-installer updates a mod you installed by hand, but never uninstalls it.
+Each one is a plugin of its own: run the line from the table in a Claude Code session. The
+first time it asks whether to add the marketplace: answer `y` and choose the **user** scope
+to have it in every project. They come from the same `nzt` marketplace as the method, read
+from this repo's `main` branch.
 
 ### Updating them
 
@@ -252,13 +187,11 @@ when that version goes up.
   `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**. From then on each new
   session downloads new versions and says `Run /reload-plugins` to load them.
 - **By hand.** `claude plugin update <mod>@nzt` in the terminal (for example,
-  `claude plugin update nzt-state@nzt`), **Update marketplace** in that same `/plugin` tab, or
-  run the installer again, which updates every mod there is.
+  `claude plugin update nzt-state@nzt`) or **Update marketplace** in that same `/plugin` tab.
 
 ### Uninstalling them
 
-`claude plugin uninstall <mod>@nzt` removes one. When uninstalling, the installer removes only
-the mods it installed (`uninstall --provider claude-code --mods only` keeps the method).
+`claude plugin uninstall <mod>@nzt` removes one.
 **Do not remove the `nzt` marketplace**: that uninstalls every mod that came from it at once.
 
 How a mod is built and what it has to include is in
@@ -292,12 +225,11 @@ nzt-software/
   method/agents/   the subagents, for Claude Code and for Codex
   evals/           the suite that measures whether the right skill triggers
   mods/            the Claude Code mods, one per folder (optional)
-  build/           build.sh / build.ps1 — the development loop, builds dist/
-  cli/             nzt-ai, the CLI that installs, with its checks
-  cli/install/     install.ps1 / install.sh / variants.sh — the one-line commands
+  build/           build.sh / build.ps1 — the development loop: validates the skills and builds dist/plugin
+  VERSION          the version of the plugin and of its release tag
   release/         the plugin branch's README and each version's notes
   presentation/    the NZT deck
-Plan/specs/        nzt-core/ — the founding spec, plus the installer's, the plugin's, the mods' and one per mod
+Plan/specs/        nzt-core/ — the founding spec, plus the plugin's, the mods' and one per mod
 ```
 
 **13 skills with 137 references**, 76 of them in `nzt-software`. The current plan and where it

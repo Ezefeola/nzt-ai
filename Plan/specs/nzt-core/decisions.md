@@ -2519,3 +2519,35 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Después:** el 2026-11-08 el usuario pidió borrar `temper-v3.md`: la §13 queda en la
     historia de git (commit `f04b062`) y la spec queda en tres archivos.
   - **Revertirla:** volver `Plan/specs/` y el workflow al commit `9249e97`.
+- **D100.** **nzt-software se instala de una sola forma: como plugin, en Claude Code y en
+  Codex. Se borra el CLI `nzt-ai`, con sus comandos de una línea y sus binarios.** Revisa D24,
+  D46, D91, D95 y D97. Estado: **aceptada** el 2026-11-08, decidida por el usuario (QT-121).
+  Rama `pendientes-post-v5`, unidades 530–535 (tramo S5).
+  - **Lo que la forzó:** había dos caminos para lo mismo —el plugin de Claude Code y `nzt-ai`
+    con sus `irm`/`curl`— y cada uno con su documentación, sus pruebas y su release. Codex ya
+    tiene plugins, así que un plugin alcanza para los dos proveedores.
+  - **Lo verificado de Codex** (2026-11-08, `codex-cli 0.164.0` instalado acá):
+    [Package your plugin](https://developers.openai.com/plugins/build/plugins) y
+    [Developer commands](https://learn.chatgpt.com/docs/developer-commands?surface=cli).
+    Se instala con `codex plugin marketplace add owner/repo[@ref]` y `codex plugin add
+    <plugin>@<marketplace>`; un plugin trae `skills/<nombre>/SKILL.md`, MCP y hooks; el
+    manifiesto es `plugin.json` en la raíz o `.codex-plugin/plugin.json`; el marketplace propio
+    es `.agents/plugins/marketplace.json` y lee `.claude-plugin/marketplace.json` como legado.
+    No documenta subagentes en un plugin ni cómo nombra las skills: lo resuelve la unidad 531.
+  - **Decisión:**
+    - **Un solo camino:** marketplace del repo y plugin `nzt-software`, en los dos proveedores.
+      Los mods siguen siendo plugins solo de Claude Code.
+    - **QT-121 · se borra `nzt-software/cli/`**: el instalador, sus checks, los comandos de una
+      línea y los binarios del release. El build ya valida las skills con las mismas reglas que
+      `verify`, y el CI corre el state check de los scripts de `nzt-plan`. Se van también
+      `adapter-claude.md` y las salidas `dist/claude-code` y `dist/codex`, que solo usaba el
+      instalador.
+    - **Migración:** quien instaló con `nzt-ai` lo desinstala con la copia que ya tiene
+      (`nzt-ai uninstall`) antes de instalar el plugin; si no, el kernel llega dos veces.
+    - **Sin prueba en vivo de la instalación** (unidad 536 descartada por el usuario: si
+      funciona en Claude Code, en Codex también).
+  - **Lo que se acepta:** **(1)** Codex no documenta subagentes en plugins: si no los trae, en
+    Codex todo corre en la conversación, como NZT ya prevé sin subagentes; **(2)** los 184
+    checks del instalador se van con él; **(3)** que el plugin cargue primero la skill `nzt` en
+    Codex no se probó instalado.
+  - **Revertirla:** volver el árbol al commit `a3bbdb0`.

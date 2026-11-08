@@ -1,7 +1,9 @@
-# NZT para Claude Code
+# NZT for Claude Code and Codex
 
-NZT aporta un método de trabajo para planificar, construir y verificar cambios. Incluye las skills de cada fase, dos subagentes y las reglas de software. El método vive en la skill `nzt-software:nzt`.
+NZT is a working method to plan, build and verify changes. It includes one skill per phase, two subagents (Claude Code only) and the software rules. The method lives in the `nzt-software:nzt` skill.
 
-En Claude Code, ejecutá `/plugin marketplace add Ezefeola/nzt-ai`, luego `/plugin install nzt-software@nzt` y abrí una sesión nueva. Si tenés el plugin `nzt` de la v5, desinstalalo antes con `/plugin uninstall nzt@nzt`.
+**Claude Code:** run `/plugin marketplace add Ezefeola/nzt-ai`, then `/plugin install nzt-software@nzt`, and open a new session.
 
-La [guía de NZT](https://github.com/Ezefeola/nzt-ai#instalación) explica cómo actualizar desde v4, elegir la vía de instalación y agregar los mods opcionales.
+**Codex:** run `codex plugin marketplace add Ezefeola/nzt-ai`, then `codex plugin add nzt-software@nzt`, and open a new session.
+
+The [NZT guide](https://github.com/Ezefeola/nzt-ai/blob/main/nzt-software/README.md#installation) explains how to update, how to move from an earlier version and how to add the optional Claude Code mods.

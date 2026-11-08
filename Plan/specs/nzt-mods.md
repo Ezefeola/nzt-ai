@@ -2,7 +2,8 @@
 
 > Estado: **especificada** (2026-10-13) · código en `nzt-software/mods/` · una spec por mod en
 > `Plan/specs/mods/` · Depende de: `Plan/specs/nzt-core/README.md` (secciones 2, 9 y D63) y
-> `Plan/specs/nzt-installer.md` (sección 1)
+> `Plan/specs/nzt-installer.md` (sección 1; retirada por D100: los mods se instalan desde el
+> marketplace de Claude Code, `nzt-ai` ya no existe)
 
 ## 1. Qué es un mod
 
@@ -160,7 +161,8 @@ caminos:
 - **Mientras se desarrolla.** `claude --plugin-dir nzt-software/mods/<mod>` o la variable
   `CLAUDE_CODE_PLUGIN_DIRS` cargan el mod desde la carpeta.
 
-**Con el instalador:** qué se elige y qué pasa cuando algo falla está en
+**Con el instalador** (hasta la v5; desde D100 `nzt-ai` no existe y los mods se instalan solo
+con los comandos de arriba, así que esta parte queda como registro): qué se elige y qué pasa cuando algo falla está en
 `Plan/specs/nzt-installer.md` sección 11 (unidad 181, 2026-10-16): Todo NZT, solo el método o solo
 los mods, y una línea `install-claude-full`. **Cómo** lo hace (M3, unidad 182; preguntas y
 fuentes en la sección 10):

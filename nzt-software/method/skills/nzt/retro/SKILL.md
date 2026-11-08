@@ -43,15 +43,15 @@ It runs only when the user asks: never offered, not a phase, no router sends you
    read that changed nothing, or missing when needed; the same file or search read twice.
    **A proposal with no moment behind it goes to *Discarded***, with one line on why.
 4. **Turn each moment into a proposal** with one destination and what would change there:
-   - **mechanical** (a program could check it) → a check: a CI gate, a linter rule, `nzt-ai
-     lint` — not a sentence. A repository with no automated checks is itself a finding;
+   - **mechanical** (a program could check it) → a check: a CI gate, a linter rule, a check in
+     NZT's build — not a sentence. A repository with no automated checks is itself a finding;
    - **of judgment** → a written rule in the narrowest place that would have been read at
      that moment.
 
    | Section | Destinations |
    |---|---|
    | For the project | `Docs/Architecture/tech.md`, `Docs/agent-tools.md`, `Docs/` (glossary, architecture), `Docs/Architecture/tech-debt.md`, CI gates and linters, `CLAUDE.md` or `AGENTS.md` |
-   | For NZT | the kernel, a router, a reference, a `nzt-ai` check, a missing case in `evals/` |
+   | For NZT | the kernel, a router, a reference, a build check, a missing case in `evals/` |
 
 5. **Classify**: category — **navigation**, **automated checks**, **rules** (tech, code
    conventions), **instructions** (guidance that weighs or changes nothing), **tool

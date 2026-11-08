@@ -150,12 +150,12 @@ if (Test-Path $skillsRoot) {
 }
 
 # --- the plugin: manifest, the method inside nzt-software:nzt, subagents (Plan/specs/nzt-plugin.md) ---
-# NZT's version is the installer's (D24): one number for nzt-ai and the plugin.
+# NZT's version lives in nzt-software/VERSION (D100): one number for the plugin and its tag.
 
-$csproj = Get-Content (Join-Path $root 'cli/src/Nzt.Cli/Nzt.Cli.csproj') -Raw
-$version = if ($csproj -match '<Version>(.+?)</Version>') { $Matches[1] } else { '' }
+$versionFile = Join-Path $root 'VERSION'
+$version = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { '' }
 if (-not $version) {
-    Write-Warning 'no <Version> in cli/src/Nzt.Cli/Nzt.Cli.csproj.'
+    Write-Warning 'no version in nzt-software/VERSION.'
     $failed = $true
 }
 
@@ -174,7 +174,7 @@ Set-Content -Path (Join-Path $plugin '.claude-plugin/plugin.json') -Value ($mani
 # The method inside the skill nzt, the same way for every host (QT-109, D95): the shared
 # frontmatter, the kernel and the host's adapter are the skill's body, and what skills/nzt
 # does today becomes its reference entry.md. Its description is what makes it load first
-# in every session; nothing else loads it. nzt-ai installs the same files, byte for byte.
+# in every session; nothing else loads it. One adapter serves Claude Code and Codex (D100).
 $entrySrc = Get-Content (Join-Path $method 'skills/nzt/SKILL.md') -Raw
 $entryAt = $entrySrc.IndexOf("`n---`n", 3)
 $frontmatter = (Get-Content (Join-Path $method 'core/skill-nzt.md') -Raw).TrimEnd()
@@ -186,12 +186,10 @@ function Build-Nzt([string]$dest, [string]$adapterFile, [string]$label) {
     Set-Content -Path (Join-Path $dest 'SKILL.md') -Value "$frontmatter`n`n$kernel`n`n$adapter`n" -Encoding utf8 -NoNewline
     Test-Skill (Get-Item (Join-Path $dest 'SKILL.md')) $label 'nzt'
 }
-if (Build-Nzt (Join-Path $plugin 'skills/nzt') 'adapter-claude-skill.md' 'plugin skills/nzt') { $failed = $true }
-if (Build-Nzt (Join-Path $OutDir 'claude-code/nzt') 'adapter-claude.md' 'claude-code nzt') { $failed = $true }
-if (Build-Nzt (Join-Path $OutDir 'codex/nzt') 'adapter-codex.md' 'codex nzt') { $failed = $true }
-foreach ($old in 'CLAUDE.md', 'AGENTS.md') {
+if (Build-Nzt (Join-Path $plugin 'skills/nzt') 'adapter-plugin.md' 'plugin skills/nzt') { $failed = $true }
+foreach ($old in 'claude-code', 'codex', 'CLAUDE.md', 'AGENTS.md') {
     $path = Join-Path $OutDir $old
-    if (Test-Path $path) { Remove-Item -Force $path }
+    if (Test-Path $path) { Remove-Item -Recurse -Force $path }
 }
 
 # Subagents: Claude Code reads their skills: list, not the model, so the build gives it

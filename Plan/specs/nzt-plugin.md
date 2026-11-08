@@ -1,15 +1,17 @@
 # NZT — Plugin
 
-> Estado: **diseñado, construido y probado** (unidades 473–476) · Decisiones: D91, revisada por D97 y
-> D92 · Depende de: `Plan/specs/nzt-core/README.md` (C7, C8) y `decisions.md` (D24, D91, D92) y `Plan/specs/nzt-installer.md` ·
-> Sin aceptar. El primer diseño —`/nzt:setup` escribía el kernel en un `CLAUDE.md`, con un hook
+> Estado: **diseñado, construido y probado** en Claude Code (unidades 473–476); **construido
+> para Codex** (D100, unidades 530–535), sin probar instalado · Decisiones: D91, revisada por
+> D97, D92 y D100 · Depende de: `Plan/specs/nzt-core/README.md` (C7, C8, 9.2) y `decisions.md`
+> (D24, D91, D92, D100) · Sin aceptar. El primer diseño —`/nzt:setup` escribía el kernel en un `CLAUDE.md`, con un hook
 > de aviso— se construyó y probó en las unidades 462–471 y se retiró en la 476 (QT-109): queda
 > en el registro de abajo y en el commit `db92912`.
 
 ## Qué resuelve
 
-Hoy NZT en Claude Code se instala con `nzt-ai`, un CLI aparte que hay que bajar y correr.
-Quien ya instala todo desde `/plugin` no tiene cómo traer NZT por ahí. Un plugin no puede
+Hasta la v5, NZT se instalaba con `nzt-ai`, un CLI aparte que había que bajar y correr, y
+quien ya instalaba todo desde `/plugin` no tenía cómo traer NZT por ahí. Desde D100 el plugin
+es la única forma de instalar NZT, en Claude Code y en Codex. Un plugin no puede
 traer un `CLAUDE.md` que se cargue (C7), y el kernel tiene que estar presente en toda la
 sesión. El plugin resuelve las dos cosas: trae las skills de NZT y lleva **el kernel dentro
 de la skill `nzt-software:nzt`**, que Claude carga primero en cada sesión por su descripción. No
@@ -19,29 +21,26 @@ NZT.
 ## Alcance
 
 **Adentro**
-- Instalar NZT en Claude Code desde un marketplace, como plugin.
+- Instalar NZT desde el marketplace del repo, como plugin, en Claude Code y en Codex (D100).
 - Que `nzt-software:nzt`, con el kernel, cargue primero en toda sesión —también ante una pregunta— y
   siga presente después de compactar.
 - Desactivar o desinstalar el plugin sin dejar nada de NZT en la máquina ni en el proyecto.
+- Migrar desde `nzt-ai`: se desinstala con la copia que ya se tiene (`nzt-ai uninstall`) antes
+  de instalar el plugin; si no, el kernel llega dos veces. Lo dicen las notas de la v6.0.0.
 
 **Afuera**
-- Codex: `[TO-DEFINE]` hasta probar lo que C8 deja sin verificar contra Codex 0.164.0 (Q-01).
-  En Codex NZT se instala con `nzt-ai`.
-- Reemplazar a `nzt-ai`: sigue siendo la forma común a Claude Code y Codex (D24). Las reglas de
-  software viajan en el plugin, en `nzt-software` (D93); desde D96 no hay packs, `nzt-games`
-  ni `nzt-ai project`.
-- Tener `nzt-ai` y el plugin a la vez: el kernel llegaría dos veces. Nada lo impide; la guía
-  dice que se usa uno solo.
-- Los mods: plugins aparte del mismo marketplace (D63).
+- Otro camino de instalación: `nzt-ai` y sus comandos de una línea se borraron (D100, QT-121).
+  Las reglas de software viajan en el plugin (D93); desde D96 no hay packs ni `nzt-games`.
+- Subagentes en Codex: Codex no los documenta en un plugin; allí todo corre en la conversación.
+- Los mods: plugins aparte del mismo marketplace, solo de Claude Code (D63).
 - Partir NZT en partes que se instalen por separado (contexto, discovery, build…): es la
   dirección después de lanzar este plugin completo, no parte de él.
 
 ## Glosario de esta spec
 
-- **Kernel**: las reglas de NZT que valen en todos los turnos (`nzt-software/method/core/kernel.md`). Es el mismo
-  texto que `nzt-ai` pone en su skill `nzt` (D95).
+- **Kernel**: las reglas de NZT que valen en todos los turnos (`nzt-software/method/core/kernel.md`).
 - **`nzt-software:nzt`**: la skill de entrada del plugin. Su cuerpo es el kernel y el adaptador del
-  plugin; lo que la skill `nzt` hace en `nzt-ai` es su referencia `references/entry.md`.
+  plugin; lo que la skill `nzt` del repo hace es su referencia `references/entry.md`.
 - **Entrada**: leer el estado, dimensionar el pedido, elegir las fases y pasar la posta
   (`references/entry.md`).
 
@@ -62,14 +61,16 @@ El plugin no escribe en archivos del usuario para funcionar. Desactivado o desin
 trabaja sin NZT y no queda nada que limpiar.
 
 ### RN-plugin-mismo-kernel · origin: D24
-El kernel de `nzt-software:nzt` es, byte por byte, el que escribe `nzt-ai`; el build lo comprueba. Solo
-cambia el adaptador de Claude Code (`nzt-software/method/core/adapter-claude-skill.md`).
+El kernel de `nzt-software:nzt` es, byte por byte, `nzt-software/method/core/kernel.md`: el build lo
+copia sin tocarlo. Claude Code y Codex reciben la misma skill; lo que cambia por host lo dice
+un solo adaptador, `nzt-software/method/core/adapter-plugin.md`, con una parte por proveedor (D100).
 
 ### RN-plugin-nombres · origin: QT-97, D97
 El plugin se llama `nzt-software`, y sus skills y subagentes no llevan el prefijo `nzt-`
 del repo: `nzt-software:build`, `nzt-software:explorer`. Donde NZT nombra `nzt-<x>`, se
 carga `nzt-software:<x>`; el kernel es `nzt-software:nzt`. Solo el build cambia los nombres:
-en el repo y en `nzt-ai` siguen siendo `nzt-<x>`.
+en el repo siguen siendo `nzt-<x>`. En Codex se invocan `$nzt-software:<x>` (openai/codex PR
+28608; sin probar en una sesión).
 
 ## Requisitos no funcionales
 
@@ -83,38 +84,48 @@ en el repo y en `nzt-ai` siguen siendo `nzt-<x>`.
 
 | Historia | Qué cubre |
 |---|---|
-| US-001-instalar | Como usuario de Claude Code, quiero instalar el plugin y trabajar con NZT desde la sesión siguiente, sin otro paso |
+| US-001-instalar | Como usuario de Claude Code o de Codex, quiero instalar el plugin y trabajar con NZT desde la sesión siguiente, sin otro paso |
 | US-002-apagar | Como usuario, quiero desactivar o desinstalar el plugin y que Claude trabaje sin NZT, sin archivos que limpiar |
 | US-003-actualizar | Como usuario, quiero que actualizar el plugin actualice el método, sin tocar nada más |
 | US-004-retomar | Como usuario, quiero que el método siga aplicando después de compactar una sesión larga |
 
-## Diseño técnico (unidades 473 y 476)
+## Diseño técnico (unidades 473, 476 y 532–534)
 
 ### Piezas
 
 | Pieza | En el repo | En el plugin publicado |
 |---|---|---|
 | Kernel | `nzt-software/method/core/kernel.md` | cuerpo de `skills/nzt/SKILL.md` → `nzt-software:nzt` |
-| Adaptador del plugin | `nzt-software/method/core/adapter-claude-skill.md` | después del kernel, en la misma skill |
+| Adaptador del plugin | `nzt-software/method/core/adapter-plugin.md` (Claude Code y Codex, D100) | después del kernel, en la misma skill |
 | Entrada | cuerpo de `nzt-software/method/skills/nzt/SKILL.md` | `skills/nzt/references/entry.md` |
-| Resto de las skills | `skills/` (las mismas que copia `nzt-ai`) | sin prefijo (D97): `skills/build/` → `nzt-software:build`, `nzt-software:plan`… |
-| Subagentes | `nzt-software/method/agents/nzt-explorer.md`, `nzt-worker.md` | `agents/explorer.md`, `worker.md` → `nzt-software:explorer`, `nzt-software:worker` |
-| Manifiesto | lo arma el build | `.claude-plugin/plugin.json`, `name: nzt-software`, versión de NZT |
+| Resto de las skills | `nzt-software/method/skills/` | sin prefijo (D97): `skills/build/` → `nzt-software:build`, `nzt-software:plan`… |
+| Subagentes | `nzt-software/method/agents/nzt-explorer.md`, `nzt-worker.md` | `agents/explorer.md`, `worker.md` → `nzt-software:explorer`, `nzt-software:worker`; solo los usa Claude Code |
+| Manifiesto | lo arma el build | `.claude-plugin/plugin.json`, `name: nzt-software`, versión de `nzt-software/VERSION`; Codex lo lee igual (531) |
+| Marketplace de Claude Code | `.claude-plugin/marketplace.json` | fuente `github` con `ref: plugin-nzt-software`, más los mods |
+| Marketplace de Codex | `.agents/plugins/marketplace.json` | fuente `url` con `ref: plugin-nzt-software`, solo `nzt-software` |
 
 No hay hooks ni archivos que escriba el plugin. El único código es el state check de
 `nzt-software:plan` (`skills/plan/scripts/`, S2d): lo corre el agente, no el plugin, y sin
-intérprete revisa el estado a mano (ver *El state check en macOS*). Se publica en la rama `plugin-nzt-software` (QT-96; `plugin` hasta la v5, D98) y el marketplace del repo
-suma la entrada `nzt-software` con `{"source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin"}`:
-se instala como `nzt-software@nzt` (D97; hasta la v5, `nzt@nzt`).
+intérprete revisa el estado a mano (ver *El state check en macOS*). Se publica en la rama `plugin-nzt-software` (QT-96; `plugin` hasta la v5, D98) y se instala
+como `nzt-software@nzt` (D97; hasta la v5, `nzt@nzt`) desde uno de los dos marketplaces:
+
+- Claude Code: `.claude-plugin/marketplace.json`, con
+  `{"source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin-nzt-software"}`.
+- Codex: `codex plugin marketplace add Ezefeola/nzt-ai` y `codex plugin add nzt-software@nzt`.
+  Codex lee `.agents/plugins/marketplace.json` antes que el de `.claude-plugin` y no entiende
+  la fuente `github` (531), así que el suyo usa
+  `{"source": "url", "url": "https://github.com/Ezefeola/nzt-ai.git", "ref": "plugin-nzt-software"}`
+  y no lista los mods.
 
 ### Build y release
 
 - `nzt-software/build/build.*` arma `nzt-software/dist/plugin/` (D23): la skill `nzt` con el kernel y su entrada, las
   demás skills y los subagentes sin el prefijo `nzt-` (D97), los subagentes con los nombres del plugin en su lista `skills:` (QT-103) y la
-  versión de NZT en `plugin.json`, la del `.csproj` (D24). La skill `nzt` del plugin, la de
-  Claude Code y la de Codex salen del mismo armado (D95). Las dos builds dan la misma salida.
-- El workflow de release copia `nzt-software/dist/plugin/` **sin `evals/`** a la rama `plugin-nzt-software` (`plugin` hasta la v5, D98), en un commit
-  por versión (QT-104).
+  versión de `nzt-software/VERSION` en `plugin.json` (D100). El build arma solo `dist/plugin/`:
+  sin `dist/claude-code` ni `dist/codex`, que eran del instalador. Las dos builds dan la misma salida.
+- El workflow corre las puertas —el build y el state check— y copia `nzt-software/dist/plugin/`
+  **sin `evals/`** a la rama `plugin-nzt-software` (`plugin` hasta la v5, D98), en un commit
+  por versión (QT-104); el release se crea sin assets (D100).
 
 ### Lo verificado
 
@@ -125,6 +136,8 @@ se instala como `nzt-software@nzt` (D97; hasta la v5, `nzt@nzt`).
 | Plugin desactivado | en vivo (475) | ninguna skill, escritura ni mención de NZT |
 | Nombres `nzt:nzt-<x>` | evals de la 470 y de la 474 | el modelo carga los nombres del plugin |
 | Nombres `nzt-software:<x>` sin prefijo (D97) | sin medir: los evals se reescribieron (513) y no se corrieron | — |
+| Codex instala el plugin (531) | `codex-cli 0.164.0` con un plugin mínimo en un `CODEX_HOME` descartable | lo instala con `.claude-plugin/plugin.json`; lee `.agents/plugins/marketplace.json` primero; saltea la fuente `github` y acepta `url` con `ref` |
+| `nzt-software:nzt` primera en Codex, y sus nombres | sin probar en una sesión (536 descartada) | nombres según openai/codex PR 28608 |
 
 ### El state check en macOS (unidad 489)
 
@@ -151,12 +164,15 @@ Linux. La pregunta: ¿un Mac sin nada instalado tiene `python3`? Leído el 2026-
 
 ## Abierto
 
-- Codex: el plugin de Codex sigue `[TO-DEFINE]` (Q-01); el `irm` con la skill `nzt` (D95) lo probó el usuario el 2026-11-06 y cargó bien (496).
+- Codex: el plugin está construido (D100) y Codex lo instala (531), pero no se probó en una
+  sesión que `nzt-software:nzt` cargue primero ni cómo nombra las skills; el usuario lo dio por
+  bueno si funciona en Claude Code (536 descartada).
 - La suite de evals mide todavía con el kernel en `CLAUDE.md`: pasa a medir el plugin en la
   unidad 477 (QT-111).
 - Desvíos del método vistos en la 474 y la 475 —no objetar una vez saltear el plan, una
   pregunta sin id `QT`, un cambio chico que escribió estado—: son del método, no del plugin.
-- `nzt-ai` y el plugin juntos: sin medir.
+- `nzt-ai` y el plugin juntos, en quien migra sin desinstalar: sin medir; las notas de la
+  v6.0.0 dicen que se desinstale antes.
 
 ## Preguntas
 
@@ -173,7 +189,8 @@ Q-02 a Q-09 respondieron al diseño con setup, retirado por QT-109; quedan como 
 - bloquea: el alcance, y si el tramo S3 existe
 - opciones: A, solo Claude Code y Codex `[TO-DEFINE]` hasta probar lo que C8 deja sin
   verificar; B, los dos desde ahora. El agente recomendó A.
-- respuesta: **A**, solo Claude Code · 2026-11-04
+- respuesta: **A**, solo Claude Code · 2026-11-04 · *superada por D100 (QT-121, 2026-11-08):
+  Codex entra, y el plugin es la única forma de instalar*
 
 #### Q-02 · ¿Dónde escribe el setup el kernel?
 - bloquea: la regla de destino y la de desinstalación
@@ -231,6 +248,16 @@ Q-02 a Q-09 respondieron al diseño con setup, retirado por QT-109; quedan como 
 ## Decisiones técnicas
 
 Registro de la unidad 464, solo se agrega. Los números siguen la numeración de QT del repo.
+
+### 2026-11-08 · D100, unidades 530–535
+
+**QT-121 · ¿Se borra el CLI `nzt-ai`?**
+> Sí: el plugin es la única forma de instalar, en Claude Code y en Codex (D100). Con eso se
+> van `nzt-software/cli/`, `adapter-claude.md`, `adapter-codex.md`, los `.toml` de los
+> subagentes y las salidas `dist/claude-code` y `dist/codex`. Un solo adaptador,
+> `adapter-plugin.md`, con una parte por proveedor; la versión pasa a `nzt-software/VERSION`.
+> Codex tiene su marketplace en `.agents/plugins/marketplace.json` porque no entiende la
+> fuente `github` de Claude (spike 531). — el usuario, 2026-11-08
 
 ### 2026-11-04
 

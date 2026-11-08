@@ -62,6 +62,19 @@ plugin.
 fundacional está en `Plan/specs/nzt-core/` en cuatro archivos, y nzt-software publica sus
 releases con `--latest`; un producto futuro usa tags `<producto>-vX.Y.Z` y `--latest=false`.
 
+## 3 · Una sola forma de instalar: como plugin, en Claude Code y en Codex
+
+**Hecho en esta rama: D100** (`Plan/specs/nzt-core/decisions.md`, unidades 530–535, tramo S5).
+Se borró el CLI `nzt-ai` (`nzt-software/cli/`), con sus comandos de una línea y sus binarios
+(QT-121). nzt-software se instala como plugin desde el marketplace del repo: en Claude Code
+desde `.claude-plugin/marketplace.json`, en Codex desde `.agents/plugins/marketplace.json`. Un
+solo adaptador (`adapter-plugin.md`), la versión en `nzt-software/VERSION`, y el release sin
+assets. Quien tenía `nzt-ai` lo desinstala antes (notas de la v6.0.0).
+
+**Queda abierto:** que en Codex `nzt-software:nzt` cargue primero no se probó en una sesión
+(536 descartada por el usuario). Después: la landing (repo `nzt-ai-landing`) tiene que explicar
+solo la instalación como plugin.
+
 ## Otras notas guardadas
 
 - Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;
@@ -70,5 +83,5 @@ releases con `--latest`; un producto futuro usa tags `<producto>-vX.Y.Z` y `--la
   plugin entero, como `nzt-software`.
 - **Hecho en esta rama: D97** (unidades 509–515, tramo S2). El plugin se llama
   `nzt-software` y dentro de él las skills y subagentes van sin prefijo
-  (`nzt-software:build`); en el repo, Codex y `nzt-ai` siguen siendo `nzt-<x>`. Versión 6.0.0,
-  sin publicar.
+  (`nzt-software:build`); en el repo siguen siendo `nzt-<x>`. Versión 6.0.0, sin publicar.
+  Desde D100 Codex también usa el plugin y `nzt-ai` ya no existe.

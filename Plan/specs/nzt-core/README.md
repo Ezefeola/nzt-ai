@@ -6,7 +6,8 @@
 > anteriores citan las rutas de su momento: `specs/` es `Plan/specs/`; `core/`, `skills/` y
 > `agents/` están en `nzt-software/method/`; `evals/`, `mods/` y `presentation/` en
 > `nzt-software/`; `install/build.*` es `nzt-software/build/`; `installer/` es
-> `nzt-software/cli/`, con `install/install.*` y `variants.sh` en `nzt-software/cli/install/`;
+> `nzt-software/cli/`, con `install/install.*` y `variants.sh` en `nzt-software/cli/install/`,
+> todo borrado por D100;
 > `.github/releases/` y `.github/plugin-README.md` están en `nzt-software/release/`; `dist/` es
 > `nzt-software/dist/`. La estructura actual está en la sección 9.
 
@@ -807,51 +808,51 @@ vive en su carpeta. Hoy hay uno, `nzt-software/`.
 nzt-ai/
 ├─ .claude-plugin/
 │  └─ marketplace.json          # Claude Code lo lee de acá: el plugin nzt-software y sus mods
+├─ .agents/plugins/
+│  └─ marketplace.json          # Codex lo lee antes que el de .claude-plugin: solo nzt-software (D100)
 ├─ .github/workflows/
 │  └─ nzt-software-release.yml  # puertas y release de nzt-software (D46); el único con --latest (D99)
 ├─ Plan/
 │  ├─ state.json                # el estado NZT del trabajo en este repo
 │  └─ specs/
 │     ├─ nzt-core/              # esta spec: README.md (§1–11), decisions.md (§12), build-status.md (§14)
-│     ├─ nzt-installer.md       # el instalador
-│     ├─ nzt-plugin.md          # el plugin de Claude Code
+│     ├─ nzt-plugin.md          # el plugin nzt-software, en Claude Code y en Codex
+│     ├─ nzt-installer.md       # el instalador nzt-ai, retirado por D100: queda como registro
 │     ├─ nzt-mods.md            # qué es un mod y qué trae cada uno (D63)
 │     ├─ mods/<mod>/            # la spec de cada mod (spec.md) y su mockup (mockup.html)
 │     └─ testing/, nzt-brand.md, pendientes.md
 ├─ nzt-software/
+│  ├─ VERSION                   # la versión de NZT: la del plugin y la del tag (D100)
 │  ├─ method/
-│  │  ├─ core/                  # kernel.md, skill-nzt.md y un adapter por host
+│  │  ├─ core/                  # kernel.md, skill-nzt.md y adapter-plugin.md (Claude Code y Codex)
 │  │  ├─ skills/nzt/            # árbol anidado por cohesión (ver 4.3)
 │  │  │  ├─ SKILL.md
 │  │  │  ├─ <fase>/SKILL.md ... # cada carpeta con SKILL.md es una skill
 │  │  │  └─ <fase>/references/  # las hojas de ese router (D50)
-│  │  └─ agents/                # nzt-explorer y nzt-worker: .md para Claude Code, .toml para Codex
+│  │  └─ agents/                # nzt-explorer.md y nzt-worker.md, subagentes de Claude Code
 │  ├─ evals/                    # suite de disparo (D23): README, _fixtures/, <grupo>/<caso>/
 │  ├─ mods/<mod>/               # los mods de Claude Code, opcionales (D63)
 │  ├─ build/
-│  │  └─ build.ps1 / build.sh   # loop de desarrollo: genera dist/ y valida el árbol
-│  ├─ cli/                      # nzt-ai, el que instala de verdad (D24)
-│  │  ├─ src/Nzt.Cli/           # consola .NET 10, contenido embebido
-│  │  ├─ tests/Nzt.Cli.Checks/  # comprobaciones con destinos temporales
-│  │  └─ install/               # install.ps1 / install.sh y variants.sh: los comandos de una línea
+│  │  └─ build.ps1 / build.sh   # valida el árbol y arma dist/plugin
 │  ├─ release/
 │  │  ├─ plugin-README.md       # el README de la rama del plugin
 │  │  └─ notes/vX.Y.Z.md        # las notas de cada release
 │  ├─ presentation/             # el deck HTML de NZT
-│  ├─ dist/                     # salida del build, ignorada: plugin/, claude-code/, codex/
+│  ├─ dist/plugin/              # salida del build, ignorada: el plugin que se publica
 │  └─ README.md                 # la guía de nzt-software
 ├─ README.md                    # índice: qué productos hay
 └─ LICENSE
 ```
 
-### 9.1 Anidado en el repo, plano en el proveedor
+### 9.1 Anidado en el repo, plano en el plugin
 
 Claude Code y Codex **no soportan anidamiento**: cada skill es una carpeta directa dentro
 de `skills/`. En este repo sí anidamos, porque el árbol expresa la relación router → hoja
-y mantiene la cohesión. El instalador aplana:
+y mantiene la cohesión. El build aplana:
 
 - **Nombre de la skill** = path relativo a `skills/`, con `/` reemplazado por `-`.
-  `skills/nzt/discovery/write-spec/` → `nzt-discovery-write-spec`.
+  `skills/nzt/discovery/write-spec/` → `nzt-discovery-write-spec`. En el plugin la carpeta
+  pierde el prefijo `nzt-` (D97): `nzt-software:discovery-write-spec`.
 - **Toda carpeta con un `SKILL.md` es una skill.** Las carpetas sin `SKILL.md` son
   agrupación pura y no generan nada.
 - El `name` del frontmatter debe coincidir con el nombre derivado del path. El build lo
@@ -860,28 +861,34 @@ y mantiene la cohesión. El instalador aplana:
   manteniendo sus rutas relativas intactas.
 - **`references/` es donde viven las hojas** (D50). El build les aplica el mismo tope de 200
   líneas que a una SKILL.md, y falla si una referencia no tiene fila en la tabla de su router.
-- Instaladas, todas las skills son carpetas hermanas, así que un router lee la referencia de
-  otro por ruta relativa: `../nzt-build/references/tests.md`.
+- En el plugin todas las skills son carpetas hermanas, así que un router lee la referencia de
+  otro por ruta relativa: `../build/references/tests.md`.
 
-### 9.2 Build e instalación
+### 9.2 Build, instalación y release
 
-1. El build genera `CLAUDE.md` (kernel + adapter-claude) y `AGENTS.md` (kernel +
-   adapter-codex). Ambos ≤ 200 líneas.
-2. El instalador copia `skills/` **entero y global** (D18), al destino del proveedor elegido:
-   - Claude Code: `~/.claude/skills/`
-   - Codex CLI: `~/.agents/skills/`
+Desde D100 hay una sola forma de instalar: **el plugin `nzt-software`**, en Claude Code y en
+Codex. No hay CLI ni archivos de instrucciones que escribir.
 
-   Los destinos por proyecto (`.claude/skills/`, `.agents/skills/`) existen en las dos
-   plataformas y NZT **no los usa**: no hay instalación parcial ni capa opcional.
-3. Escribe/parchea el archivo de instrucciones **global** de cada proveedor
-   (`~/.claude/CLAUDE.md`, `$CODEX_HOME/AGENTS.md`), respetando el contenido previo: el
-   bloque delimitado por `<!-- nzt:start -->` / `<!-- nzt:end -->` es lo único que NZT toca.
-4. Un manifiesto por proveedor registra lo copiado, con hashes, para poder actualizar o
-   desinstalar sin residuos y sin pisar lo que el usuario editó.
+1. `nzt-software/build/build.*` valida el árbol y arma `nzt-software/dist/plugin/`: la skill
+   `nzt` con `skill-nzt.md`, el kernel y `adapter-plugin.md` (D95), las demás skills
+   aplanadas sin prefijo, los subagentes de Claude Code y `.claude-plugin/plugin.json` con la
+   versión de `nzt-software/VERSION`. Codex instala el plugin con ese mismo manifiesto
+   (unidad 531). Las dos builds dan la misma salida.
+2. El workflow corre las puertas —el build y el state check de `nzt-plan`— y copia
+   `dist/plugin/` **sin `evals/`** a la rama `plugin-nzt-software` (D98), en un commit por
+   versión; el release se crea sin assets.
+3. Se instala desde el marketplace del repo. En Claude Code, `nzt-software@nzt` desde
+   `.claude-plugin/marketplace.json` (fuente `github` con `ref`). En Codex,
+   `codex plugin marketplace add Ezefeola/nzt-ai` y `codex plugin add nzt-software@nzt`, que
+   lee `.agents/plugins/marketplace.json` (fuente `url` con `ref`): Codex no entiende la
+   fuente `github` de Claude. Los mods solo están en el de Claude Code.
+4. **El *latest* del repo es siempre de nzt-software (D99).** GitHub tiene uno solo por repo y
+   sin flag lo elige por fecha y versión: el workflow publica con `gh release create --latest`.
+   Un producto futuro de este repo usa tags `<producto>-vX.Y.Z` y publica con `--latest=false`.
 
-Lo hace el CLI de `installer/` (D24). El plugin de `dist/` existe sólo para que
-`claude plugin eval` tenga un target (D23) y no se instala. En Claude Code hay además un
-plugin para instalar, con el kernel dentro de la skill `nzt:nzt` (D91, D92, `specs/nzt-plugin.md`).
+Los destinos por proyecto (`.claude/skills/`, `.agents/skills/`) existen en las dos
+plataformas y NZT **no los usa**. Lo que hacía el instalador `nzt-ai` hasta la v5 queda en
+`Plan/specs/nzt-installer.md`, retirada.
 
 ## 10. Reglas de autoría de las skills
 
@@ -1010,11 +1017,9 @@ Derivadas de las buenas prácticas publicadas por Anthropic y OpenAI:
 | 7 | Capa de stack: .NET 10 + Blazor, portada del set existente (4.5) | ✅ |
 | 8 | Rama profesor: `nzt-learn` + 7 hojas (4.6) | ✅ |
 | 9 | Medición de R1 con el catálogo completo en Codex | — |
-| 10 | Instalador .NET 10 → `specs/nzt-installer.md` | ✅ construido · falta la instalación real |
+| 10 | Instalador .NET 10 → `specs/nzt-installer.md` | retirado por D100: se instala como plugin (`specs/nzt-plugin.md`) |
 
-Mientras tanto la instalación es manual, o con `install/build.*` + copia. El instalador
-llega último a propósito: automatizar un catálogo que todavía cambia de forma es trabajo
-que se tira.
+Desde D100 la instalación es el plugin `nzt-software`, en Claude Code y en Codex (9.2).
 
 > Esta spec está en tres archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
 > diseño vigente) · [decisions.md](decisions.md) (§12, riesgos y decisiones D-NN) ·

@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "updated": "2026-11-08T03:37:27Z",
-  "goal": "specs/pendientes.md: S1 (sin packs), S2 (plugin nzt-software sin prefijo), S3 (todo en nzt-software/) y S4 (los dos abiertos de D98: partir nzt-core.md y el latest de los releases) (rama pendientes-post-v5)",
+  "updated": "2026-11-08T04:06:58Z",
+  "goal": "specs/pendientes.md: S1 a S4 hechos; S5: una sola forma de instalar nzt-software, como plugin en Claude Code y en Codex, sin el CLI nzt-ai (rama pendientes-post-v5)",
   "cadence": "upfront",
   "slices": [
     {
@@ -287,24 +287,91 @@
           ]
         }
       ]
+    },
+    {
+      "id": "S5",
+      "name": "Solo plugin, en Claude Code y en Codex",
+      "status": "done",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 530,
+              "do": "D100: nzt-software se instala solo como plugin en Claude Code y en Codex; QT-121 se borra el CLI nzt-ai; lo verificado de Codex con fuente y fecha, y lo que queda para el spike",
+              "status": "done"
+            },
+            {
+              "id": 531,
+              "do": "Spike en Codex con un plugin mínimo en un marketplace local: si la skill nzt carga primero, cómo nombra las skills del plugin, si un plugin trae subagentes, y si lee .claude-plugin/marketplace.json con la fuente github",
+              "status": "done",
+              "detail": "codex 0.164.0 en un CODEX_HOME descartable: instala el plugin con su .claude-plugin/plugin.json; lee .agents/plugins/marketplace.json antes que el de .claude-plugin; no entiende la fuente github de Claude (saltea nzt-software) y sí los mods locales; source url con ref sale como git. Nombres nzt-software:<x> según openai/codex PR 28608, no probado en una sesión"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 532,
+              "do": "Build: dist/plugin con el manifiesto de Codex (o una variante de Codex si el spike lo pide) y el adapter del plugin para Codex",
+              "status": "done",
+              "detail": "un solo adapter (adapter-plugin.md) para Claude Code y Codex; se borran adapter-claude.md, adapter-codex.md y los .toml de los subagentes; la versión sale de nzt-software/VERSION; el build arma solo dist/plugin"
+            },
+            {
+              "id": 533,
+              "do": "Marketplace de Codex: .agents/plugins/marketplace.json, o el de .claude-plugin si el spike muestra que alcanza",
+              "status": "done",
+              "detail": ".agents/plugins/marketplace.json con solo nzt-software (fuente url y ref plugin-nzt-software): Codex lo lee antes que el de .claude-plugin, y así no ve los mods"
+            },
+            {
+              "id": 534,
+              "do": "Borrar nzt-software/cli (instalador, checks, one-liners) y lo que solo servía al instalador (adapter-claude.md, dist/claude-code, dist/codex); workflow sin binarios ni prueba de migración, con build y state check como puertas",
+              "status": "done",
+              "detail": "se borra nzt-software/cli; workflow con puertas build y state check, versión en VERSION, sin binarios ni prueba de migración; el release se crea sin assets"
+            },
+            {
+              "id": 535,
+              "do": "Documentos: READMEs con la instalación como plugin en los dos proveedores, notas de la v6.0.0 con la migración desde nzt-ai, nzt-installer.md retirada, nzt-plugin.md con Codex, sección 9 y pendientes",
+              "status": "done",
+              "detail": "READMEs, mods, plugin-README y notas v6.0.0; nzt-installer.md retirada; nzt-plugin.md con Codex, los dos marketplaces y QT-121; sección 9 de nzt-core/README.md reescrita con la regla de tags; nzt-mods.md y pendientes.md al día; build.sh y build.ps1 sin warnings e iguales"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 536,
+              "do": "Builds; instalar el plugin desde una carpeta local en Claude Code y en Codex y ver que la skill nzt carga primero; buscar restos de irm, curl y nzt-ai",
+              "status": "dropped",
+              "detail": "el usuario: si funciona en Claude Code, en Codex también; no se prueba la instalación en vivo"
+            }
+          ]
+        }
+      ]
     }
   ],
   "approved": true,
   "delegation": "ask",
   "autonomy": {
     "units": [
-      525,
-      526,
-      527,
-      528,
-      529
+      530,
+      531,
+      532,
+      533,
+      534,
+      535
     ],
     "keep_stops": []
   },
-  "waiting_on": "el usuario: sigue trabajando en esta rama; al mergear, main y el tag v6.0.0 juntos",
+  "waiting_on": "el usuario: revisar S5 y pedir el commit (no quiere commit ni push hasta que lo pida)",
   "notes": [
-    "D96 a D99: sin packs; plugin nzt-software sin prefijo; todo en nzt-software/; nzt-core en cuatro archivos y latest fijo. S1 bc7ae46, S2 d4dc246, S3 9249e97.",
-    "S4 aprobado el 2026-11-08 (QT-119: cuatro archivos; QT-120: latest fijo en nzt-software). La rama no se mergea todavía: el usuario sigue trabajando acá.",
-    "Al mergear: main y el tag v6.0.0 juntos, porque el marketplace apunta a la rama plugin-nzt-software."
+    "D96 a D99 hechos y pusheados en origin/pendientes-post-v5 (último a3bbdb0). Desde S5 el usuario no quiere commit ni push hasta que lo pida.",
+    "Codex verificado el 2026-11-08 en developers.openai.com/plugins/build/plugins y learn.chatgpt.com/docs/developer-commands: codex plugin marketplace add owner/repo[@ref], codex plugin add <plugin@marketplace>; lee .claude-plugin/marketplace.json como legado; no documenta subagentes ni el nombre de las skills del plugin.",
+    "Después de S5: cambiar la landing (repo nzt-ai-landing) para explicar solo la instalación como plugin."
   ]
 }

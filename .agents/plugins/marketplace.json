@@ -1,0 +1,12 @@
+{
+  "name": "nzt",
+  "interface": { "displayName": "NZT" },
+  "plugins": [
+    {
+      "name": "nzt-software",
+      "source": { "source": "url", "url": "https://github.com/Ezefeola/nzt-ai.git", "ref": "plugin-nzt-software" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Coding"
+    }
+  ]
+}

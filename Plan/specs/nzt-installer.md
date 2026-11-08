@@ -1,6 +1,13 @@
 # NZT — Instalador
 
-> Estado: **construido** (v1.1.0) · `nzt-software/cli/src/Nzt.Cli` · Runbook en
+> Estado: **retirada por D100** (2026-11-08, QT-121). `nzt-ai` y `nzt-software/cli/` se
+> borraron: nzt-software se instala solo como plugin, en Claude Code y en Codex
+> (`Plan/specs/nzt-plugin.md`). Quien lo instaló con `nzt-ai` lo desinstala con la copia que
+> tiene (`nzt-ai uninstall`) antes de instalar el plugin. Esta spec queda como registro de lo
+> que se construyó hasta la v5; el código está en el commit `a3bbdb0`. Las rutas de abajo
+> son las de ese momento.
+>
+> Estado anterior: **construido** (v1.1.0) · `nzt-software/cli/src/Nzt.Cli` · Runbook en
 > `nzt-software/cli/README.md` · Depende de: `Plan/specs/nzt-core/README.md` (secciones 3, 9.1 y 9.2)
 
 ## 1. Propósito

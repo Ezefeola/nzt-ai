@@ -1,8 +1,8 @@
-# Release de nzt-software (D46, Plan/specs/nzt-installer.md sección 10.1; rutas de D98).
+# Release de nzt-software (D46, D98, D100).
 #
-# Un tag vX.Y.Z publica los seis binarios self-contained, SHA256SUMS y los
-# seis comandos de una línea: install-claude, install-claude-full e install-codex, en .ps1 y .sh. Antes corren las mismas puertas que en local: si una
-# falla, no hay release.
+# Un tag vX.Y.Z publica el plugin nzt-software en la rama plugin-nzt-software, la que leen
+# los marketplaces de Claude Code y de Codex, y crea el release con sus notas. Antes corren
+# las mismas puertas que en local: si una falla, no hay release.
 
 name: release
 
@@ -13,6 +13,7 @@ on:
     paths:
       - 'nzt-software/**'
       - '.claude-plugin/**'
+      - '.agents/plugins/**'
       - 'Plan/state.json'
       - '.github/workflows/nzt-software-release.yml'
   push:
@@ -26,101 +27,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
 
-      # I3: el tag y el <Version> del .csproj son la misma versión.
+      # El tag y nzt-software/VERSION son la misma versión (D100).
       - if: github.event_name == 'push'
-        name: Tag coincide con la versión del CLI
+        name: Tag coincide con la versión
         run: |
-          version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' nzt-software/cli/src/Nzt.Cli/Nzt.Cli.csproj)
+          version="$(tr -d ' \r\n' < nzt-software/VERSION)"
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "El tag es $GITHUB_REF_NAME y el .csproj dice $version." >&2
+            echo "El tag es $GITHUB_REF_NAME y nzt-software/VERSION dice $version." >&2
             exit 1
           fi
 
-      - name: Build del set
+      # Valida el árbol de skills (nombres, descripciones, presupuestos, referencias) y arma el plugin.
+      - name: Build del plugin
         run: bash nzt-software/build/build.sh
 
-      - name: Comprobaciones del instalador
-        run: dotnet run --project nzt-software/cli/tests/Nzt.Cli.Checks
-
-      - name: Lint del contenido embebido
-        run: dotnet run --project nzt-software/cli/src/Nzt.Cli -- verify
-
-      - name: Probar instalación limpia y migración desde v4 en un perfil descartable
-        run: |
-          git fetch --depth=1 origin tag v4.0.0
-          git worktree add --detach "$RUNNER_TEMP/v4" v4.0.0
-          dotnet build "$RUNNER_TEMP/v4/installer/src/Nzt.Cli"
-          v4="$RUNNER_TEMP/v4/installer/src/Nzt.Cli/bin/Debug/net10.0/nzt.dll"
-          v5="$PWD/nzt-software/cli/src/Nzt.Cli/bin/Debug/net10.0/nzt.dll"
-          export HOME="$(mktemp -d)"
-          dotnet "$v5" install --provider codex
-          test -s "$HOME/.agents/skills/nzt/SKILL.md"
-          test ! -e "$HOME/.codex/AGENTS.md"
-          mkdir -p "$HOME/.claude"
-          echo 'Instrucciones propias' > "$HOME/.claude/CLAUDE.md"
-          dotnet "$v4" install --provider claude-code
-          grep -Fq '<!-- nzt:start -->' "$HOME/.claude/CLAUDE.md"
-          dotnet "$v5" install --provider claude-code
-          test "$(cat "$HOME/.claude/CLAUDE.md")" = 'Instrucciones propias'
-          cmp nzt-software/dist/claude-code/nzt/SKILL.md "$HOME/.claude/skills/nzt/SKILL.md"
-
-  publish:
-    if: github.event_name == 'push'
-    needs: gates
-    strategy:
-      matrix:
-        include:
-          - { rid: win-x64, os: ubuntu-latest, ext: .exe }
-          - { rid: win-arm64, os: ubuntu-latest, ext: .exe }
-          - { rid: linux-x64, os: ubuntu-latest, ext: '' }
-          - { rid: linux-arm64, os: ubuntu-latest, ext: '' }
-          # En macOS: ahí el SDK firma ad-hoc el ejecutable, que Apple Silicon exige.
-          - { rid: osx-x64, os: macos-latest, ext: '' }
-          - { rid: osx-arm64, os: macos-latest, ext: '' }
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Publicar ${{ matrix.rid }}
-        run: |
-          dotnet publish nzt-software/cli/src/Nzt.Cli/Nzt.Cli.csproj -c Release -r ${{ matrix.rid }} -o out
-          mkdir -p assets
-          mv "out/nzt${{ matrix.ext }}" "assets/nzt-${{ matrix.rid }}${{ matrix.ext }}"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: nzt-${{ matrix.rid }}
-          path: assets/*
-          if-no-files-found: error
+      - name: State check de este repo
+        run: python3 nzt-software/method/skills/nzt/plan/scripts/state-check.py
 
   release:
-    needs: publish
+    if: github.event_name == 'push'
+    needs: gates
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          path: assets
-          pattern: nzt-*
-          merge-multiple: true
-
-      # Un comando por proveedor, generado de las dos fuentes de nzt-software/cli/install/.
-      - name: Hashes y comandos por proveedor
-        run: |
-          cd assets
-          sha256sum nzt-* > SHA256SUMS
-          cat SHA256SUMS
-          sh ../nzt-software/cli/install/variants.sh .
 
       - name: Publicar el plugin de este tag
         run: |
@@ -165,9 +97,10 @@ jobs:
           if test -f "nzt-software/release/notes/$GITHUB_REF_NAME.md"; then
             notes=(--notes-file "nzt-software/release/notes/$GITHUB_REF_NAME.md")
           fi
-          # --latest (D99): los one-liners bajan de releases/latest/download/, así que el latest del
-          # repo es siempre el de nzt-software. Otro producto publica con --latest=false.
-          gh release create "$GITHUB_REF_NAME" assets/* --verify-tag --latest --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
+          # --latest (D99): el latest del repo es siempre el de nzt-software. Otro producto
+          # publica con tags <producto>-vX.Y.Z y --latest=false.
+          gh release create "$GITHUB_REF_NAME" --verify-tag --latest --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
+
   notify-landing:
     needs: release
     runs-on: ubuntu-latest
