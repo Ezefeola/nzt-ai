@@ -21,6 +21,12 @@ cosas:
 Y tiene que **poder apoyarse en plugins, MCPs o ambos**, y en las herramientas que tenga el
 agente, **cuando el trabajo las necesite** o el agente lo considere útil. No como requisito.
 
+**Cómo se apoya en herramientas** (aclarado por el usuario el 2026-11-08): el agente **no
+instala ni usa un plugin o MCP de una**. Se fija qué necesitaría el trabajo para hacerse de
+manera excelente y **se lo consulta a la persona**, por ejemplo preguntándole si quiere que
+investigue si hace falta algún plugin, MCP o ambos para lo que pidió. La forma exacta (cuándo
+preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por debatir**.
+
 ## De dónde viene
 
 - **`nzt-software`** (`../nzt-software/README.md`) define su forma de trabajo al principio
@@ -52,12 +58,38 @@ agente, **cuando el trabajo las necesite** o el agente lo considere útil. No co
 - **El nombre:** `nzt-method` es provisorio. *Propuesta de Claude:* no usar solo `nzt`,
   porque es la marca y el monorepo entero.
 - **La relación con `nzt-software`:** lo reemplaza, `nzt-software` se apoya en él, o
-  conviven.
+  conviven. Se decide **después** de tener el método genérico; la idea del usuario es que
+  los dominios (software y otros) lleguen como paquetes.
 - **Qué es lo mínimo** que tiene que tener el método para mantener el contexto sin volverse
   burocracia en un trabajo chico.
 - **Cómo se adapta a un dominio** sin nombrarlo: quién aporta el vocabulario y las
   prácticas de cada tipo de trabajo (el usuario, un plugin, un MCP, el propio agente).
 - **En qué hosts corre:** Claude Code y Codex como `nzt-software`, o también otros.
+- **Cómo propone herramientas:** en qué momento pregunta (al empezar un trabajo, cuando
+  aparece un hueco, o ambos), qué muestra al proponer, qué pasa con lo que la persona
+  rechaza, y dónde queda registrado lo instalado.
+
+## Cómo retomar
+
+Si se limpia el contexto, una sesión nueva retoma así:
+
+1. Leer este archivo y `README.md` de esta carpeta. Lo de esta carpeta es la única fuente:
+   no hay `Plan/state.json` ni NZT activo.
+2. Mirar **Estado actual** (abajo) y los últimos commits de la rama `metodo-generico`.
+3. Seguir desde el próximo paso, sin decidir nada que figure como abierto sin consultarlo.
+
+## Estado actual
+
+- **2026-11-08:** leídos `Idea.md`, `README.md` y el principio de
+  `../nzt-software/README.md`. Sumada la aclaración sobre cómo se proponen las herramientas.
+  Claude propuso el primer paso y el usuario aprobó empezar por investigar.
+- **2026-11-08:** hecha la investigación de BMAD-Method, Spec Kit, Agent OS y Shape Up en
+  `Investigacion.md`: se confirma que ninguno es genérico, y al final hay ideas para tomar.
+- **2026-11-08, decisión del usuario:** el método genérico se hace **aparte y primero**.
+  `nzt-software` no se toca ni se usa como base a desmontar; después se verá si se integra
+  con paquetes por dominio (software y otros).
+  **Próximo paso:** debatir con el usuario los principios del método genérico, partiendo de
+  las conclusiones de `Investigacion.md`, antes de escribir su estructura.
 
 ## Primer paso sugerido
 
