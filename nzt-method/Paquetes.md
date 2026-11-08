@@ -43,10 +43,10 @@ ejemplo.
 ### 3. Cómo se activa
 
 - Al empezar, el agente reconoce el dominio y **propone** qué paquete aplicaría. Con el sí
-  de la persona, queda **declarado en el archivo de estado** (P2), igual que `tech.md`
-  declara las reglas en `nzt-software`.
-- Solo se lee lo que el archivo de estado declara, y de cada paquete solo la parte que la
-  pieza necesita.
+  de la persona, queda **anotado en el archivo de herramientas del agente** (PQ2), igual
+  que `tech.md` declara las reglas en `nzt-software`.
+- Solo se lee lo que ese archivo declara, y de cada paquete solo la parte que la pieza
+  necesita.
 - **Puede haber varios a la vez:** un juego puede llevar software, diseño y escritura.
 
 ### 4. Quién gana si hay conflicto

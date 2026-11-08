@@ -113,6 +113,15 @@ Si se limpia el contexto, una sesión nueva retoma así:
   default genérico para escribir cualquier documento. Quedan abiertos: el nombre y el lugar
   del archivo de estado y del de herramientas, y qué dice el default de documentos.
   **Próximo paso:** revisar con el usuario los 11 principios de `Principios.md` uno por uno.
+- **2026-11-08:** commit `c6fc8ea`. Claude probó los 11 principios contra ocho trabajos
+  distintos y anotó en `Principios.md` → *Revisión* lo que pasa sin cambios, 5 huecos
+  (R1–R5) y 4 principios que podrían faltar (R6–R9). **Próximo paso:** que el usuario
+  decida R1–R9; después reescribir los principios con lo decidido.
+- **2026-11-08:** el usuario aceptó R1–R9. `Principios.md` quedó reescrito con **14
+  principios aceptados**, lo abierto y el historial de decisiones. **Próximo paso:** definir
+  lo abierto (nombre y lugar del archivo de estado y del de herramientas, y el default
+  genérico de documentos) y después la estructura del método (qué skills y archivos tiene),
+  usando `gestionar-skills` y `skill-creator` al escribir las skills.
 
 ## Primer paso sugerido
 
