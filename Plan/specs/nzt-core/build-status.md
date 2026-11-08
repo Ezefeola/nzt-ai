@@ -1,13 +1,13 @@
 # NZT — Estado de la construcción
 
-> Esta spec está en cuatro archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
+> Esta spec está en tres archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
 > diseño vigente) · [decisions.md](decisions.md) (§12, riesgos y decisiones D-NN) ·
-> [temper-v3.md](temper-v3.md) (§13) · [build-status.md](build-status.md) (§14). Los números de
-> sección son los de siempre.
+> [build-status.md](build-status.md) (§14). Los números de sección son los de siempre; la §13,
+> la revisión contra Temper v3, se retiró y queda en la historia de git (commit `f04b062`).
 
 ## 14. Estado de la construcción
 
-> Punto de retomada. Si empezás una sesión nueva, leé esto y la sección 13.
+> Punto de retomada. Si empezás una sesión nueva, leé esto.
 
 > **Estado actual (2026-11-01), rama `refactor-marco-generico`.** D88: global queda solo el
 > marco —12 skills, 60 referencias—, y lo de una tecnología o una arquitectura son 8 packs

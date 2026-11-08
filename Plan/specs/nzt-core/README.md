@@ -2,7 +2,7 @@
 
 > Estado: borrador para aprobación · Fecha: 2026-09-16 · Owner: Eze
 
-> **Rutas desde D98 (2026-11-07).** Esta spec vive en `Plan/specs/nzt-core/`, en cuatro archivos (D99). Las decisiones
+> **Rutas desde D98 (2026-11-07).** Esta spec vive en `Plan/specs/nzt-core/`, en tres archivos (D99). Las decisiones
 > anteriores citan las rutas de su momento: `specs/` es `Plan/specs/`; `core/`, `skills/` y
 > `agents/` están en `nzt-software/method/`; `evals/`, `mods/` y `presentation/` en
 > `nzt-software/`; `install/build.*` es `nzt-software/build/`; `installer/` es
@@ -812,7 +812,7 @@ nzt-ai/
 ├─ Plan/
 │  ├─ state.json                # el estado NZT del trabajo en este repo
 │  └─ specs/
-│     ├─ nzt-core/              # esta spec: README.md (§1–11), decisions.md (§12), temper-v3.md, build-status.md
+│     ├─ nzt-core/              # esta spec: README.md (§1–11), decisions.md (§12), build-status.md (§14)
 │     ├─ nzt-installer.md       # el instalador
 │     ├─ nzt-plugin.md          # el plugin de Claude Code
 │     ├─ nzt-mods.md            # qué es un mod y qué trae cada uno (D63)
@@ -1016,10 +1016,10 @@ Mientras tanto la instalación es manual, o con `install/build.*` + copia. El in
 llega último a propósito: automatizar un catálogo que todavía cambia de forma es trabajo
 que se tira.
 
-> Esta spec está en cuatro archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
+> Esta spec está en tres archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
 > diseño vigente) · [decisions.md](decisions.md) (§12, riesgos y decisiones D-NN) ·
-> [temper-v3.md](temper-v3.md) (§13) · [build-status.md](build-status.md) (§14). Los números de
-> sección son los de siempre.
+> [build-status.md](build-status.md) (§14). Los números de sección son los de siempre; la §13,
+> la revisión contra Temper v3, se retiró y queda en la historia de git (commit `f04b062`).
 
 ## Fuentes
 

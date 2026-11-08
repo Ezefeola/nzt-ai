@@ -1,9 +1,9 @@
 # NZT — Riesgos y decisiones
 
-> Esta spec está en cuatro archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
+> Esta spec está en tres archivos (D99): [README.md](README.md) (§1–11 y Fuentes, el
 > diseño vigente) · [decisions.md](decisions.md) (§12, riesgos y decisiones D-NN) ·
-> [temper-v3.md](temper-v3.md) (§13) · [build-status.md](build-status.md) (§14). Los números de
-> sección son los de siempre.
+> [build-status.md](build-status.md) (§14). Los números de sección son los de siempre; la §13,
+> la revisión contra Temper v3, se retiró y queda en la historia de git (commit `f04b062`).
 
 ## 12. Riesgos y decisiones abiertas
 
@@ -2516,4 +2516,6 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
   - **Lo que se acepta:** **(1)** quien busque una decisión por "nzt-core.md" la encuentra en
     `nzt-core/decisions.md`; **(2)** la regla de QT-120 depende de que el workflow del producto
     nuevo la cumpla: nada la hace cumplir sola.
+  - **Después:** el 2026-11-08 el usuario pidió borrar `temper-v3.md`: la §13 queda en la
+    historia de git (commit `f04b062`) y la spec queda en tres archivos.
   - **Revertirla:** volver `Plan/specs/` y el workflow al commit `9249e97`.
