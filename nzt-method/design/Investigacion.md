@@ -14,7 +14,7 @@ mediados de noviembre de 2026.
 
 **Qué es.** Un método para llevar una idea o un cambio hasta software funcionando. Su loop
 tiene cuatro pasos: aclarar, planificar, construir y verificar, aprender y ajustar. Aprender
-vuelve a planificar. Se entra por cualquier punto: una idea vaga empieza por aclarar, un
+vuelve a planificar. Se entra por cualquier punto: una idea vaga emunidad por aclarar, un
 cambio chico va directo a construir.
 
 **Cómo se dimensiona.** El proceso crece según el trabajo, en cuatro caminos:
@@ -81,7 +81,7 @@ externos), *hooks* antes y después de cada comando, *presets* que cambian plant
 **terminología**, workflows, bundles y catálogos. Avisa que lo del catálogo no está auditado
 y que hay que revisar el código antes de instalar.
 
-**Qué tiene de bueno.** Los procesos como piezas sueltas; cada uno termina en un **veredicto
+**Qué tiene de bueno.** Los procesos como unidades sueltas; cada uno termina en un **veredicto
 explícito** (`verified`/`partial`/`failed`, `go`/`kill`); la *constitution* como reglas del
 proyecto; los presets que cambian el vocabulario, que es justo el problema de adaptarse a un
 dominio sin nombrarlo.
@@ -153,7 +153,7 @@ propio libro separa "verdades básicas" de "prácticas específicas".
    ninguno. Hay espacio para lo que se busca.
 2. **Lo que se repite en todos** y parece ser el núcleo de verdad: dimensionar el proceso al
    trabajo; guardar el contexto en archivos legibles, no en memoria; separar "qué y para qué"
-   de "cómo se hace" y de "qué sigue"; terminar cada pieza en un veredicto o una parada.
+   de "cómo se hace" y de "qué sigue"; terminar cada unidad en un veredicto o una parada.
 3. **Ideas para tomar:**
    - de BMAD, **entrar por cualquier punto** y que el método **recomiende el próximo paso**;
    - de Spec Kit, **procesos sueltos** en vez de fases, el **veredicto explícito** al final

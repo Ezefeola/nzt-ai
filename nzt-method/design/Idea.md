@@ -29,7 +29,7 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 
 ## De dónde viene
 
-- **`nzt-software`** (`../nzt-software/README.md`) define su forma de trabajo al principio
+- **`nzt-software`** (`../../nzt-software/README.md`) define su forma de trabajo al principio
   del README: las fases DISCOVERY → ARCHITECTURE → DESIGN → BUILD → VERIFY → SHIP, y en cada
   unidad el loop Entender → Proponer → Ejecutar → Verificar → Registrar, con el estado en
   `Plan/state.json`. **La idea es tomar esa forma, pero genérica:** las fases y sus nombres
@@ -58,8 +58,8 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 
 ## Preguntas abiertas
 
-- **El nombre:** `nzt-method` es provisorio. *Propuesta de Claude:* no usar solo `nzt`,
-  porque es la marca y el monorepo entero.
+- ~~**El nombre:** `nzt-method` es provisorio.~~ Decidido: **`nzt`** (S1 en
+  `Estructura.md`). La carpeta del repositorio sigue siendo `nzt-method/`.
 - **La relación con `nzt-software`:** lo reemplaza, `nzt-software` se apoya en él, o
   conviven. Se decide **después** de tener el método genérico; la idea del usuario es que
   los dominios (software y otros) lleguen como paquetes.
@@ -76,10 +76,14 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 
 Si se limpia el contexto, una sesión nueva retoma así:
 
-1. Leer este archivo y `README.md` de esta carpeta. Lo de esta carpeta es la única fuente:
-   no hay `Plan/state.json` ni NZT activo. Según el estado, seguir con `Principios.md`
+1. Leer este archivo (`nzt-method/design/Idea.md`) y `../README.md`. Lo de `nzt-method/`
+   es la única fuente: no hay `Plan/state.json` ni NZT activo. Los documentos de diseño
+   están en `design/` y el plugin, cuando exista, en `plugin/`. Según el estado, seguir con
+   `Principios.md`
    (principios y sus decisiones), `Paquetes.md` (paquetes de dominio), `Archivos.md`
-   (archivos de estado y de herramientas), `Documentos.md` (default de documentos) e
+   (archivos de estado y de herramientas), `Documentos.md` (default de documentos),
+   `Estructura.md` (skills y archivos del método), `Glosario.md` (términos del método, en
+   español e inglés) e
    `Investigacion.md` (métodos parecidos revisados).
 2. Mirar **Estado actual** (abajo) y los últimos commits de la rama `metodo-generico`.
 3. Seguir desde el próximo paso, sin decidir nada que figure como abierto sin consultarlo.
@@ -87,7 +91,7 @@ Si se limpia el contexto, una sesión nueva retoma así:
 ## Estado actual
 
 - **2026-11-08:** leídos `Idea.md`, `README.md` y el principio de
-  `../nzt-software/README.md`. Sumada la aclaración sobre cómo se proponen las herramientas.
+  `../../nzt-software/README.md`. Sumada la aclaración sobre cómo se proponen las herramientas.
   Claude propuso el primer paso y el usuario aprobó empezar por investigar.
 - **2026-11-08:** hecha la investigación de BMAD-Method, Spec Kit, Agent OS y Shape Up en
   `Investigacion.md`: se confirma que ninguno es genérico, y al final hay ideas para tomar.
@@ -137,6 +141,36 @@ Si se limpia el contexto, una sesión nueva retoma así:
   (principio 10). **No queda nada abierto en principios, paquetes, archivos ni documentos.**
   **Próximo paso:** proponer la estructura del método (qué skills y archivos tiene, en
   inglés), usando `gestionar-skills` y `skill-creator` al escribir las skills.
+- **2026-11-08:** commit `cf48147`. Borrador de la estructura en `Estructura.md`: cinco
+  skills del núcleo, sus referencias, cómo se enchufa un paquete y dónde vive el plugin,
+  con preguntas S1–S4 (S1, el nombre, hace falta antes de escribir la primera skill y no
+  puede chocar con las de `nzt-software`). **Próximo paso:** las respuestas del usuario.
+- **2026-11-08:** decididos S1–S4 (`Estructura.md`): el método se llama **`nzt`**; las cinco
+  skills quedan por ahora; Claude Code y Codex. Ordenada la carpeta: diseño en `design/`,
+  plugin en `plugin/`. Queda anotado el choque de nombres con `nzt-software` (no instalar
+  los dos juntos hasta integrarlos). **Próximo paso:** escribir la primera skill, `nzt`, en
+  `plugin/skills/nzt/`, con `gestionar-skills` y `skill-creator`, y probarla con trabajos
+  de al menos tres dominios.
+- **2026-11-08:** antes de escribir, el usuario pidió revisar responsabilidades. Anotada en
+  `Estructura.md` → *Revisión de responsabilidades*: correcciones a `nzt` y `nzt-retro`,
+  una sola dueña por referencia y un glosario. En charla: esas correcciones, qué es
+  `nzt-writing` (solo un ejemplo de paquete) y el nombre de `nzt-piece`, que al usuario no le
+  cierra. **Próximo paso:** sus respuestas; recién después escribir skills.
+- **2026-11-08:** el usuario aceptó las correcciones de responsabilidades. A su pedido se
+  sumó el **glosario de cada trabajo** (principio 15, `Docs/glossary.md`) y quedó explícito
+  que **cada aporte de un paquete tiene un default genérico en el núcleo** (`Paquetes.md`,
+  sección 5), para que el método funcione sin ningún paquete. Ahora son 15 principios.
+  Sigue en charla el nombre de `nzt-piece` (`Estructura.md` → *En charla*). La
+  reorganización a `design/` está en stage, sin commit.
+- **2026-11-08:** `nzt-piece` pasa a llamarse **`nzt-do`**. Las skills del núcleo son
+  `nzt`, `nzt-plan`, `nzt-do`, `nzt-tools` y `nzt-retro`. Queda en charla si "unidad" se
+  dice `piece` o `unit` en inglés. **Próximo paso:** eso, el glosario del método y escribir
+  la skill `nzt` con `gestionar-skills` y `skill-creator`.
+- **2026-11-08:** "pieza" pasa a ser **unidad** (`unit` en inglés), y los documentos de
+  diseño ya lo dicen así. Escrito el glosario del método en `Glosario.md`; quedan como
+  *propuesta* los nombres en inglés de los tamaños (`direct`, `planned`, `sliced`) y de
+  "recortable" (`cuttable`). **Próximo paso:** escribir la skill `nzt` en
+  `plugin/skills/nzt/` con `gestionar-skills` y `skill-creator`.
 
 ## Primer paso sugerido
 

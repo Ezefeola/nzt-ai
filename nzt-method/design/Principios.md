@@ -1,7 +1,7 @@
 # Principios del método genérico
 
 Aceptados por el usuario el 2026-11-08. Salen de lo pedido en `Idea.md`, de
-`Investigacion.md`, de la forma de trabajo de `../nzt-software/README.md` (tomada como
+`Investigacion.md`, de la forma de trabajo de `../../nzt-software/README.md` (tomada como
 referencia) y de una revisión contra ocho trabajos distintos: una función de software, una
 mudanza, una novela, un curso, una investigación, un evento, aprender algo y una exploración
 creativa. Los paquetes de dominio están en `Paquetes.md`. Al final está el historial de cómo
@@ -10,7 +10,7 @@ se decidió cada cosa.
 ## Los principios
 
 1. **El núcleo no nombra ningún dominio.** No trae fases, roles ni tipos de entregable de
-   ningún tema: habla de *trabajo*, *pieza*, *decisión* y *verificación*. El saber de un tema
+   ningún tema: habla de *trabajo*, *unidad*, *decisión* y *verificación*. El saber de un tema
    llega en **paquetes de dominio**, cada uno un plugin aparte, y el núcleo funciona sin
    ninguno (ver `Paquetes.md`).
 
@@ -19,15 +19,15 @@ se decidió cada cosa.
    según cuánto vale el trabajo para la persona, no según cuánto se estima que tarda:
    - **al paso:** se hace y se reporta, sin plan ni estado;
    - **con plan corto:** un plan que se aprueba una vez;
-   - **por partes:** el trabajo se corta en piezas, cada una con su parada.
+   - **por partes:** el trabajo se corta en unidades, cada una con su parada.
 
    El agente dice qué tamaño eligió, y la persona lo puede cambiar en cualquier momento.
 
-3. **Cada pieza recorre el mismo loop, tan corto como haga falta:** entender → proponer →
-   hacer → verificar → registrar. Al paso, cada paso puede ser una línea; en una pieza grande,
+3. **Cada unidad recorre el mismo loop, tan corto como haga falta:** entender → proponer →
+   hacer → verificar → registrar. Al paso, cada paso puede ser una línea; en una unidad grande,
    un documento. Ningún paso es un trámite.
 
-4. **En cada pieza queda dicho quién hace el trabajo:** el agente, la persona o los dos.
+4. **En cada unidad queda dicho quién hace el trabajo:** el agente, la persona o los dos.
    Cuando lo hace la persona (una mudanza, un evento), el agente prepara, guía y verifica con
    lo que la persona le cuenta o le muestra. Cuando la persona quiere **aprender**, hace ella
    y el agente enseña, sin hacerlo por ella.
@@ -41,9 +41,9 @@ se decidió cada cosa.
    trabajo (un texto que revisa un lector, una mudanza con todo en su lugar, un programa con
    sus pruebas). Verificar es comprobar contra ese criterio, no opinar.
 
-7. **Cada pieza termina en una parada con veredicto:** hecho, parcial o no logrado, con qué
+7. **Cada unidad termina en una parada con veredicto:** hecho, parcial o no logrado, con qué
    se comprobó y qué quedó sin comprobar. Para ir más rápido, la persona puede dar un lote
-   cerrado de piezas, y el agente igual para al terminarlo. En un trabajo largo, **para antes
+   cerrado de unidades, y el agente igual para al terminarlo. En un trabajo largo, **para antes
    de quedarse sin contexto**, con el estado al día.
 
 8. **El contexto vive en los archivos del trabajo.** Todo trabajo con estado tiene **una
@@ -80,6 +80,13 @@ se decidió cada cosa.
     se recorta alcance en vez de estirar el plazo, y lo recortable queda marcado desde el
     plan.
 
+15. **Cada trabajo mantiene su glosario.** Las palabras clave del trabajo, con lo que
+    significan *en este trabajo*, quedan en `Docs/glossary.md`. Se usan las palabras de la
+    persona; si un paquete trae vocabulario, es un punto de partida, y lo que la persona
+    llama distinto gana. El agente lo crea con el primer término que necesite fijar, lo
+    actualiza cuando aparece o cambia uno, y usa siempre el mismo término para el mismo
+    concepto, en la conversación y en los documentos.
+
 ## Abierto
 
 Nada en los principios. Los archivos están decididos en `Archivos.md` y el default de
@@ -111,3 +118,5 @@ documentos en `Documentos.md`.
 - **Herramientas, antes y durante (2026-11-08):** el agente revisa antes de empezar a
   trabajar si tiene todo, y propone solo lo que necesita y no tiene; si una falta aparece en
   medio, la plantea en la parada, o para si lo bloquea. → principio 10.
+- **Glosario del trabajo (2026-11-08):** pedido del usuario; no estaba contemplado (solo se
+  había pensado un glosario del método). → principio 15.

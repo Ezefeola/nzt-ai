@@ -42,8 +42,8 @@ Qué se quiere lograr y para quién. Tamaño: <al paso | con plan corto | por pa
 ## Hecho cuando
 El criterio acordado (principio 6).
 
-## Piezas
-| Pieza | Quién hace | Estado | Veredicto |
+## Unidades
+| Unidad | Quién hace | Estado | Veredicto |
 |---|---|---|---|
 | … | agente / persona / los dos | pendiente / en curso / parada | hecho / parcial / no logrado |
 
@@ -58,7 +58,7 @@ Lo que el agente recomendó y si la persona ya lo aprobó.
 ```
 
 Las secciones vacías no se escriben. Si un tiempo fijo aplica (principio 14), va en *Qué
-es*, y lo recortable se marca en *Piezas*.
+es*, y lo recortable se marca en *Unidades*.
 
 ## `herramientas.md`
 
@@ -111,6 +111,21 @@ Todo lo que usa el trabajo además del agente: plugins, MCPs y paquetes de domin
 ├── Plan/
 │   └── state.md
 ├── Docs/
-│   └── agent-tools.md
+│   ├── agent-tools.md
+│   └── glossary.md
 └── … lo que produce el trabajo
 ```
+
+- **Glosario (2026-11-08, principio 15):** `Docs/glossary.md` se crea con el primer término
+  que haga falta fijar, también en un trabajo al paso si aparece uno. Forma propuesta:
+
+```markdown
+# Glossary
+
+| Término | Qué significa en este trabajo | No confundir con |
+|---|---|---|
+| … | … | otro término parecido, si lo hay |
+```
+
+  Orden alfabético; un término por concepto; si un término cambia, se reemplaza y se anota
+  en *Decisiones* de `Plan/state.md`.

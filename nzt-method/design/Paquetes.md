@@ -24,9 +24,9 @@ Lo que suma, ordenado por el paso del loop en que se usa:
 
 | Aporta | Para qué paso | Ejemplo en escritura |
 |---|---|---|
-| **Vocabulario:** cómo se llaman las piezas y los documentos | Todos | capítulo, borrador, versión editada |
+| **Vocabulario:** cómo se llaman las unidades y los documentos | Todos | capítulo, borrador, versión editada |
 | **Preguntas de arranque:** qué hay que saber antes de empezar | Entender | público, tono, extensión, fecha |
-| **Cómo se corta el trabajo en piezas** | Proponer | un capítulo por pieza |
+| **Cómo se corta el trabajo en unidades** | Proponer | un capítulo por unidad |
 | **Prácticas:** cómo se hace bien | Hacer | estructura, voz, ritmo |
 | **Criterios de hecho típicos y cómo se comprueban** | Verificar | se lee en voz alta, lo revisa un lector |
 | **Herramientas que suelen hacer falta** | Al empezar, solo si falta algo (P3) | un corrector, un MCP de documentos |
@@ -45,7 +45,7 @@ ejemplo.
 - Al empezar, el agente reconoce el dominio y **propone** qué paquete aplicaría. Con el sí
   de la persona, queda **anotado en el archivo de herramientas del agente** (PQ2), igual
   que `tech.md` declara las reglas en `nzt-software`.
-- Solo se lee lo que ese archivo declara, y de cada paquete solo la parte que la pieza
+- Solo se lee lo que ese archivo declara, y de cada paquete solo la parte que la unidad
   necesita.
 - **Puede haber varios a la vez:** un juego puede llevar software, diseño y escritura.
 
@@ -55,11 +55,24 @@ ejemplo.
 2. Las convenciones del propio trabajo (lo que ya está hecho, el archivo de estado).
 3. Los paquetes. Si dos paquetes se contradicen, el agente pregunta.
 
-### 5. Si no hay paquete para el dominio
+### 5. Si no hay paquete: el default de cada aporte
 
-El agente trabaja con lo que sabe, **lo dice**, y propone las preguntas de arranque y los
-criterios de hecho él mismo. Si el dominio se repite, puede proponer armar un paquete con lo
-aprendido.
+**El núcleo trae un default genérico para cada cosa que un paquete puede aportar**, igual
+que trae el default de documentos. Así funciona en cualquier trabajo sin ningún paquete; un
+paquete solo lo mejora o lo vuelve más consistente en su tema. (Ampliado el 2026-11-08 a
+pedido del usuario.)
+
+| Aporte | Default del núcleo, sin paquete |
+|---|---|
+| **Vocabulario** | Las palabras de la persona. El agente fija las clave en el glosario del trabajo (principio 15) y no inventa jerga |
+| **Preguntas de arranque** | Un juego genérico: qué se quiere lograr, para quién, para cuándo, qué existe ya, qué restricciones hay (plata, tiempo, reglas) y cómo se va a saber que salió bien. Solo se pregunta lo que no se puede deducir |
+| **Cómo cortar en unidades** | Cada unidad deja algo que se puede verificar solo; es lo bastante chica para una parada; primero va lo que más riesgo o incógnitas tiene, y después lo que depende de otra cosa |
+| **Prácticas** | Lo que el agente sabe de ese tema, dicho como propuesta y no como regla: "así se suele hacer, ¿te sirve?". Si no sabe, lo dice y propone investigar |
+| **Criterios de hecho** | Se derivan de *cómo se va a saber que salió bien* y se acuerdan (principio 6) |
+| **Herramientas** | El principio 10, igual que con paquete |
+
+Cuando el agente trabaja sin paquete, **lo dice una vez al empezar**. Si el mismo tipo de
+trabajo se repite, la retro lo señala y se puede armar un paquete con lo aprendido (PQ4).
 
 ## Preguntas para el debate
 
@@ -88,8 +101,8 @@ aprendido.
 - **Documentos (2026-11-08): el núcleo trae un default genérico para escribir cualquier
   documento,** no solo los suyos, porque rara vez un plugin o paquete dice cómo escribir la
   documentación. Quedan así:
-  - **Los del método:** el archivo de estado, la propuesta o plan de una pieza (qué, para
-    qué, criterio de hecho, piezas) y el reporte de la parada (veredicto, qué se comprobó,
+  - **Los del método:** el archivo de estado, la propuesta o plan de una unidad (qué, para
+    qué, criterio de hecho, unidades) y el reporte de la parada (veredicto, qué se comprobó,
     qué no). Existen siempre que el tamaño los pida, haya paquete o no.
   - **Los entregables del trabajo** (un capítulo, una spec, el temario de un curso): se
     escriben con el **default genérico** del núcleo. Un paquete puede sumarle o reemplazarle
