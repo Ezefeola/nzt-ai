@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: sliced-course-clarify
+expected_outcome: |
+  Treats the request as vague: asks the starting questions it cannot deduce in one numbered message, each with a suggested default, and does not size or plan before they are answered (or sizes it provisionally and says so).

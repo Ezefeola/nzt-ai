@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: person-does-house-move
+expected_outcome: |
+  Recognizes that the person does most of the work and the agent prepares, guides and verifies; sizes it as planned or sliced with a fixed deadline; proposes where to keep the work folder and waits for a yes; hands off to nzt-plan.

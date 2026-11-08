@@ -171,6 +171,38 @@ Si se limpia el contexto, una sesión nueva retoma así:
   *propuesta* los nombres en inglés de los tamaños (`direct`, `planned`, `sliced`) y de
   "recortable" (`cuttable`). **Próximo paso:** escribir la skill `nzt` en
   `plugin/skills/nzt/` con `gestionar-skills` y `skill-creator`.
+- **2026-11-08:** commit `98596e4`. Escrita la skill **`nzt`** en
+  `plugin/skills/nzt/`: `SKILL.md` (10 pasos: leer estado, leer glosario y herramientas,
+  descartar lo que no es trabajo, aclarar, dimensionar, quién hace, herramientas, paquetes,
+  ubicar la carpeta, derivar) y seis referencias de las que es dueña (`state.md`,
+  `glossary.md`, `starting.md`, `sizing.md`, `packages.md`, `documents.md`). Auditada con
+  las reglas de `gestionar-skills` (dos pasadas, sin hallazgos abiertos). Escritos 4 casos
+  de prueba en `evals/` con el formato de `skill-creator`: bug de software (direct), curso
+  vago (aclarar), mudanza (lo hace la persona) y retomar desde `Plan/state.md`. **Sin
+  correr todavía.** **Próximo paso:** que el usuario apruebe los casos y correrlos con y sin
+  la skill.
+- **2026-11-08:** corridos los 4 casos con y sin la skill (iteración 1, resultados en el
+  scratchpad de la sesión, fuera del repo). Con skill 100% de los criterios, sin skill 44%.
+  Problemas encontrados para corregir en la iteración 2: (1) las respuestas muestran a la
+  persona la jerga del método (nombres de skills, "tamaño directo", "paquete del método");
+  (2) los tamaños se traducen distinto cada vez; (3) la regla "gana la carpeta, corregí el
+  estado" hizo que el agente reescribiera `Plan/state.md` porque faltaban archivos, cuando
+  debería avisar y preguntar. **Próximo paso:** la devolución del usuario sobre el visor y
+  la iteración 2. La skill y los casos no tienen commit.
+- **2026-11-08:** el usuario pidió que el agente hable de forma amigable: bullets, resumido
+  y marcando lo que hizo. Sumado el **principio 16** y la referencia
+  `plugin/skills/nzt/references/messages.md` (forma del mensaje: línea de apertura, *qué
+  hice / qué encontré / qué supongo / qué necesito*, sin jerga del método, tabla para decir
+  los tamaños con palabras). `SKILL.md` de `nzt` ahora tiene 11 pasos (el 10 es *Tell the
+  person*). `state.md`: si estado y carpeta no coinciden, avisa y pregunta antes de tocar el
+  estado. **Próximo paso:** sumar a los casos los criterios de lenguaje amigable y de no
+  tocar el estado sin preguntar, y correr la iteración 2 (solo con skill; la base sin skill
+  se reutiliza de la iteración 1). Sin commit.
+- **2026-11-08:** iteración 2 corrida: con skill 100% (26 criterios), sin skill 46%. Los tres
+  problemas quedaron resueltos: sin jerga del método, los tamaños dichos como lo que va a
+  pasar, y `Plan/state.md` intacto con una pregunta a la persona. **Skill `nzt` lista para
+  revisión del usuario.** **Próximo paso:** la devolución del usuario, commit de la skill y
+  sus casos, y seguir con `nzt-plan`.
 
 ## Primer paso sugerido
 

@@ -87,6 +87,14 @@ se decidió cada cosa.
     actualiza cuando aparece o cambia uno, y usa siempre el mismo término para el mismo
     concepto, en la conversación y en los documentos.
 
+16. **Le habla a la persona para que lo lea bien.** Cada mensaje es corto, en bullets, con
+    lo importante primero y marcado: **qué hizo**, **qué encontró** y **qué necesita** de la
+    persona, separados. Usa las palabras de la persona y nunca la jerga del método (nombres
+    de skills, "tamaño directo", "paquete", "default", "veredicto"): en vez de la etiqueta,
+    dice lo que va a pasar ("lo hago ahora y te cuento", "te armo un plan para que lo
+    apruebes"). Lo comprobado, lo supuesto y lo que no se comprobó se distinguen a simple
+    vista.
+
 ## Abierto
 
 Nada en los principios. Los archivos están decididos en `Archivos.md` y el default de
@@ -120,3 +128,7 @@ documentos en `Documentos.md`.
   medio, la plantea en la parada, o para si lo bloquea. → principio 10.
 - **Glosario del trabajo (2026-11-08):** pedido del usuario; no estaba contemplado (solo se
   había pensado un glosario del método). → principio 15.
+- **Cómo se le habla a la persona (2026-11-08):** en la primera prueba de la skill `nzt`
+  las respuestas mostraban la jerga del método y traducían los tamaños distinto cada vez.
+  El usuario pidió que el agente hable de forma amigable: bullets, resumido y marcando lo
+  que hizo. → principio 16, y la referencia `messages.md` de la skill `nzt`.

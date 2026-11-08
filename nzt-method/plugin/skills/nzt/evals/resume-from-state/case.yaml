@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: resume-from-state
+expected_outcome: |
+  Reads Plan/state.md first, reports in one line that unit 2 is in progress, asks nothing already answered there, and hands off to nzt-do to continue unit 2.
+context:
+  scaffold_script: place-files.sh

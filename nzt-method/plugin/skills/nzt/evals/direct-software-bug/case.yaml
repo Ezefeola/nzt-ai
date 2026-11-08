@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: direct-software-bug
+expected_outcome: |
+  Sizes it as direct, says the agent does it, creates no plan or state file, and hands off to nzt-do in one line.
