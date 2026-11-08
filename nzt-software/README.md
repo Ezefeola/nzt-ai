@@ -1,140 +1,155 @@
 # NZT
 
-**Un método de trabajo para agentes de código.** No le agrega conocimiento al modelo ni se
-lo limita: le da forma —método, memoria y frenos— para que rinda parejo en vez de a los
-saltos.
-
-El nombre viene de *Limitless*, una película en la que NZT es una pastilla ficticia que le
-permite al protagonista aprovechar al máximo sus capacidades mentales.
-
-En *Limitless*, la pastilla no le enseña nada nuevo a Eddie: le da acceso ordenado a lo que
-ya sabe. Eso es NZT para Claude Code y Codex. **El agente sigue siendo el agente; NZT es la
-disciplina.** Y las consecuencias malas de la película venían de tomarla sin estructura, así
-que acá la estructura es el producto: puntos de freno, estado persistido y revisión humana.
-
-## Para qué sirve
-
-Un agente sin método es rapidísimo haciendo lo que no le pediste. Los cinco problemas que
-NZT existe para evitar:
-
-| Sin NZT | Con NZT |
-|---|---|
-| Escribe código antes de que nadie haya definido qué tiene que hacer | Primero el análisis funcional, y lo que no está definido **es una pregunta, no una suposición** |
-| Arranca y no para hasta que algo se rompe | Corta en unidades revisables y **frena a esperarte** al final de cada una; si querés avanzar, le das una tanda cerrada (N unidades, o hasta un hito) y frena igual pasado el 40% de contexto |
-| Se le termina el contexto y perdiste el hilo | El plan y el estado viven en `Plan/state.json`: se retoma sin volver a explicar |
-| Elige el patrón que le gusta hoy, distinto del de ayer | El documento técnico (`Docs/Architecture/tech.md`) decide, y **solo aplica lo que ese documento declara** |
-| Te dice que funciona | Reporta lo que pasó: el test que falló, el paso que salteó, la suposición que hizo |
-
-Lo que ganás no es que escriba mejor código: es que **puedas revisar lo que hizo, retomar
-donde quedaste y no descubrir a lo último que entendió otra cosa.**
-
-## Cómo funciona
-
-Tres capas, la de arriba siempre cargada, y las reglas de software que el proyecto declara.
-
-**1. El kernel** (~115 líneas) va dentro de la skill `nzt`, que el proveedor carga primero en
-toda sesión: no se escribe nada en tu `CLAUDE.md` ni en tu `AGENTS.md`, igual con el plugin
-que con la línea de instalación. Trae el bucle, los frenos, el formato del
-estado y **la tabla de ruteo**. Eso último es la decisión de diseño más importante del set:
-qué skill cargar está *instruido en una tabla*, no librado a que el modelo adivine por la
-descripción.
-
-**2. Los routers.** Son las skills: uno por fase, más el de entrada
-(`nzt`), el de investigación (`nzt-research`) y el de delegar en un subagente —lecturas, o
-unidades que el plan aprobado marcó en paralelo— (`nzt-delegate`) y, sólo cuando lo pedís, el de
-retro (`nzt-retro`): revisa la sesión y deja propuestas de mejora en un md fuera del repo, sin
-cambiar nada. No hacen el trabajo:
-leen el pedido y el documento técnico, y dicen qué referencia leer.
-
-**3. Las referencias.** Un archivo por trabajo, de hasta 200 líneas, en la carpeta
-`references/` de su router. Se lee solo la que la tarea pide, y **no ocupa lugar en el
-listado de skills**, que el proveedor carga en toda sesión: el set global son 12 entradas.
+**A working method for coding agents.** It does not add knowledge to the model or limit it:
+it gives it shape —method, memory and stops— so it performs steadily instead of in bursts.
 
 ```
-pedido → kernel (tabla de ruteo) → router → la referencia que corresponde
-                                         ↘ lo que tech.md declara → su referencia de nzt-software
+ DISCOVERY     ARCHITECTURE  DESIGN        BUILD         VERIFY        SHIP
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│ What and │  │ How it   │  │ Screens  │  │ Code     │  │ Tests    │  │ Version  │
+│ for whom │─▶│ is built │─▶│ and flows│─▶│ and tests│─▶│ and data │─▶│ and ship │
+└──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘
+ :discovery    :architecture :design       :build        :verify       :ship
+
+ Each phase is cut into units, and every unit runs the same loop:
+
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│Understand│─▶│ Propose  │─▶│ Execute  │─▶│ Verify   │─▶│ Record   │─▶ stops and reports
+└──────────┘  └────┬─────┘  └──────────┘  └──────────┘  └──────────┘
+                   └─▶ the plan goes to Plan/state.json and waits for your approval
 ```
 
-El bucle que impone el kernel es siempre el mismo: **entender → proponer → ejecutar por
-unidades → verificar → registrar**, escalado al pedido en tres tamaños: **directo** (un bug,
-un cambio chico: sin plan ni estado), **estándar** (una mejora o una feature de una o dos
-historias: un plan corto, aprobado una vez) y **completo** (un producto, una feature grande:
-por tramos de una a tres historias). Eso es lo que hace que se banque el uso diario.
+The name comes from *Limitless*, a film in which NZT is a fictional pill that lets the main
+character make the most of his mental abilities.
 
-### Las fases
+In *Limitless*, the pill teaches Eddie nothing new: it gives him ordered access to what he
+already knows. That is NZT for Claude Code and Codex. **The agent is still the agent; NZT is
+the discipline.** And the film's bad consequences came from taking it without structure, so
+here the structure is the product: stop points, persisted state and human review.
 
-| Fase | De qué se ocupa |
+## What it is for
+
+An agent without a method is very fast at doing what you did not ask for. The five problems
+NZT exists to prevent:
+
+| Without NZT | With NZT |
 |---|---|
-| `nzt-discovery` | Qué hay que construir: requisitos, reglas de negocio, specs, historias, y el cambio a una feature que ya existe |
-| `nzt-architecture` | Cómo se resuelve: componentes, documento técnico, modelo de dominio, diseño técnico, ADR y RFC, diagramas |
-| `nzt-design` | Pantallas, flujos, sistema de diseño, revisión de usabilidad, y **el manual del usuario final**: HTML interactivo, ordenado por lo que la persona vino a hacer |
-| `nzt-build` | El código, y los tests que viajan con él |
-| `nzt-verify` | Diseñar y correr pruebas —API o pantalla, y lo dice antes de correr—, **crear los datos que faltan y borrarlos después**, medir la performance que espera el usuario, registrar la evidencia, y leer código o documentos buscando lo que no cierra |
-| `nzt-ship` | Versionado, CI/CD, despliegue, observabilidad |
-| `nzt-learn` | **Enseñarte a vos** en lugar de hacerlo por vos |
+| Writes code before anyone defined what it has to do | Functional analysis first, and whatever is undefined **is a question, not an assumption** |
+| Starts and does not stop until something breaks | Cuts the work into reviewable units and **stops to wait for you** at the end of each one; to move faster you give it a closed batch (N units, or up to a milestone), and it still stops past 40% of context |
+| Runs out of context and you lose the thread | The plan and the state live in `Plan/state.json`: work resumes without explaining it again |
+| Picks the pattern it likes today, different from yesterday's | The technical document (`Docs/Architecture/tech.md`) decides, and **only what that document declares applies** |
+| Tells you it works | Reports what happened: the test that failed, the step it skipped, the assumption it made |
 
-`nzt-learn` es el segundo modo del set: currícula, lecciones, ejercicios con su solución
-aparte, evaluación y repasos espaciados. Se dispara cuando pedís aprender, no cuando pedís
-que se haga.
+What you gain is not better code: it is that **you can review what it did, pick up where you
+left off, and not find out at the end that it understood something else.**
 
-### Las reglas de software y las herramientas del agente
+## How it works
 
-Lo que es de una tecnología, de un estilo de arquitectura o de tus reglas de código vive en la
-skill `nzt-software`, que viene con el método:
+Three layers, the top one always loaded, plus the software rules the project declares.
 
-| Reglas | Traen |
+**1. The kernel** (~115 lines) lives inside the `nzt` skill, which the provider loads first in
+every session: nothing is written to your `CLAUDE.md` or your `AGENTS.md`, the same with the
+plugin as with the one-line installer. It carries the loop, the stops, the state format and
+**the routing table**. That last one is the most important design decision of the set: which
+skill to load is *instructed in a table*, not left to the model guessing from descriptions.
+
+**2. The routers.** They are the skills: one per phase, plus the entry one (`nzt`), research
+(`nzt-research`), delegating to a subagent —readings, or units the approved plan marked as
+parallel— (`nzt-delegate`) and, only when you ask for it, retro (`nzt-retro`): it reviews the
+session and leaves improvement proposals in a markdown file outside the repo, changing
+nothing. They do not do the work: they read the request and the technical document, and say
+which reference to read.
+
+**3. The references.** One file per job, up to 200 lines, in its router's `references/`
+folder. Only the one the task needs is read, and **it takes no room in the skill listing**,
+which the provider loads in every session: the whole set is 13 entries.
+
+```
+request → kernel (routing table) → router → the matching reference
+                                          ↘ what tech.md declares → its nzt-software reference
+```
+
+The loop the kernel enforces is always the same: **understand → propose → execute in units
+→ verify → record**, scaled to the request in three sizes: **direct** (a bug, a small change:
+no plan, no state), **standard** (an improvement or a feature of one or two stories: a short
+plan, approved once) and **full** (a product, a large feature: in slices of one to three
+stories). That is what makes it hold up in daily use.
+
+### The phases
+
+| Phase | What it covers |
 |---|---|
-| `code` | tus reglas de código para cualquier lenguaje: nombres, funciones, errores, colecciones, DTOs |
-| `backend` | backend sin tecnología: arquitecturas, modelo anémico, persistencia, casos de uso, validación, errores, API, seguridad, acceso a datos |
-| `frontend` | frontend sin tecnología: arquitectura, componentes, formularios, rendering, performance |
-| `ddd` | agregados, value objects, contextos acotados y sus diagramas |
-| `csharp` | C# moderno |
-| `dotnet` | .NET: EF Core, minimal APIs o controllers, resultados, tests, contenedores, pipeline, observabilidad |
-| `blazor` | Blazor: modos de render, componentes, formularios, prerendering |
+| `nzt-discovery` | What to build: requirements, business rules, specs, stories, and changes to a feature that already exists |
+| `nzt-architecture` | How it is solved: components, technical document, domain model, technical design, ADRs and RFCs, diagrams |
+| `nzt-design` | Screens, flows, design system, usability review, and **the end user's manual**: interactive HTML, organized by what the person came to do |
+| `nzt-build` | The code, and the tests that ship with it |
+| `nzt-verify` | Designing and running tests —API or screen, and it says which before running—, **creating the data that is missing and deleting it afterwards**, measuring the performance the user expects, recording the evidence, and reading code or documents for what does not hold |
+| `nzt-ship` | Versioning, CI/CD, deployment, observability |
+| `nzt-learn` | **Teaching you** instead of doing it for you |
 
-`Docs/Architecture/tech.md` es el documento técnico del producto: una sección por componente
-con sus áreas, sus tecnologías (lenguaje, runtime, framework), sus decisiones, sus prácticas
-—DDD, niveles de test…—, sus dependencias y sus convenciones. Lo escribe `nzt-architecture`, y
-los **ejes** —arquitectura, modelo de dominio, persistencia, endpoints, modo de render…— se
-preguntan una vez, con lo que cuesta cada opción. **Una regla de `nzt-software` se aplica solo
-si `tech.md` declara su tecnología o su práctica**, y en un repositorio con convenciones
-propias las de NZT se corren a un costado y la diferencia se reporta en vez de aplicarse.
+`nzt-learn` is the set's second mode: curriculum, lessons, exercises with their solutions
+kept apart, assessment and spaced reviews. It triggers when you ask to learn, not when you
+ask for the work to be done.
 
-**El agente te ofrece las herramientas que el trabajo necesita, en cualquier fase**: un MCP, un
-plugin o los dos, para leer la documentación de una tecnología, manejar un editor, ver la
-pantalla. NZT no trae una lista: las busca en las fuentes oficiales y te dice de dónde las sacó
-y con qué fecha, qué instalan, a qué acceden, lo que tenés que hacer vos a mano y lo que él no
-puede hacer. Con tu sí las instala **en el proyecto**, nunca global, comprueba que respondan y
-las anota en `Docs/agent-tools.md`. Una que rechazás no te la vuelve a ofrecer.
+### Software rules and the agent's tools
 
-## Instalación
+What belongs to a technology, an architecture style or your code rules lives in the
+`nzt-software` skill, which comes with the method:
 
-### Plugin para Claude Code
+| Rules | Bring |
+|---|---|
+| `code` | your code rules for any language: names, functions, errors, collections, DTOs |
+| `backend` | technology-free backend: architectures, anemic model, persistence, use cases, validation, errors, API, security, data access |
+| `frontend` | technology-free frontend: architecture, components, forms, rendering, performance |
+| `ddd` | aggregates, value objects, bounded contexts and their diagrams |
+| `csharp` | modern C# |
+| `dotnet` | .NET: EF Core, minimal APIs or controllers, results, tests, containers, pipeline, observability |
+| `blazor` | Blazor: render modes, components, forms, prerendering |
 
-En Claude Code, agregá el marketplace e instalá el método:
+`Docs/Architecture/tech.md` is the product's technical document: one section per component
+with its areas, its technologies (language, runtime, framework), its decisions, its practices
+—DDD, test levels…—, its dependencies and its conventions. `nzt-architecture` writes it, and
+the **axes** —architecture, domain model, persistence, endpoints, render mode…— are asked
+once, with what each option costs. **An `nzt-software` rule applies only if `tech.md`
+declares its technology or its practice**, and in a repository with its own conventions
+NZT's step aside and the difference is reported instead of applied.
+
+**The agent offers you the tools the work needs, in any phase**: an MCP server, a plugin or
+both, to read a technology's documentation, drive an editor, see the screen. NZT ships no
+list: it searches official sources and tells you where it found each tool and when, what it
+installs, what it can access, what you have to do by hand and what it cannot do. With your
+yes it installs it **in the project**, never globally, checks that it responds and records
+it in `Docs/agent-tools.md`. One you decline is not offered again.
+
+## Installation
+
+### Plugin for Claude Code
+
+In Claude Code, add the marketplace and install the method:
 
 ```text
 /plugin marketplace add Ezefeola/nzt-ai
 /plugin install nzt-software@nzt
 ```
 
-Abrí una sesión nueva. El plugin incluye los subagentes y las reglas de software. Dentro del
-plugin las skills van sin el prefijo `nzt-`: `/nzt-software:nzt`, `/nzt-software:build`,
-`/nzt-software:verify`. Elegí una sola vía para el método. Si venís del instalador y querés pasar
-al plugin, quitá primero el método con `nzt-ai uninstall --provider claude-code --mods none`.
+Open a new session. The plugin includes the subagents and the software rules. Inside the
+plugin the skills have no `nzt-` prefix: `/nzt-software:nzt`, `/nzt-software:build`,
+`/nzt-software:verify`. Choose a single way to install the method. If you come from the
+installer and want to switch to the plugin, first remove the method with
+`nzt-ai uninstall --provider claude-code --mods none`.
 
-Si tenés el plugin `nzt` de la v5, desinstalalo antes de instalar `nzt-software`, para que el
-kernel no llegue dos veces:
+If you have the v5 `nzt` plugin, uninstall it before installing `nzt-software`, so the
+kernel does not load twice:
 
 ```text
 /plugin uninstall nzt@nzt
 ```
 
-### Instalador para Claude Code y Codex
+### Installer for Claude Code and Codex
 
-Para actualizar desde v4, repetí la línea de tu proveedor. El instalador retira el bloque
-que administraba en tu archivo de instrucciones y conserva tu texto. El método ahora vive
-en la skill `nzt`, y el chequeo de estado se ejecuta desde los scripts de `nzt-plan`.
+To update from v4, run your provider's line again. The installer removes the block it
+managed in your instructions file and keeps your text. The method now lives in the `nzt`
+skill, and the state check runs from `nzt-plan`'s scripts.
 
 **Claude Code**
 
@@ -144,7 +159,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/re
 ```
 
 ```bash
-# macOS y Linux
+# macOS and Linux
 curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude.sh | sh
 ```
 
@@ -156,11 +171,11 @@ powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/re
 ```
 
 ```bash
-# macOS y Linux
+# macOS and Linux
 curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-codex.sh | sh
 ```
 
-**Claude Code con los mods** — el método y los [mods](#mods), sin preguntar nada
+**Claude Code with the mods** — the method and the [mods](#mods), without asking anything
 
 ```powershell
 # Windows
@@ -168,128 +183,129 @@ powershell -ExecutionPolicy ByPass -c "irm https://github.com/Ezefeola/nzt-ai/re
 ```
 
 ```bash
-# macOS y Linux
+# macOS and Linux
 curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/latest/download/install-claude-full.sh | sh
 ```
 
-Cada línea baja el instalador a una carpeta temporal, verifica su SHA256, instala NZT en ese
-proveedor —las skills, con el kernel dentro de `nzt`, y los mods si es la línea
-`install-claude-full`; si una versión anterior dejó un bloque en `CLAUDE.md` o `AGENTS.md`,
-lo quita y deja tu texto—, deja una copia como `nzt-ai` (en `%LOCALAPPDATA%\nzt\bin`, que entra
-al PATH del usuario, o en `~/.local/bin`) y borra la carpeta temporal. **Para actualizar, la misma línea de nuevo.** Para desinstalar, la misma línea con
-`$env:NZT_UNINSTALL='1'; irm … | iex` en Windows o `curl … | NZT_UNINSTALL=1 sh` en el resto.
+Each line downloads the installer to a temporary folder, verifies its SHA256, installs NZT
+for that provider —the skills, with the kernel inside `nzt`, and the mods if it is the
+`install-claude-full` line; if an earlier version left a block in `CLAUDE.md` or `AGENTS.md`,
+it removes it and keeps your text—, leaves a copy as `nzt-ai` (in `%LOCALAPPDATA%\nzt\bin`,
+which is added to the user's PATH, or in `~/.local/bin`) and deletes the temporary folder.
+**To update, run the same line again.** To uninstall, the same line with
+`$env:NZT_UNINSTALL='1'; irm … | iex` on Windows or `curl … | NZT_UNINSTALL=1 sh` elsewhere.
 
-Desde el repo, con .NET 10, está el instalador completo:
+From the repo, with .NET 10, there is the full installer:
 
 ```bash
 dotnet run --project nzt-software/cli/src/Nzt.Cli
 ```
 
-El menú tiene cuatro acciones —**instalar, desinstalar, verificar el contenido y ver
-estado**—, te deja elegir Claude Code, Codex o los dos —y en Claude Code, todo NZT, solo el
-método o solo los mods—, y **te muestra la simulación y recién
-ahí pregunta**. Instala las skills y los subagentes en las carpetas de usuario del proveedor.
+The menu has four actions —**install, uninstall, verify the content and show status**—, lets
+you pick Claude Code, Codex or both —and in Claude Code, all of NZT, only the method or only
+the mods—, and **shows you the dry run before it asks**. It installs the skills and the
+subagents in the provider's user folders.
 
 ```bash
 dotnet run --project nzt-software/cli/src/Nzt.Cli -- status
 dotnet run --project nzt-software/cli/src/Nzt.Cli -- uninstall --provider claude-code
 ```
 
-Más detalles en
-[`nzt-software/cli/README.md`](cli/README.md).
+More details in [`nzt-software/cli/README.md`](cli/README.md).
 
 ## Mods
 
-NZT trae **mods**: extensiones de la interfaz de Claude Code que hacen visible lo que el
-método produce. **Son opcionales**: instalar NZT no instala ninguno y el método funciona
-completo sin ellos. Existen solo para Claude Code, porque Codex no tiene mods.
+NZT comes with **mods**: extensions to the Claude Code interface that make what the method
+produces visible. **They are optional**: installing NZT installs none of them and the method
+works fully without them. They exist only for Claude Code, because Codex has no mods.
 
-Los **genéricos** sirven en cualquier proyecto, use NZT o no; los de tipo **NZT** necesitan un
-artefacto del método para mostrar algo.
+The **generic** ones work in any project, NZT or not; the **NZT** ones need an artifact of the
+method to show something.
 
-| Mod | Tipo | Qué hace | Instalación |
+| Mod | Type | What it does | Install |
 |---|---|---|---|
-| [`nzt-state`](mods/nzt-state/README.md) | NZT: necesita `Plan/state.json` | Panel lateral con el plan y el estado de la corrida, leído de `Plan/state.json` y actualizado en vivo | `/plugin install nzt-state --marketplace Ezefeola/nzt-ai` |
-| [`nzt-changes`](mods/nzt-changes/README.md) | Genérico | Panel lateral al estilo Replay Theater: recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
-| [`nzt-files`](mods/nzt-files/README.md) | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: carpetas que se abren y cierran, marcas de git, lo que Claude lee y escribe, y el archivo elegido debajo, solo para leer y sin ocupar contexto | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
-| [`nzt-look`](mods/nzt-look/README.md) | Genérico, con capa NZT | Temas (NZT y quince más, oscuros y claros), una banda sobre el prompt con el contexto y sus marcas 30/40, los límites del plan, el costo y el modelo con su effort, y la conversación redibujada: herramientas, consola, diffs, tablas, código, fórmulas y diagramas | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
+| [`nzt-state`](mods/nzt-state/README.md) | NZT: needs `Plan/state.json` | Side panel with the run's plan and state, read from `Plan/state.json` and updated live | `/plugin install nzt-state --marketplace Ezefeola/nzt-ai` |
+| [`nzt-changes`](mods/nzt-changes/README.md) | Generic | Replay Theater-style side panel: steps, one diff at a time, through what Claude edited in the last turn or everything changed against `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
+| [`nzt-files`](mods/nzt-files/README.md) | Generic | Side panel that browses the project like VS Code's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file below, read-only and without using context | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
+| [`nzt-look`](mods/nzt-look/README.md) | Generic, with an NZT layer | Themes (NZT and fifteen more, dark and light), a band above the prompt with the context and its 30/40 marks, the plan's limits, the cost and the model with its effort, and the conversation redrawn: tools, console, diffs, tables, code, formulas and diagrams | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
 
-### Instalarlos
+### Installing them
 
-- **Con el instalador.** La línea `install-claude-full` instala el método y todos los mods.
-  Desde el repo, `dotnet run --project nzt-software/cli/src/Nzt.Cli -- install --provider
-  claude-code --mods all` hace lo mismo, `--mods only` instala solo los mods, y el menú
-  pregunta qué querés. Necesita el comando `claude` en la terminal, versión 2.1.287 o
-  posterior; sin eso instala el método y te dice cómo sumar los mods a mano.
-- **A mano, uno por vez.** La línea de la tabla, en una sesión de Claude Code en la terminal.
-  La primera vez pregunta si agrega el marketplace: contestá `y` y elegí el scope **user**
-  para tenerlo en todos los proyectos.
+- **With the installer.** The `install-claude-full` line installs the method and every mod.
+  From the repo, `dotnet run --project nzt-software/cli/src/Nzt.Cli -- install --provider
+  claude-code --mods all` does the same, `--mods only` installs only the mods, and the menu
+  asks what you want. It needs the `claude` command in the terminal, version 2.1.287 or
+  later; without it, it installs the method and tells you how to add the mods by hand.
+- **By hand, one at a time.** The line from the table, in a Claude Code session in the
+  terminal. The first time it asks whether to add the marketplace: answer `y` and choose the
+  **user** scope to have it in every project.
 
-Las dos formas usan el mismo marketplace `nzt`, que sale de la rama `main` de este repo: un
-mod que instalaste a mano el instalador lo actualiza, pero no lo desinstala nunca.
+Both ways use the same `nzt` marketplace, which comes from this repo's `main` branch: the
+installer updates a mod you installed by hand, but never uninstalls it.
 
-### Actualizarlos
+### Updating them
 
-Cada mod tiene su propia versión, independiente de la de NZT, y Claude Code baja una nueva
-solo cuando esa versión sube.
+Each mod has its own version, independent of NZT's, and Claude Code downloads a new one only
+when that version goes up.
 
-- **Automático.** Viene apagado, como en todo marketplace que no es de Anthropic. Se activa
-  una vez: `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**. Desde ahí cada sesión
-  nueva baja las versiones nuevas y avisa `Run /reload-plugins` para cargarlas.
-- **A mano.** `claude plugin update <mod>@nzt` en la terminal (por ejemplo,
-  `claude plugin update nzt-state@nzt`), **Update marketplace** en esa misma pestaña de
-  `/plugin`, o volver a correr el instalador, que actualiza todos los mods que haya.
+- **Automatic.** Off by default, as in every marketplace not from Anthropic. Turn it on once:
+  `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**. From then on each new
+  session downloads new versions and says `Run /reload-plugins` to load them.
+- **By hand.** `claude plugin update <mod>@nzt` in the terminal (for example,
+  `claude plugin update nzt-state@nzt`), **Update marketplace** in that same `/plugin` tab, or
+  run the installer again, which updates every mod there is.
 
-### Desinstalarlos
+### Uninstalling them
 
-`claude plugin uninstall <mod>@nzt` quita uno. El instalador, al desinstalar, quita solo los
-mods que instaló él (`uninstall --provider claude-code --mods only` deja el método). **No
-quites el marketplace `nzt`**: eso desinstala de una vez todos los mods que vinieron de él.
+`claude plugin uninstall <mod>@nzt` removes one. When uninstalling, the installer removes only
+the mods it installed (`uninstall --provider claude-code --mods only` keeps the method).
+**Do not remove the `nzt` marketplace**: that uninstalls every mod that came from it at once.
 
-Cómo se arma un mod y qué tiene que traer está en [`Plan/specs/nzt-mods.md`](../Plan/specs/nzt-mods.md).
+How a mod is built and what it has to include is in
+[`Plan/specs/nzt-mods.md`](../Plan/specs/nzt-mods.md).
 
-## Qué no hace
+## What it does not do
 
-Es tan importante como lo otro:
+As important as the rest:
 
-- **No restringe lo que el modelo sabe** ni lo que puede hacer. Define cómo trabaja.
-- **No delega decisiones.** Una conversación que es dueña del plan, el estado y
-  cada decisión, y que frena en los bordes de cada unidad. Puede mandar a dos subagentes
-  propios: uno lee por ella y el otro hace las unidades que el plan aprobado marcó en
-  paralelo. Sin subagentes, o con `delegation` en `off`, todo corre en esta conversación,
-  una unidad tras otra. No instala MCP globales: los que te ofrece y aceptás van al archivo de MCP
-  del proyecto, que viaja con git.
-- **No garantiza que el modelo elija siempre la skill correcta.** Por eso el ruteo está
-  instruido y por eso hay una suite de evals que lo mide.
-- **No decide por vos.** Prescribe el procedimiento, no el criterio técnico: NZT dice *cómo
-  trabajar*, vos y el modelo deciden *qué construir*.
+- **It does not restrict what the model knows** or what it can do. It defines how it works.
+- **It does not hand off decisions.** One conversation owns the plan, the state and every
+  decision, and stops at the edges of each unit. It can send work to two subagents of its
+  own: one reads for it and the other runs the units the approved plan marked as parallel.
+  Without subagents, or with `delegation` set to `off`, everything runs in this conversation,
+  one unit after another. It does not install global MCP servers: the ones it offers and you
+  accept go to the project's MCP file, which travels with git.
+- **It does not guarantee the model always picks the right skill.** That is why routing is
+  instructed and why there is an eval suite that measures it.
+- **It does not decide for you.** It prescribes the procedure, not the technical judgment:
+  NZT says *how to work*; you and the model decide *what to build*.
 
-## El repositorio
+## The repository
 
-Todo nzt-software vive en esta carpeta; las specs y el estado del trabajo, en `Plan/` en la
-raíz del repo.
+All of nzt-software lives in this folder; the specs and the state of the work, in `Plan/` at
+the repo root.
 
 ```
 nzt-software/
-  method/core/     kernel.md + un adapter por proveedor
-  method/skills/   las skills del método (anidadas acá, planas al instalarse)
-  method/agents/   los subagentes, para Claude Code y para Codex
-  evals/           la suite que mide si dispara la skill correcta
-  mods/            los mods de Claude Code, uno por carpeta (opcionales)
-  build/           build.sh / build.ps1 — el loop de desarrollo, arma dist/
-  cli/             nzt-ai, el CLI que instala, con sus comprobaciones
-  cli/install/     install.ps1 / install.sh / variants.sh — los comandos de una línea
-  release/         el README de la rama del plugin y las notas de cada versión
-  presentation/    el deck de NZT
-Plan/specs/        nzt-core/ — la spec fundacional, la del instalador, la del plugin, la de los mods y una por mod
+  method/core/     kernel.md + one adapter per provider
+  method/skills/   the method's skills (nested here, flat once installed)
+  method/agents/   the subagents, for Claude Code and for Codex
+  evals/           the suite that measures whether the right skill triggers
+  mods/            the Claude Code mods, one per folder (optional)
+  build/           build.sh / build.ps1 — the development loop, builds dist/
+  cli/             nzt-ai, the CLI that installs, with its checks
+  cli/install/     install.ps1 / install.sh / variants.sh — the one-line commands
+  release/         the plugin branch's README and each version's notes
+  presentation/    the NZT deck
+Plan/specs/        nzt-core/ — the founding spec, plus the installer's, the plugin's, the mods' and one per mod
 ```
 
-**13 skills con 137 referencias**, 76 de ellas en `nzt-software`. El plan en curso y dónde
-quedó están en [`Plan/state.json`](../Plan/state.json); las decisiones tomadas y su historia, en
-[`Plan/specs/nzt-core/`](../Plan/specs/nzt-core/README.md) —el estado actual abre
-[`build-status.md`](../Plan/specs/nzt-core/build-status.md)—. Si
-volvés al proyecto después de un tiempo, se empieza por esos dos.
+**13 skills with 137 references**, 76 of them in `nzt-software`. The current plan and where it
+stands are in [`Plan/state.json`](../Plan/state.json); the decisions taken and their history,
+in [`Plan/specs/nzt-core/`](../Plan/specs/nzt-core/README.md) —the current state opens
+[`build-status.md`](../Plan/specs/nzt-core/build-status.md)—. If you come back to the project
+after a while, start with those two.
 
-## Licencia
+## License
 
 [MIT](../LICENSE).

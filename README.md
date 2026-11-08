@@ -1,35 +1,35 @@
 # nzt-ai
 
-Herramientas de NZT para trabajar con agentes de código. Cada producto vive en su carpeta.
+NZT tools for working with coding agents. Each product lives in its own folder.
 
-| Producto | Qué es | Guía |
+| Product | What it is | Guide |
 |---|---|---|
-| **nzt-software** | El método NZT para software: el plugin para Claude Code, el instalador `nzt-ai` para Claude Code y Codex, y los mods opcionales de Claude Code | [`nzt-software/README.md`](nzt-software/README.md) |
+| **nzt-software** | The NZT method for software: the Claude Code plugin, the `nzt-ai` installer for Claude Code and Codex, and the optional Claude Code mods | [`nzt-software/README.md`](nzt-software/README.md) |
 
-## Instalación rápida
+## Quick install
 
-En Claude Code:
+In Claude Code:
 
 ```text
 /plugin marketplace add Ezefeola/nzt-ai
 /plugin install nzt-software@nzt
 ```
 
-Para Codex, el instalador y los mods, seguí la [guía de nzt-software](nzt-software/README.md#instalación).
+For Codex, the installer and the mods, follow the [nzt-software guide](nzt-software/README.md#installation).
 
-## El repositorio
+## The repository
 
 ```
-.claude-plugin/marketplace.json   el marketplace de Claude Code: nzt-software y sus mods
-.github/workflows/                un workflow de release por producto
-Plan/state.json                   el estado del trabajo en curso en este repo
-Plan/specs/                       las specs; las decisiones en nzt-core/decisions.md
-nzt-software/                     el producto: método, evals, mods, build, CLI y releases
+.claude-plugin/marketplace.json   the Claude Code marketplace: nzt-software and its mods
+.github/workflows/                one release workflow per product
+Plan/state.json                   the state of the work in progress in this repo
+Plan/specs/                       the specs; the decisions in nzt-core/decisions.md
+nzt-software/                     the product: method, evals, mods, build, CLI and releases
 ```
 
-Si volvés al proyecto después de un tiempo, empezá por `Plan/state.json` y
+If you come back to the project after a while, start with `Plan/state.json` and
 [`Plan/specs/nzt-core/README.md`](Plan/specs/nzt-core/README.md).
 
-## Licencia
+## License
 
 [MIT](LICENSE).
