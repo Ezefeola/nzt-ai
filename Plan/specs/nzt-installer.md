@@ -1,7 +1,7 @@
 # NZT — Instalador
 
 > Estado: **construido** (v1.1.0) · `nzt-software/cli/src/Nzt.Cli` · Runbook en
-> `nzt-software/cli/README.md` · Depende de: `Plan/specs/nzt-core.md` (secciones 3, 9.1 y 9.2)
+> `nzt-software/cli/README.md` · Depende de: `Plan/specs/nzt-core/README.md` (secciones 3, 9.1 y 9.2)
 
 ## 1. Propósito
 
@@ -293,6 +293,10 @@ instala a mano (RN-inst-mods-cuales).
   comprobaciones del instalador y `nzt verify`. Si una falla, no hay release.
 - `releases/latest/download/<asset>` es la URL estable: siempre apunta al último release,
   y los scripts del release N bajan los binarios del release N.
+- **El *latest* del repo es siempre de nzt-software (D99).** GitHub tiene uno solo por repo, y
+  sin flag lo elige por fecha y versión: el workflow publica con `gh release create --latest`.
+  Un producto futuro de este repo usa tags `<producto>-vX.Y.Z`, publica con `--latest=false`
+  y sus comandos de instalación no usan `latest`.
 - **Self-contained, un solo archivo, comprimido y sin trimming**: ~38 MB en `win-x64`. Con
   trimming baja a ~12 MB, pero el linker advierte sobre `System.Text.Json` en el manifiesto y
   sobre Spectre.Console, y el menú no tiene comprobación automática que lo cubra. Se reabre
@@ -487,7 +491,7 @@ en el kernel, desde D74 en `nzt-plan`):
 
 - cada `status` es `todo`, `doing`, `done` o `dropped`, en fases y en unidades;
 - cada fase se llama `analysis`, `architecture`, `ux`, `build`, `verify` o `ship` (D69 de
-  `Plan/specs/nzt-core.md`); un sinónimo como `discovery` también es un problema, aunque el panel
+  `Plan/specs/nzt-core/README.md`); un sinónimo como `discovery` también es un problema, aunque el panel
   lo lea;
 - a lo sumo una fase `doing`, y a lo sumo una unidad `doing` en todo el archivo;
 - los `id` de las unidades no se repiten;
@@ -496,7 +500,7 @@ en el kernel, desde D74 en `nzt-plan`):
 - `approved` es `true` o `false`, y las unidades que nombra `autonomy` existen en el plan;
 - `delegation`, si está, es `auto`, `ask` u `off` (D71); ausente no es un problema, rige `ask`.
 
-Un estado por tramos (D73 de `Plan/specs/nzt-core.md`) lleva `slices` en lugar de `phases`, y
+Un estado por tramos (D73 de `Plan/specs/nzt-core/decisions.md`) lleva `slices` en lugar de `phases`, y
 además:
 
 - `slices` exige `version` 2, `version` 2 exige `slices`, y `phases` y `slices` juntos en la
@@ -562,21 +566,21 @@ Reason:   el usuario: los packs solo traían cuatro MCP en una lista fija; el ag
 Before:   `nzt-ai project add <pack>` escribía el MCP de un pack en `.mcp.json` o `.codex/config.toml` y lo anotaba en `nzt.json`.
 Now:      el CLI no instala nada por proyecto.
 Impact:   I1 modificada · RN-proj-reconciliar · RN-proj-archivo · RN-proj-destinos · RN-proj-proteccion · RN-proj-mcp-usuario · RN-proj-lint, todas quitadas
-Decision: D96 en `Plan/specs/nzt-core.md` (QT-115).
+Decision: D96 en `Plan/specs/nzt-core/decisions.md` (QT-115).
 
 ### 2026-11-01 · El registro de `nzt-ai project` va en la carpeta del proveedor
 Type:     modify
 Change:   `.nzt/project.json` pasa a `.claude/nzt.json` y `.agents/nzt.json`; uno viejo se lee y se mueve.
 Reason:   el usuario, al probar 4.0.0 en local: no quiere una carpeta `.nzt/` más en la raíz del proyecto.
 Impact:   RN-proj-archivo modificada · RN-proj-reconciliar sin cambio de regla
-Decision: D89 en `Plan/specs/nzt-core.md`.
+Decision: D89 en `Plan/specs/nzt-core/decisions.md`.
 
 ### 2026-11-01 · Packs por proyecto con `nzt-ai project`
 Type:     add
 Change:   el instalador global instala solo el marco; `nzt-ai project` instala por proyecto las skills de los packs y sus MCP, para Claude Code y Codex.
 Reason:   el usuario: lo de una tecnología o una arquitectura se instala por proyecto, igual que los MCP, y un CLI hace el setup que el agente sabe correr.
 Impact:   I1 modificada · RN-proj-reconciliar · RN-proj-archivo · RN-proj-destinos · RN-proj-proteccion · RN-proj-mcp-usuario · RN-proj-lint, todas nuevas
-Decision: D88 en `Plan/specs/nzt-core.md` (QT-01..04 de `Plan/mejoras/11-marco-generico.md`).
+Decision: D88 en `Plan/specs/nzt-core/decisions.md` (QT-01..04 de `Plan/mejoras/11-marco-generico.md`).
 
 ### 2026-10-17 · El instalador ofrece los mods en Claude Code
 Type:     add

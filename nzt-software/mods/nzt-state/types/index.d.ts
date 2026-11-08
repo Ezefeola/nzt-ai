@@ -18,10 +18,10 @@ export type Unit = {
 
 export type Phase = { name: string; status: Status; rawStatus?: string }
 
-/** A slice of a plan cut into slices (D73 of Plan/specs/nzt-core.md), without its phases. */
+/** A slice of a plan cut into slices (D73 of Plan/specs/nzt-core/decisions.md), without its phases. */
 export type Slice = { id: string; name: string; status: Status; rawStatus?: string }
 
-/** How the agent hands readings to a subagent (D71 of Plan/specs/nzt-core.md). */
+/** How the agent hands readings to a subagent (D71 of Plan/specs/nzt-core/decisions.md). */
 export type DelegationMode = 'auto' | 'ask' | 'off'
 
 /**

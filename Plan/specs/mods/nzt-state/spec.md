@@ -6,7 +6,7 @@
 > en la 164; Plan y Modo al lado del personaje en la 166; aviso de preguntas abiertas,
 > RN-panel-preguntas y -preguntas-espera, aprobado en la 202, construido en la 209 y aceptado
 > por el usuario tras probarlo en vivo el 2026-10-17, unidad 210) · Depende de: `Plan/specs/nzt-mods.md`,
-> `Plan/specs/nzt-core.md` sección 7 (formato de `Plan/state.json`), D61 y D62.
+> `Plan/specs/nzt-core/README.md` sección 7 (formato de `Plan/state.json`), D61 y D62.
 > Escrita el 2026-10-13 leyendo el código; los hallazgos R-01 a R-08 los resolvió el usuario
 > el 2026-10-14 (sección **Hallazgos resueltos**).
 > **0.7.0 aceptado y cerrado** (usuario 2026-10-20, unidad 298; spec 294, mockup 295, build
@@ -119,7 +119,7 @@ no son fases y cuáles son: *⚠ «cambio: modelo y effort en la banda» no es u
 fases son Discovery, Arquitectura, Diseño, Build, Verificación, Release*. Se encontró con el estado de
 este repo: el agente había escrito cada cambio como una fase.
 
-### RN-panel-tramos · origin: D72 y D73 de `Plan/specs/nzt-core.md` (usuario 2026-10-23: "sin fases repetidas en el mod")
+### RN-panel-tramos · origin: D72 y D73 de `Plan/specs/nzt-core/decisions.md` (usuario 2026-10-23: "sin fases repetidas en el mod")
 Si el estado trae `slices` (v2), el panel muestra **el tramo en curso como si fuera el plan**:
 la línea de fases, el avance, AHORA y las tareas son las de ese tramo, y ninguna fase aparece
 dos veces. El tramo en curso es el `doing`; sin ninguno, el primero `todo`; sin ninguno, el

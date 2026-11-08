@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the host's
 # adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
-# that `claude plugin eval` runs against (see Plan/specs/nzt-core.md, D23).
+# that `claude plugin eval` runs against (see Plan/specs/nzt-core/decisions.md, D23).
 # Usage: nzt-software/build/build.sh [out-dir]   (default: nzt-software/dist)
 set -euo pipefail
 
@@ -135,7 +135,7 @@ if [ -d "$method/skills" ]; then
   echo
   echo "$count skills, ~$listing chars of skill listing (Codex floor: 8000)"
   if [ "$listing" -gt 8000 ]; then
-    echo "WARNING: skill listing is over the 8000-char floor. See R1 in Plan/specs/nzt-core.md." >&2
+    echo "WARNING: skill listing is over the 8000-char floor. See R1 in Plan/specs/nzt-core/decisions.md." >&2
   fi
 fi
 

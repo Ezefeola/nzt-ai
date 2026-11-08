@@ -3,7 +3,7 @@
 .SYNOPSIS
   Builds the skill nzt of each host from core/skill-nzt.md, core/kernel.md and the
   host's adapter (D95), validates the skill tree, and assembles dist/plugin/ — the flattened plugin
-  that `claude plugin eval` runs against (see Plan/specs/nzt-core.md, D23).
+  that `claude plugin eval` runs against (see Plan/specs/nzt-core/decisions.md, D23).
 .PARAMETER OutDir
   Where to write the built files. Defaults to nzt-software/dist.
 #>
@@ -145,7 +145,7 @@ if (Test-Path $skillsRoot) {
     Write-Host ''
     Write-Host ("$count skills, ~$($script:listingChars) chars of skill listing (Codex floor: 8000)")
     if ($script:listingChars -gt 8000) {
-        Write-Warning 'Skill listing is over the 8000-char floor. See R1 in Plan/specs/nzt-core.md.'
+        Write-Warning 'Skill listing is over the 8000-char floor. See R1 in Plan/specs/nzt-core/decisions.md.'
     }
 }
 

@@ -1,7 +1,7 @@
 # NZT — Mods
 
 > Estado: **especificada** (2026-10-13) · código en `nzt-software/mods/` · una spec por mod en
-> `Plan/specs/mods/` · Depende de: `Plan/specs/nzt-core.md` (secciones 2, 9 y D63) y
+> `Plan/specs/mods/` · Depende de: `Plan/specs/nzt-core/README.md` (secciones 2, 9 y D63) y
 > `Plan/specs/nzt-installer.md` (sección 1)
 
 ## 1. Qué es un mod
@@ -39,7 +39,7 @@ Si una regla del método necesita un mod para cumplirse, la regla está mal ubic
 Un mod lee los artefactos de NZT (`Plan/state.json`, specs, documentos) y no los escribe.
 El dueño de cada artefacto sigue siendo el método; un mod que escribe el estado abriría un
 segundo camino para cambiarlo que el kernel no controla.
-**[modify] Una excepción, pedida por el usuario el 2026-10-21 (D71 de `Plan/specs/nzt-core.md`):**
+**[modify] Una excepción, pedida por el usuario el 2026-10-21 (D71 de `Plan/specs/nzt-core/decisions.md`):**
 `nzt-state` escribe la clave `delegation` de `Plan/state.json` y nada más. El kernel dice que
 ese valor lo pone solo el usuario, y el clic es del usuario: el agente sigue sin ver otro
 camino para cambiar el plan, las unidades ni la autonomía.

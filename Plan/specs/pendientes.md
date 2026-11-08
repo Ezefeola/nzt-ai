@@ -2,14 +2,14 @@
 
 Rama `pendientes-post-v5`, sacada de `main` (= `v5.0.0`, `fcdbb4f`) el 2026-11-07.
 Ideas para atacar **de a una**, cada una en su rama cuando le toque. Nada de esto está decidido:
-cuando el usuario decide un punto, pasa a `Plan/specs/nzt-core.md` como D-NN.
+cuando el usuario decide un punto, pasa a `Plan/specs/nzt-core/decisions.md` como D-NN.
 
 `revision-post-v5` se descarta: el alcance creció demasiado para revisarlo de una vez. Lo que
 sirva de ahí se trae por partes.
 
 ## 1 · NZT trabaja con cualquier plugin o MCP, en cualquier fase
 
-**Hecho en esta rama: D96** (`Plan/specs/nzt-core.md`, unidades 497–507). Sin packs, sin
+**Hecho en esta rama: D96** (`Plan/specs/nzt-core/decisions.md`, unidades 497–507). Sin packs, sin
 `nzt-games` y sin `nzt-ai project`; el kernel tiene *Agent tools*, `nzt-research` tiene
 `references/tools.md` y `tech.md` declara solo tecnologías y prácticas. Lo que sigue es lo que
 se planteó antes de hacerlo.
@@ -52,14 +52,15 @@ cuándo consultar la herramienta instalada ni qué gana si contradice una regla 
 
 ## 2 · Revisar la estructura de carpetas del repositorio
 
-**Hecho en esta rama: D98** (`Plan/specs/nzt-core.md`, unidades 516–524, tramo S3). Todo el
+**Hecho en esta rama: D98** (`Plan/specs/nzt-core/decisions.md`, unidades 516–524, tramo S3). Todo el
 producto pasa a `nzt-software/` (`method/`, `evals/`, `mods/`, `build/`, `cli/`, `release/`,
 `presentation/`), las specs a `Plan/specs/`, y `Plan/mejoras/` se borró. La raíz queda con el
 marketplace, `.github/`, `Plan/`, el README índice y la licencia. El build sigue armando el mismo
 plugin.
 
-**Queda afuera, a decidir:** partir `Plan/specs/nzt-core.md` (más de 5400 líneas) y cómo se
-nombran los tags cuando haya un segundo producto (GitHub tiene un solo *latest* por repo).
+**Los dos puntos que dejó abiertos están hechos: D99** (unidades 525–529, tramo S4). La spec
+fundacional está en `Plan/specs/nzt-core/` en cuatro archivos, y nzt-software publica sus
+releases con `--latest`; un producto futuro usa tags `<producto>-vX.Y.Z` y `--latest=false`.
 
 ## Otras notas guardadas
 

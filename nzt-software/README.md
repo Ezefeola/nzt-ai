@@ -281,12 +281,13 @@ nzt-software/
   cli/install/     install.ps1 / install.sh / variants.sh — los comandos de una línea
   release/         el README de la rama del plugin y las notas de cada versión
   presentation/    el deck de NZT
-Plan/specs/        nzt-core.md — la spec fundacional, la del instalador, la del plugin, la de los mods y una por mod
+Plan/specs/        nzt-core/ — la spec fundacional, la del instalador, la del plugin, la de los mods y una por mod
 ```
 
 **13 skills con 137 referencias**, 76 de ellas en `nzt-software`. El plan en curso y dónde
 quedó están en [`Plan/state.json`](../Plan/state.json); las decisiones tomadas y su historia, en
-[`Plan/specs/nzt-core.md`](../Plan/specs/nzt-core.md) —la sección 14 abre con el estado actual—. Si
+[`Plan/specs/nzt-core/`](../Plan/specs/nzt-core/README.md) —el estado actual abre
+[`build-status.md`](../Plan/specs/nzt-core/build-status.md)—. Si
 volvés al proyecto después de un tiempo, se empieza por esos dos.
 
 ## Licencia

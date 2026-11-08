@@ -165,7 +165,9 @@ jobs:
           if test -f "nzt-software/release/notes/$GITHUB_REF_NAME.md"; then
             notes=(--notes-file "nzt-software/release/notes/$GITHUB_REF_NAME.md")
           fi
-          gh release create "$GITHUB_REF_NAME" assets/* --verify-tag --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
+          # --latest (D99): los one-liners bajan de releases/latest/download/, así que el latest del
+          # repo es siempre el de nzt-software. Otro producto publica con --latest=false.
+          gh release create "$GITHUB_REF_NAME" assets/* --verify-tag --latest --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
   notify-landing:
     needs: release
     runs-on: ubuntu-latest

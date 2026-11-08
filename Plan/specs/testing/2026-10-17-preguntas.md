@@ -1,6 +1,6 @@
 # Preguntas · regla del kernel, nzt-questions, nzt-hub y nzt-state — 2026-10-17
 
-Unidad 210, sobre D64 de `Plan/specs/nzt-core.md`, `Plan/specs/mods/nzt-questions/spec.md`, el cambio
+Unidad 210, sobre D64 de `Plan/specs/nzt-core/decisions.md`, `Plan/specs/mods/nzt-questions/spec.md`, el cambio
 0.2.0 de `Plan/specs/mods/nzt-hub/spec.md` y RN-panel-preguntas de `Plan/specs/mods/nzt-state/spec.md`.
 
 > **Corrido y cerrado** el 2026-10-17: todos los escenarios pasaron (corrida 3 al final).

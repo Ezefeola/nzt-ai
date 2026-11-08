@@ -1,7 +1,7 @@
 # NZT — Plugin
 
 > Estado: **diseñado, construido y probado** (unidades 473–476) · Decisiones: D91, revisada por D97 y
-> D92 · Depende de: `Plan/specs/nzt-core.md` (C7, C8, D24, D91, D92) y `Plan/specs/nzt-installer.md` ·
+> D92 · Depende de: `Plan/specs/nzt-core/README.md` (C7, C8) y `decisions.md` (D24, D91, D92) y `Plan/specs/nzt-installer.md` ·
 > Sin aceptar. El primer diseño —`/nzt:setup` escribía el kernel en un `CLAUDE.md`, con un hook
 > de aviso— se construyó y probó en las unidades 462–471 y se retiró en la 476 (QT-109): queda
 > en el registro de abajo y en el commit `db92912`.
@@ -373,7 +373,7 @@ las dos sesiones. — `usuario y agente, observado`
 **QT-111** → A, en la unidad 477. — `usuario`
 
 **Unidad 476, lo hecho.** Con 473–475 a favor, el diseño de la skill queda (D92 en
-`Plan/specs/nzt-core.md`). Se retiraron del repo `plugin/` (setup, hook y sus pruebas),
+`Plan/specs/nzt-core/README.md`). Se retiraron del repo `plugin/` (setup, hook y sus pruebas),
 `nzt-software/method/core/adapter-claude-plugin.md`, los evals `plugin/` y el fixture `plugin-block.sh`; el build
 ya no arma el bloque. Esta spec se reescribió arriba; `Plan/specs/nzt-installer.md` y la guía de la
 landing, al día. — `agente, dentro del alcance aprobado`

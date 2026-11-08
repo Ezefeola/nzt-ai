@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "updated": "2026-11-07T18:32:48Z",
-  "goal": "specs/pendientes.md: S1 (sin packs, herramientas del agente en cualquier fase), S2 (plugin nzt-software sin prefijo) y S3 (punto 2: todo el producto en nzt-software/, specs en Plan/specs) (rama pendientes-post-v5)",
+  "updated": "2026-11-08T03:37:27Z",
+  "goal": "specs/pendientes.md: S1 (sin packs), S2 (plugin nzt-software sin prefijo), S3 (todo en nzt-software/) y S4 (los dos abiertos de D98: partir nzt-core.md y el latest de los releases) (rama pendientes-post-v5)",
   "cadence": "upfront",
   "slices": [
     {
@@ -233,28 +233,78 @@
           ]
         }
       ]
+    },
+    {
+      "id": "S4",
+      "name": "Partir nzt-core.md y fijar el latest de los releases",
+      "status": "done",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 525,
+              "do": "D99 con QT-119 (nzt-core.md en cuatro archivos dentro de Plan/specs/nzt-core/) y QT-120 (nzt-software publica con --latest; otro producto usa <producto>-vX.Y.Z y --latest=false)",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 526,
+              "do": "Partir Plan/specs/nzt-core.md en Plan/specs/nzt-core/README.md (§1–11 y Fuentes), decisions.md (§12), temper-v3.md (§13) y build-status.md (§14), con los números de sección intactos",
+              "status": "done",
+              "detail": "README 1044, decisions 2520, temper-v3 1374, build-status 641 líneas; README con git mv para conservar la historia"
+            },
+            {
+              "id": 527,
+              "do": "Referencias a nzt-core.md en specs, READMEs, mods, CLI, build y workflow: a README.md o a decisions.md según lo que citan",
+              "status": "done",
+              "detail": "referencias a nzt-core.md en 13 archivos: las que citan una D-NN o R1 a decisions.md, el resto a README.md; los mockups HTML y el histórico de state.json sin tocar"
+            },
+            {
+              "id": 528,
+              "do": "nzt-software-release.yml publica con --latest; la regla de tags por producto en nzt-installer.md y en la sección 9",
+              "status": "done",
+              "detail": "el release publica con --latest; la regla de tags por producto en nzt-installer.md 10.1 y en la sección 9"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 529,
+              "do": "Builds, checks y verify del CLI, enlaces relativos y búsqueda de nzt-core.md suelto",
+              "status": "done",
+              "detail": "builds sin warnings e iguales, skills idénticas a la línea base; 184 checks y verify pasan; 0 enlaces rotos; nzt-core.md solo queda en el texto de D99 y en mockups"
+            }
+          ]
+        }
+      ]
     }
   ],
   "approved": true,
   "delegation": "ask",
   "autonomy": {
     "units": [
-      516,
-      517,
-      518,
-      519,
-      520,
-      521,
-      522,
-      523,
-      524
+      525,
+      526,
+      527,
+      528,
+      529
     ],
     "keep_stops": []
   },
-  "waiting_on": "el usuario: revisar S3 (commiteado, sin push); mergear a main y taggear v6.0.0 juntos, porque el marketplace ya apunta a la rama plugin-nzt-software",
+  "waiting_on": "el usuario: sigue trabajando en esta rama; al mergear, main y el tag v6.0.0 juntos",
   "notes": [
-    "D96, D97 y D98: sin packs; plugin nzt-software sin prefijo; todo en nzt-software/ y specs en Plan/specs. S1 en bc7ae46, S2 en d4dc246.",
-    "S3 aprobado por el usuario el 2026-11-07 en modo autónomo hasta la 524: specs va a Plan/specs; el CLI vive en nzt-software/cli; tags vX.Y.Z se mantienen hasta que haya un segundo producto.",
-    "Línea base de dist (antes de mover) guardada fuera del repo, en el scratchpad de la sesión."
+    "D96 a D99: sin packs; plugin nzt-software sin prefijo; todo en nzt-software/; nzt-core en cuatro archivos y latest fijo. S1 bc7ae46, S2 d4dc246, S3 9249e97.",
+    "S4 aprobado el 2026-11-08 (QT-119: cuatro archivos; QT-120: latest fijo en nzt-software). La rama no se mergea todavía: el usuario sigue trabajando acá.",
+    "Al mergear: main y el tag v6.0.0 juntos, porque el marketplace apunta a la rama plugin-nzt-software."
   ]
 }

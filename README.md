@@ -23,12 +23,12 @@ Para Codex, el instalador y los mods, seguí la [guía de nzt-software](nzt-soft
 .claude-plugin/marketplace.json   el marketplace de Claude Code: nzt-software y sus mods
 .github/workflows/                un workflow de release por producto
 Plan/state.json                   el estado del trabajo en curso en este repo
-Plan/specs/                       las specs y las decisiones (nzt-core.md)
+Plan/specs/                       las specs; las decisiones en nzt-core/decisions.md
 nzt-software/                     el producto: método, evals, mods, build, CLI y releases
 ```
 
 Si volvés al proyecto después de un tiempo, empezá por `Plan/state.json` y
-[`Plan/specs/nzt-core.md`](Plan/specs/nzt-core.md).
+[`Plan/specs/nzt-core/README.md`](Plan/specs/nzt-core/README.md).
 
 ## Licencia
 
