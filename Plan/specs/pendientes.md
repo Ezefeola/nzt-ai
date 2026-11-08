@@ -47,19 +47,20 @@ cuándo consultar la herramienta instalada ni qué gana si contradice una regla 
 **Lo que se dejó afuera de D96 al traerlo:** que `tech.md` deje de nombrar packs (filas de
 *Decision*) y el kernel más corto. Son cambios aparte; si se quieren, van como su propio punto.
 
-**Pendiente de D96, ya visto:** en evals, el agente ofreció `--scope user` como alternativa;
-`tools.md` tiene que decir que nunca se ofrece alcance de usuario.
+**Lo que se vio en evals, ya resuelto:** el agente ofrecía `--scope user` como alternativa;
+`tools.md` (paso 5) dice ahora que se instala en el proyecto, nunca global ni a nivel usuario.
 
 ## 2 · Revisar la estructura de carpetas del repositorio
 
 **Hecho en esta rama: D98** (`Plan/specs/nzt-core/decisions.md`, unidades 516–524, tramo S3). Todo el
-producto pasa a `nzt-software/` (`method/`, `evals/`, `mods/`, `build/`, `cli/`, `release/`,
-`presentation/`), las specs a `Plan/specs/`, y `Plan/mejoras/` se borró. La raíz queda con el
+producto pasa a `nzt-software/` (`method/`, `evals/`, `mods/`, `build/`, `cli/` —borrado en
+D100—, `release/`, `presentation/`), las specs a `Plan/specs/`, y `Plan/mejoras/` se borró. La raíz queda con el
 marketplace, `.github/`, `Plan/`, el README índice y la licencia. El build sigue armando el mismo
 plugin.
 
 **Los dos puntos que dejó abiertos están hechos: D99** (unidades 525–529, tramo S4). La spec
-fundacional está en `Plan/specs/nzt-core/` en cuatro archivos, y nzt-software publica sus
+fundacional está en `Plan/specs/nzt-core/` en tres archivos (eran cuatro; `temper-v3.md` se
+borró después), y nzt-software publica sus
 releases con `--latest`; un producto futuro usa tags `<producto>-vX.Y.Z` y `--latest=false`.
 
 ## 3 · Una sola forma de instalar: como plugin, en Claude Code y en Codex
@@ -72,8 +73,11 @@ solo adaptador (`adapter-plugin.md`), la versión en `nzt-software/VERSION`, y e
 assets. Quien tenía `nzt-ai` lo desinstala antes (notas de la v6.0.0).
 
 **Queda abierto:** que en Codex `nzt-software:nzt` cargue primero no se probó en una sesión
-(536 descartada por el usuario). Después: la landing (repo `nzt-ai-landing`) tiene que explicar
-solo la instalación como plugin.
+(536 descartada por el usuario).
+
+**La landing está hecha** en el repo `nzt-ai-landing`, rama `instalacion-plugin` (commit
+`ed9c260`): explica solo la instalación como plugin. Falta mergearla, junto con el PR de esta
+rama a `main`.
 
 ## Otras notas guardadas
 

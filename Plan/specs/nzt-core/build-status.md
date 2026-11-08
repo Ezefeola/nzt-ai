@@ -9,14 +9,35 @@
 
 > Punto de retomada. Si empezás una sesión nueva, leé esto.
 
-> **Estado actual (2026-11-01), rama `refactor-marco-generico`.** D88: global queda solo el
+> **Estado actual (2026-11-08), rama `pendientes-post-v5`.** Versión **6.0.0, sin tag ni
+> release**; el PR a `main` queda para después. Lo que cambió desde la v5.0.0:
+>
+> - **D96:** sin packs, sin `nzt-games` y sin `nzt-ai project`. El kernel tiene *Agent tools*
+>   (cualquier MCP o plugin, en cualquier fase, registrado en `Docs/agent-tools.md`),
+>   `nzt-research` tiene `references/tools.md`, y `tech.md` declara solo tecnologías y
+>   prácticas, que eligen las references de `nzt-software`.
+> - **D97:** el plugin se llama `nzt-software`; dentro de él las skills y subagentes van sin
+>   prefijo (`nzt-software:build`).
+> - **D98:** todo el producto vive en `nzt-software/` (`method/`, `evals/`, `mods/`, `build/`,
+>   `release/`, `presentation/`, `dist/`) y las specs en `Plan/specs/`.
+> - **D99:** esta spec en tres archivos, y los releases de nzt-software con `--latest`.
+> - **D100:** se borró el CLI `nzt-ai`. nzt-software se instala solo como plugin desde el
+>   marketplace del repo, en Claude Code y en Codex; la versión está en `nzt-software/VERSION`
+>   y el release no lleva assets.
+>
+> El build (`nzt-software/build/build.sh`) arma el plugin 6.0.0 con 13 skills, 2 subagentes
+> y 40 casos de eval. Lo abierto está en `Plan/specs/pendientes.md`; el plan, en
+> `Plan/state.json`. La landing explica solo el plugin en su rama `instalacion-plugin`, sin
+> mergear. Los bloques de abajo son historia.
+
+> **Estado al 2026-11-01, rama `refactor-marco-generico`.** D88: global queda solo el
 > marco —12 skills, 60 referencias—, y lo de una tecnología o una arquitectura son 8 packs
 > por proyecto (75 referencias) que instala `nzt-ai project`, con sus MCP. El documento
 > técnico es `Docs/Architecture/tech.md`. D89: antes de trabajar el agente prepara el
 > trabajo con el usuario (`references/tech.md`, paso 4), el diseño vive en `Docs/Design/` y la
 > versión es **4.0.0, sin tag ni release** hasta que el usuario la pruebe en local. D90:
-> skills, referencias y packs reescritos sin redundancia, con `skill-creator`. El bloque
-> de abajo, del 2026-10-11, es historia: sus cuentas y su capa de stack ya no valen.
+> skills, referencias y packs reescritos sin redundancia, con `skill-creator`. Los packs y
+> `nzt-ai project` se fueron en D96, y `nzt-ai` en D100.
 
 > **Estado al 2026-10-11, rama `capa-generica`.** Lo que sigue a este bloque es la
 > historia de la construcción hasta v1.0.0 y antes de D50: sus cuentas (111 skills, hojas
