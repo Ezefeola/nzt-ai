@@ -152,8 +152,23 @@ Codex everything runs in the conversation.
 twice:
 
 - The v5 `nzt` plugin in Claude Code: `/plugin uninstall nzt@nzt`.
-- The `nzt-ai` installer, retired in v6: run `nzt-ai uninstall --provider claude-code --mods none`
-  or `nzt-ai uninstall --provider codex` with the copy you already have.
+- The one-line installer (`irm` or `curl`), retired in v6. It left no copy on your machine:
+  it downloaded the program to a temporary folder and deleted it when done. Run its v5.0.0
+  script again in uninstall mode, pinned to v5.0.0, because the latest release has no
+  binaries. For Claude Code, `NZT_MODS=none` keeps your mods, which are still the same
+  plugins:
+
+  ```powershell
+  $env:NZT_UNINSTALL='1'; $env:NZT_VERSION='v5.0.0'; $env:NZT_MODS='none'; irm https://github.com/Ezefeola/nzt-ai/releases/download/v5.0.0/install-claude.ps1 | iex
+  ```
+
+  ```bash
+  curl -fsSL https://github.com/Ezefeola/nzt-ai/releases/download/v5.0.0/install-claude.sh | NZT_UNINSTALL=1 NZT_VERSION=v5.0.0 NZT_MODS=none sh
+  ```
+
+  For Codex, use `install-codex.ps1` or `install-codex.sh` instead, without `NZT_MODS`. It
+  removes only what its manifest lists. On Windows, close that PowerShell window afterwards:
+  the `NZT_*` variables stay set in it.
 
 ## Mods
 

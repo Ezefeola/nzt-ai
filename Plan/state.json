@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-11-08T04:06:58Z",
+  "updated": "2026-11-08T04:20:11Z",
   "goal": "specs/pendientes.md: S1 a S4 hechos; S5: una sola forma de instalar nzt-software, como plugin en Claude Code y en Codex, sin el CLI nzt-ai (rama pendientes-post-v5)",
   "cadence": "upfront",
   "slices": [
@@ -368,10 +368,10 @@
     ],
     "keep_stops": []
   },
-  "waiting_on": "el usuario: revisar S5 y pedir el commit (no quiere commit ni push hasta que lo pida)",
+  "waiting_on": "el usuario: publicar el release v6.0.0; después, merge y deploy de la rama instalacion-plugin de nzt-ai-landing",
   "notes": [
     "D96 a D99 hechos y pusheados en origin/pendientes-post-v5 (último a3bbdb0). Desde S5 el usuario no quiere commit ni push hasta que lo pida.",
     "Codex verificado el 2026-11-08 en developers.openai.com/plugins/build/plugins y learn.chatgpt.com/docs/developer-commands: codex plugin marketplace add owner/repo[@ref], codex plugin add <plugin@marketplace>; lee .claude-plugin/marketplace.json como legado; no documenta subagentes ni el nombre de las skills del plugin.",
-    "Después de S5: cambiar la landing (repo nzt-ai-landing) para explicar solo la instalación como plugin."
+    "Landing en la rama instalacion-plugin de nzt-ai-landing, pusheada: explica solo el plugin; no se publica hasta el release v6.0.0."
   ]
 }

@@ -25,8 +25,10 @@ NZT.
 - Que `nzt-software:nzt`, con el kernel, cargue primero en toda sesión —también ante una pregunta— y
   siga presente después de compactar.
 - Desactivar o desinstalar el plugin sin dejar nada de NZT en la máquina ni en el proyecto.
-- Migrar desde `nzt-ai`: se desinstala con la copia que ya se tiene (`nzt-ai uninstall`) antes
-  de instalar el plugin; si no, el kernel llega dos veces. Lo dicen las notas de la v6.0.0.
+- Migrar desde `nzt-ai`: se desinstala antes de instalar el plugin; si no, el kernel llega dos
+  veces. El comando de una línea no dejó copia del binario, así que se corre su script de la
+  v5.0.0 en modo desinstalar, fijado en esa versión (`NZT_VERSION=v5.0.0`). Lo dicen la guía
+  de `nzt-software/README.md` y las notas de la v6.0.0.
 
 **Afuera**
 - Otro camino de instalación: `nzt-ai` y sus comandos de una línea se borraron (D100, QT-121).

@@ -2,8 +2,10 @@
 
 > Estado: **retirada por D100** (2026-11-08, QT-121). `nzt-ai` y `nzt-software/cli/` se
 > borraron: nzt-software se instala solo como plugin, en Claude Code y en Codex
-> (`Plan/specs/nzt-plugin.md`). Quien lo instaló con `nzt-ai` lo desinstala con la copia que
-> tiene (`nzt-ai uninstall`) antes de instalar el plugin. Esta spec queda como registro de lo
+> (`Plan/specs/nzt-plugin.md`). Quien lo instaló con el comando de una línea lo desinstala
+> antes de instalar el plugin, con el script de la v5.0.0 en modo desinstalar
+> (`NZT_UNINSTALL=1`, `NZT_VERSION=v5.0.0`): el comando no dejó copia del binario. Los pasos
+> están en la guía de `nzt-software/README.md`. Esta spec queda como registro de lo
 > que se construyó hasta la v5; el código está en el commit `a3bbdb0`. Las rutas de abajo
 > son las de ese momento.
 >

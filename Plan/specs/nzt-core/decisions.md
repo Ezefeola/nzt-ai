@@ -2542,8 +2542,13 @@ Las tres últimas las pidió el usuario después de leer el reporte de la segund
       `verify`, y el CI corre el state check de los scripts de `nzt-plan`. Se van también
       `adapter-claude.md` y las salidas `dist/claude-code` y `dist/codex`, que solo usaba el
       instalador.
-    - **Migración:** quien instaló con `nzt-ai` lo desinstala con la copia que ya tiene
-      (`nzt-ai uninstall`) antes de instalar el plugin; si no, el kernel llega dos veces.
+    - **Migración:** quien instaló con `nzt-ai` lo desinstala antes de instalar el plugin; si
+      no, el kernel llega dos veces. *Corregido el 2026-11-08:* decía "con la copia que ya
+      tiene (`nzt-ai uninstall`)", pero el comando de una línea baja el binario a una carpeta
+      temporal y la borra, y el binario se llama `nzt`. La migración corre el script de la
+      v5.0.0 en modo desinstalar, fijado con `NZT_VERSION=v5.0.0` porque el `latest` de la v6 no
+      tiene binarios, y con `NZT_MODS=none` en Claude Code para dejar los mods (guía de
+      nzt-software y notas de la v6.0.0).
     - **Sin prueba en vivo de la instalación** (unidad 536 descartada por el usuario: si
       funciona en Claude Code, en Codex también).
   - **Lo que se acepta:** **(1)** Codex no documenta subagentes en plugins: si no los trae, en
