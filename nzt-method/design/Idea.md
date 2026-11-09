@@ -417,10 +417,10 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo:** auditoría aplicada y probada (31/34; las 3 fallas son de un caso de
-   `plan` anterior a las etapas). Ver `Trabajo-por-etapas.md` → *Regresión de la
-   auditoría*. Falta: commit (el usuario lo pide), actualizar los casos de `plan`, y decidir
-   cómo se escribe un cambio que saca una parte entera.
+0. **Lo próximo:** auditoría con commit (`74503c6`); casos de `plan` actualizados a las etapas
+   y pasando (cumple 5/5, mudanza 6/6). Queda por decidir con el usuario cómo se escribe un
+   cambio que saca una parte entera (toca también la definición general). Después, volver a
+   probar en la app (`nzt-proyecto`) con un proyecto nuevo.
 1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1

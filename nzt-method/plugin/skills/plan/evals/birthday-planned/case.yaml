@@ -1,4 +1,6 @@
 schema_version: "1.1"
 name: birthday-planned
 expected_outcome: |
-  Presents a short plan of two to five parts, each with what it leaves and who does it, plus what must be true at the end, and asks for approval. Writes no state file and no deliverable before the yes.
+  With the definition and how already written, it cuts the birthday into a short plan of two to five units, each with what it leaves and who does it, states the work done criterion, and asks for approval before writing the state file or producing anything.
+context:
+  scaffold_script: place-files.sh

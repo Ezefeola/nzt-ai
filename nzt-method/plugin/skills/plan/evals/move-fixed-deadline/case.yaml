@@ -1,4 +1,6 @@
 schema_version: "1.1"
 name: move-fixed-deadline
 expected_outcome: |
-  Presents a plan in parts ordered by risk (booking the movers and the lease notice early), says who does each part (mostly the couple, the agent prepares), treats the 15th as fixed and marks what can be dropped, placing it last; asks for approval and writes no state before the yes.
+  With a fixed date and the definition and how already written, it plans the move putting first what must be booked or notified early (movers, notice to the landlord), says who does each unit, marks what can be dropped if time runs short and puts it last, and asks for approval before writing anything.
+context:
+  scaffold_script: place-files.sh

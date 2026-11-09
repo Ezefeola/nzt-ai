@@ -5,4 +5,6 @@ timeout_seconds: 600
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 
-Me mudo de departamento el 15 del mes que viene, de Palermo a Caballito, con mi pareja y un gato. Ayudame a organizar todo. Alquilamos los dos, vamos a contratar un flete. Podés crear la carpeta acá mismo.
+Ya está definida la mudanza y cómo la hacemos, está en Docs. Armá el plan.
+
+Input files: Docs/General/definition.md, Docs/How/how.md

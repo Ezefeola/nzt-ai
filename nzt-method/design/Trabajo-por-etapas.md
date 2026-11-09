@@ -355,8 +355,12 @@ se cortaron por el límite de uso y se dejaron para no gastar el doble):
 Total **31/34**; las tres fallas son del caso viejo, no de la auditoría.
 
 **Pendiente de esta parte:**
-- Actualizar `plan/evals/birthday-planned` (y revisar `move-fixed-deadline`) para que
-  arranquen con definición y `how.md` ya escritos, como entra hoy un trabajo a `plan`.
+- ~~Actualizar `plan/evals/birthday-planned` y `move-fixed-deadline`~~ hecho el
+  2026-11-09: arrancan con `Docs/General/definition.md` y `Docs/How/how.md` ya escritos y
+  el pedido "armá el plan". Corridos con la versión nueva: cumple **5/5** (cinco pasos con
+  quién hace cada uno, criterio de terminado, pide aprobación, nada escrito antes del sí) y
+  mudanza **6/6** (aviso al dueño y flete primero, cambio de domicilio último como
+  recortable, pide aprobación, nada escrito).
 - Hueco visto en `define`: cuando un cambio saca una parte entera, también toca la
   definición general, y `change-file.md` no dice si va un `change.md` por definición o uno
   solo. Decidir con el usuario.
