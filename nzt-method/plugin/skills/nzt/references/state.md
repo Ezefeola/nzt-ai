@@ -17,6 +17,7 @@ Before asking the person anything:
   this plan;
 - the person asks for something unrelated to this work → a new work, in its own folder;
 - a unit `in progress` → report it in one line and continue it with `nzt-do`;
+- an approved plan with the next unit `pending` → start that unit with `nzt-do`;
 - a plan not yet approved → show that plan again instead of writing a new one;
 - every unit with a verdict → the new request is a new work, or a new plan for this one;
 - *Next step* waiting on the person → say what it waits on first.

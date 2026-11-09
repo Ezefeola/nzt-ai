@@ -230,6 +230,54 @@ Si se limpia el contexto, una sesión nueva retoma así:
   documentos del método, no en textos propios de la persona (salió en el caso de la carta).
   **Próximo paso:** iteración 2 de `nzt-do` (al menos el caso del flete), commit, y seguir
   con `nzt-tools` y `nzt-retro`.
+- **2026-11-08:** commit `bd3e794` con `nzt-do` y **push** de `metodo-generico` a `origin`.
+  Iteración 2 del caso del flete: **6/6** (antes 4/6): dejó `Flete.md` con huecos, mensaje
+  para pedir presupuestos, tabla para comparar y pasos; dijo qué confirmación cierra la
+  parte y la pidió. Salió un hueco más y se corrigió: en `nzt/references/state.md`, un plan
+  aprobado con la próxima unidad pendiente → empezarla con `nzt-do`.
+
+### Punto de retomada (2026-11-08)
+
+**Hecho y probado** (en `plugin/skills/`, cada una con casos en su `evals/`):
+
+| Skill | Qué hace | Prueba |
+|---|---|---|
+| `nzt` | Entrada: lee el estado, aclara, dimensiona, quién hace, herramientas, paquetes, carpeta, le cuenta a la persona y deriva | 4 casos, 26/26 con skill, 46% sin |
+| `nzt-plan` | Corta en unidades (qué deja, cuándo está lista, quién la hace), ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
+| `nzt-do` | Hace una unidad (o guía, o enseña), verifica con evidencia, registra y para con reporte | 3 casos; tras corregir el flete, todos los criterios con skill |
+
+Las referencias compartidas son de `nzt` (`state`, `glossary`, `starting`, `sizing`,
+`packages`, `documents`, `messages`); `nzt-plan` tiene `slicing`; `nzt-do` tiene `who-does`,
+`teaching` y `verify`.
+
+**Pendiente, en orden:**
+
+1. **Debatir la enseñanza.** El usuario quiere que enseñar sea una skill aparte, partiendo de
+   `nzt-learn` de `nzt-software` (currículo, lecciones, ejercicios con soluciones aparte,
+   evaluación, repasos espaciados), y no una referencia de `nzt-do` (`teaching.md`). Dijo
+   también que hay que quitarla de `nzt-software`: **en esta rama `nzt-software` no se
+   modifica**, así que eso queda para cuando se integren; acá solo se diseña la skill
+   genérica. Preguntas abiertas: si es `nzt-learn` en el núcleo o un paquete; cómo la elige
+   `nzt` (hoy el paso 6 manda a `nzt-do` a enseñar); qué pasa con `teaching.md`.
+2. Escribir **`nzt-tools`** (proponer, investigar en fuentes oficiales con un sí, instalar con
+   otro sí, comprobar, registrar en `Docs/agent-tools.md` con rechazadas; plantilla
+   `agent-tools.md`).
+3. Escribir **`nzt-retro`** (solo a pedido; propone mejoras sin cambiar nada; señala qué
+   merece un paquete).
+4. Actualizar `design/Estructura.md` con lo que cambió al escribir las skills (columnas de
+   unidades, `messages.md`, enseñanza), y crear los manifiestos del plugin (Claude Code y
+   Codex) en `plugin/`.
+
+**Cómo se prueba una skill** (lo que se hizo hasta ahora): casos en `evals/<caso>/` con el
+formato de `skill-creator`; por cada caso, un subagente con las skills (empezando por
+`nzt/SKILL.md`) y otro sin skill, cada uno en su carpeta del scratchpad; calificar en
+`grading.json`; `py -m scripts.aggregate_benchmark` y
+`py eval-viewer/generate_review.py --static` desde la carpeta de `skill-creator` (en esta
+máquina Python se llama con `py`). Los resultados del scratchpad no están en el repo.
+
+**Detalle visto:** el ejemplo de `nzt/references/messages.md` está en inglés y una corrida
+escribió primero los títulos en inglés; si se repite, poner el ejemplo en español o aclarar
+que los títulos van en el idioma de la persona.
 
 ## Primer paso sugerido
 
