@@ -20,7 +20,9 @@ work itself (that is `nzt-do`) and never writes a plan (that is `nzt-plan`).
    reference says for the person's request, and skip to step 11.
 3. **Read the work's files.** If they exist, read `Docs/glossary.md` (with
    `references/glossary.md`) and `Docs/agent-tools.md`, and use their terms and packages from
-   here on.
+   here on. When a tool listed there covers what has to be done, do it through that tool;
+   if what the tool says or does contradicts what this work decided, the decision wins: say
+   so.
 4. **Route out what is not work.** A question that asks for no change or product is answered
    directly; the method does not apply.
 5. **Clarify a vague request.** If what is wanted, for whom, or how success is recognized

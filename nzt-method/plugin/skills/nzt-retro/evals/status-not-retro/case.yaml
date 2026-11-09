@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: status-not-retro
+expected_outcome: |
+  Answers where the move stands from the state (packing in progress, what is left, next step) without writing a retro file or listing improvement proposals.
+context:
+  scaffold_script: place-files.sh

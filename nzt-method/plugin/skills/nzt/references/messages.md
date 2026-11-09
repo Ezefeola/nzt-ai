@@ -7,7 +7,8 @@ it — the person hired someone to help, not a process to watch.
 ## Shape
 
 1. **One opening line** with the outcome or the situation, in plain words.
-2. **Sections only when they have content**, in this order, each with a bold label:
+2. **Sections only when they have content**, in this order, each with a bold label written
+   in the person's language (the English labels below and in the example are translated):
    - **What I did** — only what actually happened.
    - **What I found** — facts, problems, anything surprising.
    - **What I'm assuming** — so the person can correct it.
@@ -45,7 +46,7 @@ it — the person hired someone to help, not a process to watch.
   | handing off to another skill | nothing: just carry on |
 
 - **Verified, assumed and not checked are visibly different:** "checked: …", "assuming: …",
-  "not checked: …".
+  "not checked: …", said in the person's language.
 - **Files as links** when the host renders them, and only the ones the person would open.
 - **No internal notes:** no HTML comments, tool names or step numbers.
 

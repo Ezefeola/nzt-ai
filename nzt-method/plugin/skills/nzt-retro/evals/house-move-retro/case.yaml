@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: house-move-retro
+expected_outcome: |
+  Writes one retro file under Docs/retros/ with proposals tied to the moments in the state (paperwork for the wrong city, packing list by type twice, message assumed sendable), each with a destination and status proposed; says which sessions could not be reviewed; changes nothing else; tells the person briefly.
+context:
+  scaffold_script: place-files.sh

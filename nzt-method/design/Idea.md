@@ -286,6 +286,44 @@ Si se limpia el contexto, una sesión nueva retoma así:
   sesión, antes que nada, incluso para una pregunta, y otra vez tras compactar; quitado el
   resguardo de `nzt-plan`, `nzt-do` y `nzt-learn`; caso `nzt/evals/kernel-loaded`. El hook
   de inicio de sesión queda para cuando se armen los manifiestos. Sin commit.
+- **2026-11-09:** antes de escribir `nzt-tools`, Claude resumió el diseño y cómo lo hace
+  `nzt-software` (`research/references/tools.md`, kernel *Agent tools*) y propuso la skill:
+  `SKILL.md` con los pasos del principio 10 y la referencia `agent-tools.md` (plantilla),
+  genérica (sin comandos ni hosts), tomando de `nzt-software` el orden de fuentes, "si no se
+  repite, no hay herramienta", las claves nunca en la conversación y "si está anotada, se
+  usa". El usuario aceptó lo recomendado en T1–T5 (`Archivos.md` → *Decididos*).
+  **Próximo paso:** escribir `nzt-tools`, ajustar el paso 3 de `nzt` (T4) y probarla.
+- **2026-11-09:** escrita **`nzt-tools`** (`plugin/skills/nzt-tools/`: `SKILL.md` de 9 pasos
+  y `references/agent-tools.md` con la plantilla y 4 reglas), auditada con
+  `gestionar-skills` (dos pasadas; se quitó lo que repetía `messages.md`). `nzt/SKILL.md`
+  paso 3 suma T4. Cuatro casos en `nzt-tools/evals/`: novela en documentos en la nube
+  (pregunta antes de investigar), conector ya rechazado (no se reofrece), planillas de Excel
+  (pidió buscar: investiga en fuentes oficiales y no instala sin otro sí) y cumpleaños (no
+  hace falta nada). Iteración 1: **100% con skill (17/17), 77,5% sin**. Sin skill: no dice
+  que no llega a los documentos y manda a activar un conector sin preguntar; investiga en
+  directorios de terceros, sin qué tocan ni alcance. Los casos del rechazo y del cumpleaños
+  no discriminan (pasan igual sin skill). Se repitió el detalle de los títulos en inglés
+  (cumpleaños: *What I'm assuming*): `messages.md` ahora dice que los títulos van en el
+  idioma de la persona. Sin commit.
+- **2026-11-09:** el usuario dio por buena `nzt-tools` y pidió seguir. Para `nzt-retro`
+  Claude propuso la adaptación de la retro de `nzt-software`; decididos R1–R4
+  (`Estructura.md` → *Decididos*): preguntar siempre dónde se guarda, últimas 10 sesiones o
+  las que elija la persona, la sección del método puede nombrar skills, y solo a mano.
+  **Próximo paso:** escribir `nzt-retro` y probarla. Sin commit.
+- **2026-11-09:** escrita **`nzt-retro`** (`plugin/skills/nzt-retro/`: `SKILL.md` de 8 pasos
+  y `references/retro-file.md` con la plantilla y 7 reglas), auditada con
+  `gestionar-skills` (la gravedad pasó a la referencia para que el paso 5 sea una sola
+  acción). Cuatro casos en `nzt-retro/evals/`: retro de la mudanza con lugar dado, retro sin
+  lugar (pregunta dónde), newsletter en su tercera edición (señala un paquete) y "¿cómo
+  venimos?" (es estado, no retro). Iteración 1: **100% con skill (16/16), 86,6% sin**. Sin
+  skill: escribe "qué cambiamos" como reglas ya decididas, sin destino ni estado
+  `proposed`, y propone la guía sin atar cada aporte a su momento. Pedir el lugar y "¿cómo
+  venimos?" no discriminan. Ajustes: el paso 1 decía "antes de leer nada" y chocaba con
+  `nzt`, que lee el estado primero → "antes de revisar nada"; una respuesta escribió "No
+  checked:" en inglés → `messages.md` aclara que esas marcas van en el idioma de la
+  persona. Iteración 2 (mudanza, solo con skill): 7/7, marcas en español ("No
+  verificado:"), solo se agregó la retro. Mostró un hueco: si la persona ya dio el lugar,
+  no se avisaba de carpeta compartida → el paso 1 avisa en los dos casos. Sin commit.
 
 ### Punto de retomada (2026-11-09)
 
@@ -297,20 +335,21 @@ Si se limpia el contexto, una sesión nueva retoma así:
 | `nzt-plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
 | `nzt-do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `nzt-learn` | 3 casos (BUSCARV pasó a `nzt-learn`) |
 | `nzt-learn` | Enseña: pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades en `Plan/state.md`, ejercicios con la solución aparte, correcciones con pistas, evaluación y repasos espaciados | 5 casos, todos los criterios con skill (iteraciones 2–3), 79% sin |
+| `nzt-tools` | Nombra la falta, mira lo que ya hay y lo rechazado, pregunta antes de investigar, investiga en fuentes oficiales, propone con la opción de ninguna, instala con otro sí en el alcance más chico, comprueba, anota en `Docs/agent-tools.md` y vuelve al trabajo | 4 casos, 17/17 con skill, 77,5% sin |
+| `nzt-retro` | Solo a pedido: pregunta dónde guardarla, revisa las últimas 10 sesiones (o las que elija la persona) y los archivos del trabajo, convierte cada momento costoso en una propuesta con destino (trabajo, método o paquete), señala paquetes posibles y no cambia nada más | 4 casos, 16/16 con skill, 86,6% sin |
 
 Las referencias compartidas son de `nzt` (`state`, `glossary`, `starting`, `sizing`,
 `packages`, `documents`, `messages`); `nzt-plan` tiene `slicing`; `nzt-do` tiene `who-does`
 y `verify`; `nzt-learn` tiene `plan`, `teach`, `train`, `tutor`, `assess`, `retain` y
-`exercises`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
+`exercises`; `nzt-tools` tiene `agent-tools`; `nzt-retro` tiene `retro-file`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
 ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-1. Escribir **`nzt-tools`** (proponer, investigar en fuentes oficiales con un sí, instalar con
-   otro sí, comprobar, registrar en `Docs/agent-tools.md` con rechazadas; plantilla
-   `agent-tools.md`).
-2. Escribir **`nzt-retro`** (solo a pedido; propone mejoras sin cambiar nada; señala qué
-   merece un paquete).
+1. ~~Escribir `nzt-tools`~~ hecho el 2026-11-09 y aprobado por el usuario (falta el
+   commit).
+2. ~~Escribir `nzt-retro`~~ hecho el 2026-11-09 (falta la devolución del usuario y el
+   commit).
 3. Actualizar `design/Estructura.md` con lo que cambió al escribir las skills (columnas de
    unidades, `messages.md` y *Asking*, `nzt` como base, `nzt-learn` como sexta skill), y
    crear los manifiestos del plugin (Claude Code y Codex) en `plugin/`.

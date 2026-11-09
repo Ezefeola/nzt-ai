@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: birthday-no-tool-needed
+expected_outcome: |
+  Says no tool is needed for this and goes on with the work (or with how it will go), without researching or proposing plugins or MCPs.

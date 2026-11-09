@@ -129,3 +129,20 @@ Todo lo que usa el trabajo además del agente: plugins, MCPs y paquetes de domin
 
   Orden alfabético; un término por concepto; si un término cambia, se reemplaza y se anota
   en *Decisiones* de `Plan/state.md`.
+
+- **Herramientas, al escribir `nzt-tools` (2026-11-09, decidido por el usuario con lo
+  recomendado por Claude):**
+  - **T1. Columnas:** las de A2, y *Rechazadas* suma **Motivo** (como en `nzt-software`),
+    para que se entienda por qué no se vuelve a ofrecer.
+  - **T2. Trabajo al paso sin carpeta:** si se instala o se rechaza una herramienta, el
+    agente **propone crear la carpeta del trabajo** para anotarla en `Docs/agent-tools.md`.
+  - **T3. Qué cuenta como herramienta:** plugins, MCPs y paquetes, **y también los programas
+    que el agente usa** (por ejemplo, de línea de comandos) cuando se instalan para el
+    trabajo. Tipo: `plugin / MCP / package / program`.
+  - **T4. "Si está anotada, se usa":** una línea en el paso 3 de `nzt`, que ya lee
+    `Docs/agent-tools.md`: cuando una herramienta anotada cubre lo que hay que hacer, se
+    hace a través de ella; si lo que dice contradice lo decidido en el trabajo, gana lo
+    decidido y se avisa.
+  - **T5. Alcance:** se instala en el alcance más chico que sirva (el trabajo antes que todo
+    el equipo). Si el host no permite ese alcance, **se avisa y se pregunta** antes de
+    instalar más arriba.

@@ -155,3 +155,24 @@ paquete.
 - **`unit` (2026-11-08):** lo que antes se llamaba "pieza" es una **unidad** en el diseño y
   una **`unit`** en las skills, como en `nzt-software`. Los documentos de diseño ya dicen
   "unidad". Los términos del método están en `Glosario.md`.
+
+- **`nzt-retro` (2026-11-09, decidido por el usuario):** antes de escribirla, Claude miró la
+  retro de `nzt-software` (`method/skills/nzt/retro/SKILL.md`) y propuso adaptarla sin hosts
+  ni destinos de software: revisa sesiones y los archivos del trabajo (estado, glosario,
+  herramientas), cada propuesta sale de un momento donde el trabajo costó más de lo debido,
+  y va a uno de tres destinos: **el trabajo**, **el método** o **un paquete** (nuevo, con las
+  filas que traería, o uno en uso). Toma de `nzt-software`: sin momento va a *Descartadas*,
+  verificación si es mecánico y regla si es de criterio, gravedad, estado `proposed` que
+  solo cambia la persona, nada de valores copiados. Decidido:
+  - **R1. Dónde se guarda:** se pregunta **siempre** (salvo que la persona ya lo haya dicho),
+    sugiriendo `Docs/retros/<fecha>-<tema>.md` en la carpeta del trabajo y avisando si esa
+    carpeta es un repositorio compartido.
+  - **R2. Qué sesiones:** las **últimas 10** del trabajo, **o las que elija la persona**
+    (pueden ser de otros trabajos, para ver qué se repite). Se leen solo si el host las
+    guarda y se pueden leer (dónde, en su documentación oficial; la skill no nombra hosts);
+    si no, se dice y se revisa la sesión actual más los archivos del trabajo.
+  - **R3. Jerga:** la sección *Para el método* del archivo puede nombrar skills y
+    referencias, porque la lee quien mantiene el método; el mensaje a la persona sigue sin
+    jerga.
+  - **R4. Solo a mano:** el agente **nunca la ofrece ni la activa**; la usa la persona
+    cuando la pide.
