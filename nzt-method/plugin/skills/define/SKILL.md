@@ -11,7 +11,7 @@ is the `plan` skill) and never does the work (that is the `do` skill). A definit
 names a technology, a supplier or a material has drifted into how.
 
 The shared references named here (`references/folder.md`, `references/questions.md`,
-`references/glossary.md`, `references/documents.md`) live in the `nzt` skill's folder.
+`references/glossary.md`, `references/documents.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Steps
 
@@ -52,8 +52,8 @@ and a change was approved before it touched the definition.
 
 ## References
 
-| Reference | Read it when |
+| File | Read it when |
 |---|---|
 | `references/interview.md` | questions are prepared or asked |
-| `references/definition-file.md` | a definition, general or of a part, is written or updated |
-| `references/change-file.md` | something already agreed is added to, changed or removed |
+| `references/definition-file.md`, `assets/definition.md` and `assets/part-definition.md` | a definition, general or of a part, is written or updated |
+| `references/change-file.md` and `assets/change.md` | something already agreed is added to, changed or removed |

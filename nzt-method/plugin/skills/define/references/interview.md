@@ -31,10 +31,8 @@ For a part, the same questions narrow to that part, plus its rules and its bad c
 4. **The edges early:** who else is affected, what happens before and after.
 5. **The bad case by its name:** what happens when it goes wrong, is late, is empty, is
    done twice.
-6. **Bring a proposal when the person may not know:** options with what each leads to, the
-   one you recommend first.
-7. **Do not ask what the folder, the logs or the request already answer.**
-8. **Follow up an answer that opens something,** in the next round.
+6. **Bring a proposal when the person may not know,** as a choice.
+7. **Follow up an answer that opens something,** in the next round.
 
 ## When the person does not know yet
 

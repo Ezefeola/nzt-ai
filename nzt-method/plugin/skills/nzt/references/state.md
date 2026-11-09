@@ -28,40 +28,18 @@ If the state and the folder disagree (a file it names is missing, or one it does
 mention is there), tell the person and ask before touching the state: a missing file may
 only live somewhere else. Correct the state once the person confirms what is true.
 
-## Template
+## The file
 
-Headings and fixed words in English; what is written under them in the person's language.
-Empty sections are not written.
+It starts from `assets/state.md`. Headings and fixed words in English; what is written
+under them in the person's language. Empty sections are not written.
 
-```markdown
-# <Work name>
-
-## What it is
-What is wanted and for whom, in one line; the definition holds the rest.
-Size: <direct | planned | sliced>.
-Fixed time: <deadline>, if any.
-
-## Done when
-The agreed done criterion for the whole work.
-
-## Units
-| Unit | Part | Leaves | Done when | Who does it | Status | Verdict |
-|---|---|---|---|---|---|---|
-| … | the part it belongs to, if any | what exists after it | its own done criterion | agent / person / both | pending / in progress / stopped | done / partial / not achieved |
-
-Units in the order they are done. Units that can be cut if time runs out are marked
-`(cuttable)`. Units the person approved to run in a row without stopping are marked
-`(batch)`.
-
-## Decisions
-- **<date> — <what was decided>.** Why: <reason>.
-
-## Where we are
-What the last session did, and what was left unverified.
-
-## Next step
-What the agent recommended, and whether the person approved it.
-```
+- **Units** go in the order they are done. *Part* is the part it belongs to, if any;
+  *Leaves* is what exists after it; *Who does it* is `agent`, `person` or `both`; *Status*
+  is `pending`, `in progress` or `stopped`; *Verdict* is `done`, `partial` or
+  `not achieved`.
+- **Marks:** units that can be cut if time runs out are marked `(cuttable)`; units the
+  person approved to run in a row without stopping are marked `(batch)`.
+- **Fixed time** is written only when there is a deadline.
 
 A topic the person is learning uses this same file: `learn` says how its units,
 verdicts, *Next review* column and *Log* section are read.

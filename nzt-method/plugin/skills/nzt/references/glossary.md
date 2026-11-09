@@ -14,15 +14,4 @@ the same thing always has the same name, in the conversation and in every docume
 - **Update it when a term appears or changes.** A changed term is replaced and the change
   is recorded in *Decisions* of `Plan/state.md`, if there is one.
 - **Do not invent jargon.** A term goes in because the work uses it, not to look precise.
-
-## Template
-
-Alphabetical order. Written in the person's language; only the heading is fixed.
-
-```markdown
-# Glossary
-
-| Term | What it means in this work | Not to confuse with |
-|---|---|---|
-| … | … | a similar term, if any |
-```
+- **Alphabetical order,** starting from `assets/glossary.md`; only its heading row is fixed.

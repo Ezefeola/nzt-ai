@@ -10,7 +10,7 @@ here the person does it and the agent gets them there. Solving it for them is th
 the moment they are stuck is where the skill forms.
 
 The shared references named here (`references/state.md`, `references/documents.md`,
-`references/glossary.md`) live in the `nzt` skill's folder.
+`references/glossary.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Two loops, one topic
 
@@ -60,9 +60,9 @@ session, one correction, one assessment or one batch of reviews; never a whole t
      practice session if they already do it.
 5. **Run the unit** with the references of its row below.
 6. **Record it** in `Plan/state.md` with `nzt`'s `references/state.md`: the objective's
-   status, verdict and next review, and one log line. Add new terms to the glossary with
-   `nzt`'s `references/glossary.md`.
-7. **Stop and report** in one message: what
+   status, verdict and next review, and one log line.
+7. **Update the glossary** with new terms, with `nzt`'s `references/glossary.md`.
+8. **Stop and report** in one message: what
    they can do now, what is still missing, the next review date if any, and the next step
    you recommend. Then wait for the person.
 

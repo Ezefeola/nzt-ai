@@ -33,14 +33,13 @@ request is the `define` skill's, deciding how it is made is `approach`'s, planni
    Ask only when it cannot be deduced and the answer changes the work.
 7. **Check the packages** with `references/packages.md`: propose a domain package that fits
    and is not in use. Without one, you go with what you know about the subject: say so in
-   step 9.
+   step 10.
 8. **Settle what direct work needs**, only for the direct size:
    - **The tools:** if one the work needs is missing, or one would clearly do it better,
      load the `tools` skill first.
    - **Base choices are the person's:** what the result is made with or on, when changing
-     it later would be costly (a program, a format, a supplier), is asked as a choice,
-     each option naming concretely what you would use and what it means for them, the one
-     you recommend first.
+     it later would be costly (a program, a format, a supplier), is asked as a choice with
+     `references/questions.md`.
 9. **Place the work.** A planned or sliced work needs a folder: use the one it has, or
    propose where to create it. `references/folder.md` has what goes inside.
 10. **Tell the person** how the work will go, in one message: what will happen, who does
@@ -67,13 +66,14 @@ that is not work was answered.
 
 ## References
 
-| Reference | Read it when |
+| File | Read it when |
 |---|---|
 | `references/messages.md` | at step 1: every message to the person and every question, from any `nzt` skill |
-| `references/state.md` | `Plan/state.md` is read, created or updated, by this skill or another one |
-| `references/glossary.md` | the glossary is read, created or updated |
+| `references/state.md` and `assets/state.md` | `Plan/state.md` is read, created or updated, by this skill or another one |
+| `references/glossary.md` and `assets/glossary.md` | the glossary is read, created or updated |
 | `references/sizing.md` | the work is sized, or its size changes |
 | `references/packages.md` | a domain package is proposed, applied, in conflict, or missing |
 | `references/folder.md` | a work's folder is created, or any file is placed in it |
-| `references/questions.md` | a question about what or how is written, asked or answered |
+| `references/questions.md` | a question about what or how is written, asked or answered, or a choice is offered |
+| `assets/questions.md` | a question log is created |
 | `references/documents.md` | any document is written: a definition, a plan, a report, a deliverable |

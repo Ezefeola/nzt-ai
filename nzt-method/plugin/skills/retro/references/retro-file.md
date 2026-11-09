@@ -1,33 +1,10 @@
 # The retro file
 
-```markdown
-# Retro · <work> · <YYYY-MM-DD>
-
-Sessions reviewed: <current | dates or names> · Not reviewed: <what was asked and could not be read, or "none">
-
-<three lines: what went well, what cost the most, the one proposal to look at first>
-
-## For the work
-
-### R-01 · <title>
-- Severity: high
-- Moment: <which session, and what happened, in words>
-- Destination: <file or place>
-- Proposal: <what would change there>
-- Status: proposed
-
-## For the method
-
-## For packages
-
-## Discarded
-
-- <idea> — <why: no moment behind it, or not ours to change>
-```
+The file starts from `assets/retro.md`.
 
 ## Rules
 
-1. **Headings stay as above; everything else is in the person's language.**
+1. **Headings stay as in the asset; everything else is in the person's language.**
 2. **Plain words, except *For the method*:** its reader maintains the method, so it can name
    skills, references and the method's labels.
 3. **Never a value from a session:** no key, output, file content or personal data the

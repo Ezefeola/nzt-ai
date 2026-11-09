@@ -9,7 +9,7 @@ The only skill that does the work. It takes one unit (or an approved batch) from
 to verified and recorded, and stops. It never re-plans (that is the `plan` skill).
 
 The shared references named here (`references/state.md`, `references/documents.md`,
-`references/glossary.md`) live in the `nzt` skill's folder.
+`references/glossary.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Steps
 
@@ -22,9 +22,9 @@ The shared references named here (`references/state.md`, `references/documents.m
    - The part has no definition, or an open question blocks this unit → load the `define`
      skill for that part, then come back.
    - A choice of how it is made is missing → load the `approach` skill, then come back.
-   - A detail inside what was agreed → decide it, say it is yours, and go on.
-   - Anything else undefined is a question for the person, never an assumption, but it
-     does not hold back what can be done without it: do that part now, leave a visible
+   - Anything else undefined → check with `nzt`'s `references/questions.md` whether it is a
+     question for the person; one that is never becomes an assumption, but it does not
+     hold back what can be done without it: do that part now, leave a visible
      blank for the missing data, and ask in the same message.
 3. **Fix its done criterion.** Use the one in the plan; for direct work, write it in one
    line and tell the person, so they can correct it.
@@ -34,13 +34,14 @@ The shared references named here (`references/state.md`, `references/documents.m
    - the person is learning it → hand the unit to the `learn` skill and stop here.
 5. **Verify it** against the done criterion with `references/verify.md`, and settle the
    verdict.
-6. **Record it.** With a state file, update it with `nzt`'s `references/state.md`. Add new
-   or changed terms to the glossary with `nzt`'s `references/glossary.md`. Never edit a
-   definition or `how.md`: a change to them goes through `define` or `approach`.
-7. **Check what comes next.** In an approved batch with a *done* verdict, take the next unit
+6. **Record it** in the state file, if there is one, with `nzt`'s `references/state.md`.
+   Never edit a definition or `how.md`: a change to them goes through `define` or
+   `approach`.
+7. **Update the glossary** with new or changed terms, with `nzt`'s `references/glossary.md`.
+8. **Check what comes next.** In an approved batch with a *done* verdict, take the next unit
    of the batch (back to step 1). Otherwise, or if the session is close to running out of
-   context, go to step 8.
-8. **Stop and report** in one message: what was
+   context, go to step 9.
+9. **Stop and report** in one message: what was
    done, the verdict with what was checked and what was not, any tool that was missing or
    would have done it better (with the question whether to look for it, through the
    `tools` skill), and the next step you recommend. Then wait for the person.

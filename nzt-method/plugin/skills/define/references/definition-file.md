@@ -7,72 +7,16 @@ interview, not the agent's ideas: every line traces to an answer in the log, and
 agent filled in is marked *proposed*.
 
 ## Contents
-- The general definition
-- A part's definition
+- The files
 - Rules
 - Example: something built (an app)
 - Example: something done in the world (a house move)
 
-## The general definition
+## The files
 
-Headings fixed, in English; the rest in the person's language. Empty sections are not
-written.
-
-```markdown
-# <Work name>
-Status: <draft | approved> · <date>
-
-## What it is
-One or two sentences: what will exist or change, and the problem it solves.
-
-## For whom
-| Who | What they need | How they manage today |
-
-## Objectives
-- **<A result for someone>.** Known by: <what changes when it is achieved>.
-
-## In and out
-**In:** … **Out:** … (Q-NN where it was decided)
-
-## Parts
-- **<NN · part>** — what it covers, in one line.
-
-## Limits
-Deadline, budget, rules, what already exists.
-
-## Done when
-What must be true when the whole work is over.
-
-## Open
-- Q-NN · <question still open, and what it blocks>
-
-## History
-- <date> — <what changed>. Reason: "<the person's sentence>".
-```
-
-## A part's definition
-
-```markdown
-# <NN · Part name>
-Status: <draft | approved> · <date>
-
-## What it does
-One or two sentences, for whom and why.
-
-## Rules
-### <rule-name> · <the rule in one line>
-- Known by: <a concrete case that shows it holds, with real values>.
-- Bad case: <what happens when it goes wrong, and the expected answer>.
-
-## Out of this part
-What someone might expect here and is not.
-
-## Open
-- Q-NN · <question, and what it blocks>
-
-## History
-- <date> — <what changed>. Reason: "<the person's sentence>".
-```
+The general one starts from `assets/definition.md`, a part's from
+`assets/part-definition.md`. Headings fixed, in English; the rest in the person's language.
+Empty sections are not written.
 
 ## Rules
 

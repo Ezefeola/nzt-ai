@@ -23,7 +23,9 @@ definition it changes, and its presence means a change **not yet approved**.
    reason, and delete `change.md`. If what it changes was already done, the plan needs a
    unit to redo or undo it: that is the `plan` skill's.
 
-## The file
+## Example
+
+The file starts from `assets/change.md`.
 
 ```markdown
 # Change — 01 · The list

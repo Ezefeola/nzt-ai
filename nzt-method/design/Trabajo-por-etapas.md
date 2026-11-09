@@ -245,7 +245,7 @@ referencias a un nivel) y `skill-creator`:
 
 ### Auditoría del resto (2026-11-09)
 
-Hallazgos con `gestionar-skills` en las skills no tocadas, **sin aplicar** (a decidir):
+Hallazgos con `gestionar-skills` en las skills no tocadas; **aplicados el 2026-11-09** (ver *Auditoría aplicada*):
 
 1. **Plantillas a `assets/`** para que todas sigan la misma forma que `approach` y `tools`
    (regla 9, consistencia): `nzt/references/state.md`, `glossary.md` y `questions.md`;
@@ -306,3 +306,59 @@ preguntas separadas y recomienda lo que la persona tiene instalado (.NET 10, Pos
 los choques se preguntan (también uno nuevo en `how-written-tools`: qué pasa si la compu
 estuvo apagada); el cumple pregunta el reparto del presupuesto; ninguna ronda pasa de
 cuatro. `change-one-choice` sigue sin discriminar (la anterior también miró la compu).
+
+### Auditoría aplicada (2026-11-09)
+
+Commit `69aee51` (approach, tools, do y casos) y push antes de empezar. Después, a pedido del
+usuario, con `gestionar-skills`:
+
+- **Plantillas a `assets/`:** `nzt/assets/state.md`, `glossary.md` y `questions.md`;
+  `define/assets/definition.md`, `part-definition.md` y `change.md`;
+  `retro/assets/retro.md` (más los de `approach` y `tools`). Las referencias quedan con las
+  reglas y, donde la forma no se deduce, un ejemplo. Cada `SKILL.md` nombra el asset en la
+  misma fila del índice que su referencia, y las skills que usan las compartidas dicen que
+  sus plantillas están en `nzt/assets/`.
+- **`learn` sin assets, a propósito:** sus archivos (lecciones, ejercicios, evaluaciones)
+  son de la persona y van enteros en su idioma, títulos incluidos; una plantilla con
+  títulos fijos en inglés no sirve. Sus tablas de partes y ejemplos se quedan.
+- **Redundancias:** la forma de las opciones (una decisión por pregunta, nombre real, qué
+  implica, recomendada primero, palabras simples) pasa a `nzt/references/questions.md` →
+  *Options*, que usan `approach`, `define` y `nzt` paso 8; sale de `decisions.md`, de
+  `interview.md` y del paso 8 de `nzt`. "No preguntar lo que ya está respondido" queda en
+  `define` paso 3 y `questions.md` regla 2 (que suma "o la carpeta"); sale de
+  `interview.md`. "Un detalle lo decide el agente" queda solo en `questions.md`; `do` paso 2
+  manda a esa regla.
+- **Pasos con dos acciones partidos:** `approach` (preguntar / registrar, ahora 11 pasos),
+  `do` (estado / glosario, ahora 9) y `learn` (estado / glosario, ahora 8).
+- **Error de numeración:** `nzt` paso 7 decía "say so in step 9" y el paso que avisa es el
+  10; corregido.
+- **Segunda pasada:** ninguna referencia nombra otra referencia; no quedan plantillas
+  dentro de referencias.
+- **Ajuste tras la regresión:** el índice de `nzt` separa `references/questions.md` (siempre
+  que se pregunta o se ofrece una elección) de `assets/questions.md` (solo al crear un
+  registro), porque un trabajo directo leía la plantilla sin necesitarla.
+
+### Regresión de la auditoría (2026-11-09)
+
+Seis casos de las skills tocadas, solo con la versión nueva (las corridas contra `69aee51`
+se cortaron por el límite de uso y se dejaron para no gastar el doble):
+
+| Caso | Resultado | Qué se vio |
+|---|---|---|
+| `define/course-definition` | 6/6 | Definición desde `assets/definition.md`, lo no dicho como propuesto, preguntas Q-NN, glosario |
+| `define/remove-reminders` | 6/6 | `change.md` desde el asset, con la comprobación de ausencia; nada más tocado |
+| `do/person-books-movers` | 6/6 | Material listo con huecos, pide la confirmación escrita, estado en `partial` |
+| `retro/house-move-retro` | 7/7 | Retro desde `assets/retro.md`, 8 propuestas `proposed`, estado intacto |
+| `nzt/spreadsheet-no-learn-question` | 4/4 | Pregunta el programa con opciones concretas, no pregunta si quiere aprender |
+| `plan/birthday-planned` | 2/5 | Se frenó en la entrevista de `define`: **el caso está viejo**, es de antes de las etapas (`af068dd`) y espera que `plan` arme el plan directo desde el pedido |
+
+Total **31/34**; las tres fallas son del caso viejo, no de la auditoría.
+
+**Pendiente de esta parte:**
+- Actualizar `plan/evals/birthday-planned` (y revisar `move-fixed-deadline`) para que
+  arranquen con definición y `how.md` ya escritos, como entra hoy un trabajo a `plan`.
+- Hueco visto en `define`: cuando un cambio saca una parte entera, también toca la
+  definición general, y `change-file.md` no dice si va un `change.md` por definición o uno
+  solo. Decidir con el usuario.
+- Dos corridas vieron los criterios del caso al leer `eval_metadata.json` para sacar la
+  consigna: en la próxima, pasar la consigna en el prompt y no el archivo.

@@ -11,7 +11,7 @@ plans the units (that is the `plan` skill) and never installs a tool (that is th
 skill).
 
 The shared references named here (`references/folder.md`, `references/questions.md`,
-`references/glossary.md`, `references/packages.md`) live in the `nzt` skill's folder.
+`references/glossary.md`, `references/packages.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Steps
 
@@ -28,13 +28,14 @@ The shared references named here (`references/folder.md`, `references/questions.
 5. **Write the questions** in the how log with `references/questions.md`, each with what it
    blocks, before asking any.
 6. **Ask in rounds** in the order of `references/decisions.md`, apart from any question
-   about what the work must do, and record each answer.
-7. **Tell the person** in one line each topic that does not apply, and why.
-8. **Write `how.md`** with `references/how-file.md`, starting from `assets/how.md`:
+   about what the work must do, each choice written as `references/questions.md` says.
+7. **Record each answer** in the how log, in the person's words.
+8. **Tell the person** in one line each topic that does not apply, and why.
+9. **Write `how.md`** with `references/how-file.md`, starting from `assets/how.md`:
    `Docs/How/how.md`, or the part's own when only that part decides it.
-9. **Load the `tools` skill** with what was chosen, even when nothing seems missing: it
+10. **Load the `tools` skill** with what was chosen, even when nothing seems missing: it
    asks the person which tools to work with.
-10. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
+11. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
 
 ## Done when
 

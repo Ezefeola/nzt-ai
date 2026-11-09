@@ -1,7 +1,8 @@
 # The question logs
 
 Every question asked to agree a work is kept, so that a cleared context or a new session
-never asks it again and anyone can see what was chosen and by whom.
+never asks it again and anyone can see what was chosen and by whom. A log starts from
+`assets/questions.md`.
 
 ## Where
 
@@ -16,10 +17,10 @@ Ids are numbered per log and never reused.
 
 1. **Write it before asking,** with an empty answer and what it blocks: what cannot be
    written or done without it. A question that blocks nothing is curiosity: drop it.
-2. **Before writing it, check it is a question:** already answered in a log, a definition
-   or `how.md` → read it there; a fact that can be checked (a version, a price, an opening
-   time) → research it with its source; a detail inside what was agreed → decide it, say
-   it is yours, and go on.
+2. **Before writing it, check it is a question:** already answered in a log, a definition,
+   `how.md` or the folder → read it there; a fact that can be checked (a version, a price,
+   an opening time) → research it with its source; a detail inside what was agreed →
+   decide it, say it is yours, and go on.
 3. **Record the answer in the person's words, with the date.** An inferred answer is not an
    answer: it stays open, or goes in the definition marked as proposed.
 4. **Only append.** A changed answer is marked *superseded by* the new id, never rewritten.
@@ -27,25 +28,28 @@ Ids are numbered per log and never reused.
    step that needs it asks it when it gets there.
 6. **It closes with an answer, or with `[out]`** when the person takes it out of scope.
    Assuming is not a way to close it.
+7. **Headings, ids and field names** (`blocks`, `proposed`, `answer`) stay in English; the
+   rest is in the person's language. `proposed` holds the options while the question is
+   open.
 
-## Template
+## Options
 
-Headings, ids and field names (`blocks`, `proposed`, `answer`) fixed, in English; the rest
-in the person's language. `proposed` holds the options and the one you recommend, while
-the question is open.
+When a question is a choice, each option is written so the person can pick it without
+knowing the field:
+
+- **One decision per question.** Two choices folded into one option cannot be picked apart.
+- **What would be used, by its real name:** ".NET 10 with PostgreSQL", "a moving company
+  with a truck and three people", "a shared folder in the cloud".
+- **What it means for the person:** what it costs, what they have to do or install, what
+  they can and cannot do later ("the tasks stay on this laptop only").
+- **The one you recommend first,** marked, with the reason in a few words.
+- **Plain words first and the name after** for a person who does not know the field:
+  "a page that opens in the browser (HTML and JavaScript)".
+
+## Example
 
 ```markdown
-# Questions — <work or part>
-
-## Open
-### Q-04 · What happens to a task that is due and not done?
-- blocks: the reminders rule
-- proposed: it stays on top in red (recommended); it moves to a "late" list
-
 ## Answered
-### Q-01 · Who will use it?
-- blocks: whether there are accounts
-- answer: Only me, on my laptop and my phone. · 2026-11-09
 ### Q-02 · Do tasks have a due date?
 - answer: Superseded by Q-05.
 

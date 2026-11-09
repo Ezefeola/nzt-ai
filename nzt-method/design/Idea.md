@@ -417,10 +417,10 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo:** iteración 2 corrida con los 5 ajustes: nueva 100%, anterior 76%
-   (`Trabajo-por-etapas.md` → *Prueba, iteración 2*). Falta: que el usuario revise, commit,
-   y decidir la *Auditoría del resto* (plantillas a `assets/` en `nzt`, `define`, `retro` y
-   `learn`; redundancias; pasos con dos acciones).
+0. **Lo próximo:** auditoría aplicada y probada (31/34; las 3 fallas son de un caso de
+   `plan` anterior a las etapas). Ver `Trabajo-por-etapas.md` → *Regresión de la
+   auditoría*. Falta: commit (el usuario lo pide), actualizar los casos de `plan`, y decidir
+   cómo se escribe un cambio que saca una parte entera.
 1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1

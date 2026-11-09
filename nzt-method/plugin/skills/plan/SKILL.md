@@ -9,7 +9,7 @@ Cuts the work into units and gets the plan approved. It writes no deliverable (t
 `do`) and never starts the first unit before the plan is approved.
 
 The shared references named here (`references/state.md`, `references/documents.md`,
-`references/glossary.md`) live in the `nzt` skill's folder.
+`references/glossary.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Steps
 

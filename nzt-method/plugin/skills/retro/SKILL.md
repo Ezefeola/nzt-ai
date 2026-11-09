@@ -53,6 +53,6 @@ nothing but that file was written.
 
 ## References
 
-| Reference | Read it when |
+| File | Read it when |
 |---|---|
-| `references/retro-file.md` | the retro file is written: its template and rules |
+| `references/retro-file.md` and `assets/retro.md` | the retro file is written |

@@ -59,16 +59,3 @@ Ask in rounds, each one built on the one before: the **base** first; then **stru
 quality, conventions, dependencies and delivery**, which depend on the base; then the
 **agent's tools**. A round has at most four questions, the ones that unblock most first;
 the rest go in the next round, and the message says what comes after.
-
-## How each option is written
-
-- **One decision per question.** Where it runs, what it is made with and where the data is
-  kept are three questions, even inside the base: folded into one option, the person
-  cannot pick one without the others.
-- **What would be used, by its real name:** ".NET 10 with PostgreSQL", "a moving company
-  with a truck and three people", "a shared folder in the cloud".
-- **What it means for the person:** what it costs, what they have to do or install, what
-  they can and cannot do later ("the tasks stay on this laptop only").
-- **The one you recommend first,** marked, with the reason in a few words.
-- **For a person who does not know the field,** plain words first and the name after:
-  "a page that opens in the browser (HTML and JavaScript)".
