@@ -17,7 +17,10 @@ replace the form of a deliverable of its domain; otherwise this applies.
    detail after.
 5. **Organized by what the reader came to do,** not by how the work was done.
 6. **Length in proportion:** what fits in one paragraph gets no sections.
-7. **Status and date visible:** draft, in review or approved, and when it was last changed.
+7. **Status and date visible** in the documents the method keeps for the work (a plan, a
+   report, a spec): draft, in review or approved, and when it last changed. Not in the
+   person's own texts (a letter, a message, a chapter of their book) nor in files that
+   already have a form of their own.
 
 ## How it is written
 

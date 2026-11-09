@@ -215,6 +215,21 @@ Si se limpia el contexto, una sesión nueva retoma así:
   it*: cambio de plan → `nzt-plan`; pedido ajeno → trabajo nuevo). **Próximo paso:** commit
   de `nzt-plan`, y después escribir **`nzt-do`** (referencias propias: `who-does.md`,
   `teaching.md`, `verify.md`), luego `nzt-tools` y `nzt-retro`.
+- **2026-11-08:** commit `53d6f21` con `nzt-plan`. Escrita **`nzt-do`**
+  (`plugin/skills/nzt-do/`: 8 pasos; referencias `who-does.md`, `teaching.md`,
+  `verify.md`), auditada con `gestionar-skills`. Tres casos en `nzt-do/evals/` (corregir
+  ortografía, reservar el flete que hace la persona, enseñar BUSCARV) **corriéndose**
+  (iteración 1, en el scratchpad). Sin commit.
+- **2026-11-08:** `nzt-do` iteración 1: con skill 89%, sin skill 75%. Ortografía 6/6 y
+  BUSCARV 5/5, pero **el flete salió 4/6, peor que sin skill (5/6)**: la regla "lo
+  indefinido se pregunta" lo dejó solo haciendo preguntas, sin preparar el mensaje para los
+  fletes, y no pidió la confirmación como evidencia. Corregido: `nzt-do` paso 2 (hacer ya lo
+  que no depende del dato, con huecos visibles, y preguntar en el mismo mensaje);
+  `who-does.md` (preparar ahora con huecos; decir desde el principio qué evidencia cierra la
+  unidad). También `nzt/references/documents.md` regla 7: estado y fecha solo en los
+  documentos del método, no en textos propios de la persona (salió en el caso de la carta).
+  **Próximo paso:** iteración 2 de `nzt-do` (al menos el caso del flete), commit, y seguir
+  con `nzt-tools` y `nzt-retro`.
 
 ## Primer paso sugerido
 

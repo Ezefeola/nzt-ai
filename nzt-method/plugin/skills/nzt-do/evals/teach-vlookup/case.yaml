@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: teach-vlookup
+expected_outcome: |
+  Teaches instead of doing: finds or assumes the starting point, explains one idea with the person own sheets as example, gives an exercise on their data with what a good result looks like, keeps the full answer apart, and waits for their attempt.
