@@ -235,45 +235,101 @@ Si se limpia el contexto, una sesión nueva retoma así:
   para pedir presupuestos, tabla para comparar y pasos; dijo qué confirmación cierra la
   parte y la pidió. Salió un hueco más y se corrigió: en `nzt/references/state.md`, un plan
   aprobado con la próxima unidad pendiente → empezarla con `nzt-do`.
+- **2026-11-08:** debatida la enseñanza. El usuario aceptó E1–E5 (`Ensenanza.md`):
+  `nzt-learn` en el núcleo, un solo `Plan/state.md` por tema con los objetivos como
+  unidades, `nzt` y `nzt-do` derivan a ella, `teaching.md` se borra, y se adapta la de
+  `nzt-software` con ejemplos de varios dominios y sin jerga. **Próximo paso:** escribir
+  `nzt-learn` con `gestionar-skills` y `skill-creator`, ajustar `nzt` y `nzt-do`, y
+  probarla con y sin la skill.
+- **2026-11-08:** escrita **`nzt-learn`** (`plugin/skills/nzt-learn/`: `SKILL.md` y 7
+  referencias), auditada con `gestionar-skills`. `nzt` y `nzt-do` derivan a ella;
+  `teaching.md` borrada. Cinco casos en `nzt-learn/evals/`. Iteración 1: 89% con skill, 85%
+  sin; corregidos dos problemas (lección en la conversación y práctica con fecha).
+  Iteración 2: **96% con skill, 79% sin**. Detalle y lo que queda en charla en
+  `Ensenanza.md`. Sin commit. **Próximo paso:** que el usuario decida lo de *En charla* en
+  `Ensenanza.md`, commit, y seguir con `nzt-tools`.
+- **2026-11-08:** decididos E6 (repasos vencidos directo, con opción de saltear) y E7
+  (criterio de BUSCARV ajustado), en `Ensenanza.md`. **Pedido nuevo del usuario:** las
+  preguntas del método se hacen con la herramienta de preguntas del host
+  (`AskUserQuestion` en Claude Code; en Codex, la que ofrezca), como regla general siempre
+  presente. Claude propone dónde ubicarla y cómo escribirla; **en charla**. Sin commit.
+- **2026-11-08, aclaraciones del usuario:** (1) el plugin instalado nombra **solo** la
+  herramienta de su host: el de Claude Code no menciona Codex y viceversa; (2) le parece
+  que alcanza con que `nzt` lea `messages.md`, sin que cada skill lo nombre. Claude propuso
+  un archivo por host que el build copia al plugin de cada uno, y que `nzt` sea el núcleo
+  que las demás cargan si no está en contexto. **En charla**, sin escribir.
+- **2026-11-09, decisiones del usuario:** `nzt` es la skill base, siempre presente, y todo
+  se carga desde ella (no `AGENTS.md` ni `CLAUDE.md`, como en `nzt-software`); se descarta
+  un archivo por host, y la regla de preguntas se escribe genérica, sin nombrar hosts ni
+  herramientas. Hecho: `nzt/SKILL.md` (paso 1 nuevo: leer `messages.md`; pasos
+  renumerados a 12), `messages.md` → *Asking*, y `nzt-plan`, `nzt-do` y `nzt-learn` cargan
+  `nzt` si falta y ya no nombran `messages.md`. Principio 17 en `Principios.md`. Sin commit.
+- **2026-11-09, prueba (iteración 4, solo con skill):** (1) entrada directa por
+  `nzt-learn` con el caso de italiano: cargó `nzt` y `messages.md` antes de responder,
+  mandó las dos pruebas en el mensaje y una sola decisión (qué situaciones del viaje) con la
+  herramienta de preguntas, la recomendada primero. Visto: al cargar `nzt` desde otra skill
+  no corrió sus pasos de herramientas y paquetes, y esta vez no preguntó por la carpeta. (2)
+  Mudanza por `nzt`: la carpeta fue a la herramienta de preguntas ("Sí, creala
+  (recomendado)") y lo abierto (supuestos, presupuesto) quedó en el mensaje. Ninguna nombró
+  un host. **Próximo paso:** decidir si `nzt` cargada desde otra skill corre sus pasos
+  completos; commit; seguir con `nzt-tools`.
+- **2026-11-09, aclaración del usuario:** `nzt` no la carga otra skill: tiene que ser la
+  **primera skill cargada en cada sesión**, siempre. Claude miró cómo lo logra
+  `nzt-software`: sin hooks, con la `description` de su skill `nzt` ("Load it first in every
+  session, before anything else, even for a question, and again after the conversation is
+  compacted") y un caso de prueba que lo verifica (`evals/routing/kernel-loaded`). Propuesta
+  en charla: lo mismo acá, más que las demás skills, si arrancan sin `nzt`, la carguen y
+  sigan desde su paso 1; y un hook de inicio de sesión en el plugin como refuerzo, para
+  evaluar al armar los manifiestos.
+- **2026-11-09, decidido:** puntos 1 y 3 sí; el 2 no: las demás skills **no** repiten que
+  se cargue `nzt`. Hecho: la `description` de `nzt` dice que se carga primero en cada
+  sesión, antes que nada, incluso para una pregunta, y otra vez tras compactar; quitado el
+  resguardo de `nzt-plan`, `nzt-do` y `nzt-learn`; caso `nzt/evals/kernel-loaded`. El hook
+  de inicio de sesión queda para cuando se armen los manifiestos. Sin commit.
 
-### Punto de retomada (2026-11-08)
+### Punto de retomada (2026-11-09)
 
 **Hecho y probado** (en `plugin/skills/`, cada una con casos en su `evals/`):
 
 | Skill | Qué hace | Prueba |
 |---|---|---|
-| `nzt` | Entrada: lee el estado, aclara, dimensiona, quién hace, herramientas, paquetes, carpeta, le cuenta a la persona y deriva | 4 casos, 26/26 con skill, 46% sin |
-| `nzt-plan` | Corta en unidades (qué deja, cuándo está lista, quién la hace), ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
-| `nzt-do` | Hace una unidad (o guía, o enseña), verifica con evidencia, registra y para con reporte | 3 casos; tras corregir el flete, todos los criterios con skill |
+| `nzt` | **Skill base:** se carga primero en cada sesión (por su `description`) y otra vez tras compactar; lee `messages.md` (paso 1), el estado, aclara, dimensiona, quién hace, herramientas, paquetes, carpeta, le cuenta a la persona y deriva | 4 casos, 26/26 con skill, 46% sin; `kernel-loaded` escrito, sin correr |
+| `nzt-plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
+| `nzt-do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `nzt-learn` | 3 casos (BUSCARV pasó a `nzt-learn`) |
+| `nzt-learn` | Enseña: pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades en `Plan/state.md`, ejercicios con la solución aparte, correcciones con pistas, evaluación y repasos espaciados | 5 casos, todos los criterios con skill (iteraciones 2–3), 79% sin |
 
 Las referencias compartidas son de `nzt` (`state`, `glossary`, `starting`, `sizing`,
-`packages`, `documents`, `messages`); `nzt-plan` tiene `slicing`; `nzt-do` tiene `who-does`,
-`teaching` y `verify`.
+`packages`, `documents`, `messages`); `nzt-plan` tiene `slicing`; `nzt-do` tiene `who-does`
+y `verify`; `nzt-learn` tiene `plan`, `teach`, `train`, `tutor`, `assess`, `retain` y
+`exercises`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
+ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-1. **Debatir la enseñanza.** El usuario quiere que enseñar sea una skill aparte, partiendo de
-   `nzt-learn` de `nzt-software` (currículo, lecciones, ejercicios con soluciones aparte,
-   evaluación, repasos espaciados), y no una referencia de `nzt-do` (`teaching.md`). Dijo
-   también que hay que quitarla de `nzt-software`: **en esta rama `nzt-software` no se
-   modifica**, así que eso queda para cuando se integren; acá solo se diseña la skill
-   genérica. Preguntas abiertas: si es `nzt-learn` en el núcleo o un paquete; cómo la elige
-   `nzt` (hoy el paso 6 manda a `nzt-do` a enseñar); qué pasa con `teaching.md`.
-2. Escribir **`nzt-tools`** (proponer, investigar en fuentes oficiales con un sí, instalar con
+1. Escribir **`nzt-tools`** (proponer, investigar en fuentes oficiales con un sí, instalar con
    otro sí, comprobar, registrar en `Docs/agent-tools.md` con rechazadas; plantilla
    `agent-tools.md`).
-3. Escribir **`nzt-retro`** (solo a pedido; propone mejoras sin cambiar nada; señala qué
+2. Escribir **`nzt-retro`** (solo a pedido; propone mejoras sin cambiar nada; señala qué
    merece un paquete).
-4. Actualizar `design/Estructura.md` con lo que cambió al escribir las skills (columnas de
-   unidades, `messages.md`, enseñanza), y crear los manifiestos del plugin (Claude Code y
-   Codex) en `plugin/`.
+3. Actualizar `design/Estructura.md` con lo que cambió al escribir las skills (columnas de
+   unidades, `messages.md` y *Asking*, `nzt` como base, `nzt-learn` como sexta skill), y
+   crear los manifiestos del plugin (Claude Code y Codex) en `plugin/`.
+4. Correr `nzt/evals/kernel-loaded` con el plugin instalado. El script de disparo de
+   `skill-creator` (`scripts.run_eval`) falla en Windows (`WinError 10038`): no sirve para
+   medirlo en esta máquina.
+5. **Idea para el final:** un hook de inicio de sesión (y tras compactar) en el plugin de
+   cada host que haga cargar `nzt`, como refuerzo de la `description`. No descartado; se
+   ataca al final, sobre todo si `kernel-loaded` muestra que `nzt` no se carga primero. Va
+   en la configuración del plugin, nunca en el texto de las skills.
 
-**Cómo se prueba una skill** (lo que se hizo hasta ahora): casos en `evals/<caso>/` con el
-formato de `skill-creator`; por cada caso, un subagente con las skills (empezando por
-`nzt/SKILL.md`) y otro sin skill, cada uno en su carpeta del scratchpad; calificar en
-`grading.json`; `py -m scripts.aggregate_benchmark` y
-`py eval-viewer/generate_review.py --static` desde la carpeta de `skill-creator` (en esta
-máquina Python se llama con `py`). Los resultados del scratchpad no están en el repo.
+**Cómo se prueba una skill:** casos en `evals/<caso>/` con el formato de `skill-creator`;
+por cada caso, un subagente con las skills (empezando por `nzt/SKILL.md`) y otro sin skill,
+cada uno en su carpeta del scratchpad; calificar en `grading.json`;
+`py -m scripts.aggregate_benchmark` y `py eval-viewer/generate_review.py --static` desde la
+carpeta de `skill-creator` (en esta máquina Python se llama con `py`). Para probar la regla
+de preguntas, se le dice al subagente que no puede abrir diálogos y que escriba en una
+sección "Question tool" lo que preguntaría con la herramienta. Los resultados del scratchpad
+no están en el repo.
 
 **Detalle visto:** el ejemplo de `nzt/references/messages.md` está en inglés y una corrida
 escribió primero los títulos en inglés; si se repite, poner el ejemplo en español o aclarar

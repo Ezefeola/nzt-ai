@@ -11,12 +11,23 @@ it — the person hired someone to help, not a process to watch.
    - **What I did** — only what actually happened.
    - **What I found** — facts, problems, anything surprising.
    - **What I'm assuming** — so the person can correct it.
-   - **What I need from you** — numbered questions or decisions, each with the option you
-     would pick, so "yes" is a valid answer.
+   - **What I need from you** — what the person has to answer or send, as *Asking* says.
 3. **Bullets of one idea each**, with the key word in bold. No paragraph longer than three
    lines.
 4. **Length in proportion:** a direct task can be two lines; a stop at the end of a long
    unit can be a dozen bullets. Never longer than it needs.
+
+## Asking
+
+- **Decisions go through the host's tool for asking the person**, when it has one: a
+  choice between options, an approval, a yes or no. Each question is understood on its own,
+  because the person may see only the question; the option you recommend goes first and is
+  marked as recommended, so accepting it is a valid answer. The message before the
+  question says what was done and what the question is about.
+- **Open answers stay in the message:** an exercise, a probe, a draft or a file to send, a
+  fact only the person knows. They go numbered under **What I need from you**.
+- **Without such a tool**, decisions also go numbered under **What I need from you**, each
+  with the option you would pick, so "yes" is a valid answer.
 
 ## Words
 

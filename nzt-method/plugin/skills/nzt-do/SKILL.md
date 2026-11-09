@@ -1,6 +1,6 @@
 ---
 name: nzt-do
-description: Does one unit of work in any domain - or guides the person through it, or teaches it - then verifies it against its done criterion, records it and stops with a plain report and a recommended next step. Use when nzt hands off direct work, when a planned unit or an approved batch is next, or when the person says to continue the work.
+description: Does one unit of work in any domain - or guides the person through it - then verifies it against its done criterion, records it and stops with a plain report and a recommended next step. Use when nzt hands off direct work, when a planned unit or an approved batch is next, or when the person says to continue the work.
 ---
 
 # nzt-do
@@ -8,8 +8,8 @@ description: Does one unit of work in any domain - or guides the person through 
 The only skill that does the work. It takes one unit (or an approved batch) from understood
 to verified and recorded, and stops. It never re-plans (that is `nzt-plan`).
 
-The method's shared references live in the `nzt` skill: `references/state.md`,
-`references/messages.md`, `references/documents.md` and `references/glossary.md` there.
+The shared references named here (`references/state.md`, `references/documents.md`,
+`references/glossary.md`) live in the `nzt` skill's folder.
 
 ## Steps
 
@@ -26,7 +26,7 @@ The method's shared references live in the `nzt` skill: `references/state.md`,
 4. **Do it**, by who does it:
    - the agent → do it; any document follows `nzt`'s `references/documents.md`;
    - the person or both → `references/who-does.md`;
-   - the person is learning it → `references/teaching.md`.
+   - the person is learning it → hand the unit to `nzt-learn` and stop here.
 5. **Verify it** against the done criterion with `references/verify.md`, and settle the
    verdict.
 6. **Record it.** With a state file, update it with `nzt`'s `references/state.md`. Add new
@@ -34,7 +34,7 @@ The method's shared references live in the `nzt` skill: `references/state.md`,
 7. **Check what comes next.** In an approved batch with a *done* verdict, take the next unit
    of the batch (back to step 1). Otherwise, or if the session is close to running out of
    context, go to step 8.
-8. **Stop and report** in one message written with `nzt`'s `references/messages.md`: what was
+8. **Stop and report** in one message: what was
    done, the verdict with what was checked and what was not, any tool that turned out to be
    missing, and the next step you recommend. Then wait for the person.
 
@@ -52,5 +52,4 @@ on a question or a blocking tool the person was told about.
 | Reference | Read it when |
 |---|---|
 | `references/who-does.md` | the person, or the person and the agent, do the unit |
-| `references/teaching.md` | the person wants to learn how to do it |
 | `references/verify.md` | a unit is verified and its verdict settled |

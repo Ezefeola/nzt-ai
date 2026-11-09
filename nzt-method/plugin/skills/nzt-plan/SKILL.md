@@ -8,8 +8,8 @@ description: Turns a planned or sliced piece of work, in any domain, into a plan
 Cuts the work into units and gets the plan approved. It writes no deliverable (that is
 `nzt-do`) and never starts the first unit before the plan is approved.
 
-The method's shared references live in the `nzt` skill: `references/state.md`,
-`references/messages.md`, `references/documents.md` and `references/glossary.md` there.
+The shared references named here (`references/state.md`, `references/documents.md`,
+`references/glossary.md`) live in the `nzt` skill's folder.
 
 ## Steps
 
@@ -22,7 +22,7 @@ The method's shared references live in the `nzt` skill: `references/state.md`,
    package in use. For each unit: what it leaves, its done criterion, and who does it.
 4. **Order the units** with `references/slicing.md`, marking the cuttable ones under a fixed
    deadline and the ones that could run as a batch.
-5. **Present the plan** in one message written with `nzt`'s `references/messages.md`:
+5. **Present the plan** in one message:
    - the units as a short numbered list, each with what it leaves and who does it;
    - the work's done criterion;
    - the question to approve it, and the offer of a batch if step 4 found one.

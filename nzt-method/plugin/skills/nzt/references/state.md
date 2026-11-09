@@ -16,6 +16,8 @@ Before asking the person anything:
 - the person asks to add, remove or change part of the plan → `nzt-plan`, as a change to
   this plan;
 - the person asks for something unrelated to this work → a new work, in its own folder;
+- a topic the person is learning (its units are objectives, with a *Next review*
+  column) → continue it with `nzt-learn`, which offers the overdue reviews first;
 - a unit `in progress` → report it in one line and continue it with `nzt-do`;
 - an approved plan with the next unit `pending` → start that unit with `nzt-do`;
 - a plan not yet approved → show that plan again instead of writing a new one;
@@ -59,6 +61,9 @@ What the last session did, and what was left unverified.
 ## Next step
 What the agent recommended, and whether the person approved it.
 ```
+
+A topic the person is learning uses this same file: `nzt-learn` says how its units,
+verdicts, *Next review* column and *Log* section are read.
 
 ## Updating it
 

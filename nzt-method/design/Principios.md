@@ -95,6 +95,13 @@ se decidió cada cosa.
     apruebes"). Lo comprobado, lo supuesto y lo que no se comprobó se distinguen a simple
     vista.
 
+17. **Las decisiones se preguntan con la herramienta del host.** Cuando el host ofrece una
+    herramienta para preguntarle a la persona, las decisiones (elegir entre opciones,
+    aprobar, sí o no) van con ella: cada pregunta se entiende sola y la opción recomendada
+    va primera. Lo que pide una respuesta abierta (un ejercicio, un borrador, un dato) sigue
+    en el mensaje. Sin esa herramienta, van numeradas en el mensaje. Las skills lo dicen de
+    forma genérica: no nombran ningún host ni ninguna herramienta.
+
 ## Abierto
 
 Nada en los principios. Los archivos están decididos en `Archivos.md` y el default de
@@ -132,3 +139,15 @@ documentos en `Documentos.md`.
   las respuestas mostraban la jerga del método y traducían los tamaños distinto cada vez.
   El usuario pidió que el agente hable de forma amigable: bullets, resumido y marcando lo
   que hizo. → principio 16, y la referencia `messages.md` de la skill `nzt`.
+- **Preguntas con la herramienta del host (2026-11-09):** pedido del usuario. Se escribe
+  genérico, sin nombrar Claude Code, Codex ni sus herramientas, porque el plugin instalado
+  en un host no debe mencionar el otro; se descartó un archivo por host. Vive en
+  `nzt/references/messages.md` → *Asking*. → principio 17.
+- **`nzt` es la skill base (2026-11-09):** decisión del usuario, igual que en
+  `nzt-software`, donde se descartó poner el método en `AGENTS.md` o `CLAUDE.md`. `nzt`
+  queda en contexto toda la sesión, lee `references/messages.md` en su paso 1 y sus reglas
+  para hablarle a la persona valen para todas las skills, que ya no nombran `messages.md`.
+  **Se carga primero en cada sesión**, siempre, por su `description` (como en
+  `nzt-software`), y otra vez si la conversación se compactó. Las demás skills **no**
+  repiten que haya que cargarla (pedido del usuario, 2026-11-09: no tiene sentido
+  repetirlo en cada skill). Un caso de prueba (`nzt/evals/kernel-loaded`) lo verifica.

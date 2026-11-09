@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: kernel-loaded
+expected_outcome: |
+  The smoke case: with the plugin installed and nothing in the request naming the method, the nzt skill is the first skill loaded, before any other skill and before the reply, and the reply follows its rules for talking to the person. If this case fails, every other case measures something else.
