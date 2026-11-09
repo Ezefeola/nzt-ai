@@ -1,4 +1,4 @@
-# Estructura del método (en debate)
+# Estructura del método
 
 Borrador del 2026-11-08: qué skills y archivos tiene el método, para llevar a la práctica lo
 decidido en `Principios.md`, `Paquetes.md`, `Archivos.md` y `Documentos.md`. Todo es
@@ -16,49 +16,54 @@ inglés (A1); este documento de diseño, en español.
   el detalle va en referencias, todas nombradas desde `SKILL.md` y a un solo nivel; sin
   redundancia entre skills.
 
-## Las skills del núcleo
+## Las skills del núcleo (como quedaron escritas, 2026-11-09)
 
-`<m>` es el prefijo del método, que todavía no tiene nombre (ver S1).
+Lo que sigue es la estructura **escrita y probada** en `plugin/skills/`. El borrador original
+(cinco skills con prefijo `<m>`) cambió al escribirlas: `nzt` pasó a ser la skill base,
+`learn` se sumó como sexta skill (`Ensenanza.md`) y `teaching.md` se borró.
 
 | Skill | Cuándo se usa | Qué hace | Principios |
 |---|---|---|---|
-| `<m>` | Al empezar o retomar un trabajo | Lee `Plan/state.md` si existe y sigue desde ahí. Si no, aclara lo difuso, elige el tamaño, acuerda "hecho" y quién hace, revisa herramientas y paquetes, y hace el trabajo al paso o pasa a `<m>-plan` | 2, 4, 5, 6, 10 |
-| `<m>-plan` | El trabajo es con plan corto o por partes | Escribe el plan: unidades, quién hace cada una, criterio de hecho, lo recortable si hay tiempo fijo. Lo presenta, espera el sí y crea o actualiza `Plan/state.md` | 2, 4, 6, 8, 14 |
-| `<m>-do` | Hay una unidad aprobada para hacer | Corre el loop de una unidad (entender → proponer → hacer → verificar → registrar) y termina en la parada con veredicto y el próximo paso recomendado | 3, 5, 7, 11, 12 |
-| `<m>-tools` | Antes de empezar, si falta algo; o en una parada, si apareció una falta | Propone, investiga en fuentes oficiales con un sí, instala con otro sí, comprueba y registra en `Docs/agent-tools.md`, incluidas las rechazadas | 10 |
-| `<m>-retro` | Solo cuando la persona la pide | Revisa cómo fue el trabajo, deja propuestas de mejora sin cambiar nada y señala lo que se repite y merece un paquete | 13 |
+| `nzt` | **Primero en cada sesión**, por su `description`, y otra vez tras compactar | Skill base: lee cómo hablarle a la persona (`messages.md`), el estado, el glosario y las herramientas (si una anotada cubre lo que hay que hacer, se usa); aclara, dimensiona, decide quién hace, revisa herramientas y paquetes, ubica la carpeta, le cuenta a la persona y deriva | 2, 4, 5, 6, 10, 16, 17 |
+| `plan` | Trabajo con plan corto o por partes, o un cambio al plan | Corta en unidades, ordena por riesgo, marca recortables y tandas, espera el sí y escribe `Plan/state.md` | 2, 4, 6, 8, 14 |
+| `do` | Hay una unidad aprobada, o trabajo al paso | Hace la unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `learn` | 3, 5, 7, 11, 12 |
+| `learn` | La persona quiere aprender algo | Pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades, ejercicios, correcciones, evaluación y repasos | `Ensenanza.md` |
+| `tools` | Falta una herramienta antes o durante el trabajo, se instala un paquete, o la persona pregunta por una | Propone, investiga en fuentes oficiales con un sí, instala con otro sí en el alcance más chico, comprueba y anota en `Docs/agent-tools.md` (también lo rechazado) | 10 |
+| `retro` | **Solo a mano**, cuando la persona la pide | Pregunta dónde guardarla, revisa las últimas 10 sesiones (o las elegidas) y los archivos del trabajo, y deja propuestas con destino (trabajo, método o paquete) sin cambiar nada más | 13 |
 
-Son **cinco entradas** en la lista de skills. Lo demás va como referencias.
+Son **seis entradas** en la lista de skills. Instaladas, el host las agrupa bajo el nombre del plugin: `nzt:nzt`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools` y `nzt:retro` (M1). Ninguna nombra un host ni una herramienta
+(principio 17). Las demás skills no repiten que se cargue `nzt`: lo asegura su
+`description` (y, como refuerzo pendiente, un hook de inicio de sesión).
 
 ### Las referencias
 
-Cada una se lee solo en el momento que la necesita, y la nombra la skill que la usa:
+Cada referencia tiene **una sola dueña**; las compartidas son de `nzt` y las demás skills
+las nombran por su ruta.
 
-| Referencia | De la skill | Se lee cuando |
-|---|---|---|
-| `state.md` | `<m>`, `<m>-plan`, `<m>-do` | se crea o actualiza `Plan/state.md`: la plantilla y sus reglas (`Archivos.md`) |
-| `sizing.md` | `<m>` | hay que elegir el tamaño o aclarar un pedido difuso |
-| `who-does.md` | `<m>-do` | la unidad la hace la persona o los dos: cómo prepara, guía y verifica el agente |
-| `teaching.md` | `<m>-do` | la persona quiere aprender: el agente enseña sin hacerlo por ella |
-| `verify.md` | `<m>-do` | se verifica contra el criterio de hecho y se arma el veredicto |
-| `documents.md` | `<m>-plan`, `<m>-do` | la unidad produce un documento: el default de `Documentos.md` |
-| `agent-tools.md` | `<m>-tools` | se crea o actualiza `Docs/agent-tools.md`: la plantilla |
-| `packages.md` | `<m>`, `<m>-retro` | hay que proponer un paquete o armar uno nuevo |
+| Skill | Referencias |
+|---|---|
+| `nzt` | `messages.md` (cómo se habla y *Asking*), `state.md` (plantilla de `Plan/state.md`: la tabla de unidades lleva *Unit, Leaves, Done when, Who does it, Status, Verdict* y las marcas `(cuttable)` y `(batch)`), `glossary.md`, `starting.md`, `sizing.md`, `packages.md`, `documents.md` |
+| `plan` | `slicing.md` |
+| `do` | `who-does.md`, `verify.md` |
+| `learn` | `plan.md`, `teach.md`, `train.md`, `tutor.md`, `assess.md`, `retain.md`, `exercises.md` |
+| `tools` | `agent-tools.md` (plantilla de `Docs/agent-tools.md`) |
+| `retro` | `retro-file.md` (plantilla del archivo de retro) |
 
 `documents.md` es referencia y no skill a propósito: como skill competiría con las de
 documentos que ya trae el host y se cargaría en trabajos donde no hace falta.
 
 ## Cómo se enchufa un paquete
 
-- **Cada paquete es un plugin aparte (PQ3) con una skill**, por ejemplo `<m>-writing`. Su
+- **Cada paquete es un plugin aparte (PQ3) con una skill**, por ejemplo `nzt-writing`. Su
   `SKILL.md` es un índice con una fila por lo que aporta (`Paquetes.md`, sección 1):
   vocabulario, preguntas de arranque, cómo cortar en unidades, prácticas, criterios de hecho y
   herramientas. Cada fila apunta a una referencia propia; un paquete puede traer solo
   algunas filas.
-- **Se activa solo si está en `Docs/agent-tools.md`** (PQ2). `<m>` lo propone al empezar;
-  `<m>-plan` y `<m>-do` leen del paquete solo la fila del paso en que están.
-- **Para armar un paquete nuevo** (PQ4) se parte de lo que señaló `<m>-retro` y se escribe
-  con `gestionar-skills` y `skill-creator`.
+- **Se activa solo si está en `Docs/agent-tools.md`** (PQ2). `nzt` lo propone al empezar y
+  `tools` lo instala; `plan` y `do` leen del paquete solo la fila del paso en que
+  están.
+- **Para armar un paquete nuevo** (PQ4) se parte de lo que señaló `retro`; es un trabajo
+  más, que empieza con `nzt`.
 
 ## Dónde vive en el repositorio
 
@@ -66,27 +71,27 @@ Todo dentro de `nzt-method/`:
 
 ```
 nzt-method/
-├── design/                 los documentos de diseño de hoy (Idea.md, Principios.md, …)
-└── plugin/
-    ├── .claude-plugin/     el manifiesto de Claude Code
-    ├── .codex-plugin/      el de Codex, si se publica también ahí (S4)
+├── design/                 los documentos de diseño
+└── plugin/                 el plugin nzt, para Claude Code y Codex (S4)
+    ├── .claude-plugin/plugin.json   el manifiesto de Claude Code
+    ├── plugin.json                  el manifiesto portable que lee Codex
     └── skills/
-        ├── <m>/SKILL.md, references/
-        ├── <m>-plan/…
-        ├── <m>-do/…
-        ├── <m>-tools/…
-        └── <m>-retro/…
+        ├── nzt/SKILL.md, references/, evals/
+        ├── plan/…
+        ├── do/…
+        ├── learn/…
+        ├── tools/…
+        └── retro/…
 ```
 
-Mover los documentos de diseño a `design/` es opcional. Su ventaja es que el plugin y su
-diseño no se mezclan. Si se mueven, se ajusta *Cómo retomar* en `Idea.md`.
+Los manifiestos se decidieron el 2026-11-09 (*Decididos* → *Manifiestos*).
 
 ## Cómo se escriben las skills
 
 Una por vez, con `gestionar-skills` (reglas y auditoría) y `skill-creator` (casos de prueba
-y evaluación). Cada skill se prueba con al menos tres trabajos reales de dominios distintos
-(por ejemplo: un cambio de software, un documento, una mudanza) antes de pasar a la
-siguiente. Orden propuesto: `<m>`, `<m>-plan`, `<m>-do`, `<m>-tools`, `<m>-retro`.
+y evaluación). Cada skill se prueba con casos de dominios distintos, con y sin la skill,
+antes de pasar a la siguiente. Cómo se corren está en `Idea.md` → *Cómo se prueba una
+skill*.
 
 ## Revisión de responsabilidades (aceptada el 2026-11-08)
 
@@ -176,3 +181,38 @@ paquete.
     jerga.
   - **R4. Solo a mano:** el agente **nunca la ofrece ni la activa**; la usa la persona
     cuando la pide.
+
+- **Manifiestos (2026-11-09):** el usuario pidió arrancar el pendiente 3. Claude leyó la
+  documentación oficial de los dos hosts (*Plugin manifest reference* de Claude Code y
+  *Package your plugin* de Codex, leídas el 2026-11-09) y cómo lo arma `nzt-software`
+  (`build/build.sh`, D97 y D100 en `Plan/specs/nzt-core/decisions.md`). Hecho, con estos
+  defaults de Claude que **falta confirmar con el usuario**:
+  - **Dos manifiestos en `plugin/`:** `.claude-plugin/plugin.json` (Claude Code) y
+    `plugin.json` en la raíz del plugin (el manifiesto portable que Codex lee primero, con
+    `extensions.com.openai.interface`). Mismo nombre `nzt`, versión `0.1.0`, licencia MIT.
+    Las skills se descubren solas en `skills/`, sin campo `skills`.
+  - **M1. Nombres de las skills (corregido el mismo día):** el default era dejarlas como
+    `nzt-plan`…, que instaladas quedaban `nzt:nzt-plan`. El usuario preguntó si convenía
+    acortarlas y pidió investigar Codex en vez de suponer. **Comprobado** instalando el
+    plugin en un `CODEX_HOME` temporal del scratchpad (`codex plugin marketplace add` con un
+    marketplace local y `codex debug prompt-input`): Codex también lista las skills de un
+    plugin como `<plugin>:<skill>`, igual que Claude Code (documentado en su *Plugin
+    manifest reference*). Su documentación de skills solo dice que dos skills con el mismo
+    `name` no se mezclan y aparecen las dos. **Decidido por el usuario: se acortan.** Las
+    carpetas y los `name:` pasan a `plan`, `do`, `learn`, `tools` y `retro`; la base sigue
+    siendo `nzt`. Instaladas: `nzt:nzt`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools`,
+    `nzt:retro`, sin choque con otra skill `plan` (queda `plan` u `otro:plan`). Dentro de
+    las skills se nombran como "la skill `plan`". Los documentos de diseño anteriores a
+    esta fecha conservan los nombres viejos como historial.
+  - **M2. Marketplace: decidido por el usuario que lo tiene que tener, pero después**
+    (pendiente 4 en `Idea.md`). Por ahora, sin entrada en los marketplaces: `.claude-plugin/marketplace.json` y
+    `.agents/plugins/marketplace.json` están en la raíz del repo, fuera de `nzt-method/`, y
+    no se tocan sin permiso. Tampoco hay pipeline de release propio todavía.
+  - **Verificado:** `claude plugin validate` (Claude Code 2.1.318) → *Validation passed*,
+    con un aviso de que falta un ícono. **En Codex** (`codex-cli 0.164.0`, sin comando de
+    validación) el plugin se instaló desde un marketplace local en un `CODEX_HOME`
+    temporal y sus seis skills aparecen en el prompt; la configuración real de Codex no
+    se tocó.
+  - **Choque con `nzt-software`, revisado:** con el espacio de nombres del plugin las skills
+    ya no se pisan (`nzt:nzt` y `nzt-software:nzt`), pero las dos bases dicen "cargame
+    primero en cada sesión"; la regla de no instalar los dos juntos sigue.

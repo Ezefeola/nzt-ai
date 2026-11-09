@@ -1,12 +1,12 @@
 ---
-name: nzt-plan
+name: plan
 description: Turns a planned or sliced piece of work, in any domain, into a plan the person approves once - units in order, what each leaves, its done criterion, who does it, and what can be cut under a fixed deadline - and records it in Plan/state.md. Use after nzt sizes a work as planned or sliced, when the person asks for a plan, or when an existing plan has to change.
 ---
 
-# nzt-plan
+# plan
 
 Cuts the work into units and gets the plan approved. It writes no deliverable (that is
-`nzt-do`) and never starts the first unit before the plan is approved.
+`do`) and never starts the first unit before the plan is approved.
 
 The shared references named here (`references/state.md`, `references/documents.md`,
 `references/glossary.md`) live in the `nzt` skill's folder.
@@ -30,12 +30,12 @@ The shared references named here (`references/state.md`, `references/documents.m
    again; never start without the yes.
 7. **Record the plan:** create or update `Plan/state.md` with `nzt`'s `references/state.md`,
    including in *Decisions* the size and the plan's approval, each with its reason.
-8. **Hand off** the first pending unit, or the approved batch, to `nzt-do`.
+8. **Hand off** the first pending unit, or the approved batch, to the `do` skill.
 
 ## Done when
 
 The person approved the plan, `Plan/state.md` holds it, and the first unit (or batch) was
-handed to `nzt-do`; or the plan waits on the person's answer.
+handed to the `do` skill; or the plan waits on the person's answer.
 
 ## References
 

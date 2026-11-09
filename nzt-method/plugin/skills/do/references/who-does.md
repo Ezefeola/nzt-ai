@@ -22,7 +22,7 @@ with beats a list of questions.
 - One step at a time when the steps depend on each other; the whole list when they do not.
 - Say what a good result looks like at each step, so the person can tell on their own.
 - When something goes off script (a supplier says no, a date moves), adapt the steps, and
-  if it changes the plan, say so: changing the plan is `nzt-plan`'s.
+  if it changes the plan, say so: changing the plan belongs to the `plan` skill.
 
 ## Verify with evidence
 

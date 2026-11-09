@@ -325,38 +325,56 @@ Si se limpia el contexto, una sesión nueva retoma así:
   verificado:"), solo se agregó la retro. Mostró un hueco: si la persona ya dio el lugar,
   no se avisaba de carpeta compartida → el paso 1 avisa en los dos casos. Sin commit.
 
+- **2026-11-09:** commit `1c5e9ce` con `nzt-tools` y `nzt-retro`, y push. Pendiente 3
+  hecho: `Estructura.md` reescrita con las seis skills como quedaron, sus referencias y el
+  árbol del plugin; manifiestos `plugin/.claude-plugin/plugin.json` y `plugin/plugin.json`
+  (portable, para Codex). `claude plugin validate` pasa (solo avisa que falta ícono); en
+  Codex no se pudo validar. Defaults a confirmar: M1 (nombres de skills sin cambiar,
+  `nzt:nzt-plan`…) y M2 (sin entrada en los marketplaces de la raíz, que están fuera de
+  `nzt-method/`). Detalle en `Estructura.md` → *Decididos* → *Manifiestos*. Sin commit.
+- **2026-11-09:** M1 corregido. El usuario pidió investigar Codex: instalado el plugin en
+  un `CODEX_HOME` temporal, Codex lista las skills como `nzt:nzt-plan`, igual que Claude
+  Code. Decidido acortar los nombres: carpetas y `name:` pasan a `plan`, `do`, `learn`,
+  `tools` y `retro` (base `nzt`), con todas las menciones entre skills y en los casos
+  actualizadas ("la skill `plan`"). Comprobado: `claude plugin validate` pasa y Codex lista
+  `nzt:nzt`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools`, `nzt:retro`. Los casos no se
+  volvieron a correr (solo cambió cómo se nombran). Sin commit.
 ### Punto de retomada (2026-11-09)
 
-**Hecho y probado** (en `plugin/skills/`, cada una con casos en su `evals/`):
+**Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
 
 | Skill | Qué hace | Prueba |
 |---|---|---|
 | `nzt` | **Skill base:** se carga primero en cada sesión (por su `description`) y otra vez tras compactar; lee `messages.md` (paso 1), el estado, aclara, dimensiona, quién hace, herramientas, paquetes, carpeta, le cuenta a la persona y deriva | 4 casos, 26/26 con skill, 46% sin; `kernel-loaded` escrito, sin correr |
-| `nzt-plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
-| `nzt-do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `nzt-learn` | 3 casos (BUSCARV pasó a `nzt-learn`) |
-| `nzt-learn` | Enseña: pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades en `Plan/state.md`, ejercicios con la solución aparte, correcciones con pistas, evaluación y repasos espaciados | 5 casos, todos los criterios con skill (iteraciones 2–3), 79% sin |
-| `nzt-tools` | Nombra la falta, mira lo que ya hay y lo rechazado, pregunta antes de investigar, investiga en fuentes oficiales, propone con la opción de ninguna, instala con otro sí en el alcance más chico, comprueba, anota en `Docs/agent-tools.md` y vuelve al trabajo | 4 casos, 17/17 con skill, 77,5% sin |
-| `nzt-retro` | Solo a pedido: pregunta dónde guardarla, revisa las últimas 10 sesiones (o las que elija la persona) y los archivos del trabajo, convierte cada momento costoso en una propuesta con destino (trabajo, método o paquete), señala paquetes posibles y no cambia nada más | 4 casos, 16/16 con skill, 86,6% sin |
+| `plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
+| `do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `learn` | 3 casos (BUSCARV pasó a `learn`) |
+| `learn` | Enseña: pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades en `Plan/state.md`, ejercicios con la solución aparte, correcciones con pistas, evaluación y repasos espaciados | 5 casos, todos los criterios con skill (iteraciones 2–3), 79% sin |
+| `tools` | Nombra la falta, mira lo que ya hay y lo rechazado, pregunta antes de investigar, investiga en fuentes oficiales, propone con la opción de ninguna, instala con otro sí en el alcance más chico, comprueba, anota en `Docs/agent-tools.md` y vuelve al trabajo | 4 casos, 17/17 con skill, 77,5% sin |
+| `retro` | Solo a pedido: pregunta dónde guardarla, revisa las últimas 10 sesiones (o las que elija la persona) y los archivos del trabajo, convierte cada momento costoso en una propuesta con destino (trabajo, método o paquete), señala paquetes posibles y no cambia nada más | 4 casos, 16/16 con skill, 86,6% sin |
 
 Las referencias compartidas son de `nzt` (`state`, `glossary`, `starting`, `sizing`,
-`packages`, `documents`, `messages`); `nzt-plan` tiene `slicing`; `nzt-do` tiene `who-does`
-y `verify`; `nzt-learn` tiene `plan`, `teach`, `train`, `tutor`, `assess`, `retain` y
-`exercises`; `nzt-tools` tiene `agent-tools`; `nzt-retro` tiene `retro-file`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
+`packages`, `documents`, `messages`); `plan` tiene `slicing`; `do` tiene `who-does`
+y `verify`; `learn` tiene `plan`, `teach`, `train`, `tutor`, `assess`, `retain` y
+`exercises`; `tools` tiene `agent-tools`; `retro` tiene `retro-file`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
 ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-1. ~~Escribir `nzt-tools`~~ hecho el 2026-11-09 y aprobado por el usuario (falta el
-   commit).
-2. ~~Escribir `nzt-retro`~~ hecho el 2026-11-09 (falta la devolución del usuario y el
-   commit).
-3. Actualizar `design/Estructura.md` con lo que cambió al escribir las skills (columnas de
-   unidades, `messages.md` y *Asking*, `nzt` como base, `nzt-learn` como sexta skill), y
-   crear los manifiestos del plugin (Claude Code y Codex) en `plugin/`.
-4. Correr `nzt/evals/kernel-loaded` con el plugin instalado. El script de disparo de
+1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
+2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
+3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1
+   decidido (nombres cortos).
+4. **Marketplace (M2):** el usuario decidió que el plugin `nzt` **tiene que tener
+   marketplace**, pero queda para después. Hay que sumar su entrada en
+   `.claude-plugin/marketplace.json` (Claude Code) y en `.agents/plugins/marketplace.json`
+   (Codex), en la raíz del repo, fuera de `nzt-method/`: pedir permiso antes de tocarlos.
+   Decidir de dónde sale (la carpeta `nzt-method/plugin` o una rama propia, como
+   `plugin-nzt-software`) y el pipeline de release propio.
+5. Correr `nzt/evals/kernel-loaded` con el plugin instalado (necesita el marketplace o
+   instalarlo desde la carpeta). El script de disparo de
    `skill-creator` (`scripts.run_eval`) falla en Windows (`WinError 10038`): no sirve para
    medirlo en esta máquina.
-5. **Idea para el final:** un hook de inicio de sesión (y tras compactar) en el plugin de
+6. **Idea para el final:** un hook de inicio de sesión (y tras compactar) en el plugin de
    cada host que haga cargar `nzt`, como refuerzo de la `description`. No descartado; se
    ataca al final, sobre todo si `kernel-loaded` muestra que `nzt` no se carga primero. Va
    en la configuración del plugin, nunca en el texto de las skills.

@@ -1,12 +1,12 @@
 ---
-name: nzt-do
+name: do
 description: Does one unit of work in any domain - or guides the person through it - then verifies it against its done criterion, records it and stops with a plain report and a recommended next step. Use when nzt hands off direct work, when a planned unit or an approved batch is next, or when the person says to continue the work.
 ---
 
-# nzt-do
+# do
 
 The only skill that does the work. It takes one unit (or an approved batch) from understood
-to verified and recorded, and stops. It never re-plans (that is `nzt-plan`).
+to verified and recorded, and stops. It never re-plans (that is the `plan` skill).
 
 The shared references named here (`references/state.md`, `references/documents.md`,
 `references/glossary.md`) live in the `nzt` skill's folder.
@@ -26,7 +26,7 @@ The shared references named here (`references/state.md`, `references/documents.m
 4. **Do it**, by who does it:
    - the agent → do it; any document follows `nzt`'s `references/documents.md`;
    - the person or both → `references/who-does.md`;
-   - the person is learning it → hand the unit to `nzt-learn` and stop here.
+   - the person is learning it → hand the unit to the `learn` skill and stop here.
 5. **Verify it** against the done criterion with `references/verify.md`, and settle the
    verdict.
 6. **Record it.** With a state file, update it with `nzt`'s `references/state.md`. Add new
@@ -39,7 +39,7 @@ The shared references named here (`references/state.md`, `references/documents.m
    missing, and the next step you recommend. Then wait for the person.
 
 If a missing tool blocks the unit at any step, stop there, say what is missing, and offer
-`nzt-tools`; a missing tool that does not block is raised in the report.
+`tools`; a missing tool that does not block is raised in the report.
 
 ## Done when
 

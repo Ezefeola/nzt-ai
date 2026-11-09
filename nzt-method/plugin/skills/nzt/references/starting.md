@@ -23,4 +23,4 @@ The default for any domain. A package in use may add its own; these still apply.
 - **Ask everything left at once**, in a single message, never one question per turn.
 - **Propose exploring instead** when the person does not know yet what they want (an idea,
   a creative search): a short round of options or research whose only output is a clearer
-  request. Exploring is direct work done by `nzt-do`.
+  request. Exploring is direct work done by `do`.

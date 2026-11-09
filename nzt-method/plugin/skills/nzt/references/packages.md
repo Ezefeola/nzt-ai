@@ -13,16 +13,16 @@ read. For each, the method's default applies when no package in use brings it.
 |---|---|---|
 | **Vocabulary** | every step | The person's words, fixed in `Docs/glossary.md`. No invented jargon |
 | **Starting questions** | understanding | The method's starting questions, the ones used to clarify any request |
-| **How to slice into units** | the plan | The slicing rules of `nzt-plan` |
+| **How to slice into units** | the plan | The slicing rules of `plan` |
 | **Practices** | doing | What the agent knows about the subject, offered as a proposal ("this is how it is usually done, does it work for you?"). If it does not know, it says so and proposes researching |
 | **Done criteria and how to check them** | verifying | Derived from "how will we know it went well?" and agreed with the person |
-| **Tools usually needed** | before starting | `nzt-tools`, same as with a package |
+| **Tools usually needed** | before starting | `tools`, same as with a package |
 
 ## Proposing a package
 
 1. **Recognize the domain** from the request and the folder, never from a name alone.
 2. **Propose the package** that fits, saying what it would add. It is installed only with
-   the person's yes, through `nzt-tools`, and then recorded in `Docs/agent-tools.md`.
+   the person's yes, through `tools`, and then recorded in `Docs/agent-tools.md`.
 3. **Without a package for the domain,** tell the person once, at the start, that you will
    go with what you know and run your suggestions by them.
 
@@ -42,6 +42,6 @@ Several packages can apply at once: a game can use software, design and writing.
 
 ## A new package
 
-When the same kind of work keeps repeating, `nzt-retro` can point it out. Building the
+When the same kind of work keeps repeating, `retro` can point it out. Building the
 package is a work of its own: it starts with `nzt`, and its skill is written with whatever
 skill-authoring skills the host has.

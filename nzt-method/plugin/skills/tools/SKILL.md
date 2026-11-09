@@ -1,9 +1,9 @@
 ---
-name: nzt-tools
+name: tools
 description: Proposes, researches, installs, checks and records a tool the agent works through (a plugin, an MCP server, a program, or a domain package) for any work in any domain, always with the person's yes and never on its own. Use when the work needs something the agent does not have - before the work starts or when a missing tool turns up in the middle of it - when a domain package is to be installed, or when the person asks whether there is a plugin, MCP or tool for what they want.
 ---
 
-# nzt-tools
+# tools
 
 Takes a missing tool from "the work needs this" to installed, checked and recorded, or to
 a clear "we go on without it". Nothing is installed or used without the person knowing:

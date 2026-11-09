@@ -15,7 +15,7 @@ trabajo, **cómo retomar** y el **estado actual** con el próximo paso.
 | Carpeta | Qué tiene |
 |---|---|
 | `design/` | Los documentos de diseño, en español: idea, investigación, principios, paquetes, archivos, documentos y estructura |
-| `plugin/` | El plugin `nzt`, con sus skills en inglés (todavía no existe) |
+| `plugin/` | El plugin `nzt` para Claude Code y Codex: sus manifiestos y sus seis skills en inglés (`nzt`, `plan`, `do`, `learn`, `tools`, `retro`), cada una con sus casos de prueba |
 
 ## Restricciones
 

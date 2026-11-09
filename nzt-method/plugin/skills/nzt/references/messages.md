@@ -33,7 +33,7 @@ it — the person hired someone to help, not a process to watch.
 ## Words
 
 - **The person's language and words**, the ones in `Docs/glossary.md` if there is one.
-- **No method jargon.** Never name a skill (`nzt-do`, `nzt-plan`…) and never use the
+- **No method jargon.** Never name a skill (`do`, `plan`…) and never use the
   method's labels — size names, "unit", "package", "default", "verdict", "stop" — unless
   the person uses them. Say what will happen instead:
 

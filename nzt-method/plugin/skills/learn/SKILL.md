@@ -1,9 +1,9 @@
 ---
-name: nzt-learn
+name: learn
 description: Teaches the person a skill in any domain (a spreadsheet formula, a language, cooking, an instrument, code) instead of doing the work for them - one lesson in the conversation, or a whole topic with objectives, exercises with the solution kept apart, corrections, an assessment and spaced reviews. Use when the person wants to learn, practise, be corrected or assessed, says "teach me" or "I want to learn, don't do it for me", or resumes a topic they are learning.
 ---
 
-# nzt-learn
+# learn
 
 Produces ability in the person, not a product. Everywhere else the agent does the work;
 here the person does it and the agent gets them there. Solving it for them is the failure:

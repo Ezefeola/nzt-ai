@@ -1,6 +1,6 @@
 ---
 name: nzt
-description: The nzt working method's base skill - how to talk to the person and where each request goes, for any work in any domain (software, writing, a course, research, an event, a house move, learning something). Load it first in every session, before anything else, even for a question, and again after the conversation is compacted. It reads the work's state, clarifies a vague request, sizes it, agrees who does it, checks the tools and domain packages it needs, and hands off to nzt-plan, nzt-do or nzt-learn.
+description: The nzt working method's base skill - how to talk to the person and where each request goes, for any work in any domain (software, writing, a course, research, an event, a house move, learning something). Load it first in every session, before anything else, even for a question, and again after the conversation is compacted. It reads the work's state, clarifies a vague request, sizes it, agrees who does it, checks the tools and domain packages it needs, and hands off to its plan, do or learn skills.
 ---
 
 # nzt
@@ -9,7 +9,7 @@ The method's base skill and entry point, loaded first in every session. It stays
 for the whole session, and its rules for talking to the person apply to every other `nzt`
 skill. If the conversation was compacted and these rules are no longer in front of you,
 load `nzt` again. It decides how the work is approached and hands it off; it never does the
-work itself (that is `nzt-do`) and never writes a plan (that is `nzt-plan`).
+work itself (that is the `do` skill) and never writes a plan (that is the `plan` skill).
 
 ## Steps
 
@@ -30,10 +30,10 @@ work itself (that is `nzt-do`) and never writes a plan (that is `nzt-plan`).
    first. Never size a request you cannot describe in one sentence.
 6. **Size the work** with `references/sizing.md`.
 7. **Decide who does the work:** the agent, the person, or both. If the person wants to
-   learn it, the person does it and `nzt-learn` teaches; it places the topic itself, so
+   learn it, the person does it and `learn` teaches; it places the topic itself, so
    skip step 10.
 8. **Check the tools.** Compare the tools the work needs with those already available and
-   in `Docs/agent-tools.md`. If one it needs is missing, load `nzt-tools` before any work
+   in `Docs/agent-tools.md`. If one it needs is missing, load the `tools` skill before any work
    starts.
 9. **Check the packages** with `references/packages.md`: propose a domain package that fits
    and is not in use, or note that the method's defaults apply.
@@ -41,13 +41,13 @@ work itself (that is `nzt-do`) and never writes a plan (that is `nzt-plan`).
     has, or propose where to create it.
 11. **Tell the person** how the work will go, in one message: what will happen, who does
     what, and anything to approve (a folder, a package, a tool). If something needs their yes, stop here and wait.
-12. **Hand off:** the person learns → load `nzt-learn`; direct → load `nzt-do` for a
-    single unit; planned or sliced → load `nzt-plan`.
+12. **Hand off:** the person learns → load the `learn` skill; direct → load the `do` skill for a
+    single unit; planned or sliced → load the `plan` skill.
 
 ## Done when
 
 The person knows, in their own words, how the work will go and who does what, and the work
-was handed to `nzt-do`, `nzt-plan` or `nzt-learn` (or waits on a yes they were asked for); or a question
+was handed to the `do`, `plan` or `learn` skill (or waits on a yes they were asked for); or a question
 that is not work was answered.
 
 ## References

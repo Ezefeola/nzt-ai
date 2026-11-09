@@ -1,9 +1,9 @@
 ---
-name: nzt-retro
+name: retro
 description: Reviews how a piece of work went, in any domain, and writes a file of improvement proposals for the work itself, for the nzt method and for domain packages, each tied to a moment where the work cost more than it should. Use only when the person asks for a retro, a review of how the work or the sessions went, or lessons learned; never offer or start it on your own. It changes nothing but its own file.
 ---
 
-# nzt-retro
+# retro
 
 Turns the moments where the work stumbled into proposals someone can decide on later. It
 runs only when the person asks for it: no other skill offers it or hands off to it.

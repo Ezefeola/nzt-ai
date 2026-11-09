@@ -5,9 +5,9 @@ how much it is worth to the person, never by how the request was phrased.
 
 | Size | When | What it carries |
 |---|---|---|
-| **direct** | One result, small, its done criterion fits in one line, and redoing it would be cheap | One unit with `nzt-do`. No plan, no state file |
-| **planned** | A few results that depend on each other, or something that is costly to redo, but it fits one plan approved once | A short plan (`nzt-plan`), `Plan/state.md` |
-| **sliced** | Many results, an unclear path, or work that will span several sessions | A plan cut into units, each with its own stop (`nzt-plan`), `Plan/state.md` |
+| **direct** | One result, small, its done criterion fits in one line, and redoing it would be cheap | One unit with `do`. No plan, no state file |
+| **planned** | A few results that depend on each other, or something that is costly to redo, but it fits one plan approved once | A short plan (`plan`), `Plan/state.md` |
+| **sliced** | Many results, an unclear path, or work that will span several sessions | A plan cut into units, each with its own stop (`plan`), `Plan/state.md` |
 
 ## Rules
 
