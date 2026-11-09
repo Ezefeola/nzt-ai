@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: change-one-choice
+expected_outcome: |
+  In a work whose how.md already settles every topic, the person wants to move the tasks from SQLite to PostgreSQL. It touches only that choice and what depends on it (the Sqlite library), says what the change implies (installing and running PostgreSQL, the backup, migrating the existing tasks), records it as a new H-NN that supersedes H-03 (never rewriting H-03), and does not ask again the other topics.
+context:
+  scaffold_script: place-files.sh

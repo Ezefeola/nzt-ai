@@ -56,12 +56,14 @@ se decidió cada cosa.
    tareas o memoria, el agente los usa en vez de inventar los suyos. Pero lo necesario para
    retomar siempre queda en los archivos del trabajo.
 
-10. **Las herramientas se proponen, no se imponen.** **Antes de empezar a trabajar**, el
-    agente revisa qué necesita el trabajo y qué tiene ya disponible, para saber de entrada si
-    tiene todo. Propone una herramienta **solo si la necesita para algo y no la tiene**, y
-    pregunta si quiere que la investigue. Si en medio del trabajo aparece una falta que no se
-    vio al empezar, la plantea en la parada, sin cortar lo que está haciendo; si lo bloquea,
-    para y pregunta ahí. Con un sí, busca en fuentes oficiales
+10. **Las herramientas se proponen, nunca se suman solas.** **Al decidir cómo se hace** un
+    trabajo nuevo, el agente **siempre** pregunta por las herramientas como una decisión más
+    del cómo: opciones concretas para trabajar mejor con lo elegido (documentación oficial,
+    algo que compruebe la calidad, un conector), cada una con lo que aporta, y la opción de
+    ninguna. Además, **en cualquier momento**, cuando ve que una herramienta haría mejor el
+    trabajo (no solo cuando falta algo), pregunta si quiere que se fije. Si en medio del
+    trabajo aparece una falta, la plantea en la parada, sin cortar lo que está haciendo; si
+    lo bloquea, para y pregunta ahí. Con un sí, busca en fuentes oficiales
     y presenta qué encontró, de dónde, a qué accede, qué cuesta y qué hay que hacer a mano.
     Instala solo con otro sí, **en el alcance más chico que sirva** (el trabajo antes que todo
     el equipo), comprueba que responde y lo anota en el **archivo de herramientas del
@@ -133,6 +135,11 @@ documentos en `Documentos.md`.
 - **Herramientas, antes y durante (2026-11-08):** el agente revisa antes de empezar a
   trabajar si tiene todo, y propone solo lo que necesita y no tiene; si una falta aparece en
   medio, la plantea en la parada, o para si lo bloquea. → principio 10.
+- **Herramientas siempre en el cómo (2026-11-09):** reemplaza P3. En la tercera prueba real
+  el agente nunca propuso herramientas porque "solo si falta algo" le dejó decidir en
+  silencio que no faltaba nada. Decisión del usuario: se preguntan siempre al decidir el cómo
+  y cuando el agente ve que una herramienta haría mejor el trabajo; nunca se suman sin
+  preguntar. Detalle en `Trabajo-por-etapas.md` → *Tercera prueba*. → principio 10.
 - **Glosario del trabajo (2026-11-08):** pedido del usuario; no estaba contemplado (solo se
   había pensado un glosario del método). → principio 15.
 - **Cómo se le habla a la persona (2026-11-08):** en la primera prueba de la skill `nzt`

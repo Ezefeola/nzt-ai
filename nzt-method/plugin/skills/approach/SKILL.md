@@ -1,13 +1,14 @@
 ---
 name: approach
-description: Decides how a work is made, in any domain - the technologies, materials, suppliers, places or methods each part is made with - asking the person each choice apart from what the work must do, with concrete options and what each implies; records it in how.md and then proposes the tools that would help the agent work with what was chosen. Use after define for a new planned work, when a part needs choices of its own, when the person asks what it will be built or done with, or wants to change a technology, supplier or method already chosen.
+description: Settles how a work is made once what it must do is agreed, for any work in any domain - what it is made with, how it is organised so it can be maintained, how it is checked, its conventions, third parties and delivery, and then the tools to work with all that - asking the person each choice with concrete options and writing Docs/How/how.md. Use after the define skill hands over a new planned work, when a part or unit needs a choice of how that is missing, when the person asks what it will be built or done with, or wants to change a technology, supplier or method already chosen.
 ---
 
 # approach
 
 Settles **how** the work is made once **what** it must do is agreed, and writes it in
-`how.md`. It never changes what the work must do (that is the `define` skill) and never
-plans the units (that is the `plan` skill).
+`how.md`. It never changes what the work must do (that is the `define` skill), never
+plans the units (that is the `plan` skill) and never installs a tool (that is the `tools`
+skill).
 
 The shared references named here (`references/folder.md`, `references/questions.md`,
 `references/glossary.md`, `references/packages.md`) live in the `nzt` skill's folder.
@@ -19,34 +20,31 @@ The shared references named here (`references/folder.md`, `references/questions.
    packages in use.
 2. **Read the evidence:** what already exists in the folder (files, a project, earlier
    choices) and what the person already has (installed programs, accounts, a supplier
-   they use). Evidence answers; ask only what it cannot settle.
-3. **Find the decisions** this work or part needs with `references/decisions.md`, from what
-   it is, and the decisions a package in use adds. If it has none, say so in one line and go
-   to step 8.
-4. **Research the facts** a choice depends on (versions, prices, availability, limits) in
-   official sources. A fact is never asked.
+   they use).
+3. **Walk the seven topics** with `references/decisions.md` and mark each one as answered,
+   read from what exists, not applicable (with its reason), or to ask.
+4. **Find the options** of each topic to ask with `references/decisions.md`, deduced from
+   the base and from a package in use.
 5. **Write the questions** in the how log with `references/questions.md`, each with what it
    blocks, before asking any.
-6. **Ask the decisions** in one round, ordered by what depends on what (the base before
-   what is built on it), apart from any question about what the work must do. Each option
-   names concretely what would be used and what it means for the person (cost, effort,
-   what they can and cannot do later); the one you recommend first. Record the answers.
-7. **Write `how.md`** with `references/how-file.md`: `Docs/How/how.md`, or the part's own
-   when only that part decides it.
-8. **Prepare the tools:** for what was chosen, name what you will have to do with it
-   (write it, run it, read its documentation, check its result, reach a supplier) and load
-   the `tools` skill for the needs a tool would do better. If none, say so in one line.
-9. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
+6. **Ask in rounds** in the order of `references/decisions.md`, apart from any question
+   about what the work must do, and record each answer.
+7. **Tell the person** in one line each topic that does not apply, and why.
+8. **Write `how.md`** with `references/how-file.md`, starting from `assets/how.md`:
+   `Docs/How/how.md`, or the part's own when only that part decides it.
+9. **Load the `tools` skill** with what was chosen, even when nothing seems missing: it
+   asks the person which tools to work with.
+10. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
 
 ## Done when
 
-Every decision the work needs has a choice the person made, or is an open question they
-know about; `how.md` says what was chosen, why and what it implies; the tools for working
-with it were proposed or ruled out; and what the work must do was not changed here.
+Each of the seven topics was answered by the person, read from what exists, or told to
+them as not applicable; `how.md` says what was chosen, why and what it implies; the
+person was asked about the agent's tools; and what the work must do was not changed here.
 
 ## References
 
-| Reference | Read it when |
+| File | Read it when |
 |---|---|
-| `references/decisions.md` | the decisions a work or part needs are worked out and asked |
-| `references/how-file.md` | `how.md` is written or updated |
+| `references/decisions.md` | the topics are walked, their options found and asked |
+| `references/how-file.md` and `assets/how.md` | `how.md` is written or updated |

@@ -41,11 +41,12 @@ The shared references named here (`references/state.md`, `references/documents.m
    of the batch (back to step 1). Otherwise, or if the session is close to running out of
    context, go to step 8.
 8. **Stop and report** in one message: what was
-   done, the verdict with what was checked and what was not, any tool that turned out to be
-   missing, and the next step you recommend. Then wait for the person.
+   done, the verdict with what was checked and what was not, any tool that was missing or
+   would have done it better (with the question whether to look for it, through the
+   `tools` skill), and the next step you recommend. Then wait for the person.
 
 If a missing tool blocks the unit at any step, stop there, say what is missing, and offer
-`tools`; a missing tool that does not block is raised in the report.
+the `tools` skill.
 
 ## Done when
 

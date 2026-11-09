@@ -61,7 +61,8 @@ preguntar, cuánto investigar, qué mostrar, dónde se registra) **está por deb
 - ~~**El nombre:** `nzt-method` es provisorio.~~ Decidido: **`nzt`** (S1 en
   `Estructura.md`). La carpeta del repositorio sigue siendo `nzt-method/`.
 - **La relación con `nzt-software`:** lo reemplaza, `nzt-software` se apoya en él, o
-  conviven. Se decide **después** de tener el método genérico; la idea del usuario es que
+  conviven. Observación del usuario (2026-11-09): si se apoya en él, `nzt-software` tendrá
+  que quitar lo que el genérico ya hace y quedarse con el saber de software como paquete. Se decide **después** de tener el método genérico; la idea del usuario es que
   los dominios (software y otros) lleguen como paquetes.
 - **Qué es lo mínimo** que tiene que tener el método para mantener el contexto sin volverse
   burocracia en un trabajo chico.
@@ -385,6 +386,13 @@ Si se limpia el contexto, una sesión nueva retoma así:
   estado, dimensiona y rutea; `Docs/` en `General/`, `How/`, `Parts/<NN-nombre>/`,
   `Retros/`. Hecho y probado (9 casos, nueva 51/52 tras un ajuste, anterior 72%). Sin
   commit.
+- **2026-11-09, tercera prueba real revisada (pendiente 0):** se confirmaron los dos puntos
+  del usuario: `approach` se saltó el paso 8 (nunca propuso herramientas) y solo preguntó la
+  base, sin estructura ni calidad (todo en `Program.cs`, "sin pruebas" decidido por el
+  agente). Decididos D1–D4: herramientas siempre en el cómo y cuando harían mejor el
+  trabajo (principio 10 reescrito, reemplaza P3); siete temas del cómo; se pregunta solo lo
+  que falta; el genérico pregunta bien sin paquetes. Detalle y propuesta de construcción en
+  `Trabajo-por-etapas.md` → *Tercera prueba real*. Sin commit.
 ### Punto de retomada (2026-11-09)
 
 **Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `define`, `approach`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
@@ -409,22 +417,10 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo (el usuario lo pidió al cerrar la sesión del 2026-11-09):** revisar la
-   tercera prueba real en la app (carpeta `Escritorio/nzt-proyecto`, la sesión más nueva
-   en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/*.jsonl`,
-   hecha con `define` y `approach` ya escritas) y corroborar en el registro lo que el
-   usuario sintió:
-   - **Nunca propuso herramientas:** al acordar cómo construirlo no ofreció, por ejemplo,
-     el MCP de Microsoft Learn o un plugin para la tecnología elegida, ni para escribir
-     buen código; dejó todo el código en `Program.cs`. Debería preguntarse siempre, más en
-     un proyecto nuevo o cuando faltan herramientas para hacerlo bien.
-   - **Al decidir el cómo faltaron preguntas:** por ejemplo la arquitectura y los patrones
-     (en software), para que el resultado se pueda mantener. Mirar cómo lo resuelve
-     `nzt-software` (`architecture/references/tech.md` y `nzt-software`'s `choosing.md`) y
-     lograr algo equivalente **genérico**: que `approach` pregunte bien y no saltee nada,
-     sin atarse a software (software es solo el ejemplo que el usuario conoce mejor), con
-     `how.md` acotado.
-   Primero revisar y proponer, esperar la respuesta del usuario antes de cambiar skills.
+0. **Lo próximo:** iteración 2 corrida con los 5 ajustes: nueva 100%, anterior 76%
+   (`Trabajo-por-etapas.md` → *Prueba, iteración 2*). Falta: que el usuario revise, commit,
+   y decidir la *Auditoría del resto* (plantillas a `assets/` en `nzt`, `define`, `retro` y
+   `learn`; redundancias; pasos con dos acciones).
 1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1

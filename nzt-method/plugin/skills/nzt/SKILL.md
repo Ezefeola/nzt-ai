@@ -35,7 +35,8 @@ request is the `define` skill's, deciding how it is made is `approach`'s, planni
    and is not in use. Without one, you go with what you know about the subject: say so in
    step 9.
 8. **Settle what direct work needs**, only for the direct size:
-   - **The tools:** if one the work needs is missing, load the `tools` skill first.
+   - **The tools:** if one the work needs is missing, or one would clearly do it better,
+     load the `tools` skill first.
    - **Base choices are the person's:** what the result is made with or on, when changing
      it later would be costly (a program, a format, a supplier), is asked as a choice,
      each option naming concretely what you would use and what it means for them, the one

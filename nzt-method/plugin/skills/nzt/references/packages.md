@@ -13,11 +13,11 @@ read. For each, the method's default applies when no package in use brings it.
 |---|---|---|
 | **Vocabulary** | every step | The person's words, fixed in the glossary. No invented jargon |
 | **Starting questions** | understanding (`define`) | The method's starting questions |
-| **Decisions of how it is made** | `approach` | The method's guide to finding the decisions |
+| **The axes and values of a topic of how** (for software: architectures, test levels) | `approach` | The seven topics of `approach`, with the axes and values the agent deduces from the base |
 | **How to slice into units** | the plan | The slicing rules of `plan` |
 | **Practices** | doing | What the agent knows about the subject, offered as a proposal ("this is how it is usually done, does it work for you?"). If it does not know, it says so and proposes researching |
 | **Done criteria and how to check them** | verifying | Derived from "how will we know it went well?" and agreed with the person |
-| **Tools usually needed** | before starting | `tools`, same as with a package |
+| **Tools usually needed** | `tools`, after `approach` | The needs `tools` names from what was chosen |
 
 ## Proposing a package
 
