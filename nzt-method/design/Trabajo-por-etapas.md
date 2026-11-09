@@ -361,8 +361,16 @@ Total **31/34**; las tres fallas son del caso viejo, no de la auditoría.
   quién hace cada uno, criterio de terminado, pide aprobación, nada escrito antes del sí) y
   mudanza **6/6** (aviso al dueño y flete primero, cambio de domicilio último como
   recortable, pide aprobación, nada escrito).
-- Hueco visto en `define`: cuando un cambio saca una parte entera, también toca la
-  definición general, y `change-file.md` no dice si va un `change.md` por definición o uno
-  solo. Decidir con el usuario.
+- ~~Hueco en `define`: un cambio que saca una parte entera~~ resuelto el 2026-11-09 con la
+  propuesta de Claude, que el usuario pidió aplicar: **un pedido es un solo `change.md`**,
+  que se aprueba una vez. Si toca una sola definición va al lado de ella; si toca varias
+  (sacar una parte cambia también *Parts* e *In* de la general) va en `Docs/General/`, y
+  cada punto dice en qué archivo cambia (`in:`). Al aplicarlo, cada definición tocada suma
+  su línea de *History*; la parte sacada conserva su carpeta con `Status: removed`; la
+  comprobación de ausencia va al *Done when* de la general. Por qué así: una sola
+  aprobación y un solo motivo para todo el pedido, y nada se borra sin rastro. Cambiados
+  `define/references/change-file.md` (*Where it goes*), `define/assets/change.md` (campo
+  `in:`), `define/SKILL.md` paso 9 y `nzt/references/folder.md` (`change.md` en `General/`).
+  Caso `remove-reminders` ajustado (criterios 01 y 07) y corrido con la versión nueva: **7/7** (un solo `Docs/General/change.md` con dos puntos, cada uno con su `in:`, comprobación de ausencia en el *Done when* de la general, nada más tocado, pide aprobación).
 - Dos corridas vieron los criterios del caso al leer `eval_metadata.json` para sacar la
   consigna: en la próxima, pasar la consigna en el prompt y no el archivo.

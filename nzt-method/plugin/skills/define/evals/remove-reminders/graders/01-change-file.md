@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-A change.md exists in Docs/Parts/02-recordatorios/ (or next to the definition it changes).
+A single change.md exists in Docs/General/ (the request removes the whole reminders part), and each of its points names the definition file it changes.

@@ -36,8 +36,8 @@ The shared references named here (`references/folder.md`, `references/questions.
 8. **Write or update the definition** with `references/definition-file.md`: the general
    one in `Docs/General/definition.md`, a part's in its own folder. Add any new term to the
    glossary. Then go to step 11.
-9. **Write the change** with `references/change-file.md` in `change.md`, next to the
-   definition it changes, and ask the person to approve it. Nothing else is touched first.
+9. **Write the change** in one `change.md`, placed as `references/change-file.md` says,
+   and ask the person to approve it. Nothing else is touched first.
 10. **Apply the approved change** to the definition, with its history, and delete
     `change.md`.
 11. **Hand off:** a new work → load the `approach` skill; a part → back to the unit that

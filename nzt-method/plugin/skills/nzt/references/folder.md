@@ -11,6 +11,7 @@ Docs/
     definition.md       what it is, for whom, what is in and out, its parts   (define)
     questions.md        questions about what, Q-NN                            (define)
     glossary.md         the work's words                                      (any skill)
+    change.md           only while a change to several definitions waits      (define)
   How/                  how the whole work is made
     how.md              what is used for each part, and why                   (approach)
     questions.md        questions about how, H-NN                             (approach)

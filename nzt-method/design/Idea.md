@@ -393,6 +393,11 @@ Si se limpia el contexto, una sesión nueva retoma así:
   trabajo (principio 10 reescrito, reemplaza P3); siete temas del cómo; se pregunta solo lo
   que falta; el genérico pregunta bien sin paquetes. Detalle y propuesta de construcción en
   `Trabajo-por-etapas.md` → *Tercera prueba real*. Sin commit.
+- **2026-11-09, cierre:** approach con siete temas y herramientas siempre (iteración 2:
+  100% contra 76%), auditoría de todas las skills (plantillas a `assets/`, redundancias,
+  pasos partidos; regresión 31/34 por un caso viejo, ya actualizado), casos de `plan` al
+  día (5/5 y 6/6) y cambios que tocan varias definiciones en un solo `change.md` (7/7).
+  Detalle en `Trabajo-por-etapas.md`.
 ### Punto de retomada (2026-11-09)
 
 **Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `define`, `approach`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
@@ -417,10 +422,13 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo:** auditoría con commit (`74503c6`); casos de `plan` actualizados a las etapas
-   y pasando (cumple 5/5, mudanza 6/6). Queda por decidir con el usuario cómo se escribe un
-   cambio que saca una parte entera (toca también la definición general). Después, volver a
-   probar en la app (`nzt-proyecto`) con un proyecto nuevo.
+0. **Lo próximo (2026-11-09):** el usuario prueba el plugin en la app, en
+   `Escritorio/nzt-proyecto`, con un proyecto nuevo, ya con `approach` de siete temas,
+   herramientas siempre, plantillas en `assets/` y cambios de varias definiciones en un solo
+   `change.md`. Después: revisar esa sesión como se hizo con la tercera (el `.jsonl` más
+   nuevo en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/`, extraído
+   con un script) y corroborar lo que el usuario cuente. Todo lo anterior tiene commit y
+   push (`69aee51`, `74503c6`, `311f208` y el de cierre).
 1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1
