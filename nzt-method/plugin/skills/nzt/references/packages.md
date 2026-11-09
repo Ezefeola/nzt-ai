@@ -11,8 +11,9 @@ read. For each, the method's default applies when no package in use brings it.
 
 | Brings | Used in | Default without a package |
 |---|---|---|
-| **Vocabulary** | every step | The person's words, fixed in `Docs/glossary.md`. No invented jargon |
-| **Starting questions** | understanding | The method's starting questions, the ones used to clarify any request |
+| **Vocabulary** | every step | The person's words, fixed in the glossary. No invented jargon |
+| **Starting questions** | understanding (`define`) | The method's starting questions |
+| **Decisions of how it is made** | `approach` | The method's guide to finding the decisions |
 | **How to slice into units** | the plan | The slicing rules of `plan` |
 | **Practices** | doing | What the agent knows about the subject, offered as a proposal ("this is how it is usually done, does it work for you?"). If it does not know, it says so and proposes researching |
 | **Done criteria and how to check them** | verifying | Derived from "how will we know it went well?" and agreed with the person |
@@ -22,9 +23,7 @@ read. For each, the method's default applies when no package in use brings it.
 
 1. **Recognize the domain** from the request and the folder, never from a name alone.
 2. **Propose the package** that fits, saying what it would add. It is installed only with
-   the person's yes, through `tools`, and then recorded in `Docs/agent-tools.md`.
-3. **Without a package for the domain,** tell the person once, at the start, that you will
-   go with what you know and run your suggestions by them.
+   the person's yes, through `tools`, and then recorded in the agent's tools file.
 
 Several packages can apply at once: a game can use software, design and writing.
 

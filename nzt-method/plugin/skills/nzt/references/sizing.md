@@ -12,6 +12,9 @@ how much it is worth to the person, never by how the request was phrased.
 ## Rules
 
 - **In doubt, the lighter size.** When the work outgrows it, say so and propose the next.
+- **Never direct:** a request you cannot describe in one sentence, or something new with
+  several parts that will keep growing (an app, a course, a book). It goes to `define`
+  first.
 - **The person can change the size at any moment**; record the change in *Decisions*.
 - **Size cuts ceremony, never quality:** every size agrees its done criterion, verifies
   against it and ends with a verdict.
@@ -25,5 +28,6 @@ how much it is worth to the person, never by how the request was phrased.
 | Fix the spelling of this paragraph | direct |
 | Organize a birthday: invitation, guest list, menu | planned |
 | Write a ten-lesson course | sliced |
+| An app to keep my task list | planned: new, with parts that will grow |
 | A bug in a function | direct |
 | Move house next month | sliced, done mostly by the person |

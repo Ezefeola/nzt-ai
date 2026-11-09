@@ -5,6 +5,6 @@ timeout_seconds: 600
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 
-Hacé una retro de la newsletter y guardala en Docs/retros/.
+Hacé una retro de la newsletter y guardala en Docs/Retros/.
 
-Input files: Plan/state.md, Docs/glossary.md
+Input files: Plan/state.md, Docs/General/glossary.md

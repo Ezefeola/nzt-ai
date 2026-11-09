@@ -5,6 +5,9 @@ chapter per unit, a feature per unit), these rules still hold around it.
 
 ## What makes a good unit
 
+- **It belongs to one part** of the definition, when the work has parts: a unit never
+  mixes two.
+
 - **It leaves something that can be checked on its own:** a draft, a list, a decision, a
   booked date, a working change. Never "progress on X".
 - **It fits one stop:** done, verified and reported in one sitting. If it needs two

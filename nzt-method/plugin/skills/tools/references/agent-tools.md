@@ -1,6 +1,6 @@
 # The agent tools file
 
-`Docs/agent-tools.md`, in the work's folder, lists what the work uses besides the agent:
+`Docs/How/agent-tools.md`, in the work's folder, lists what the work uses besides the agent:
 plugins, MCP servers, programs and domain packages, and the ones the person declined. It
 is created with the first tool installed or declined. Headings stay as below; what goes in
 the rows is written in the person's language.

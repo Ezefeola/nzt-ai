@@ -1,6 +1,6 @@
 # The work's glossary
 
-`Docs/glossary.md` fixes the key words of one work and what they mean *in this work*, so
+`Docs/General/glossary.md` fixes the key words of one work and what they mean *in this work*, so
 the same thing always has the same name, in the conversation and in every document.
 
 ## Rules

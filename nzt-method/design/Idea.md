@@ -339,27 +339,92 @@ Si se limpia el contexto, una sesión nueva retoma así:
   actualizadas ("la skill `plan`"). Comprobado: `claude plugin validate` pasa y Codex lista
   `nzt:nzt`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools`, `nzt:retro`. Los casos no se
   volvieron a correr (solo cambió cómo se nombran). Sin commit.
+- **2026-11-09:** commit `f9c045d` y push. El usuario confirmó que el marketplace queda
+  pendiente (4) y dejó pendientes 5 y 6. A su pedido, carpeta de prueba manual fuera del
+  repo, en el escritorio: `nzt-prueba/` con `CASOS.md` (cómo abrir una sesión con el
+  plugin en Claude Code con `--plugin-dir` y en Codex con un marketplace local, y 7 casos
+  acotados, uno por carpeta). Comprobado: Codex no acepta una ruta absoluta en un
+  marketplace local; funciona con `./nzt`, un enlace (junction) a `nzt-method/plugin`, y
+  guarda una copia al instalar.
+- **2026-11-09:** el usuario borró `nzt-prueba/` tras probar los casos (está en la
+  papelera). Para probarlo en la app de escritorio quedó `nzt-prueba/claude-marketplace/`
+  (marketplace local `nzt-local`, enlace `./nzt` a `nzt-method/plugin`). Comprobado con un
+  `CLAUDE_CONFIG_DIR` temporal: valida, se instala con `--scope local` (queda en
+  `.claude/settings.local.json` de la carpeta, apagado fuera de ella) y lista las 6 skills;
+  (después se comprobó que lo lee de su carpeta: los cambios entran en la sesión siguiente). El nombre `nzt` choca
+  con `nzt@nzt` de `nzt-software` (apagado a nivel usuario); `nzt-state` y `nzt-look`
+  siguen activos y se apagan por carpeta. No verificado dentro de la app. Sin commit.
+- **2026-11-09:** a pedido del usuario, marketplace `nzt-local` agregado a su configuración
+  real y plugin instalado con `--scope local` en `Escritorio/nzt-proyecto/` (vacía, para
+  probarlo en un proyecto nuevo desde la app), con `nzt-state` y `nzt-look` apagados ahí.
+  Comprobado: activo solo en esa carpeta; fuera de ella todo sigue como estaba.
+- **2026-11-09, primera prueba real (app, `nzt-proyecto`, "quiero hacer una aplicación para
+  cargar una lista de tareas"):** cargó `nzt` primero (pendiente 5 visto en la app), aclaró
+  con 4 preguntas en el diálogo, lo tomó como trabajo directo, hizo un `index.html` con
+  guardado en el navegador, lo verificó en el navegador y cerró bien en español. Hallazgos
+  del usuario: (a) le chocó la pregunta "¿la hago yo o querés aprender?" (paso 7 de `nzt`
+  se leyó como "preguntar siempre"); (b) eligió la tecnología sin consultarla. Visto en el
+  registro: saltó el paso 9 (no leyó `packages.md` ni dijo que iba con lo que sabe, cuya
+  regla ya pide ofrecer las prácticas como propuesta); el recuadro final del host salió en
+  inglés. El usuario aceptó P1–P3 (ver `Estructura.md`, *Decididos*); aplicadas en `nzt`
+  con casos nuevos `app-base-choices`, `spreadsheet-no-learn-question` y `learn-signal`.
+  Probado contra la versión anterior (copia en el scratchpad), con `direct-software-bug` y
+  `person-does-house-move` como regresión: nueva 26/26, anterior 87% (preguntó "¿la hago
+  yo o querés aprender?", no dijo que iba con lo que sabe y armó la planilla antes de
+  preguntar en qué programa). Ajuste en una segunda vuelta: la primera versión preguntaba
+  la plataforma pero sin nombrar tecnologías; ahora cada opción nombra en concreto qué se
+  usaría y qué implica (HTML + JavaScript, React Native, Electron; almacenamiento local,
+  archivo, Firebase), y el criterio del caso lo exige. Sin commit. Comprobado con
+  `claude plugin update`: un plugin de un marketplace local se lee de su carpeta ("nothing
+  to update"), así que los cambios entran solos en la sesión siguiente de `nzt-proyecto`.
+- **2026-11-09, segunda prueba real y rediseño:** en la app, el agente mezcló qué y cómo,
+  el usuario corrigió la tecnología dos veces, no quedó nada escrito ni propuso
+  herramientas. Decidido con el usuario y escrito en `Trabajo-por-etapas.md`: skills nuevas
+  `define` (qué, entrevista, preguntas `Q-NN`, definiciones, `change.md`) y `approach`
+  (cómo, preguntas `H-NN`, `how.md`, herramientas vía `tools`); `nzt` solo habla, lee el
+  estado, dimensiona y rutea; `Docs/` en `General/`, `How/`, `Parts/<NN-nombre>/`,
+  `Retros/`. Hecho y probado (9 casos, nueva 51/52 tras un ajuste, anterior 72%). Sin
+  commit.
 ### Punto de retomada (2026-11-09)
 
-**Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
+**Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `define`, `approach`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
 
 | Skill | Qué hace | Prueba |
 |---|---|---|
-| `nzt` | **Skill base:** se carga primero en cada sesión (por su `description`) y otra vez tras compactar; lee `messages.md` (paso 1), el estado, aclara, dimensiona, quién hace, herramientas, paquetes, carpeta, le cuenta a la persona y deriva | 4 casos, 26/26 con skill, 46% sin; `kernel-loaded` escrito, sin correr |
+| `nzt` | **Skill base:** se carga primero en cada sesión y otra vez tras compactar; solo habla (`messages.md`), lee el estado, dimensiona, deduce quién hace, revisa paquetes, resuelve lo propio del trabajo directo, ubica la carpeta (`folder.md`) y rutea a la skill dueña | casos propios + `new-app-interview`; ver `Trabajo-por-etapas.md` |
+| `define` | Qué se quiere: entrevista en lenguaje natural por rondas, preguntas `Q-NN` guardadas, definición general y por parte, cambios con `change.md` | 2 casos + `new-app-interview` (`Trabajo-por-etapas.md`) |
+| `approach` | Cómo se hace: decisiones según qué es el trabajo, preguntas `H-NN` aparte con opciones concretas, `how.md`, herramientas vía `tools` | 3 casos (app y cumple) |
 | `plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
 | `do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `learn` | 3 casos (BUSCARV pasó a `learn`) |
 | `learn` | Enseña: pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades en `Plan/state.md`, ejercicios con la solución aparte, correcciones con pistas, evaluación y repasos espaciados | 5 casos, todos los criterios con skill (iteraciones 2–3), 79% sin |
-| `tools` | Nombra la falta, mira lo que ya hay y lo rechazado, pregunta antes de investigar, investiga en fuentes oficiales, propone con la opción de ninguna, instala con otro sí en el alcance más chico, comprueba, anota en `Docs/agent-tools.md` y vuelve al trabajo | 4 casos, 17/17 con skill, 77,5% sin |
+| `tools` | Nombra la falta, mira lo que ya hay y lo rechazado, pregunta antes de investigar, investiga en fuentes oficiales, propone con la opción de ninguna, instala con otro sí en el alcance más chico, comprueba, anota en `Docs/How/agent-tools.md` y vuelve al trabajo | 4 casos, 17/17 con skill, 77,5% sin |
 | `retro` | Solo a pedido: pregunta dónde guardarla, revisa las últimas 10 sesiones (o las que elija la persona) y los archivos del trabajo, convierte cada momento costoso en una propuesta con destino (trabajo, método o paquete), señala paquetes posibles y no cambia nada más | 4 casos, 16/16 con skill, 86,6% sin |
 
-Las referencias compartidas son de `nzt` (`state`, `glossary`, `starting`, `sizing`,
-`packages`, `documents`, `messages`); `plan` tiene `slicing`; `do` tiene `who-does`
+Las referencias compartidas son de `nzt` (`state`, `glossary`, `sizing`, `packages`,
+`documents`, `messages`, `folder`, `questions`); `define` tiene `interview`,
+`definition-file` y `change-file`; `approach` tiene `decisions` y `how-file`; `plan` tiene `slicing`; `do` tiene `who-does`
 y `verify`; `learn` tiene `plan`, `teach`, `train`, `tutor`, `assess`, `retain` y
 `exercises`; `tools` tiene `agent-tools`; `retro` tiene `retro-file`. La regla de preguntas (principio 17) está en `messages.md` → *Asking*, genérica:
 ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
+0. **Lo próximo (el usuario lo pidió al cerrar la sesión del 2026-11-09):** revisar la
+   tercera prueba real en la app (carpeta `Escritorio/nzt-proyecto`, la sesión más nueva
+   en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/*.jsonl`,
+   hecha con `define` y `approach` ya escritas) y corroborar en el registro lo que el
+   usuario sintió:
+   - **Nunca propuso herramientas:** al acordar cómo construirlo no ofreció, por ejemplo,
+     el MCP de Microsoft Learn o un plugin para la tecnología elegida, ni para escribir
+     buen código; dejó todo el código en `Program.cs`. Debería preguntarse siempre, más en
+     un proyecto nuevo o cuando faltan herramientas para hacerlo bien.
+   - **Al decidir el cómo faltaron preguntas:** por ejemplo la arquitectura y los patrones
+     (en software), para que el resultado se pueda mantener. Mirar cómo lo resuelve
+     `nzt-software` (`architecture/references/tech.md` y `nzt-software`'s `choosing.md`) y
+     lograr algo equivalente **genérico**: que `approach` pregunte bien y no saltee nada,
+     sin atarse a software (software es solo el ejemplo que el usuario conoce mejor), con
+     `how.md` acotado.
+   Primero revisar y proponer, esperar la respuesta del usuario antes de cambiar skills.
 1. ~~Escribir `nzt-tools`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1

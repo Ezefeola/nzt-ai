@@ -13,8 +13,8 @@ work.
 
 Before asking the person anything:
 
-- the person asks to add, remove or change part of the plan → `plan`, as a change to
-  this plan;
+- the person asks to add, change or remove something the work must do → `define`, as a
+  change; what it is made with → `approach`; only the units or their order → `plan`;
 - the person asks for something unrelated to this work → a new work, in its own folder;
 - a topic the person is learning (its units are objectives, with a *Next review*
   column) → continue it with the `learn` skill, which offers the overdue reviews first;
@@ -37,16 +37,17 @@ Empty sections are not written.
 # <Work name>
 
 ## What it is
-What is wanted and for whom. Size: <direct | planned | sliced>.
+What is wanted and for whom, in one line; the definition holds the rest.
+Size: <direct | planned | sliced>.
 Fixed time: <deadline>, if any.
 
 ## Done when
 The agreed done criterion for the whole work.
 
 ## Units
-| Unit | Leaves | Done when | Who does it | Status | Verdict |
-|---|---|---|---|---|---|
-| … | what exists after it | its own done criterion | agent / person / both | pending / in progress / stopped | done / partial / not achieved |
+| Unit | Part | Leaves | Done when | Who does it | Status | Verdict |
+|---|---|---|---|---|---|---|
+| … | the part it belongs to, if any | what exists after it | its own done criterion | agent / person / both | pending / in progress / stopped | done / partial / not achieved |
 
 Units in the order they are done. Units that can be cut if time runs out are marked
 `(cuttable)`. Units the person approved to run in a row without stopping are marked

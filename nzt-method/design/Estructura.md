@@ -18,20 +18,26 @@ inglés (A1); este documento de diseño, en español.
 
 ## Las skills del núcleo (como quedaron escritas, 2026-11-09)
 
+> **Actualizado el mismo día** con `Trabajo-por-etapas.md`: se sumaron `define` y `approach`, la base
+> `nzt` pasó a solo hablar, leer el estado, dimensionar y rutear, y `Docs/` se ordenó en
+> `General/`, `How/`, `Parts/` y `Retros/`. La tabla de abajo ya lo refleja.
+
 Lo que sigue es la estructura **escrita y probada** en `plugin/skills/`. El borrador original
 (cinco skills con prefijo `<m>`) cambió al escribirlas: `nzt` pasó a ser la skill base,
 `learn` se sumó como sexta skill (`Ensenanza.md`) y `teaching.md` se borró.
 
 | Skill | Cuándo se usa | Qué hace | Principios |
 |---|---|---|---|
-| `nzt` | **Primero en cada sesión**, por su `description`, y otra vez tras compactar | Skill base: lee cómo hablarle a la persona (`messages.md`), el estado, el glosario y las herramientas (si una anotada cubre lo que hay que hacer, se usa); aclara, dimensiona, decide quién hace, revisa herramientas y paquetes, ubica la carpeta, le cuenta a la persona y deriva | 2, 4, 5, 6, 10, 16, 17 |
-| `plan` | Trabajo con plan corto o por partes, o un cambio al plan | Corta en unidades, ordena por riesgo, marca recortables y tandas, espera el sí y escribe `Plan/state.md` | 2, 4, 6, 8, 14 |
+| `nzt` | **Primero en cada sesión**, por su `description`, y otra vez tras compactar | Skill base: cómo hablarle a la persona (`messages.md`), el estado, el glosario y las herramientas; dimensiona, deduce quién hace, revisa paquetes, resuelve lo propio del trabajo directo (herramientas, elecciones de base), ubica la carpeta y rutea con una tabla a la skill dueña | 2, 4, 5, 6, 10, 16, 17 |
+| `define` | Trabajo nuevo o poco claro con plan, una parte sin definir, o un cambio a lo acordado | Entrevista en lenguaje natural por rondas, guarda preguntas y respuestas (`Q-NN`), escribe la definición general y la de cada parte, y los cambios con `change.md` | 5, 6 |
+| `approach` | Después de `define`, o cuando se decide o cambia con qué se hace algo | Deduce las decisiones de cómo según qué es el trabajo, las pregunta aparte con opciones concretas (`H-NN`), escribe `how.md` y propone herramientas vía `tools` | 5, 10 |
+| `plan` | Después de `define` y `approach`, o un cambio a las unidades | Lee la definición y `how.md`, corta en unidades atadas a una parte, ordena por riesgo, marca recortables y tandas, espera el sí y escribe `Plan/state.md` | 2, 4, 6, 8, 14 |
 | `do` | Hay una unidad aprobada, o trabajo al paso | Hace la unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `learn` | 3, 5, 7, 11, 12 |
 | `learn` | La persona quiere aprender algo | Pregunta suelta, lección en la conversación o tema con carpeta; objetivos como unidades, ejercicios, correcciones, evaluación y repasos | `Ensenanza.md` |
-| `tools` | Falta una herramienta antes o durante el trabajo, se instala un paquete, o la persona pregunta por una | Propone, investiga en fuentes oficiales con un sí, instala con otro sí en el alcance más chico, comprueba y anota en `Docs/agent-tools.md` (también lo rechazado) | 10 |
+| `tools` | Falta una herramienta antes o durante el trabajo, se instala un paquete, o la persona pregunta por una | Propone, investiga en fuentes oficiales con un sí, instala con otro sí en el alcance más chico, comprueba y anota en `Docs/How/agent-tools.md` (también lo rechazado) | 10 |
 | `retro` | **Solo a mano**, cuando la persona la pide | Pregunta dónde guardarla, revisa las últimas 10 sesiones (o las elegidas) y los archivos del trabajo, y deja propuestas con destino (trabajo, método o paquete) sin cambiar nada más | 13 |
 
-Son **seis entradas** en la lista de skills. Instaladas, el host las agrupa bajo el nombre del plugin: `nzt:nzt`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools` y `nzt:retro` (M1). Ninguna nombra un host ni una herramienta
+Son **ocho entradas** en la lista de skills. Instaladas, el host las agrupa bajo el nombre del plugin: `nzt:nzt`, `nzt:define`, `nzt:approach`, `nzt:plan`, `nzt:do`, `nzt:learn`, `nzt:tools` y `nzt:retro` (M1). Ninguna nombra un host ni una herramienta
 (principio 17). Las demás skills no repiten que se cargue `nzt`: lo asegura su
 `description` (y, como refuerzo pendiente, un hook de inicio de sesión).
 
@@ -42,11 +48,13 @@ las nombran por su ruta.
 
 | Skill | Referencias |
 |---|---|
-| `nzt` | `messages.md` (cómo se habla y *Asking*), `state.md` (plantilla de `Plan/state.md`: la tabla de unidades lleva *Unit, Leaves, Done when, Who does it, Status, Verdict* y las marcas `(cuttable)` y `(batch)`), `glossary.md`, `starting.md`, `sizing.md`, `packages.md`, `documents.md` |
+| `nzt` | `messages.md` (cómo se habla y *Asking*), `state.md` (plantilla de `Plan/state.md`: la tabla de unidades lleva *Unit, Part, Leaves, Done when, Who does it, Status, Verdict* y las marcas `(cuttable)` y `(batch)`), `glossary.md`, `sizing.md`, `packages.md`, `documents.md`, `folder.md` (mapa de la carpeta del trabajo), `questions.md` (registros de preguntas, compartido con `define` y `approach`) |
+| `define` | `interview.md` (reemplaza a `starting.md`), `definition-file.md`, `change-file.md` |
+| `approach` | `decisions.md`, `how-file.md` |
 | `plan` | `slicing.md` |
 | `do` | `who-does.md`, `verify.md` |
 | `learn` | `plan.md`, `teach.md`, `train.md`, `tutor.md`, `assess.md`, `retain.md`, `exercises.md` |
-| `tools` | `agent-tools.md` (plantilla de `Docs/agent-tools.md`) |
+| `tools` | `agent-tools.md` (plantilla de `Docs/How/agent-tools.md`) |
 | `retro` | `retro-file.md` (plantilla del archivo de retro) |
 
 `documents.md` es referencia y no skill a propósito: como skill competiría con las de
@@ -216,3 +224,20 @@ paquete.
   - **Choque con `nzt-software`, revisado:** con el espacio de nombres del plugin las skills
     ya no se pisan (`nzt:nzt` y `nzt-software:nzt`), pero las dos bases dicen "cargame
     primero en cada sesión"; la regla de no instalar los dos juntos sigue.
+- **Primera prueba real (2026-11-09), decidido por el usuario: las tres propuestas.**
+  En la app, "quiero hacer una aplicación para cargar una lista de tareas" terminó en un
+  `index.html` hecho sin consultar la tecnología, después de preguntar "¿la hago yo o
+  querés aprender?".
+  - **P1. Quién hace el trabajo se deduce** (paso 7 de `nzt`): el agente hace lo que puede;
+    la persona, lo que solo ella puede (lo físico, firmar, estar en un lugar). Aprender solo
+    cuando lo dice o el contexto lo muestra (un curso, una tarea). Se pregunta solo si no se
+    puede deducir y la respuesta cambia el trabajo.
+  - **P2. Las elecciones de base son de la persona** (paso 11 de `nzt`): con qué o sobre qué
+    se arma el resultado, si cambiarlo después cuesta (tecnología, plataforma, dónde se
+    guardan los datos, material, lugar), se propone con cada opción nombrando en concreto
+    qué se usaría y qué implica, la recomendada primero, y espera el
+    sí; si ya se está preguntando en el paso 5, va ahí. El aviso de "voy con lo que sé"
+    sin paquete pasa al paso 9 (se dice en el 11) y se quita de `packages.md` para no
+    repetirlo.
+  - **P3. Todo lo que ve la persona va en su idioma** (`messages.md`), también el resumen o
+    estado que el host muestra del turno.

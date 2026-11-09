@@ -1,6 +1,6 @@
 ---
 name: tools
-description: Proposes, researches, installs, checks and records a tool the agent works through (a plugin, an MCP server, a program, or a domain package) for any work in any domain, always with the person's yes and never on its own. Use when the work needs something the agent does not have - before the work starts or when a missing tool turns up in the middle of it - when a domain package is to be installed, or when the person asks whether there is a plugin, MCP or tool for what they want.
+description: Proposes, researches, installs, checks and records a tool the agent works through (a plugin, an MCP server, a program, or a domain package) for any work in any domain, always with the person's yes and never on its own. Use when the work needs something the agent does not have - before the work starts, after approach settles what the work is made with, or when a missing tool turns up in the middle of it - when a domain package is to be installed, or when the person asks whether there is a plugin, MCP or tool for what they want.
 ---
 
 # tools
@@ -14,7 +14,7 @@ the agent proposes, the person decides. When it ends, the work goes back to wher
 1. **Name the need:** what the work has to do that a tool would do better than you can now,
    and whether it will come up again. If you can already do it well, or it is a one-off,
    there is no tool to look for: say so in a line and go back to the work.
-2. **Look at what is already there:** `Docs/agent-tools.md` (in use and declined) and the
+2. **Look at what is already there:** `Docs/How/agent-tools.md` (in use and declined) and the
    tools already available to you. One available that covers the need is used, not
    installed again. One in *Declined* is not offered again unless the person asks for it.
 3. **Ask before researching:** say what is missing and what it would change, and ask
@@ -36,7 +36,7 @@ the agent proposes, the person decides. When it ends, the work goes back to wher
 7. **Check that it answers** with one small real use before relying on it. If it only
    answers after a restart or a new session, say so; until it answers, the work goes on
    without it.
-8. **Record it** in `Docs/agent-tools.md` with `references/agent-tools.md`: what was
+8. **Record it** in `Docs/How/agent-tools.md` with `references/agent-tools.md`: what was
    installed, or what was declined and why. If the work has no folder yet, propose where to
    create it.
 9. **Go back to the work:** the step or unit that needed the tool continues, now with it
@@ -45,11 +45,11 @@ the agent proposes, the person decides. When it ends, the work goes back to wher
 ## Done when
 
 The person knows what the tool does, what it installed and what they did by hand; it
-answered, or they know the work goes on without it; and `Docs/agent-tools.md` says so. Or
+answered, or they know the work goes on without it; and `Docs/How/agent-tools.md` says so. Or
 the person was told no tool is needed, or none was found, and the work went on.
 
 ## References
 
 | Reference | Read it when |
 |---|---|
-| `references/agent-tools.md` | `Docs/agent-tools.md` is created or updated: a tool installed, declined, removed or no longer answering |
+| `references/agent-tools.md` | `Docs/How/agent-tools.md` is created or updated: a tool installed, declined, removed or no longer answering |

@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Turns a planned or sliced piece of work, in any domain, into a plan the person approves once - units in order, what each leaves, its done criterion, who does it, and what can be cut under a fixed deadline - and records it in Plan/state.md. Use after nzt sizes a work as planned or sliced, when the person asks for a plan, or when an existing plan has to change.
+description: Turns a planned or sliced piece of work, in any domain, into a plan the person approves once - units in order, the part each belongs to, what each leaves, its done criterion, who does it, and what can be cut under a fixed deadline - and records it in Plan/state.md. Use after define and approach have settled what the work is and how it is made, when the person asks for a plan, or when the units or their order have to change.
 ---
 
 # plan
@@ -13,13 +13,16 @@ The shared references named here (`references/state.md`, `references/documents.m
 
 ## Steps
 
-1. **Read what is settled.** Take the request, size, who does it, packages and folder that
-   `nzt` settled. If `Plan/state.md` exists, read it with `nzt`'s `references/state.md`: this
-   is a change to that plan, not a new one.
-2. **Write the work's done criterion:** a short list of what must be true when the whole
-   work is over, from "how will we know it went well?".
+1. **Read what is settled:** the size, who does it, packages and folder that `nzt`
+   settled; `Docs/General/definition.md` (its parts, limits and done criterion) and
+   `Docs/How/how.md`. If `Plan/state.md` exists, read it with `nzt`'s `references/state.md`:
+   this is a change to that plan, not a new one.
+2. **Take the work's done criterion** from the definition's *Done when*; if it has none,
+   write a short list from "how will we know it went well?" and show it with the plan.
 3. **Cut the work into units** with `references/slicing.md`, or with the slicing row of a
-   package in use. For each unit: what it leaves, its done criterion, and who does it.
+   package in use. For each unit: the part it belongs to, what it leaves, its done criterion, and who does
+   it. A part not yet defined starts with its definition, done by the `define` skill when
+   its unit comes.
 4. **Order the units** with `references/slicing.md`, marking the cuttable ones under a fixed
    deadline and the ones that could run as a batch.
 5. **Present the plan** in one message:

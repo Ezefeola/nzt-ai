@@ -5,6 +5,6 @@ timeout_seconds: 600
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
 ---
 
-Hacé una retro de cómo venimos con la mudanza y guardala en Docs/retros/.
+Hacé una retro de cómo venimos con la mudanza y guardala en Docs/Retros/.
 
-Input files: Plan/state.md, Docs/agent-tools.md
+Input files: Plan/state.md, Docs/How/agent-tools.md

@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: declined-not-offered-again
 expected_outcome: |
-  Reads Docs/agent-tools.md, sees the shared documents connector was declined, does not offer it again, and reviews the pacing of capitulos/cap3.md from the file.
+  Reads Docs/How/agent-tools.md, sees the shared documents connector was declined, does not offer it again, and reviews the pacing of capitulos/cap3.md from the file.
 context:
   scaffold_script: place-files.sh

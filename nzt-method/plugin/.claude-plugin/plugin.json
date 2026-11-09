@@ -2,7 +2,7 @@
   "name": "nzt",
   "displayName": "NZT",
   "version": "0.1.0",
-  "description": "NZT, a working method for any work in any domain: keeps the context between sessions, sizes the work, plans it in units, does and verifies each one, teaches, proposes tools and reviews how it went. Its base skill, nzt, loads first in every session.",
+  "description": "NZT, a working method for any work in any domain: keeps the context between sessions, agrees what the work must do and how it is made, keeping every question and answer, plans it in units, does and verifies each one, teaches, proposes tools and reviews how it went. Its base skill, nzt, loads first in every session.",
   "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
   "repository": "https://github.com/Ezefeola/nzt-ai",
   "license": "MIT",

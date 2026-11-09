@@ -32,7 +32,8 @@ it — the person hired someone to help, not a process to watch.
 
 ## Words
 
-- **The person's language and words**, the ones in `Docs/glossary.md` if there is one.
+- **The person's language and words**, the ones in the glossary if there is one, in
+  everything the person sees: also any summary or status the host shows for the turn.
 - **No method jargon.** Never name a skill (`do`, `plan`…) and never use the
   method's labels — size names, "unit", "package", "default", "verdict", "stop" — unless
   the person uses them. Say what will happen instead:

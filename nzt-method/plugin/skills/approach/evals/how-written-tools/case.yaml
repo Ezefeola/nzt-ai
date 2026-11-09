@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: how-written-tools
+expected_outcome: |
+  With every how question answered, it writes Docs/How/how.md with one table row per decision (real names, the reason citing H-NN, what it implies), then names what it will do with the chosen means and asks before looking for tools, installing nothing.
+context:
+  scaffold_script: place-files.sh

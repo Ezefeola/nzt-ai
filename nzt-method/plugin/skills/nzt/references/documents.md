@@ -1,7 +1,7 @@
 # Writing any document
 
 The default for every document the work produces: the method's own (plan, stop report,
-state) and the deliverables (a chapter, a spec, a syllabus). A package in use can add to or
+state) and the deliverables (a chapter, a definition, a syllabus). A package in use can add to or
 replace the form of a deliverable of its domain; otherwise this applies.
 
 ## Before writing
@@ -25,7 +25,7 @@ replace the form of a deliverable of its domain; otherwise this applies.
 ## How it is written
 
 8. **In the person's and the reader's language and words,** consistent with
-   `Docs/glossary.md`, without the agent's jargon.
+   the glossary, without the agent's jargon.
 9. **Short sentences, one idea each,** and a concrete example where something is abstract.
 10. **What is, apart from what is believed:** verified facts, assumptions and proposals are
     never mixed, and proposals are marked.

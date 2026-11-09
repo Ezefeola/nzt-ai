@@ -14,7 +14,7 @@ product of the work is touched: applying a proposal is a new request.
 ## Steps
 
 1. **Ask where to save the retro** before reviewing anything, unless the person already
-   said: suggest `Docs/retros/<YYYY-MM-DD>-<topic>.md` in the work's folder, and wait for
+   said: suggest `Docs/Retros/<YYYY-MM-DD>-<topic>.md` in the work's folder, and wait for
    the answer. Either way, warn if that place is shared with others (a repository, a shared
    drive), since they will see it.
 2. **Choose the sessions:** the last 10 of this work, or the ones the person names, which
@@ -24,7 +24,8 @@ product of the work is touched: applying a proposal is a new request.
    missing or unreadable is reported as not reviewed, never rebuilt from memory. If none
    can be read, say so and review the current conversation.
 3. **Read the work's files:** `Plan/state.md` (decisions, units redone, plan changes),
-   `Docs/glossary.md` and `Docs/agent-tools.md` (tools missing or declined). They keep
+   the glossary, the definitions and question logs (what was asked twice or changed) and
+   `Docs/How/agent-tools.md` (tools missing or declined). They keep
    what happened in sessions that can no longer be read.
 4. **Find the moments** where the work cost more than it should: the person corrected or
    repeated something; something was assumed and was not there; a check failed or a unit
