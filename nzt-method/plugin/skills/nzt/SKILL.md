@@ -11,8 +11,8 @@ does the work itself (that is `nzt-do`) and never writes a plan (that is `nzt-pl
 ## Steps
 
 1. **Read the state.** If `Plan/state.md` exists in the work's folder, read it with
-   `references/state.md` before asking anything. If it shows work under way, continue from
-   its *Next step*: skip to step 10.
+   `references/state.md` before asking anything. If it shows work under way, do what that
+   reference says for the person's request, and skip to step 10.
 2. **Read the work's files.** If they exist, read `Docs/glossary.md` (with
    `references/glossary.md`) and `Docs/agent-tools.md`, and use their terms and packages from
    here on.

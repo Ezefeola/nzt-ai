@@ -13,7 +13,7 @@ read. For each, the method's default applies when no package in use brings it.
 |---|---|---|
 | **Vocabulary** | every step | The person's words, fixed in `Docs/glossary.md`. No invented jargon |
 | **Starting questions** | understanding | The method's starting questions, the ones used to clarify any request |
-| **How to slice into units** | the plan | Each unit leaves something verifiable on its own and fits one stop; riskiest or most unknown first, then what depends on it |
+| **How to slice into units** | the plan | The slicing rules of `nzt-plan` |
 | **Practices** | doing | What the agent knows about the subject, offered as a proposal ("this is how it is usually done, does it work for you?"). If it does not know, it says so and proposes researching |
 | **Done criteria and how to check them** | verifying | Derived from "how will we know it went well?" and agreed with the person |
 | **Tools usually needed** | before starting | `nzt-tools`, same as with a package |

@@ -13,6 +13,9 @@ work.
 
 Before asking the person anything:
 
+- the person asks to add, remove or change part of the plan → `nzt-plan`, as a change to
+  this plan;
+- the person asks for something unrelated to this work → a new work, in its own folder;
 - a unit `in progress` → report it in one line and continue it with `nzt-do`;
 - a plan not yet approved → show that plan again instead of writing a new one;
 - every unit with a verdict → the new request is a new work, or a new plan for this one;
@@ -38,11 +41,13 @@ Fixed time: <deadline>, if any.
 The agreed done criterion for the whole work.
 
 ## Units
-| Unit | Who does it | Status | Verdict |
-|---|---|---|---|
-| … | agent / person / both | pending / in progress / stopped | done / partial / not achieved |
+| Unit | Leaves | Done when | Who does it | Status | Verdict |
+|---|---|---|---|---|---|
+| … | what exists after it | its own done criterion | agent / person / both | pending / in progress / stopped | done / partial / not achieved |
 
-Units that can be cut if time runs out are marked `(cuttable)`.
+Units in the order they are done. Units that can be cut if time runs out are marked
+`(cuttable)`. Units the person approved to run in a row without stopping are marked
+`(batch)`.
 
 ## Decisions
 - **<date> — <what was decided>.** Why: <reason>.

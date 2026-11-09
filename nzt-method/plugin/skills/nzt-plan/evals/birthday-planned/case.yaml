@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: birthday-planned
+expected_outcome: |
+  Presents a short plan of two to five parts, each with what it leaves and who does it, plus what must be true at the end, and asks for approval. Writes no state file and no deliverable before the yes.

@@ -203,6 +203,18 @@ Si se limpia el contexto, una sesión nueva retoma así:
   pasar, y `Plan/state.md` intacto con una pregunta a la persona. **Skill `nzt` lista para
   revisión del usuario.** **Próximo paso:** la devolución del usuario, commit de la skill y
   sus casos, y seguir con `nzt-plan`.
+- **2026-11-08:** commit `b5f0140` con la skill `nzt`. Escrita **`nzt-plan`**
+  (`plugin/skills/nzt-plan/`: 8 pasos y `references/slicing.md`), auditada con
+  `gestionar-skills`. La tabla de unidades de `nzt/references/state.md` suma las columnas
+  *Leaves* y *Done when* y las marcas `(cuttable)` y `(batch)`. Tres casos en
+  `nzt-plan/evals/` (cumpleaños con plan corto, mudanza con fecha fija, cambiar un plan
+  existente) **corriéndose** (iteración 1, en el scratchpad). Sin commit.
+- **2026-11-08:** `nzt-plan` iteración 1: con skill 100% (16 criterios), sin skill 38%. La
+  prueba mostró un hueco en `nzt`: con trabajo en curso, un pedido que cambia el plan no
+  tenía camino. Corregido en `nzt/SKILL.md` paso 1 y `nzt/references/state.md` (*Reading
+  it*: cambio de plan → `nzt-plan`; pedido ajeno → trabajo nuevo). **Próximo paso:** commit
+  de `nzt-plan`, y después escribir **`nzt-do`** (referencias propias: `who-does.md`,
+  `teaching.md`, `verify.md`), luego `nzt-tools` y `nzt-retro`.
 
 ## Primer paso sugerido
 
