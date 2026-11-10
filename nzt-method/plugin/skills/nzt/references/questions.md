@@ -17,27 +17,40 @@ Ids are numbered per log and never reused.
 
 1. **Write it before asking,** with an empty answer and what it blocks: what cannot be
    written or done without it. A question that blocks nothing is curiosity: drop it.
-2. **Before writing it, check it is a question:** already answered in a log, a definition,
-   `how.md` or the folder → read it there; a fact that can be checked (a version, a price,
-   an opening time) → research it with its source; a detail inside what was agreed →
-   decide it, say it is yours, and go on.
+2. **Before writing it, check it is a question:**
+   - already answered in a log, a definition, `how.md` or the folder → read it there;
+   - a fact that can be checked (a version, a price, an opening time) → research it with
+     its source and say it;
+   - it changes nothing for the person (an internal name, a port, a file's place inside a
+     folder already agreed) → just do it;
+   - a detail of how it is made, with the mode **I propose** on the first line of the how
+     log (`approach` asks it) → decide it and say it under **What I decided**;
+   - anything else, including what changes what the person sees, uses or pays or would be
+     costly to change later → ask it.
 3. **Record the answer in the person's words, with the date.** An inferred answer is not an
-   answer: it stays open, or goes in the definition marked as proposed.
-4. **Only append.** A changed answer is marked *superseded by* the new id, never rewritten.
-5. **An open question does not stop the rest:** what does not depend on it goes on; the
+   answer: the question stays open. A value you would propose is asked as an option,
+   recommended, never written down as agreed.
+4. **An unclear answer is asked again at once:** one that picks none of the options, can be
+   read two ways, or is itself a question. Rephrase it in plainer words, with the options
+   again, before doing anything that depends on it.
+5. **Only append.** A changed answer is marked *superseded by* the new id, never rewritten.
+6. **An open question does not stop the rest:** what does not depend on it goes on; the
    step that needs it asks it when it gets there.
-6. **It closes with an answer, or with `[out]`** when the person takes it out of scope.
-   Assuming is not a way to close it.
-7. **Headings, ids and field names** (`blocks`, `proposed`, `answer`) stay in English; the
+7. **It closes with an answer, or with `[out]`** when the person takes it out of scope.
+8. **Headings, ids and field names** (`blocks`, `proposed`, `answer`) stay in English; the
    rest is in the person's language. `proposed` holds the options while the question is
    open.
 
 ## Options
 
 When a question is a choice, each option is written so the person can pick it without
-knowing the field:
+knowing the field, already in the log's `proposed` line, not only when it is asked:
 
 - **One decision per question.** Two choices folded into one option cannot be picked apart.
+- **No choice hidden inside another.** When an option carries a second costly choice (a
+  framework that runs in two modes, a template or a supplier's package with its own
+  defaults), the option names it or it becomes its own question. A default is never taken
+  in silence.
 - **What would be used, by its real name:** ".NET 10 with PostgreSQL", "a moving company
   with a truck and three people", "a shared folder in the cloud".
 - **What it means for the person:** what it costs, what they have to do or install, what

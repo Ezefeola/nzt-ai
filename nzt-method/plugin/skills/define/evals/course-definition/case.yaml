@@ -1,4 +1,4 @@
 schema_version: "1.1"
 name: course-definition
 expected_outcome: |
-  With the answers already in the request, it records them as answered questions, writes Docs/General/definition.md with what it is, for whom, objectives with how each is known, in and out, the parts, limits and done criterion, marks anything it added as proposed, lists what is still open, and names no tool or app in the definition.
+  With the answers already in the request, it records them as answered questions, writes Docs/General/definition.md with what it is, for whom, objectives with how each is known, in and out, the parts, limits and done criterion, asks anything it would add (with its proposal recommended) or lists it as open, never writes it as agreed or marked proposed, and names no tool or app in the definition.

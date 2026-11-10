@@ -27,21 +27,27 @@ The shared references named here (`references/folder.md`, `references/questions.
    the base and from a package in use.
 5. **Write the questions** in the how log with `references/questions.md`, each with what it
    blocks, before asking any.
-6. **Ask in rounds** in the order of `references/decisions.md`, apart from any question
+6. **Ask the mode** for the details with `references/decisions.md` → *Deciding the
+   details*, in the first round, unless the how log already has one.
+7. **Say what does not apply:** the message that opens the first round lists, in one line
+   each, the topics that do not apply and why, so the person can object before anything
+   is built on it.
+8. **Ask in rounds** in the order of `references/decisions.md`, apart from any question
    about what the work must do, each choice written as `references/questions.md` says.
-7. **Record each answer** in the how log, in the person's words.
-8. **Tell the person** in one line each topic that does not apply, and why.
-9. **Write `how.md`** with `references/how-file.md`, starting from `assets/how.md`:
-   `Docs/How/how.md`, or the part's own when only that part decides it.
-10. **Load the `tools` skill** with what was chosen, even when nothing seems missing: it
-   asks the person which tools to work with.
-11. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
+9. **Record each answer** in the how log, in the person's words.
+10. **Write `how.md`** with `references/how-file.md`, starting from `assets/how.md`:
+    `Docs/How/how.md`, or the part's own when only that part decides it.
+11. **Load the `tools` skill** with what was chosen, even when nothing seems missing: it
+    asks the person which tools to work with.
+12. **Hand off** to the `plan` skill, or back to the unit that needed the choice.
 
 ## Done when
 
 Each of the seven topics was answered by the person, read from what exists, or told to
-them as not applicable; `how.md` says what was chosen, why and what it implies; the
-person was asked about the agent's tools; and what the work must do was not changed here.
+them as not applicable; the mode for the details is in the how log; `how.md` says what was
+chosen, why and what it implies, with nothing the person did not choose or leave to the
+agent; the person was asked about the agent's tools; and what the work must do was not
+changed here.
 
 ## References
 

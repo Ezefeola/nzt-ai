@@ -8,8 +8,8 @@ description: Does one unit of work in any domain - or guides the person through 
 The only skill that does the work. It takes one unit (or an approved batch) from understood
 to verified and recorded, and stops. It never re-plans (that is the `plan` skill).
 
-The shared references named here (`references/state.md`, `references/documents.md`,
-`references/glossary.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
+The shared references named here (`references/state.md`, `references/questions.md`,
+`references/documents.md`, `references/glossary.md`) live in the `nzt` skill's folder, with their templates in its `assets/`.
 
 ## Steps
 
@@ -22,12 +22,16 @@ The shared references named here (`references/state.md`, `references/documents.m
    - The part has no definition, or an open question blocks this unit → load the `define`
      skill for that part, then come back.
    - A choice of how it is made is missing → load the `approach` skill, then come back.
-   - Anything else undefined → check with `nzt`'s `references/questions.md` whether it is a
-     question for the person; one that is never becomes an assumption, but it does not
-     hold back what can be done without it: do that part now, leave a visible
-     blank for the missing data, and ask in the same message.
+   - What the request already answers is not undefined: a fault to fix means it behaves
+     like the case that works. It goes in the done criterion of step 3, which the person
+     can correct; it is not asked.
+   - Anything else undefined → `nzt`'s `references/questions.md` rule 2 says whether it is
+     just done, decided and said (mode **I propose** only) or asked. Never an assumption.
+   - A question does not hold back what can be done without it: do that part now, leave
+     a visible blank for the missing data, and ask in the same message.
 3. **Fix its done criterion.** Use the one in the plan; for direct work, write it in one
-   line and tell the person, so they can correct it.
+   line and tell the person, so they can correct it. If the unit's capabilities were
+   written after the plan, its done criterion cites their `AC-NN` from now on.
 4. **Do it**, by who does it:
    - the agent → do it; any document follows `nzt`'s `references/documents.md`;
    - the person or both → `references/who-does.md`;
@@ -38,13 +42,16 @@ The shared references named here (`references/state.md`, `references/documents.m
    Never edit a definition or `how.md`: a change to them goes through `define` or
    `approach`.
 7. **Update the glossary** with new or changed terms, with `nzt`'s `references/glossary.md`.
-8. **Check what comes next.** In an approved batch with a *done* verdict, take the next unit
+8. **Mark the tools used** in `Docs/How/agent-tools.md`, if it exists: each listed tool
+   this unit relied on gets its *Checked* cell updated (answered, with the date, or what
+   failed).
+9. **Check what comes next.** In an approved batch with a *done* verdict, take the next unit
    of the batch (back to step 1). Otherwise, or if the session is close to running out of
-   context, go to step 9.
-9. **Stop and report** in one message: what was
-   done, the verdict with what was checked and what was not, any tool that was missing or
-   would have done it better (with the question whether to look for it, through the
-   `tools` skill), and the next step you recommend. Then wait for the person.
+   context, go to step 10.
+10. **Stop and report** in one message: what was done, the verdict with what was checked
+    and what was not, any tool that was missing or would have done it better (with the
+    question whether to look for it, through the `tools` skill), and the next step you
+    recommend. Then wait for the person.
 
 If a missing tool blocks the unit at any step, stop there, say what is missing, and offer
 the `tools` skill.

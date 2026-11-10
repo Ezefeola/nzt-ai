@@ -11,6 +11,11 @@ the same thing always has the same name, in the conversation and in every docume
   a word the person uses in a particular sense, a name for a part of the work, two words
   that could be confused.
 - **One term per concept.** Never two words for the same thing, never one word for two.
+- **Every term has its English name,** the single one used wherever the work is written in
+  English (code, file and folder names, data), so nobody translates it twice in two ways.
+  When the person writes in English the column is left out.
+- **The word for the work's parts is a term too:** what the person calls them (module,
+  chapter, stage), so the conversation uses it while the folder stays `Parts/`.
 - **Update it when a term appears or changes.** A changed term is replaced and the change
   is recorded in *Decisions* of `Plan/state.md`, if there is one.
 - **Do not invent jargon.** A term goes in because the work uses it, not to look precise.

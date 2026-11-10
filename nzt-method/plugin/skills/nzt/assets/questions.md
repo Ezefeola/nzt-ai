@@ -1,4 +1,5 @@
 # Questions — <work or part>
+Mode: <together | I propose | you dictate> · <date>   (how log only, from `approach`)
 
 ## Open
 ### Q-NN · <question>

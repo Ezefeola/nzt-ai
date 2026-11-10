@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: part-capabilities
+expected_outcome: |
+  Asked to write the tasks part with everything said, it writes the part's definition in its own folder with rules that are always true kept apart from what can be done, what the part handles with its limits (a maximum text length the person did not give is asked or left open, never written as agreed or marked proposed), and an index of capabilities; one file per capability (add, edit, delete, mark done) with numbered acceptance criteria in when/then form with real values and at least one bad case each; and the glossary with each term's English name. No technology is named.
+context:
+  scaffold_script: place-files.sh

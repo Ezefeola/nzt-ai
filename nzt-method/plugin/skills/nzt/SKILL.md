@@ -5,12 +5,28 @@ description: The nzt working method's base skill - how to talk to the person and
 
 # nzt
 
-The method's base skill and entry point, loaded first in every session. It stays in context
-for the whole session, and its rules for talking to the person apply to every other `nzt`
-skill. If the conversation was compacted and these rules are no longer in front of you,
-load `nzt` again. It only talks, reads the state, sizes and routes: understanding the
-request is the `define` skill's, deciding how it is made is `approach`'s, planning is
-`plan`'s and doing is `do`'s.
+The method's entry point, loaded first in every session. It stays in context for the whole
+session, and its rules apply to every other `nzt` skill; if the conversation was compacted
+and they are no longer in front of you, load `nzt` again. It only talks, reads the state,
+sizes and routes: the work itself belongs to the skill it hands off to.
+
+## Rules
+
+These hold in this skill and in every other `nzt` skill, for the whole session.
+
+1. **Never assume.** The work is the person's: what it must do and how it is made are
+   agreed with them, so a doubt is a question, never a guess. Ask it with
+   `references/questions.md`, with options and the one you recommend first, so agreeing
+   costs one answer. Only a fact that can be checked (a version, a price, an opening time)
+   is not asked: research it with its source and say what you found. The person not
+   knowing a subject, or not planning to touch the result, is a reason to ask in plainer
+   words, not to decide for them. The agent decides alone only the details the person
+   explicitly left to it (`approach` asks that), and says each one.
+2. **Say what the person needs to know, when it happens:** anything that changes what they
+   will see, do, wait for or pay (a tool that works only after a restart, a check you
+   promised and could not do, a failure you cannot explain, something done differently
+   from what was agreed). Not at the end of the turn as a loose line, and never left for
+   them to discover.
 
 ## Steps
 
@@ -35,17 +51,21 @@ request is the `define` skill's, deciding how it is made is `approach`'s, planni
    and is not in use. Without one, you go with what you know about the subject: say so in
    step 10.
 8. **Settle what direct work needs**, only for the direct size:
-   - **The tools:** if one the work needs is missing, or one would clearly do it better,
-     load the `tools` skill first.
-   - **Base choices are the person's:** what the result is made with or on, when changing
-     it later would be costly (a program, a format, a supplier), is asked as a choice with
-     `references/questions.md`.
+   - a tool the work needs is missing, or one would clearly do it better → load the
+     `tools` skill first;
+   - what the result is made with or on, when changing it later would be costly (a
+     program, a format, a supplier) → ask it (rule 1) before `do` starts.
 9. **Place the work.** A planned or sliced work needs a folder: use the one it has, or
    propose where to create it. `references/folder.md` has what goes inside.
-10. **Tell the person** how the work will go, in one message: what will happen, who does
-    what, and anything to approve (a folder, a package, a tool, a base choice). If
-    something needs their yes, stop here and wait.
-11. **Hand off** to the skill that owns the request:
+10. **Tell the person** how the work will go: what will happen, who does what, and what
+    you go with (a package, or what you know). Write it as text, in one message, before
+    you load the skill that takes over and before any question, even when the only thing
+    to approve is the folder. A question tool does not replace this message: the person
+    reads it first, then answers.
+11. **Ask the approvals with the first questions:** a folder or a package to approve goes
+    in the same round as the first questions of the skill that takes over, so the person
+    answers once. Stop and wait only when nothing can go on without the yes.
+12. **Hand off** to the skill that owns the request:
 
     | The request | Load |
     |---|---|
@@ -60,7 +80,7 @@ request is the `define` skill's, deciding how it is made is `approach`'s, planni
 
 ## Done when
 
-The person knows, in their own words, how the work will go and who does what, and the work
+The person read, before any question, how the work will go and who does what, and the work
 was handed to the skill that owns it (or waits on a yes they were asked for); or a question
 that is not work was answered.
 

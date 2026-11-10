@@ -20,6 +20,9 @@ Status: <draft | approved> · <date>
 ## Limits
 <Deadline, budget, rules, what already exists.>
 
+## How well
+- <expected level for the whole work, with its number and condition> (Q-NN)
+
 ## Done when
 <What must be true when the whole work is over.>
 

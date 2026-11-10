@@ -19,8 +19,8 @@ directly would lose what was agreed with no cheap way back. One request is one
 
    | Type | Means | In the definition |
    |---|---|---|
-   | add | something new it must do | a new rule or objective |
-   | modify | something it does changes | the rule is **replaced**, never kept alongside |
+   | add | something new it must do | a new rule, capability, criterion or objective |
+   | modify | something it does changes | the rule or criterion is **replaced**, never kept alongside |
    | remove | something stops applying | the rule goes, and a check that it no longer happens is added |
 
 3. **Write the proposal,** with nothing undefined filled in: an open point is a question in

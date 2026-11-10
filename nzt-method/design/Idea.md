@@ -398,14 +398,43 @@ Si se limpia el contexto, una sesión nueva retoma así:
   pasos partidos; regresión 31/34 por un caso viejo, ya actualizado), casos de `plan` al
   día (5/5 y 6/6) y cambios que tocan varias definiciones en un solo `change.md` (7/7).
   Detalle en `Trabajo-por-etapas.md`.
-### Punto de retomada (2026-11-09)
+- **2026-11-09, cuarta prueba real revisada (pendiente 0):** pregunta los siete temas y
+  propone herramientas bien. Aceptadas cinco correcciones (mensaje de `nzt` antes de
+  preguntar, re-preguntar respuestas ambiguas, "no aplica" junto a una ronda,
+  `agent-tools.md` al día desde `do`, versiones y volver atrás). En charla G1–G5 del
+  usuario (glosario en dos idiomas, la forma del todo, límites en la definición, partes y
+  capacidades, criterios de aceptación). Detalle en `Trabajo-por-etapas.md` → *Cuarta
+  prueba real*. Sin escribir skills todavía. Sin commit.
+- **2026-11-10:** aplicado todo lo de la cuarta prueba (cinco correcciones, G1–G5, carpeta
+  `Parts` con capacidades y criterios `AC-NN`, una carpeta por pieza del resultado,
+  versiones en Calidad). Probado: nueva 91% contra 63% en la iteración 1; tras los ajustes,
+  los dos casos que fallaban dan 6/6. Detalle en `Trabajo-por-etapas.md` → *Aplicado* y
+  *Prueba (2026-11-10)*. Sin commit.
+- **2026-11-10, quinta prueba real revisada (pendiente 0):** confirmados los tres puntos del
+  usuario (preguntas por texto, arquitectura y convenciones decididas solo, MCP sin usar) y
+  otra vez sin mensaje antes de preguntar. Decidido: **jamás asumir** como regla de `nzt`,
+  decir todo cuando pasa, `define` sin modo, **modo de decidir en `approach`** (Juntos,
+  Propongo yo, Vos me decís). Detalle en `Trabajo-por-etapas.md` → *Quinta prueba real*.
+  Aplicado y probado: iteración 1 nueva 94% contra 78%; tras ajustes (casos malos con
+  pregunta abierta, carpeta de cada pieza, resumen de `define` en tres grupos: dicho,
+  deducido, abierto) los casos que fallaban dan 7/7, 6/6 y 8/8. Sin commit.
+- **2026-11-10, sexta prueba revisada y auditoría:** la sesión salió muy bien (retomó del
+  estado, usó el MCP, probó cada `AC-NN`, no dio por hecho lo no medido). Corregido: "Lo que
+  decidí yo" solo con *Propongo yo* (decidió dos detalles en modo Juntos) y el idioma en las
+  líneas entre acciones. Auditoría con `gestionar-skills`: un solo tamaño de ronda (hasta
+  cuatro), una sola regla de qué se hace, decide o pregunta (`questions.md` regla 2), seis
+  repeticiones fuera y cuatro pasos partidos. Probado: 81/82 en doce casos; tras el ajuste
+  de `do` paso 2 (lo que el pedido ya responde va al criterio de hecho, no se pregunta),
+  82/82. Sin decidir: datos de prueba en los datos de la persona. Detalle
+  en `Trabajo-por-etapas.md` → *Sexta prueba real*. Sin commit.
+### Punto de retomada (2026-11-10)
 
 **Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `define`, `approach`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
 
 | Skill | Qué hace | Prueba |
 |---|---|---|
 | `nzt` | **Skill base:** se carga primero en cada sesión y otra vez tras compactar; solo habla (`messages.md`), lee el estado, dimensiona, deduce quién hace, revisa paquetes, resuelve lo propio del trabajo directo, ubica la carpeta (`folder.md`) y rutea a la skill dueña | casos propios + `new-app-interview`; ver `Trabajo-por-etapas.md` |
-| `define` | Qué se quiere: entrevista en lenguaje natural por rondas, preguntas `Q-NN` guardadas, definición general y por parte, cambios con `change.md` | 2 casos + `new-app-interview` (`Trabajo-por-etapas.md`) |
+| `define` | Qué se quiere: entrevista en lenguaje natural por rondas, preguntas `Q-NN` guardadas, definición general (con *How well*), por parte (reglas, límites, índice de capacidades) y un archivo por capacidad con criterios `AC-NN`, cambios con `change.md` | 2 casos + `new-app-interview` (`Trabajo-por-etapas.md`) |
 | `approach` | Cómo se hace: decisiones según qué es el trabajo, preguntas `H-NN` aparte con opciones concretas, `how.md`, herramientas vía `tools` | 3 casos (app y cumple) |
 | `plan` | Corta en unidades, ordena por riesgo, marca recortables y tirones, espera el sí, anota en `Plan/state.md` | 3 casos, 16/16 con skill, 38% sin |
 | `do` | Hace una unidad o guía a la persona, verifica con evidencia, registra y para con reporte; si la persona aprende, pasa la unidad a `learn` | 3 casos (BUSCARV pasó a `learn`) |
@@ -422,7 +451,38 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo (2026-11-09):** el usuario prueba el plugin en la app, en
+0. **Lo próximo (2026-11-10, auditoría hecha, con commit y push):** el usuario prueba otra
+   vez en la app (`Escritorio/nzt-proyecto`). En una sesión limpia: revisar esa sesión (el
+   `.jsonl` más nuevo en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/`,
+   extraído con un script) contra lo de la sexta prueba, mirando sobre todo: "Lo que decidí
+   yo" solo con *Propongo yo* (en modo Juntos se pregunta), líneas entre acciones en su
+   idioma, rondas de hasta cuatro, lo que el pedido ya responde va al criterio sin
+   preguntar, y si vuelve a usar los datos reales de la persona para probar. **Sin
+   decidir:** datos de prueba en una copia (propuesta en `Trabajo-por-etapas.md` → *Sexta
+   prueba real*, para `verify.md`). Lo de abajo de este punto ya está hecho. Hecho el
+   2026-11-10: (a) revisar
+   esa sesión (el `.jsonl` más nuevo en
+   `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/`, extraído con un
+   script) y decir si se ve algo, contra la lista de la quinta prueba de abajo; (b)
+   auditar todas las skills y references con `gestionar-skills` y `skill-creator`: sin
+   redundancias, genéricas, en pasos simples, quizás más cortas, **sin perder ningún
+   comportamiento** (probar con los evals existentes, nueva contra la actual, antes de
+   dar por buena una reducción). Lo aplicado tras la quinta prueba sigue sin commit.
+   Antes de eso: que el usuario revise lo aplicado
+   (jamás asumir, decir todo cuando pasa, modo de decidir en `approach`, `define` sin modo
+   y con resumen en tres grupos, `tools` con reinicio; detalle en `Trabajo-por-etapas.md`
+   → *Quinta prueba real*), pida commit si le parece y pruebe otra vez en la app, mirando
+   sobre todo: mensaje antes de la primera pregunta, todas las preguntas por la herramienta,
+   el modo preguntado en el cómo, arquitectura y convenciones preguntadas, y el aviso de
+   reinicio de una herramienta. Lo anterior de este punto quedó hecho: que el usuario revise lo aplicado de la cuarta prueba, pida
+   commit si le parece y pruebe otra vez en la app (`Escritorio/nzt-proyecto`, conviene
+   vaciarla antes). Después: revisar esa sesión como las anteriores (el `.jsonl` más nuevo
+   en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/`, extraído con
+   un script) y corroborar lo que cuente el usuario, mirando sobre todo lo nuevo: mensaje
+   antes de preguntar, re-preguntar lo ambiguo, la forma y las carpetas, versiones,
+   límites y *How well*, capacidades con `AC-NN`, plan por capacidad y el glosario en dos
+   idiomas. Abierto: `approach` no pregunta el reparto del presupuesto en un evento; los
+   ejemplos con tecnologías reales se dejaron (decisión del 2026-11-10). Lo que sigue es el pendiente anterior, ya hecho: el usuario prueba el plugin en la app, en
    `Escritorio/nzt-proyecto`, con un proyecto nuevo, ya con `approach` de siete temas,
    herramientas siempre, plantillas en `assets/` y cambios de varias definiciones en un solo
    `change.md`. Después: revisar esa sesión como se hizo con la tercera (el `.jsonl` más

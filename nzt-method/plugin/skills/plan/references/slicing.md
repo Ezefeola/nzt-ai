@@ -7,12 +7,15 @@ chapter per unit, a feature per unit), these rules still hold around it.
 
 - **It belongs to one part** of the definition, when the work has parts: a unit never
   mixes two.
-
+- **It delivers whole capabilities:** one per unit, or a few small ones of the same part;
+  never a layer or a step of one (not "the database", "the screens"). Its done criterion
+  cites their acceptance criteria (`01-tasks/02-edit AC-01–03`) instead of copying them.
 - **It leaves something that can be checked on its own:** a draft, a list, a decision, a
   booked date, a working change. Never "progress on X".
 - **It fits one stop:** done, verified and reported in one sitting. If it needs two
   sittings, it is two units.
-- **Its done criterion fits in one or two lines** and follows from the work's criterion.
+- **Its done criterion fits in one or two lines** and follows from the work's criterion,
+  or from the criteria of its capabilities.
 - **One who-does-it:** the agent, the person, or both. If the agent prepares and the person
   acts (book the movers, give the class), it is "both", and the unit says who does what.
 - **Named in the person's words**, the ones in the glossary if there is one.

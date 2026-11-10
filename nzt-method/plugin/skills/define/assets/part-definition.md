@@ -1,13 +1,24 @@
 # <NN · Part name>
 Status: <draft | approved> · <date>
 
-## What it does
-<One or two sentences, for whom and why.>
+## What it covers
+<One or two sentences: what this part lets someone do or achieve, for whom and why.>
 
 ## Rules
-### <rule-name> · <the rule in one line>
-- Known by: <a concrete case that shows it holds, with real values>.
-- Bad case: <what happens when it goes wrong, and the expected answer>.
+### <rule-name> · <what is always true, in one line>
+- origin: <Q-NN>
+
+## What it handles
+| Thing | What it has | Limits and values | Origin |
+|---|---|---|---|
+
+## How well
+- <expected level, with its number and condition> (Q-NN)
+
+## Capabilities
+| Capability | What it gives | Status |
+|---|---|---|
+| <NN · name> | <one line> | <to define | draft | approved> |
 
 ## Out of this part
 <What someone might expect here and is not.>

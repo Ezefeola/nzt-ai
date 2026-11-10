@@ -8,8 +8,10 @@ empty sections are not written.
 
 ## Rules
 
-1. **Only choices the person made, or evidence already settled.** A recommendation not yet
-   answered is an open question, never a row.
+1. **Only choices the person made, evidence already settled, or details they left to the
+   agent** (mode **I propose**), those cited as "decided by the agent, told on <date>". A
+   recommendation not yet answered, or an answer you had to guess, is an open `H-NN`
+   under *Open*, never a row marked "assumed" or "decided by me".
 2. **One line per decision.** The options, the discussion and the long reasons live in the
    how log (`H-NN`); `how.md` is read in a minute.
 3. **Real names and versions** where they matter ("PostgreSQL 17", ".NET 10", "Mudanzas
@@ -36,8 +38,10 @@ Updated: 2026-11-09
 | Base | Where it runs | A web page served from this laptop | Only I use it, on the laptop (H-01) | Not reachable from the phone |
 | Base | Made with | Python 3.13 with FastAPI | I know Python (H-02) | `uvicorn` starts it |
 | Base | Where tasks are kept | PostgreSQL 17, local | I want a real database (H-03) | Must be running; a dump is the backup |
+| Structure | Shape | One piece: the web app, in `TaskList/` | Only I use it, nothing else talks to it (H-08) | A phone app later means splitting out an API |
 | Structure | How the code is split | One folder per feature | Easy to remove a feature (H-04) | Some code repeats between features |
 | Quality | Automated tests | Unit tests for the rules, one end-to-end test of the list | I want to change it without fear (H-05) | Each rule ships with its test |
+| Quality | Versions | git, one commit per finished unit | To go back if something breaks (H-09) | Nothing is pushed anywhere unless asked |
 | Delivery | How I use it | Started by hand on the laptop | No server to pay (H-06) | Off when the laptop is off |
 
 ## Conventions

@@ -5,7 +5,8 @@ It is never an opinion ("looks good", "should work").
 
 ## How to check
 
-Pick, for each line of the criterion, the check that actually shows it:
+When the criterion cites acceptance criteria (`AC-NN`), each one is a line: try it with its
+own values and report it by its id. Pick, for each line, the check that actually shows it:
 
 | The result is | Check it by |
 |---|---|
@@ -26,7 +27,9 @@ If a line cannot be checked here, it is not checked: say so and say what would c
 | **not achieved** | the main line fails, or nothing could be checked |
 
 Never round up: a single unchecked line makes it *partial*. Record what failed and what was
-not checked as visibly as what passed.
+not checked as visibly as what passed. A failure seen while checking that you cannot
+explain or reproduce also keeps it from *done*: it is *partial* until it is explained or
+the person, told about it, decides it can wait.
 
 ## When it fails
 

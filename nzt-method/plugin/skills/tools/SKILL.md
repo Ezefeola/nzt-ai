@@ -31,21 +31,25 @@ goes back to where it was.
    machine, what it can reach (files, accounts, network, keys), what it costs, and what
    the person does by hand.
 5. **Propose in one message,** for someone who knows none of it: the candidates and the
-   option of none, each with what it means for the work. Nothing found: say so, and the
-   work goes on without it.
+   option of none, each with what it means for the work, and whether it works at once or
+   only after a restart or a new session. Promise only the check you can do now. Nothing
+   found: say so, and the work goes on without it.
 6. **Install on a second yes, at the smallest scope that works:** this work's folder before
    the person's whole setup. Install the way the host does it, read in its official
    documentation. If the host cannot install at that scope, say so and ask before going
    wider. Guide every step the person does by hand; a key or password is never pasted into
    the conversation: say where it goes.
-7. **Check that it answers** with one small real use before relying on it. If it only
-   answers after a restart or a new session, say so; until it answers, the work goes on
-   without it.
-8. **Record it** in `Docs/How/agent-tools.md` with `references/agent-tools.md`: what was
+7. **Check that it answers** with one small real use before relying on it.
+8. **If it only answers after a restart** or a new session, say so at once and ask how to
+   go on: continue in a new session, where the work resumes from its files with the tool
+   working (recommended when the tool matters for what comes next), or go on now without
+   it, reading what it would give by another means you have (the maker's documentation on
+   the web, say). Write the choice in the state file's next step.
+9. **Record it** in `Docs/How/agent-tools.md` with `references/agent-tools.md`: what was
    installed, and what was offered and declined, with the reason. If the work has no
    folder yet, propose where to create it.
-9. **Go back to the work:** the step or unit that needed the tool continues, now with it
-   or without it.
+10. **Go back to the work:** the step or unit that needed the tool continues, now with it
+    or without it.
 
 ## Done when
 

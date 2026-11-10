@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: ambiguous-delivery
+expected_outcome: |
+  With most of the how answered but "localhost" as the answer to how the app is opened, it does not guess: it asks that question again in plainer words; it also asks what was never settled (the app's shape, Blazor's mode hidden inside "Blazor", how versions are kept) instead of taking defaults, and how.md, if written, has no row marked assumed or to confirm.
+context:
+  scaffold_script: place-files.sh

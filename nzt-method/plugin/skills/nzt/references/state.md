@@ -13,8 +13,8 @@ work.
 
 Before asking the person anything:
 
-- the person asks to add, change or remove something the work must do → `define`, as a
-  change; what it is made with → `approach`; only the units or their order → `plan`;
+- the person asks to change what was agreed (what it must do, what it is made with, the
+  units) → route it with `nzt`'s hand-off table;
 - the person asks for something unrelated to this work → a new work, in its own folder;
 - a topic the person is learning (its units are objectives, with a *Next review*
   column) → continue it with the `learn` skill, which offers the overdue reviews first;

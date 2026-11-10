@@ -28,4 +28,9 @@ Creado el 2026-11-08. Lo marcado *propuesta* no está decidido; lo demás sí.
 | default | default | Lo que el núcleo usa cuando ningún paquete aporta algo |
 | tiempo fijo | fixed time | Opción de mantener el plazo y recortar alcance |
 | recortable | cuttable | Lo que se puede sacar del alcance si no alcanza el tiempo. *Propuesta* |
+| parte | part | Lo que se entiende, se acepta y crece por su cuenta (un módulo, una etapa, una sección); carpeta `Docs/Parts/<NN-nombre>/`. Decidido el 2026-11-09 |
+| capacidad | capability | Una cosa que se puede hacer o lograr en una parte (agregar una tarea, reservar el flete), con su archivo `<NN-nombre>.md` y sus criterios de aceptación |
+| regla | rule | Lo que es siempre verdad en una parte, cualquiera sea la capacidad; con un nombre corto que no cambia |
+| criterio de aceptación | acceptance criterion | Un caso que se puede probar, `AC-NN`: cuando…, entonces…, con datos reales; al menos uno del caso malo por capacidad |
+| forma | shape | En cuántas piezas que se entregan o cambian por separado se divide el resultado, y la carpeta de cada una; primera pregunta del tema Estructura |
 | retro | retro | Revisión del trabajo, solo cuando la persona la pide |

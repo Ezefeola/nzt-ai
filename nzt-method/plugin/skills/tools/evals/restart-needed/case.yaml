@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: restart-needed
+expected_outcome: |
+  With the yes already given, it installs the documentation tool only in the work's folder and tries it with one real use. The tool does not answer in the current session (a server added to a project is loaded only by a new session), so it says so right away, does not claim it works or was checked, and asks how to go on: continue in a new session (recommended) or go on now without it, reading the official documentation another way; the choice goes in the state file's next step, and agent-tools.md shows it as not checked.
+context:
+  scaffold_script: place-files.sh

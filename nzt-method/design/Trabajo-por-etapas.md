@@ -374,3 +374,513 @@ Total **31/34**; las tres fallas son del caso viejo, no de la auditoría.
   Caso `remove-reminders` ajustado (criterios 01 y 07) y corrido con la versión nueva: **7/7** (un solo `Docs/General/change.md` con dos puntos, cada uno con su `in:`, comprobación de ausencia en el *Done when* de la general, nada más tocado, pide aprobación).
 - Dos corridas vieron los criterios del caso al leer `eval_metadata.json` para sacar la
   consigna: en la próxima, pasar la consigna en el prompt y no el archivo.
+
+## Cuarta prueba real (2026-11-09)
+
+Sesión en la app (`nzt-proyecto`, "Hola quiero construir una aplicacion de tareas"), con
+`approach` de siete temas. Claude leyó el registro entero con un script (registro
+`7116cee0…`) y la carpeta que quedó.
+
+### Lo que se vio
+
+- **Recorrido completo:** `nzt` → `define` (3 rondas, sin tecnologías, `Q-01`–`Q-10`,
+  definición general, parte `01-la-lista`, glosario) → `approach` (3 rondas, miró lo
+  instalado) → `tools` → `plan` (4 unidades, 1–3 en batch) → `do` (probó cada regla en el
+  navegador, incluido el error al guardar).
+- **Los siete temas, preguntados:** base (plataforma, guardado, pantallas), estructura
+  (carpeta por función), calidad (la persona eligió sin pruebas automáticas; quedó como
+  *Objection*), convenciones (idioma del código), dependencias (EF Core), entrega
+  ("localhost") y herramientas. El código ya no quedó todo en `Program.cs`.
+- **Herramientas, bien:** opciones concretas y ninguna, investigó en fuentes oficiales,
+  segundo sí antes de instalar, re-preguntó cuando la persona no entendió "revisor de
+  código", MCP de Microsoft Learn solo en la carpeta, analizador de .NET encendido,
+  Roslynator anotado como rechazado.
+- **Huecos:** (1) `nzt` no dijo cómo iba el trabajo ni que iba sin paquete (pasos 7 y 10;
+  repetido de la tercera prueba); (2) ante "localhost" no re-preguntó la entrega y escribió
+  en `how.md` una fila "Asumido… falta confirmarlo", contra la regla 1 de `how-file.md`;
+  (3) `approach` paso 8 salteado: el "no aplica" quedó en `how.md` pero no se dijo; (4)
+  `agent-tools.md` quedó con "no comprobado" aunque después compiló sin avisos y usó el
+  navegador; (5) no hay control de versiones: ningún tema lo cubre.
+- **Visto además por Claude:** la interactividad en el servidor de Blazor quedó en `how.md`
+  sin preguntarse (venía escondida en "Blazor" y en la plantilla `dotnet new`); `define` no
+  preguntó plazo ni límites (dos de las preguntas de arranque).
+
+### Decidido con el usuario
+
+Aceptadas las cinco propuestas de Claude:
+1. `nzt` siempre manda el mensaje del paso 10 antes de cualquier pregunta, aunque lo único a
+   aprobar sea la carpeta; caso nuevo que lo exige.
+2. Una respuesta ambigua o que no elige ninguna opción se vuelve a preguntar antes de seguir
+   (`nzt/references/questions.md`); `how-file.md` deja explícito que un supuesto va a `H-NN`
+   como abierto, nunca como fila.
+3. Decir lo que no aplica va en el mismo mensaje que una ronda de preguntas, no como paso
+   suelto.
+4. `do` actualiza *Checked* de `agent-tools.md` cuando usa una herramienta.
+5. Sumar "cómo se guardan las versiones y cómo se vuelve atrás", genérico (git, historial
+   del documento, copias). **En charla:** en qué tema va.
+
+### En charla: lo que sintió el usuario (2026-11-09)
+
+- **G1 · Glosario en dos idiomas:** cada término con su nombre en el idioma de la persona y
+  en inglés, para que el agente tenga la traducción cuando trabaja en inglés (código,
+  archivos). Referencia: `nzt-software` ya pone el nombre en el trabajo (`Cupón · Coupon`).
+- **G2 · La forma del todo no se pregunta:** hizo todo en un Blazor Server con EF Core sin
+  preguntar si una sola pieza o una API y un front por separado. Se quiere genérico: no
+  hacer de una sin preguntar. Referencia: `nzt-software` `design-product.md` → *Shape*.
+- **G3 · La definición es una spec chica:** `define` no pregunta límites (cantidad máxima de
+  caracteres y similares, que `nzt-software` sí pregunta), sin atarlo a software.
+- **G4 · Las partes quedan cortas:** `01-la-lista` junta agregar, editar, borrar…; ¿está
+  bien o van en más archivos?, ¿y cómo se planifican en unidades?
+- **G5 · Criterios de aceptación** genéricos, por cada cosa (agregar, editar…), además de
+  las *Rules*. Referencia: `nzt-software` separa reglas (`RN-`, siempre verdaderas, en la
+  spec) de criterios (`CA-NN`, con datos concretos, en cada historia).
+
+**Propuesta de Claude (sin decidir):**
+- **G1:** el glosario suma la columna *In English* (o el nombre en el idioma del trabajo, si
+  no es inglés): el único nombre que se usa en el código, archivos y datos. Se llena siempre.
+- **G2:** el tema *Estructura* empieza por **la forma**: en cuántas piezas que se entregan o
+  evolucionan por separado se divide el todo y cómo se hablan (una app o API + front; una
+  fiesta o ceremonia y fiesta en dos lugares; un curso o tres cursos cortos). Siempre una
+  pregunta cuando la base admite más de una. Y una regla general: **una elección escondida
+  en otra** (Blazor trae servidor o navegador; una plantilla trae sus valores) se pregunta
+  aparte o la opción la nombra; el agente no la toma de un default.
+- **G3:** `define` pregunta, por cada cosa que el trabajo maneja, **sus límites y valores**:
+  qué es obligatorio, cuánto como máximo o mínimo, qué valores valen, qué pasa si se repite.
+  Va en la parte, en una sección *What it handles*. La general suma **How well** (lo que se
+  espera con número y condición: cuántas tareas sin que tarde, cuántos invitados sin
+  esperar) y siempre pregunta plazo y límites (dos preguntas de arranque que se saltó).
+- **G4:** una parte es lo que se entiende, se acepta y crece por su cuenta (un módulo);
+  `01-la-lista` como única parte está bien para una app chica. Dentro de la parte, lo que se
+  puede hacer va como **capacidades** (agregar, editar…), no en archivos aparte. `plan`
+  corta las unidades por capacidad (una o varias por unidad, nunca por capa) y el *Done
+  when* de la unidad cita sus criterios.
+- **G5:** cada capacidad tiene **criterios de aceptación** `AC-NN` (cuando…, entonces…, con
+  datos reales, al menos uno del caso malo) y cita las reglas que cumple. Las *Rules* quedan
+  solo para lo que es siempre verdad (una tarea vencida y sin hacer se destaca). Así *Known
+  by* desaparece: lo reemplazan los criterios.
+
+### En charla: carpeta por módulo y un archivo por capacidad (2026-11-09)
+
+Pedido del usuario: agrupar por carpeta, tipo módulo (`Tasks/` y adentro crear, editar…),
+cada cosa con su definición, con un registro de preguntas como el `analysis.md` por
+feature de `nzt-software`, y revisar si `Parts` es el mejor nombre.
+
+**Cómo lo hace `nzt-software`** (`discovery`): `Docs/Product/product.md` con los módulos en
+una línea (sin carpetas) y su `analysis.md`; cada feature en `Plan/specs/F-NNN-<slug>/` con
+`analysis.md` (preguntas `Q-NN` de la feature), `spec.md` (alcance, reglas `RN-<slug>` con
+`origin:`, requisitos no funcionales con número y condición, índice de historias),
+`stories/US-NNN-<slug>.md` (una historia por archivo con criterios `CA-NN` concretos y al
+menos un caso malo) y `change.md` mientras hay un cambio. El plan corta **una unidad por
+historia**; una historia se escribe cuando le toca y hasta entonces es una línea del índice.
+
+**Propuesta de Claude (sin decidir):** dos niveles, igual que feature → historias:
+
+```
+Docs/
+  General/             definition.md, questions.md, glossary.md  (como hoy)
+  How/                 how.md, questions.md, agent-tools.md      (como hoy)
+  Parts/               (nombre en charla)
+    01-tasks/          un módulo: se entiende, se acepta y crece por su cuenta
+      definition.md    la spec del módulo: qué cubre, reglas siempre verdaderas,
+                       What it handles (límites y valores), How well, índice de capacidades
+      questions.md     las Q-NN de este módulo (como analysis.md)
+      change.md        solo mientras hay un cambio sin aprobar
+      how.md           solo si el módulo decide algo propio
+      01-create.md     una capacidad: para quién y para qué, criterios AC-NN, reglas que cita
+      02-edit.md
+      03-delete.md
+```
+
+- **Capacidad = historia:** un archivo por cosa que se puede hacer o lograr. Criterios
+  `AC-NN` numerados dentro de la capacidad, citados `01-tasks/02-edit AC-01`. Se escribe
+  cuando se acerca su unidad; hasta entonces es una línea del índice del módulo.
+- **Reglas en el módulo,** no en la capacidad: varias capacidades cumplen la misma regla
+  (atrasada vale para crear y editar); la capacidad la cita por su nombre.
+- **Preguntas por módulo,** no por capacidad: un solo registro por carpeta, como
+  `analysis.md` por feature.
+- **Sin tercer nivel:** un módulo que pasa de unas ocho capacidades se parte en dos.
+- **Plan:** una unidad por capacidad (las chicas en batch); un módulo sin definir empieza con
+  su definición. El *Done when* de la unidad cita los `AC-NN`. El avance sigue solo en
+  `Plan/state.md`: los criterios no llevan casillas.
+- **Ejemplo no técnico (una fiesta):** `01-invitados/` con `01-invitar.md`,
+  `02-confirmar.md` (AC-01: cuando Juan confirma con acompañante, la lista suma 2);
+  `02-comida/` con `01-elegir-menu.md`, `02-prueba-de-menu.md`.
+- **Nombre de la carpeta:** opciones `Parts` (el más genérico: libro, mudanza, curso),
+  `Modules` (natural en apps y cursos, raro en una mudanza) o `Areas`. Recomendación:
+  dejar `Parts` fijo y que el glosario diga cómo lo llama la persona en la conversación
+  ("módulo", "capítulo", "etapa").
+
+**Decidido (2026-11-09):** la carpeta se queda como `Parts`; el glosario dice cómo la llama
+la persona en la conversación.
+
+### En charla: cada pieza del resultado en su carpeta (2026-11-09)
+
+Pedido del usuario: el resultado no va suelto en la raíz; cada componente en su carpeta
+(la API en una, el front en otra). En la cuarta prueba el proyecto de Blazor quedó en la
+raíz, mezclado con `Docs/` y `Plan/`. Referencia: `nzt-software` `architecture.md` →
+*Components*, con la columna *Root* de cada componente.
+
+**Propuesta de Claude (sin decidir):**
+- **Regla en `nzt/references/folder.md`:** el resultado vive en carpetas propias, nunca
+  suelto en la raíz junto a `Docs/` y `Plan/`; aunque sea una sola pieza, va en su carpeta.
+- **Se decide con la forma (G2):** al preguntar en cuántas piezas se divide el todo, cada
+  pieza lleva su carpeta (`TaskList.Api/`, `TaskList.Web/`; en un libro `Manuscript/`; en
+  una fiesta `Invitaciones/`, `Proveedores/`). `how.md` anota la carpeta de cada pieza en la
+  fila de la forma (tema *Structure*).
+- **Trabajo existente:** la carpeta que ya tiene se respeta; mover algo se propone y se
+  pregunta, nunca se hace solo.
+
+### Aplicado (2026-11-09)
+
+El usuario aprobó todo ("Sí, aplicalo"), con las versiones en **Calidad**. Hecho con
+`gestionar-skills` y `skill-creator`, versión anterior copiada en el scratchpad
+(`ws/skill-snapshot`):
+
+- **`nzt`:** paso 10, el mensaje de cómo va el trabajo sale antes de la primera pregunta,
+  aunque solo haya que aprobar la carpeta. `references/questions.md`: regla 4 nueva (una
+  respuesta que no elige opción, se lee de dos formas o es otra pregunta se vuelve a
+  preguntar ya; nunca se anota un supuesto) y en *Options* "ninguna elección escondida en
+  otra" (un default nunca se toma en silencio). `references/folder.md`: parte con su
+  `definition.md`, `questions.md` y un archivo por capacidad; dos niveles (más de unas ocho
+  capacidades → dos partes); el resultado en carpetas propias, una por pieza de la forma,
+  nunca suelto en la raíz; `agent-tools.md` lo marca también `do`. Glosario: columna *In
+  English* (G1) y el nombre que la persona da a las partes es un término.
+- **`define`:** `assets/part-definition.md` (qué cubre, reglas siempre verdaderas, *What it
+  handles* con límites, *How well*, índice de capacidades), `assets/capability.md` nuevo
+  (criterios `AC-NN`), `assets/definition.md` con *How well*. `definition-file.md`
+  reescrita: la definición es la spec; reglas, criterios, límites con número, nivel con
+  número y condición; ejemplos de app y de mudanza. `interview.md`: pregunta de *How
+  well*, cada pregunta de arranque se hace, se lee o se dice que no aplica, preguntas de la
+  parte (capacidades, reglas, límites) y "límites por su número". `SKILL.md`: pasos 8
+  (definiciones y capacidades) y 9 (glosario con nombre en inglés), ahora 12 pasos.
+  `change-file.md`: un cambio puede agregar o cambiar capacidades y criterios.
+- **`approach`:** `decisions.md`: Estructura empieza por **la forma** (piezas y carpeta de
+  cada una); Calidad suma versiones y cómo volver atrás. `how-file.md`: lo adivinado es un
+  `H-NN` abierto, nunca una fila "asumido"; ejemplo con fila de forma y de versiones.
+  `SKILL.md`: el "no aplica" va en el mensaje de la primera ronda (paso 8 viejo
+  absorbido; 10 pasos). Se acepta que el paso 6 diga dos cosas porque son un solo mensaje.
+- **`plan`:** `slicing.md`: una unidad entrega capacidades enteras (una o pocas de la misma
+  parte), nunca una capa; su *Done when* cita los `AC-NN`.
+- **`do`:** paso 8 nuevo, marca *Checked* en `agent-tools.md` de lo que usó (10 pasos);
+  `verify.md`: cada `AC-NN` es una línea que se prueba con sus valores y se reporta por id.
+- **Casos:** nuevos `approach/ambiguous-delivery`, `define/part-capabilities`,
+  `plan/plan-by-capability`; criterios nuevos en `nzt/new-app-interview` (mensaje antes
+  de preguntar), `approach/app-structure` (forma, versiones) y `approach/party-how`
+  (forma). Glosario del método: parte, capacidad, regla, criterio de aceptación, forma.
+
+### Prueba (2026-11-10)
+
+Siete casos, versión nueva contra la anterior (`ws/skill-snapshot`), consigna pasada en el
+prompt de cada corrida. Iteración 1: **nueva 91%, anterior 63%**.
+
+| Caso | Nueva | Anterior | Qué se vio |
+|---|---|---|---|
+| `define/part-capabilities` | 7/7 | 2/7 | La nueva: reglas aparte, *What it handles* con 200 caracteres propuestos, un archivo por capacidad con `AC-NN` y casos malos, glosario con inglés. La anterior: todo en un `definition.md`, sin criterios ni límites |
+| `approach/ambiguous-delivery` | 6/6 | 3/6 | Las dos re-preguntan "localhost"; solo la nueva pregunta el modo de Blazor, las versiones y la carpeta |
+| `approach/app-structure` | 10/10 | 8/10 | La nueva pregunta la forma (piezas y carpetas) y anota git como pregunta |
+| `approach/party-how` | 7/8 | 6/8 | La nueva dice la forma ("una sola fiesta") y anuncia las copias de lo firmado; ninguna pregunta el reparto del presupuesto (abierto desde antes) |
+| `plan/plan-by-capability` | 4/4 | 3/4 | Las dos cortan por capacidad; solo la nueva cita los `AC-NN` |
+| `define/course-definition` | 5/6 | 3/6 | La nueva no anotó lo dicho como respuestas en el registro |
+| `nzt/new-app-interview` | 4/6 | 5/6 | La nueva se frenó a pedir el sí de la carpeta sin entrevistar, y no dijo que se elige el cómo |
+
+Ajustes (iteración 2 y 3, solo la nueva):
+- `nzt` paso 10: la carpeta o el paquete a aprobar van en la misma ronda que las primeras
+  preguntas de la skill siguiente; se para solo si nada puede seguir sin el sí.
+  `messages.md`: el tamaño planeado se dice "primero entiendo qué necesitás, después
+  elegimos con qué se hace y te armo un plan".
+- `define` paso 3: lo dicho se anota como preguntas respondidas, en sus palabras.
+- `interview.md` regla 3: cada ronda, también la primera, trae al menos un caso concreto.
+- Criterio 04 de `new-app-interview`: el glosario también es válido en `Docs/General/`.
+
+Resultado: `course-definition` **6/6**; `new-app-interview` 4/6 en la iteración 2 (sin caso
+concreto; escribió glosario) y **6/6** en la 3 (pregunta "pagar el alquiler vence el 1 y no
+lo tachaste, ¿qué pasa el 2?"). Queda abierto: el reparto del presupuesto en el cumple. Visor
+de la iteración 1 en el scratchpad (`ws/iteration-1/review.html`), fuera del repo.
+
+**Decidido (2026-11-10):** los ejemplos con tecnologías reales de `how-file.md` (Python con
+FastAPI y PostgreSQL), `decisions.md` y `nzt/references/questions.md` se dejan como están.
+El usuario preguntó si rompían lo genérico; Claude explicó que son ejemplos de la forma
+(uno técnico y uno no técnico, punto 8 de *Lo decidido*) con riesgo de sesgo, y propuso
+aclarar que no son recomendaciones. El usuario prefirió no tocar nada. Si en una prueba el
+agente vuelve a copiar el stack del ejemplo, se retoma.
+
+## Quinta prueba real (2026-11-10)
+
+Sesión en la app (`nzt-proyecto`, "Hola quiero crear una aplicacion de tareas"), con todo lo
+de la cuarta prueba aplicado. Claude leyó el registro entero con un script (registro
+`20a3be0b…`, 597 líneas) y la carpeta que quedó.
+
+### Lo que se vio
+
+- **Bien:** re-preguntó una respuesta ambigua ("si" a una pregunta doble) con opciones;
+  preguntó la forma (dos piezas: `TaskList.Api/` y `TaskList.Web/`, cada una en su carpeta),
+  el modo de Blazor, las versiones (git, commit al cerrar el paso 1), los límites (200
+  caracteres, orden, hechas aparte, fechas pasadas) y *How well* (1.000 tareas, medido: 0,6
+  s); capacidades `01-add` y `02-list` con `AC-NN` y casos malos, 03–05 "to define";
+  plan por capacidad; glosario con *In English*.
+- **Mensaje antes de preguntar:** falló otra vez (segunda prueba seguida). Cargó `define` y
+  lanzó la primera ronda sin texto antes; nunca dijo cómo iba el trabajo.
+- **Preguntas por texto (lo sintió el usuario):** la segunda ronda de `define` fueron 4
+  preguntas escritas, no por la herramienta. Causa: `messages.md` → *Asking* deja las
+  respuestas abiertas en el mensaje, y el agente las tomó como abiertas aunque daba ejemplos
+  y una opción propuesta. Además juntó dos decisiones en una (la 2 y la 4).
+- **Arquitectura y convenciones sin preguntar (lo sintió el usuario):** de *Estructura* solo
+  preguntó la forma; el orden interno (`Tasks/` por función) y "código en inglés (decidido
+  por mí, avisado)" los decidió solo y no lo dijo en ningún mensaje. Causa: la persona dijo
+  "No, solo usarla" sobre el código, y "nunca es solo del agente" estaba solo en *Calidad*.
+- **MCP de Microsoft Learn sin usar (lo sintió el usuario):** lo instaló bien (en la carpeta,
+  segundo sí) pero responde recién en una sesión nueva; lo dijo recién al final, y la opción
+  aceptada prometía una prueba que no se hizo. `tools` paso 7 decía "se sigue sin ella".
+- **Menores:** el *Done when* de las unidades no cita los `AC-NN` (el plan se escribió antes
+  que las capacidades); dio el paso 1 por hecho con una falla sin explicar (clics rápidos).
+
+### Decidido con el usuario (2026-11-10)
+
+- **Jamás asumir** (regla general, va solo en `nzt/SKILL.md`: es comportamiento del agente y
+  esa skill queda cargada toda la sesión). Una duda se pregunta, con opciones y la
+  recomendada primero, por la herramienta de preguntas. Lo único que no se pregunta es lo
+  comprobable (una versión, un precio, un horario): se investiga con su fuente y se dice.
+  Referencia: `nzt-software` ("Assuming is not an exit"); su `kernel.md` "state every other
+  assumption" **no** se copia.
+- **Decir todo lo que la persona necesita saber, cuando pasa:** lo que cambia lo que ve,
+  hace, espera o paga (una herramienta que pide reiniciar, una prueba prometida que no se
+  hizo, una falla sin explicar, algo hecho distinto de lo acordado).
+- **`messages.md`:** se saca "Lo que estoy suponiendo"; se suma "Lo que decidí yo", solo
+  con el modo *Propongo yo*. *Asking* sigue ahí (cómo se pregunta): toda decisión va por la
+  herramienta; si se pueden dar ejemplos, son opciones; en el mensaje solo lo que no tiene
+  opciones (un ejercicio, un archivo, un texto largo); una decisión por pregunta; rondas
+  del tamaño que acepte la herramienta.
+- **`nzt` paso 10:** el mensaje es texto escrito antes de cargar la skill siguiente; la
+  herramienta de preguntas no lo reemplaza.
+- **`define` sin modo:** todo se pregunta. Un valor que propone el agente es su propia
+  pregunta con la opción recomendada; en la definición nunca queda nada *(proposed)*: está
+  respondido o abierto.
+- **Modo de decidir en `approach`** (como `nzt-architecture`): después de recorrer los siete
+  temas dice cuántas preguntas hay y de qué clase y pregunta el modo: **Juntos**
+  (recomendado), **Propongo yo** (decide los detalles y los dice en "Lo que decidí yo") o
+  **Vos me decís**. Cubre solo detalles: base, forma, organización interna (arquitectura),
+  convenciones, calidad y versiones se preguntan siempre. Se anota en la primera línea de
+  `Docs/How/questions.md` con la fecha; se puede cambiar. "No voy a tocar el código" no es
+  delegar.
+- **`do`:** lo que no cambia nada para la persona (un nombre interno, un puerto) se hace; lo
+  que cambia lo que ve, usa o paga, o costaría cambiar, se pregunta (o se decide y se dice
+  con *Propongo yo*). Una falla sin explicar se dice y no deja dar la unidad por hecha en
+  silencio; cuando las capacidades se escriben, el *Done when* de la unidad cita sus `AC-NN`.
+- **`tools`:** si la herramienta responde recién tras reiniciar, se dice en la pregunta del
+  sí; después se pregunta si se sigue en una sesión nueva (recomendado) o ahora sin ella,
+  leyendo mientras tanto la documentación oficial por otro medio. Nunca se promete una
+  prueba que no se puede hacer.
+- **Casos:** criterios de `define/course-definition` (04) y `define/part-capabilities` (02)
+  pasan a exigir que se pregunte en vez de marcar *proposed*; casos nuevos para "solo
+  usarla" (igual pregunta arquitectura, convenciones y modo) y herramienta que pide reiniciar.
+
+El usuario pidió aplicarlo todo y probarlo con evals mientras no está.
+
+### Aplicado (2026-11-10)
+
+Hecho con `gestionar-skills` y `skill-creator`; versión anterior copiada en el scratchpad
+(`ws5/skill-snapshot`).
+
+- **`nzt/SKILL.md`:** sección *Rules* nueva (vale para todas las skills): 1 **jamás
+  asumir** (una duda es una pregunta con opciones y la recomendada; solo lo comprobable se
+  investiga y se dice; no saber del tema o no tocar el resultado no es delegar; solo decide
+  el agente los detalles que la persona le dejó en `approach`, y los dice) y 2 **decir lo
+  que la persona necesita saber, cuando pasa**. Paso 8 resumido (la base se pregunta por la
+  regla 1). Paso 10: el mensaje es texto antes de cargar la skill siguiente y antes de
+  cualquier pregunta; la herramienta no lo reemplaza.
+- **`messages.md`:** fuera "What I'm assuming"; nuevo "What I decided" (solo detalles
+  dejados al agente). *Asking*: toda pregunta con respuestas posibles va por la
+  herramienta, también lo que suena abierto ("¿cómo lo manejás hoy?": papel, nota,
+  otra app); si hay ejemplos, son opciones; ronda del tamaño que acepte la herramienta;
+  en el mensaje solo lo que no tiene opciones. "assuming:" sacado de *Words*; ejemplo de
+  la mudanza con los supuestos pasados a preguntas.
+- **`nzt/references/questions.md`:** regla 2, todo lo no comprobable se pregunta; la
+  única excepción es un detalle de cómo se hace con el modo *I propose*. Regla 3: un valor
+  propuesto se pregunta como opción recomendada, nunca se escribe como acordado.
+  `assets/questions.md`: línea `Mode:` (solo el registro del cómo).
+- **`define`:** sin modo, todo se pregunta (dicho en la intro). Paso 3: huecos en *Open*,
+  nunca rellenados. Paso 7: lo que el agente agregaría va como pregunta propia, no dentro
+  del resumen a aprobar. `definition-file.md`: sin *(proposed)* (regla 6 reescrita, regla 4
+  pregunta el número, ejemplos citan `Q-NN`); `assets/part-definition.md` origin solo
+  `Q-NN`.
+- **`approach`:** paso 6 nuevo, preguntar el modo (11 pasos). `decisions.md`: "Quality is
+  never the agent's alone" pasa a **ningún tema es solo del agente** (base, forma y orden
+  interno, calidad y versiones, convenciones, terceros, entrega; también con "solo la
+  quiero usar") y sección nueva *Deciding the details* (Together recomendado, I propose,
+  You dictate; primera línea del registro del cómo; vale para `do`). `how-file.md` regla 1:
+  admite filas de detalles dejados al agente, citadas "decided by the agent, told on…".
+- **`tools`:** paso 5, la propuesta dice si anda ya o tras reiniciar y promete solo la
+  prueba posible; paso 7, si responde recién tras reiniciar se dice ya y se pregunta
+  (sesión nueva recomendada, o seguir sin ella leyendo la documentación por otro medio),
+  anotado en el próximo paso del estado.
+- **`do`:** paso 2, lo que no cambia nada para la persona se hace; lo que cambia lo que ve,
+  usa o paga se pregunta (o se decide y se dice con *I propose*). Paso 3: el *Done when*
+  cita los `AC-NN` si las capacidades se escribieron después del plan. `verify.md`: una
+  falla sin explicar no deja dar *done*.
+- **Casos:** `define/course-definition` 04 (renombrado `04-asked-or-open`) y
+  `define/part-capabilities` 02 exigen preguntar en vez de *proposed*;
+  `nzt/new-app-interview` 07 (preguntas por la herramienta, una decisión cada una);
+  `approach/app-structure` 11 (modo); nuevos `approach/use-only-still-asks` (6 criterios) y
+  `tools/restart-needed` (5 criterios, instala de verdad con `claude mcp add` en la carpeta).
+
+### Prueba (2026-11-10, quinta)
+
+Ocho casos, nueva contra anterior (`ws5/iteration-1` en el scratchpad), consigna en el
+prompt de cada corrida. Iteración 1: **nueva 94%, anterior 78%** (con `app-structure`
+recalificado con una regla pareja: un tema cuenta como preguntado si va en esta ronda, o
+si está anotado con opciones en el registro y anunciado para la próxima).
+
+| Caso | Nueva | Anterior | Qué se vio |
+|---|---|---|---|
+| `nzt/new-app-interview` | 7/7 | 6/7 | La anterior dejó "¿cómo anotás hoy?" escrita en el texto (y doble); la nueva la pasó por la herramienta con opciones (papel, nota, otra app, de memoria) |
+| `define/course-definition` | 6/6 | 4/6 | La anterior escribió en la definición Android o iPhone, contenido de las clases, 9 de 10 y 12 alumnos como *proposed*; la nueva los dejó abiertos y los preguntó |
+| `define/part-capabilities` | 6/7 | 6/7 | La anterior escribió "200 caracteres (proposed)"; la nueva dejó sin caso malo a agregar y editar porque dependían de una pregunta abierta |
+| `approach/app-structure` | 11/11 | 5/11 | Solo la nueva pregunta el modo y anota con opciones la organización, pruebas, versiones, forma y librerías |
+| `approach/use-only-still-asks` | 5/6 | 5/6 | Las dos siguen preguntando con "solo la quiero usar"; la nueva pregunta el modo, pero sus opciones de organización del código no dicen qué significan para la persona |
+| `approach/ambiguous-delivery` | 5/6 | 5/6 | La anterior eligió sola la carpeta `TaskApp/` ("es un detalle mío"); la nueva no nombró carpeta |
+| `approach/party-how` | 8/8 | 6/8 | La nueva pregunta el modo y anota el reparto del presupuesto (H-05, abierto desde antes) y la forma; la anterior trae "Lo que estoy suponiendo" |
+| `tools/restart-needed` | 5/5 | 5/5 | No discrimina: en una corrida corta las dos avisan y preguntan cómo seguir. La falla real pasó en una sesión larga |
+
+Ajustes (iteración 2 y 3, solo la nueva):
+- `definition-file.md` regla 3: un caso malo cuya respuesta está abierta se escribe igual,
+  con su *then* citando el `Q-NN`. `decisions.md`: con la forma ya respondida, una pieza
+  sin carpeta igual la recibe, preguntada como detalle. Criterio 04 de
+  `ambiguous-delivery` aclara que el nombre de la carpeta puede quedar abierto.
+- Iteración 2: `part-capabilities` **7/7**, `ambiguous-delivery` **6/6**. Pero el
+  calificador encontró en `part-capabilities` cosas dadas por acordadas que la persona no
+  dijo ("si dejás el texto vacío no se guarda y te avisa", "se muestra el límite",
+  "texto obligatorio"). Ajuste: `define` paso 7, el resumen va en tres grupos (lo que
+  dijo, en sus palabras; lo que se deduce, a confirmar; lo abierto) y un comportamiento no
+  dicho nunca está en los dos primeros; `definition-file.md` regla 6, un criterio tiene solo
+  lo dicho o lo que se deduce, lo demás se pregunta. Criterio nuevo 08-nothing-invented.
+- Iteración 3: `part-capabilities` **8/8**. El resumen separa "Lo que dijiste" (sus
+  palabras), "Lo que deduje" (texto obligatorio, se guarda al cerrar, una hecha o sin
+  fecha nunca en rojo…, confirmado en la primera pregunta) y lo que falta; los criterios
+  citan la deducción o la pregunta abierta.
+- Iteración 4 (pedido del usuario, los dos detalles chicos): `define` paso 7, cada
+  deducción se acepta o rechaza por separado (con la herramienta, una pregunta de elección
+  múltiple con una opción por deducción), nunca un solo sí para todas; criterio nuevo
+  09-deductions-separable. `nzt/references/questions.md` → *Options*: las opciones se
+  escriben así ya en la línea `proposed` del registro, no solo al preguntar. Corrido:
+  `part-capabilities` pregunta las seis deducciones como opciones de elección múltiple;
+  `use-only-still-asks` anota la organización del código con lo que significa cada
+  opción para la persona ("para cambiar o sacar algo se toca un solo lugar").
+
+**Abierto:** `tools/restart-needed` no discrimina en corridas cortas (las dos versiones
+avisan y preguntan); la falla real pasó en una sesión larga, así que se corrobora en la
+próxima prueba en la app. El mensaje antes de preguntar también se corrobora ahí: en los
+casos siempre pasa, en la app falló dos veces. Visor de la iteración 1 en el scratchpad
+(`ws5/iteration-1/review.html`), fuera del repo. Sin commit.
+
+## Sexta prueba real (2026-11-10)
+
+Sesión en la app (`nzt-proyecto`, "Continuemos"), que retoma la quinta: Claude leyó el
+registro entero con un script (registro `cb9919b8…`, 974 líneas extraídas) y la carpeta. La
+parte anterior (definición y cómo) no tiene registro guardado: no se pudo revisar.
+
+### Lo que se vio
+
+- **Bien:** retomó desde `Plan/state.md` sin preguntar nada ya respondido; primero probó el
+  MCP de Microsoft Learn (ya andaba tras reiniciar) y lo anotó en *Checked*; lo usó para
+  resolver un error real (la cultura es-AR en Blazor); probó cada `AC-NN` por su id, en
+  pantalla y en la API; reconoció un error propio (escribió 198 caracteres en vez de 201) y
+  repitió; simuló la fecha solo en la página, sin tocar el reloj, y lo dijo; no dio el paso
+  por hecho sin medir la velocidad (`partial`, con el porqué); frenó cuando la persona dijo
+  "dejalo acá" y dejó el estado y el próximo paso al día; no hizo commit porque lo acordado
+  era al terminar el paso.
+- **"Lo que decidí yo" con el modo Juntos:** el registro del cómo dice `Mode: together`,
+  pero decidió solo que la fecha se pueda escribir (cambia lo que la persona ve) y cargar
+  todos los datos de idioma (hace más pesada la primera carga, que toca el "menos de 3 s"
+  acordado en H-21). Las dos se debían preguntar. Causa: la sección de `messages.md` decía
+  "lo que la persona dejó al agente" sin atarlo al modo, y el criterio de qué se hace, qué
+  se decide y qué se pregunta estaba repartido entre `do`, `questions.md` y `decisions.md`.
+- **Líneas sueltas en inglés** entre acciones ("The shell rejected…", "Now index.html…",
+  "The browser pane closed…"). `messages.md` pedía el idioma de la persona en todo, pero no
+  nombraba esas líneas.
+- **Datos de prueba en los datos de la persona:** cargó 1.000 tareas de prueba en la base
+  real para medir y lo dijo recién al final. Sin decidir (ver abajo).
+- **Menor:** al retomar, el mensaje fue de una línea ("Retomo: …"); alcanza, porque
+  `state.md` pide reportar en una línea lo que estaba en curso.
+
+### Auditoría con `gestionar-skills` y `skill-creator` (2026-11-10)
+
+Pedido del usuario: todas las skills y references, sin redundancias, genéricas, en pasos
+simples, quizás más cortas, **sin perder ningún comportamiento**. Versión anterior copiada
+en el scratchpad (`ws6/skill-snapshot`).
+
+Hallazgos y lo hecho (regla de `gestionar-skills` entre paréntesis):
+
+- **H1 (9, consistente) — tres tamaños de ronda:** `interview.md` "de tres a cinco",
+  `decisions.md` "a lo sumo cuatro", `messages.md` "lo que acepte la herramienta". Queda uno
+  solo, en `messages.md` → *Asking*: **hasta cuatro** (menos si la herramienta acepta menos),
+  la que más destraba primero, el resto en la ronda siguiente y dicho, nunca una por turno.
+  Se eligió cuatro porque era el de `approach` y lo exige `app-structure/08`. `define` paso
+  5 e `interview.md` regla 2 dicen solo "en rondas".
+- **H2 (2) — qué se hace, qué se decide y qué se pregunta**, repetido en `do` paso 2,
+  `questions.md` regla 2 y `decisions.md`: queda en `questions.md` regla 2 como lista (ya
+  está escrito → leerlo; comprobable → investigarlo; no cambia nada para la persona → se
+  hace; detalle con *I propose* → se decide y se dice; todo lo demás, incluido lo que
+  cambia lo que ve, usa o paga → se pregunta). `do` paso 2 la cita.
+- **H3 (2):** "una adivinanza no es respuesta" estaba en las reglas 3, 4 y 7 de
+  `questions.md`; queda en la 3.
+- **H4 (2):** `definition-file.md` regla 4 repetía la 6 (un número no dado se pregunta);
+  queda en la 6.
+- **H5 (2):** la intro de `define` repetía la regla 1 de `nzt`; queda solo lo propio (el
+  modo de `approach` no aplica acá).
+- **H6 (2):** `decisions.md` repetía "a quien no sabe se le pregunta más simple" (regla 1 de
+  `nzt`); fuera.
+- **H7 (2):** `state.md` repetía la tabla de ruteo de `nzt`; ahora la cita. **H8 (2):** la
+  intro de `nzt` también la repetía; acortada.
+- **H9 (3, pasos simples) — pasos con "y además", partidos:** `nzt` 10 (decir cómo va / pedir
+  las aprobaciones con las primeras preguntas → 10 y 11, el ruteo pasa a 12), `define` 7
+  (devolución en tres grupos / confirmar cada deducción → 7 y 8, el resto corre uno),
+  `approach` 7 (decir lo que no aplica / preguntar en rondas → 7 y 8), `tools` 7 (comprobar /
+  si pide reinicio → 7 y 8). `nzt` paso 8 en dos viñetas.
+- **H10 (formato):** sangría del paso 10 de `do`; una línea en blanco en medio de la lista
+  de `slicing.md`.
+- **Por la sexta prueba:** `messages.md` → *What I decided* existe solo con el modo **I
+  propose**; en otro modo no hay nada que poner, porque esos detalles se preguntaron.
+  *Words*: el idioma de la persona vale también para las líneas cortas entre acciones.
+- **Sin cambios:** `learn`, `retro`, `plan/SKILL.md`, `documents`, `folder`, `glossary`,
+  `packages`, `sizing` y las plantillas: sin hallazgos que valga tocar. Los ejemplos con
+  tecnologías reales siguen (decisión del 2026-11-10). Regla 5 (una referencia no manda a
+  leer otra): se cuidó en `messages.md`.
+- **Largo:** casi igual (9.150 → 9.092 palabras en los 12 archivos tocados). Lo que se ganó
+  es una sola fuente por regla y pasos de una acción; achicar más cortaba reglas que los
+  casos usan.
+
+### Prueba (2026-11-10, sexta)
+
+Doce casos de lo tocado, solo la versión nueva (`ws6/iteration-1` en el scratchpad),
+consigna en el prompt de cada corrida; la anterior se corrió solo donde la nueva falló.
+**Nueva: 81 de 82 criterios.**
+
+| Caso | Nueva | Qué se vio |
+|---|---|---|
+| `nzt/new-app-interview` | 7/7 | Mensaje antes de preguntar; cuatro preguntas por la herramienta, una decisión cada una |
+| `nzt/resume-from-state` | 7/7 | Faltan archivos que el estado nombra: lo dice y pregunta sin tocar el estado |
+| `nzt/direct-software-bug` | 5/6 | Pregunta qué hacer con el email en mayúsculas (04, deducible). La anterior hace la misma pregunta: no es regresión |
+| `define/part-capabilities` | 9/9 | Tres grupos; las cinco deducciones en una pregunta de elección múltiple; casos malos citan su `Q-NN` abierta |
+| `define/course-definition` | 6/6 | Comprobó que marzo de 2027 tiene 4 sábados y lo preguntó; nada *proposed* |
+| `define/remove-reminders` | 7/7 | Un `change.md` en `General/`, chequeo de ausencia en la definición general |
+| `approach/app-structure` | 11/11 | Modo, choque del recordatorio, ronda de cuatro, el resto anotado y anunciado |
+| `approach/use-only-still-asks` | 6/6 | (antes 5/6) organización del código con lo que significa para la persona |
+| `approach/party-how` | 8/8 | Forma dicha desde la definición, reparto del presupuesto preguntado |
+| `do/person-books-movers` | 6/6 | Borrador con huecos, evidencia escrita, unidad en curso |
+| `tools/restart-needed` | 5/5 | Instala en la carpeta, dice que no responde acá, pregunta cómo seguir |
+| `plan/plan-by-capability` | 4/4 | Una unidad por capacidad, cita `AC-NN` |
+
+**Ajuste (pedido del usuario, iteración 2):** el criterio que fallaba (`direct-software-bug`
+04) lo causaba "jamás asumir" llevado a lo que el pedido ya responde. `do` paso 2: lo que
+el pedido ya responde no está indefinido (una falla a arreglar se comporta como el caso
+que anda); va al criterio de hecho del paso 3, que la persona puede corregir, y no se
+pregunta. Va solo en `do`, para que `define` siga confirmando sus deducciones. Corrido
+(`ws6/iteration-2`): `direct-software-bug` **6/6** (escribe el criterio sin preguntar; solo
+pregunta dónde está el código), `person-books-movers` 6/6 y `fix-spelling-direct` 6/6. Total
+de la sexta: **82/82**. Visto sin criterio: `fix-spelling-direct` cierra con una oferta
+opcional por texto ("¿le echo un ojo a la puntuación?"); se deja.
+
+**Sin decidir (para el usuario):** datos de prueba en los datos reales de la persona (la
+sexta prueba cargó 1.000 tareas en su base). Propuesta: en `verify.md`, probar sobre una
+copia o datos aparte y, si no se puede, preguntar antes de tocar lo de la persona; lo que
+quede se dice en el momento (regla 2 de `nzt`). Sin commit.
