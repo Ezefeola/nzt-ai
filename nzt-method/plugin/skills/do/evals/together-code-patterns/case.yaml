@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: together-code-patterns
+expected_outcome: |
+  With the how log in mode together and a how.md that does not say how the code is organised inside, building the unit does not pick the code's patterns alone (how the code is split into modules, whether the file is reached through a store class or plain functions, how a rejected amount travels: an exception or a returned error, the command syntax the person types): they are asked with options, logged with ids, or routed back to the how before the code that depends on them is written. Nothing is reported as decided by the agent.
+context:
+  scaffold_script: place-files.sh

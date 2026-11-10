@@ -884,3 +884,150 @@ opcional por texto ("¿le echo un ojo a la puntuación?"); se deja.
 sexta prueba cargó 1.000 tareas en su base). Propuesta: en `verify.md`, probar sobre una
 copia o datos aparte y, si no se puede, preguntar antes de tocar lo de la persona; lo que
 quede se dice en el momento (regla 2 de `nzt`). Sin commit.
+
+## Séptima prueba real (2026-11-10)
+
+Sesión en la app (`nzt-proyecto`, "continua", registro `0c83bcb6…`, extraído con un script):
+construye la unidad 1 (agregar y ver la lista). La sesión anterior, con la definición y el
+cómo (`81c67753…`), **se borró**: solo quedan sus archivos (`Docs/How/how.md`,
+`Docs/How/questions.md`, `Plan/state.md`). Lo que pasó en las rondas (tamaño, mensaje antes de
+preguntar) no se puede revisar. Para la próxima: no borrar la sesión hasta revisarla.
+
+### Lo que contó el usuario
+
+- **Bien:** con *Clean architecture* elegida y .NET, preguntó si las capas iban en carpetas o
+  en proyectos separados (H-11, "Proyectos separados"). El usuario quiere saber si lo pregunta
+  siempre.
+- **Mal:** puso las carpetas de las piezas en la raíz; no separó la API y la pantalla en una
+  carpeta cada una.
+
+### Lo que se vio, contra el pendiente 0
+
+- **Bien:** retomó desde `Plan/state.md`; probó primero el MCP de documentación y anotó
+  *Checked*; buscó las versiones de los paquetes en vez de suponerlas; probó cada `AC-NN` por
+  su id, en pantalla y contra la API; dijo lo que no pudo comprobar (la mitad de AC-03); dejó
+  el veredicto en `partial` porque falta que la persona pruebe; se recuperó de un comando que
+  falló y de no tener Python; el mensaje final en español, con las secciones bien.
+- **"Lo que decidí yo" en modo Juntos, otra vez** (`Mode: together` en el registro del cómo):
+  decidió que la fecha se pueda escribir a mano (el mismo detalle que en la sexta), lo puso en
+  *Qué decidí* y en *Decisions* de `state.md` como "detalle de pantalla". Cambia lo que la
+  persona ve y usa: era una pregunta. La regla de la sexta (`messages.md` y `questions.md`
+  regla 2) no alcanzó: la decisión aparece **mientras construye**, en `do`, y ahí no se mira.
+- **Patrones decididos solos y sin decirlos:** el código tiene un repositorio
+  (`ITaskRepository`), un reloj inyectado (`IClock`), un solo servicio con todas las
+  operaciones (`TaskService`) y errores esperados como excepciones
+  (`TaskValidationException` → 400). Nada de eso está en `how.md` ni en `questions.md`, ni se
+  dijo. Son decisiones de cómo se organiza cada pieza por dentro (Structure), que en modo
+  Juntos se preguntan. `approach` preguntó la arquitectura y "cómo se llega a la base" (EF
+  Core), pero no los patrones: la fila de Structure de `decisions.md` dice "the patterns it
+  follows" sin decir cuáles hay que mirar. Y `do` paso 2 ("falta una elección de cómo →
+  `approach`") no se disparó, porque nada le pide revisar qué patrones va a introducir.
+- **Líneas entre acciones en inglés, otra vez:** unas doce ("The documentation server is
+  responding…", "Nothing got written…", "It builds with no errors…", "AC-04 of the list
+  holds…"), y también el resumen y la pregunta con botones del cierre ("The app's first unit is
+  built…", "Did you try the app — does it work?", "Works, keep going"). La regla está en
+  `messages.md` → *Words*; no alcanzó.
+- **Datos de prueba en la base real, otra vez:** quedaron cinco tareas de prueba en
+  `tasks.db` y marcó una como hecha tocando la base directo. Lo dijo en el informe final, pero
+  no ofreció limpiarlas. La base es nueva, así que el daño es chico, pero la persona va a
+  empezar a usarla con eso adentro. Sigue sin decidir (propuesta de la sexta).
+- **Carpetas en la raíz (punto del usuario):** H-16 se preguntó ("¿Dónde van las carpetas…?",
+  respuesta "En la raíz") y el porqué escrito es "Coincide con la configuración existente": la
+  configuración de arranque que el propio agente había creado. No se ven las opciones que dio
+  (sesión borrada). Con dos piezas decididas (H-04: TaskList.Api y TaskList.Web), lo esperable
+  era recomendar una carpeta por pieza, con sus proyectos adentro; la recomendación salió de
+  un archivo propio y no de la forma acordada.
+- **Carpetas o proyectos (pregunta del usuario): no está garantizado.** H-11 salió del saber
+  del agente sobre .NET; ninguna skill ni caso lo pide. `nzt-software` sí lo tiene
+  (`backend/architecture-clean.md`: "separated by the strongest boundary the technology
+  offers. `tech.md` records the mechanism").
+- **Rondas de hasta cuatro, mensaje antes de preguntar:** no se puede ver (sesión borrada).
+  `questions.md` tiene H-01 a H-17 con el modo primero, coherente con lo pedido.
+- **Lo que el pedido ya responde va al criterio:** no aplica (trabajo planeado).
+
+### Propuestas (sin decidir, para el usuario)
+
+- **S1 · Elecciones que aparecen al construir:** en `do`, antes de hacer algo que la persona
+  ve o usa y que no está en la definición ni en `how.md`, aplicar `questions.md` regla 2; en
+  modo Juntos es una pregunta, y se sigue con lo que no depende de ella (ya lo dice `do` paso
+  2, última viñeta). Caso nuevo: construir con modo Juntos y un detalle de pantalla abierto.
+- **S2 · Patrones dentro de cada pieza:** en `decisions.md`, la fila de Structure para "algo
+  que corre" nombra los ejes que se preguntan siempre: cómo se separan las capas o módulos y
+  **con qué fuerza** (lo hace cumplir la herramienta, como proyectos o paquetes separados, o es
+  una convención de carpetas), cómo se organizan las operaciones (un servicio o una clase por
+  operación), cómo viaja un error esperado (excepción o resultado), y si los datos se alcanzan
+  detrás de una interfaz (repositorio) o directo. Genérico, sin tecnología. Y en `do` paso 2:
+  un patrón que el código va a introducir y no está en `how.md` es "una elección de cómo que
+  falta" → `approach`. Criterio nuevo en `approach/app-structure`.
+- **S3 · Idioma:** subir "todo lo que la persona puede leer va en su idioma, también las
+  líneas entre acciones, los resúmenes y los botones que muestre el host" a las reglas de
+  `nzt` (siempre en contexto), no solo en `messages.md`.
+- **S4 · Carpetas de las piezas:** en `decisions.md` → *Settling each topic*, con la forma
+  decidida, cada pieza tiene su carpeta y adentro su división; la opción recomendada nunca se
+  justifica con un archivo que creó el agente.
+- **S5 · Datos de prueba:** decidir la propuesta de la sexta (probar en una copia o datos
+  aparte; si no se puede, preguntar antes; lo que quede se dice en el momento y se ofrece
+  limpiarlo).
+
+### Lo que va a `nzt-software`
+
+El usuario planteó dejar en `nzt-software` solo las reglas genéricas de código, sin las de
+.NET, C# y Blazor, conservando las preguntas de patrones (repositorio o directo, etc.). Es
+trabajo de `nzt-software`: análisis y plan guardados en `Plan/specs/reglas-genericas.md`, con
+su entrada en `Plan/specs/pendientes.md` (punto 4). Esta prueba sirve de evidencia: sin
+ninguna regla, el código salió con constructores primarios, `var`, excepciones para errores
+esperados y un servicio único, todo contra las reglas del usuario en `nzt-software`.
+
+### Decidido con el usuario (2026-11-10)
+
+- **Nunca decidir solo en modo Juntos ni en Vos me decís**, "sí o sí", como en
+  `nzt-software`. Se miró cómo lo logra `nzt-software`: es un **mundo cerrado**. No se
+  hace trabajo que la spec no pida (`build/SKILL.md`: "No work no spec asks for"); un
+  mecanismo que `tech.md` no registra es un hueco que se pregunta y se escribe
+  (`build/SKILL.md`); una dependencia no listada se confirma antes y se sigue con el resto
+  (`implement.md` paso 3); un valor que falta se pregunta, nunca se elige (`software/SKILL.md`
+  paso 1). Reemplaza a S1.
+- **S2, corregida por el usuario:** los ejes de S2 (proyectos o carpetas, servicio o clase por
+  operación, excepción o resultado, repositorio o directo) son de desarrollo, no del método
+  genérico (no sirven para un libro). La lista concreta va al paquete de software
+  (`nzt-software` → `choosing.md`, ver `Plan/specs/reglas-genericas.md`). En el método queda
+  solo lo genérico, que ya cubre el mundo cerrado: **un patrón o estructura que el resultado
+  repite es una elección**, y en Juntos se pregunta. `decisions.md` no se toca.
+- S3, S4 y S5 siguen sin decidir.
+
+### Aplicado (2026-11-10, mundo cerrado)
+
+La causa: `questions.md` regla 2 tenía la rama "no cambia nada para la persona → se hace", y
+el agente metía ahí lo que veía como chico o interno (la fecha escribible, "detalle de
+pantalla"; los patrones de código). Cambios, con `gestionar-skills` (versión anterior en el
+scratchpad, `ws7/skill-snapshot`):
+
+- **`nzt` regla 1:** solo se hace lo acordado; lo que el resultado tendría de más (un
+  comportamiento, un agregado, un patrón, una librería) es una elección, y "chico",
+  "interno" o "un detalle" nunca es razón para hacerlo solo.
+- **`questions.md` regla 2:** la rama de "se hace" queda solo para lo que lo acordado deja
+  **una sola manera** (un nombre por las convenciones acordadas, un puerto libre, un archivo
+  en la carpeta acordada de su tipo); **más de una manera razonable** es una elección: con
+  *I propose* se decide y se dice, en cualquier otro modo se pregunta, por chica o interna que
+  sea (lo que la persona ve, usa o paga, un patrón o estructura que se repite, una librería,
+  algo más allá de lo pedido).
+- **`do` paso 2:** lo que el resultado va a tener y los archivos de la unidad no dicen pasa
+  por la regla 2 **antes de hacerlo**.
+
+### Prueba (2026-11-10, séptima)
+
+Consigna en el prompt de cada corrida; nueva contra la anterior.
+
+| Caso | Nueva | Anterior | Qué se vio |
+|---|---|---|---|
+| `do/together-screen-details` (nuevo) | 6/6 | 6/6 | Las dos preguntan cómo se pone la fecha, el orden, los textos; la nueva arma la página con huecos `[pendiente]`, la anterior deja la página sin hacer |
+| `do/together-code-patterns` (nuevo) | 5/5 | 5/5 | Las dos preguntan la organización del código, la sintaxis de los comandos y los centavos antes de escribir |
+| `do/i-propose-screen-details` (nuevo, control) | 4/4 | 4/4 | Con *I propose* deciden los detalles y los dicen en *Qué decidí*; no pregunta de más |
+| `do/together-fix-mid-build` (nuevo, 2 corridas por versión) | **6/6 y 6/6** | **3/6 y 3/6** | Unidad a medio hacer, AC-03 falla. Las dos arreglan lo mínimo, pero "solo espacios" (que AC-03 no dice): la nueva lo **pregunta** las dos veces; la anterior **lo decide sola** (`trim()`) las dos veces y lo dice después ("lo tomé como vacío… si preferís otra cosa, decime") |
+| `nzt/direct-software-bug` (regresión) | 6/6 | — | Escribe el criterio sin preguntar; solo pregunta dónde está el código |
+| `do/fix-spelling-direct` (regresión) | 6/6 | — | Corrige cuatro palabras, sin preguntas |
+| `do/person-books-movers` (regresión) | 6/6 | — | Borrador con huecos, pide la confirmación escrita |
+
+Los tres primeros no separan las versiones: con la skill recién leída y nada a medio hacer,
+las dos preguntan. La falla real aparece **en medio de construir**, al arreglar algo, que es
+lo que reproduce `together-fix-mid-build`: ahí la nueva gana 12/12 contra 6/12. Sin commit.

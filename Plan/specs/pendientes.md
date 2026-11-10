@@ -79,6 +79,14 @@ assets. Quien tenía `nzt-ai` lo desinstala antes (notas de la v6.0.0).
 `ed9c260`): explica solo la instalación como plugin. Falta mergearla, junto con el PR de esta
 rama a `main`.
 
+## 4 · Reglas de código genéricas, sin references por tecnología
+
+**Sin decidir** (2026-11-10). El usuario quiere que `nzt-software:software` tenga solo las
+reglas genéricas de código, sin `dotnet/`, `csharp/` ni `blazor/`, sin perder cómo sale hoy el
+código y sin perder las preguntas de patrones (`choosing.md`). Análisis, evidencia de una
+prueba de `nzt-method` y plan con medición (todas las references, solo genéricas con las
+reglas subidas, solo genéricas como están) en `Plan/specs/reglas-genericas.md`.
+
 ## Otras notas guardadas
 
 - Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;

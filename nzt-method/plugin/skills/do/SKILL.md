@@ -25,8 +25,10 @@ The shared references named here (`references/state.md`, `references/questions.m
    - What the request already answers is not undefined: a fault to fix means it behaves
      like the case that works. It goes in the done criterion of step 3, which the person
      can correct; it is not asked.
-   - Anything else undefined → `nzt`'s `references/questions.md` rule 2 says whether it is
-     just done, decided and said (mode **I propose** only) or asked. Never an assumption.
+   - Anything else undefined, including whatever the result will have that these files do
+     not say → `nzt`'s
+     `references/questions.md` rule 2 says whether it is just done, decided and said (mode
+     **I propose** only) or asked, before it is made. Never an assumption.
    - A question does not hold back what can be done without it: do that part now, leave
      a visible blank for the missing data, and ask in the same message.
 3. **Fix its done criterion.** Use the one in the plan; for direct work, write it in one

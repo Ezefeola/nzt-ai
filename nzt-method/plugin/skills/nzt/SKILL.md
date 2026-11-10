@@ -20,8 +20,11 @@ These hold in this skill and in every other `nzt` skill, for the whole session.
    costs one answer. Only a fact that can be checked (a version, a price, an opening time)
    is not asked: research it with its source and say what you found. The person not
    knowing a subject, or not planning to touch the result, is a reason to ask in plainer
-   words, not to decide for them. The agent decides alone only the details the person
-   explicitly left to it (`approach` asks that), and says each one.
+   words, not to decide for them. Only what was agreed is made: anything the result would
+   have beyond it (a behaviour, an extra, a pattern, a library) is a choice, and "small",
+   "internal" or "just a detail" is never a reason to make it alone. The agent decides
+   alone only the details the person explicitly left to it (`approach` asks that), and
+   says each one.
 2. **Say what the person needs to know, when it happens:** anything that changes what they
    will see, do, wait for or pay (a tool that works only after a restart, a check you
    promised and could not do, a failure you cannot explain, something done differently

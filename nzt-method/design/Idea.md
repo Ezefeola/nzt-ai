@@ -427,6 +427,19 @@ Si se limpia el contexto, una sesión nueva retoma así:
   de `do` paso 2 (lo que el pedido ya responde va al criterio de hecho, no se pregunta),
   82/82. Sin decidir: datos de prueba en los datos de la persona. Detalle
   en `Trabajo-por-etapas.md` → *Sexta prueba real*. Sin commit.
+- **2026-11-10, séptima prueba revisada (pendiente 0):** la sesión de definición y cómo se
+  borró; se revisó la de construir y los archivos. Bien: MCP, versiones investigadas, cada
+  `AC-NN`, veredicto `partial` honesto, H-11 (capas en proyectos o carpetas, salió del saber
+  del agente, no de una regla). Se repite: decidió en modo Juntos (fecha escribible), líneas
+  y cierre en inglés, datos de prueba en la base real. Nuevo: patrones decididos solos y sin
+  decir (repositorio, reloj, servicio único, excepciones) y carpetas de las piezas en la raíz
+  justificadas con un archivo propio. Propuestas S1–S5 sin decidir. Lo de reglas genéricas
+  en `nzt-software` guardado en `Plan/specs/`. Detalle en `Trabajo-por-etapas.md` →
+  *Séptima prueba real*. Después, con el usuario: nunca decidir solo fuera de *I propose*,
+  aplicado como mundo cerrado (como `nzt-software`: solo se hace lo acordado, más de una
+  manera razonable es una elección); S2 queda en el paquete de software. Cuatro casos
+  nuevos en `do/evals`; el que reproduce la falla (`together-fix-mid-build`) da 12/12
+  contra 6/12; regresiones 18/18. Sin commit.
 ### Punto de retomada (2026-11-10)
 
 **Hecho y probado** (en `plugin/skills/`; desde el 2026-11-09 las skills se llaman `nzt`, `define`, `approach`, `plan`, `do`, `learn`, `tools` y `retro`, instaladas `nzt:<skill>`, cada una con casos en su `evals/`):
@@ -451,7 +464,17 @@ ninguna skill nombra un host ni una herramienta.
 
 **Pendiente, en orden:**
 
-0. **Lo próximo (2026-11-10, auditoría hecha, con commit y push):** el usuario prueba otra
+0. **Lo próximo (2026-11-10, séptima prueba revisada):** S1 hecho como **mundo cerrado**
+   (nunca decidir solo fuera de *I propose*; `nzt` regla 1, `questions.md` regla 2, `do`
+   paso 2; probado, `together-fix-mid-build` 12/12 contra 6/12) y S2 resuelta: los ejes
+   concretos son de software y van al paquete; en el método los cubre el mundo cerrado.
+   Falta que el usuario decida S3 (idioma en las reglas de `nzt`), S4 (una carpeta por
+   pieza) y S5 (datos de prueba), y que revise lo aplicado y pida commit si le parece.
+   Detalle en `Trabajo-por-etapas.md` → *Séptima prueba real*. Lo de reglas genéricas en `nzt-software` quedó guardado allá
+   (`Plan/specs/reglas-genericas.md`, punto 4 de `Plan/specs/pendientes.md`), no acá. Para la
+   próxima prueba: no borrar la sesión antes de revisarla. Lo de abajo de este punto ya está
+   hecho (revisado en la séptima).
+   Antes, 2026-11-10, auditoría hecha, con commit y push: el usuario prueba otra
    vez en la app (`Escritorio/nzt-proyecto`). En una sesión limpia: revisar esa sesión (el
    `.jsonl` más nuevo en `~/.claude/projects/C--Users-ezefe-OneDrive-Escritorio-nzt-proyecto/`,
    extraído con un script) contra lo de la sexta prueba, mirando sobre todo: "Lo que decidí

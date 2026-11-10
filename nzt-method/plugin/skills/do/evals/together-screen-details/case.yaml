@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: together-screen-details
+expected_outcome: |
+  With the how log in mode together, building the first unit does not decide alone what the documents leave open and the person would see or use (how the date is picked or typed, how a task is added, what the empty list says, the order of the list): each is asked through the question tool, logged with an id, and what does not depend on the answers is built or left with a visible blank. Nothing is reported under a "what I decided" section and nothing beyond the agreed capability is added.
+context:
+  scaffold_script: place-files.sh

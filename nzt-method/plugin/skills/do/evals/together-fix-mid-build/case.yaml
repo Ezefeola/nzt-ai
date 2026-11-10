@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: together-fix-mid-build
+expected_outcome: |
+  With the how log in mode together and a unit half built, an acceptance criterion fails (empty text adds an empty task). The fix can change what the person sees (a disabled button, an error message, a field highlight, ignoring it silently). The agent does not pick a visible behaviour alone: it either asks which one through the question tool (logged with an id) or makes exactly what the criterion says with nothing visible added, and it never reports a detail under a "what I decided" section.
+context:
+  scaffold_script: place-files.sh

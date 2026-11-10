@@ -21,12 +21,13 @@ Ids are numbered per log and never reused.
    - already answered in a log, a definition, `how.md` or the folder → read it there;
    - a fact that can be checked (a version, a price, an opening time) → research it with
      its source and say it;
-   - it changes nothing for the person (an internal name, a port, a file's place inside a
-     folder already agreed) → just do it;
-   - a detail of how it is made, with the mode **I propose** on the first line of the how
-     log (`approach` asks it) → decide it and say it under **What I decided**;
-   - anything else, including what changes what the person sees, uses or pays or would be
-     costly to change later → ask it.
+   - what was agreed leaves only one way to do it (a name built by the agreed conventions,
+     a free port, a file in the agreed folder of its kind) → just do it;
+   - more than one reasonable way, with the mode **I propose** on the first line of the
+     how log (`approach` asks it) → decide it and say it under **What I decided**;
+   - anything else → ask it. More than one reasonable way is a choice however small or
+     internal: what the person sees, uses or pays, a pattern or structure the result
+     repeats, a library, anything beyond what was asked.
 3. **Record the answer in the person's words, with the date.** An inferred answer is not an
    answer: the question stays open. A value you would propose is asked as an option,
    recommended, never written down as agreed.
