@@ -3,7 +3,7 @@
 > Estado: **aceptado** por el usuario en 0.5.0 el 2026-10-16 ("Acepto nzt-hub y nzt-changes,
 > queda todo aprobado") y cerrado (unidad 190). **0.6.0 (unidad 364, 2026-10-25):** la app de
 > escritorio, reglas con `[modify]` hasta que el usuario lo vea en la app (H-23, QT-22 y QT-23
-> de `Plan/specs/mods/revision-escritorio.md`). Código en `nzt-software/mods/nzt-changes/`. Cómo llegó
+> de `Plan/specs/mods/revision-escritorio.md`). Código en `mods/nzt-changes/`. Cómo llegó
 > hasta acá, en **Historia** al final. · Depende de: `Plan/specs/nzt-mods.md` (reglas de todo mod).
 > El usuario pidió el mod el 2026-10-14 ("ver los cambios a los archivos realizados", "que no
 > sirva solo para código", "debe verse ordenado"), y para la 0.2.0 que se vea "tal cual
@@ -444,7 +444,7 @@ la app cuando el panel es más alto que el cuerpo. **No cubierto hasta QA:** có
 fondos con transparencia y la fila `⋯`, si respeta el espacio duro de la sangría, el hover de la
 fila del índice sobre la región, y que la rueda le llegue de verdad (el kit no lo prueba).
 
-`claude plugin test nzt-software/mods/nzt-changes` corre 85 tests (0.5.0, unidades 177 y 178; antes 74).
+`claude plugin test mods/nzt-changes` corre 85 tests (0.5.0, unidades 177 y 178; antes 74).
 Lo que sumó la 0.5.0: en `turn.test.ts`, el árbol del índice (un título por estado, la raíz y
 después las carpetas, lo cerrado oculto, el paso escondido que cuenta como su título, las
 claves de cada título, la lista plana de Turno, las filas que quedan afuera); en `git.test.ts`,

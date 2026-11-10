@@ -87,6 +87,27 @@ código y sin perder las preguntas de patrones (`choosing.md`). Análisis, evide
 prueba de `nzt-method` y plan con medición (todas las references, solo genéricas con las
 reglas subidas, solo genéricas como están) en `Plan/specs/reglas-genericas.md`.
 
+## 5 · Dos plugins y los mods divididos por plugin
+
+**Hecho el 2026-11-10, sin commit todavía** (decisiones del usuario; cuando se cierre, pasa a
+`nzt-core/decisions.md` como D-NN):
+
+- **Dos plugins en el marketplace `nzt`:** `nzt` (el método genérico, `nzt-method/`, rama
+  `plugin-nzt`, tags `nzt-vX.Y.Z`) y `nzt-software` (rama `plugin-nzt-software`, tags
+  `vX.Y.Z`). Detalle de `nzt` en `nzt-method/design/Idea.md`, pendiente 4.
+- **Mods en `mods/`, en la raíz del repo**, fuera de `nzt-software/`. Un mod que solo sirve con
+  un plugin lleva su nombre de prefijo: `nzt-state` pasa a **`nzt-software-state`** (carpeta,
+  `plugin.json`, comando `/nzt-software-state`, spec en `Plan/specs/mods/nzt-software-state/`).
+  Los generales quedan `nzt-*`. **`nzt-look` queda general** aunque su banda use las marcas
+  30/40 del kernel de nzt-software. Regla en `Plan/specs/nzt-mods.md` sección 3. Los cuatro
+  mods validan y pasan sus tests (64, 95, 142 y 230) y el build de nzt-software anda.
+- **Quien ya tenía `nzt-state`** lo desinstala e instala `nzt-software-state`. Mover `mods/`
+  fuera de `nzt-software/` hace que un cambio en un mod ya no corra las puertas de
+  `nzt-software-release.yml` (tampoco probaban los mods).
+- **Landing** (repo `nzt-ai-landing`, rama `instalacion-plugin`, sin commit): página nueva
+  *Instalar nzt, el método genérico* (es y en), las de nzt-software la nombran, mods en dos
+  grupos, `nzt-hub` fuera (retirado en M6) y búsqueda en las docs con Pagefind.
+
 ## Otras notas guardadas
 
 - Hacer el núcleo genérico para cualquier producto quedó descartado por ahora, por complejo;

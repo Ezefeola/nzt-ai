@@ -4,7 +4,7 @@
 > cerrado (unidad 287); 0.1.0, aceptado el 2026-10-14 y cerrado en la 146. **0.5.7 (unidad 363,
 > 2026-10-25):** la app de escritorio, reglas con `[modify]` hasta que el usuario lo vea en la app
 > (H-15 a H-22, QT-11 a QT-18 de `Plan/specs/mods/revision-escritorio.md`). Código en
-> `nzt-software/mods/nzt-files/`, mockup en
+> `mods/nzt-files/`, mockup en
 > `Plan/specs/mods/nzt-files/mockup.html`. Cómo llegó hasta acá, en **Historia** al final · Depende de:
 > `Plan/specs/nzt-mods.md` (reglas de todo mod).
 > El usuario pidió el mod el 2026-10-14: "ver el proyecto desde el CLI, como si fuese un
@@ -745,7 +745,7 @@ cambio). **No cubierto hasta QA:** cerrar cualquiera de las dos pestañas con su
 levanta un cierre de la persona), qué pestaña muestra la app al abrir la del archivo, y cómo dibuja la app
 el `Code` cortado al ancho.
 
-`claude plugin test nzt-software/mods/nzt-files`: **120 tests** en 0.2.0 (2026-10-19, unidad 293), todos pasan:
+`claude plugin test mods/nzt-files`: **120 tests** en 0.2.0 (2026-10-19, unidad 293), todos pasan:
 20 de la lógica del árbol (`tree.test.ts`), 40 de la lógica nueva (con los colores de C# y las
 líneas cambiadas) (`logic.test.ts`: rama, líneas, conteos, operaciones de git, qué hace cada
 herramienta, comandos que solo leen, bloques de Markdown, búsqueda, rutas, edad, ajustes, el

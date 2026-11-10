@@ -1,6 +1,6 @@
 # NZT — Mods
 
-> Estado: **especificada** (2026-10-13) · código en `nzt-software/mods/` · una spec por mod en
+> Estado: **especificada** (2026-10-13) · código en `mods/` · una spec por mod en
 > `Plan/specs/mods/` · Depende de: `Plan/specs/nzt-core/README.md` (secciones 2, 9 y D63) y
 > `Plan/specs/nzt-installer.md` (sección 1; retirada por D100: los mods se instalan desde el
 > marketplace de Claude Code, `nzt-ai` ya no existe)
@@ -23,7 +23,7 @@ Lo que separa un mod de una skill:
 |---|---|---|
 | Qué es | Texto que el modelo lee | Código que corre Claude Code |
 | Proveedores | Claude Code y Codex | Solo Claude Code |
-| Dónde vive en el repo | `nzt-software/method/skills/` | `nzt-software/mods/` |
+| Dónde vive en el repo | `nzt-software/method/skills/` | `mods/` |
 | Cómo se instala | El instalador, siempre (D18) | Aparte y opcional (sección 6) |
 
 ## 2. Reglas
@@ -41,7 +41,7 @@ Un mod lee los artefactos de NZT (`Plan/state.json`, specs, documentos) y no los
 El dueño de cada artefacto sigue siendo el método; un mod que escribe el estado abriría un
 segundo camino para cambiarlo que el kernel no controla.
 **[modify] Una excepción, pedida por el usuario el 2026-10-21 (D71 de `Plan/specs/nzt-core/decisions.md`):**
-`nzt-state` escribe la clave `delegation` de `Plan/state.json` y nada más. El kernel dice que
+`nzt-software-state` escribe la clave `delegation` de `Plan/state.json` y nada más. El kernel dice que
 ese valor lo pone solo el usuario, y el clic es del usuario: el agente sigue sin ver otro
 camino para cambiar el plan, las unidades ni la autonomía.
 
@@ -75,7 +75,7 @@ Cada mod es de uno de dos tipos, y el catálogo lo dice:
   proyecto con NZT muestra algo más, pero sin NZT funciona completo. Ejemplo: `nzt-look`
   dibuja la banda de uso de cualquier sesión, y sus marcas 20/30/40 son las del kernel.
 - **NZT:** necesita un artefacto del método para mostrar algo. Sin él, dice que no lo hay.
-  Ejemplo: `nzt-state` sin `Plan/state.json`.
+  Ejemplo: `nzt-software-state` sin `Plan/state.json`.
 
 El tipo lo decide qué lee el mod, no su nombre: todos se llaman `nzt-*` porque los trae NZT.
 Los nombres de los tipos y la regla, propuesta del agente aceptada por el usuario el 2026-10-17.
@@ -84,7 +84,7 @@ Los nombres de los tipos y la regla, propuesta del agente aceptada por el usuari
 
 ```
 nzt-ai/
-├─ nzt-software/mods/
+├─ mods/
 │  └─ <mod>/                       # una carpeta por mod; el nombre es el de plugin.json
 │     ├─ .claude-plugin/
 │     │  └─ plugin.json            # name, version, description, types
@@ -98,19 +98,22 @@ nzt-ai/
 │     └─ README.md                 # para quien lo usa: qué es, cómo se instala
 ├─ Plan/specs/
 │  ├─ nzt-mods.md                  # este documento
-│  └─ mods/<mod>/                  # una carpeta por mod, con el mismo nombre que en nzt-software/mods/
+│  └─ mods/<mod>/                  # una carpeta por mod, con el mismo nombre que en mods/
 │     ├─ spec.md                   # la spec de la feature del mod
 │     └─ mockup.html               # su mockup, si lo tiene
 └─ .claude-plugin/marketplace.json # el repo como marketplace: una entrada por mod (sección 6)
 ```
 
-- **La carpeta lleva el nombre del plugin**, sin prefijos ni alias. El mod del panel de
-  estado es `nzt-software/mods/nzt-state/` porque su `plugin.json` dice `nzt-state` (usuario,
-  2026-10-13: el nombre queda tal cual).
+- **La carpeta lleva el nombre del plugin**, sin alias. Un mod que solo sirve con un plugin
+  de NZT lleva ese plugin como prefijo; uno que sirve para cualquier proyecto queda
+  `nzt-<x>`. El panel de estado lee `Plan/state.json`, que es de nzt-software, así que es
+  `mods/nzt-software-state/` (usuario, 2026-11-10; antes `nzt-state`). `nzt-look` queda
+  general aunque su banda use las marcas 30/40 del kernel de nzt-software (usuario,
+  2026-11-10). Los mods viven en `mods/` en la raíz del repo, no adentro de un producto.
 - **Los tipos que genera Claude Code no se versionan.** `.claude-plugin/types/` lo escribe
   el motor cada vez que carga el mod desde una carpeta, y ya trae su propio `.gitignore`.
   Se versiona el contrato propio del mod (`types/index.d.ts`).
-- **`nzt-software/mods/` no entra al build de las skills.** `nzt-software/build/build.*` arma `nzt-software/dist/` desde
+- **`mods/` no entra al build de las skills.** `nzt-software/build/build.*` arma `nzt-software/dist/` desde
   `nzt-software/method/skills/` y `nzt-software/method/core/`; un mod no es una skill y no se aplana.
 - **La spec del mod está en `Plan/specs/mods/<mod>/`, no adentro del mod.** Las specs del repo
   viven juntas; dentro del mod va el `README.md`, que es documentación de uso. Cada mod tiene
@@ -123,7 +126,7 @@ nzt-ai/
 |---|---|---|
 | `Plan/specs/mods/<mod>/spec.md` | Qué hace el mod, sus reglas, qué lee, sus estados, fuera de alcance | Quien lo cambia |
 | `Plan/specs/mods/<mod>/mockup.html` | Cómo se ve, estado por estado; solo si el mod se diseñó con mockup | Quien lo cambia y quien lo revisa |
-| `nzt-software/mods/<mod>/README.md` | Qué muestra, cómo se instala y cómo se desinstala | Quien lo usa |
+| `mods/<mod>/README.md` | Qué muestra, cómo se instala y cómo se desinstala | Quien lo usa |
 | Fila en el catálogo | Nombre, una línea, estado | Quien instala NZT |
 | `version` en `plugin.json` | La versión del mod | El instalador, `claude plugin update` |
 | Tests | Lo que la spec dice que hace, contra el motor | `claude plugin test` |
@@ -135,10 +138,10 @@ Un cambio al mod cambia su spec en la misma unidad, como cualquier documento afe
 
 | Mod | Tipo | Qué hace | Lee | Spec | Estado |
 |---|---|---|---|---|---|
-| `nzt-state` | NZT | Panel lateral con el plan y el estado de la corrida: objetivo, fases, Tu turno (lo que espera de la persona), AHORA (la última hecha, la que está en curso y la que sigue) y las tareas a pedido | `Plan/state.json` | `Plan/specs/mods/nzt-state/spec.md` y `mockup.html` | construido, 0.4.0; 0.5.0 aceptado y cerrado (aviso de preguntas abiertas); 0.6.0 (aviso de fase que NZT no conoce, unidad 271); **0.7.0 aceptado y cerrado** junto con la 0.6.0 (Tu turno, AHORA y Ver tareas; usuario 2026-10-20, unidades 294 a 298); **0.8.0 a 0.9.1 aceptados y cerrados** (Delegar, tramos y su lista plegada; usuario 2026-10-24); 0.10.0 construido (el panel en la app de escritorio, unidad 361); 0.11.0 panel angosto legible en la app y sin preguntas de `nzt-questions` (M5, sin ver en la app); en `nzt-software/mods/nzt-state/` |
-| `nzt-changes` | Genérico | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `Plan/specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 aceptado y cerrado (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable); 0.6.0 la app de escritorio: una pestaña sin marco con todo por scroll, índice con la fila entera clickeable y el diff pintado como el de Visual Studio (unidad 364, sin ver en la app), en `nzt-software/mods/nzt-changes/` |
-| `nzt-files` | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `Plan/specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña; **0.2.0 aceptado y cerrado** (actividad de Claude, Markdown, búsqueda, git ampliado con el diff entero, ajustes; usuario 2026-10-20, unidad 287); 0.5.7 la app de escritorio: árbol en su pestaña y el archivo elegido en otra, con el aspecto del explorador de la app y la fila entera clickeable, el C# cambiado como el diff de Visual Studio (unidad 363, sin ver en la app), en `nzt-software/mods/nzt-files/` |
-| `nzt-look` | Genérico | Temas (los 15 de la referencia y NZT, oscuro y claro, también para `/theme`), banda de uso configurable sobre el prompt (contexto con las marcas 30/40 del kernel, límites del plan, costo, modelo y effort de la sesión; sin botón `/clear` desde 0.8.0) y la conversación redibujada; le pasa la cifra de contexto al agente. Reemplaza a `nzt-context`, ya retirado (M4) | la cifra de contexto, los límites, el costo, el modelo y el effort de la sesión, y lo que dibuja la conversación (ningún artefacto de NZT) | `Plan/specs/mods/nzt-look/` (spec y mockups) | **aceptado y cerrado en 0.5.0** (usuario 2026-10-19, unidad 272; BUG-001 sigue sin verificar en vivo); 0.1.0 (unidades 227 a 239); cambio 0.2.0 (modelo y effort, unidades 241 y 242), probado en vivo por el usuario (224); cambio 0.3.0 (fila de skill, filas plegables tocándolas, temas que no cansen; unidades 256 a 262); cambio 0.4.0 (banda en una línea con rótulos a la izquierda y naranja desde el 30; unidades 263 y 264); cambio 0.5.0 (el look sigue tras `/clear`, botón que copia NZT oscuro y claro para `/theme` y elegirlos ahí pone `nzt`; unidades 269 y 270); cambio 0.6.0 (arranca en `default`, el dibujo de Claude Code, primero en TEMA; unidades 300 a 303, sin aceptar); cambio 0.7.0 (marcas 30/40 por D80, sin naranja; sin aceptar ni probar en vivo); cambio 0.8.0 (la app de escritorio: tablas en grilla, código en una fuente, variante del sistema, temas copiados solos a `/theme`; unidad 362); 0.8.1 (tablas del escritorio con banda de encabezado); 0.8.2 (*Copiar* de las tablas del escritorio en una fila arriba, QT-21; sin ver en la app); 0.8.3 (columnas de las tablas del escritorio nunca más angostas que su palabra más larga; sin ver en la app); en `nzt-software/mods/nzt-look/` |
+| `nzt-software-state` | NZT | Panel lateral con el plan y el estado de la corrida: objetivo, fases, Tu turno (lo que espera de la persona), AHORA (la última hecha, la que está en curso y la que sigue) y las tareas a pedido | `Plan/state.json` | `Plan/specs/mods/nzt-software-state/spec.md` y `mockup.html` | construido, 0.4.0; 0.5.0 aceptado y cerrado (aviso de preguntas abiertas); 0.6.0 (aviso de fase que NZT no conoce, unidad 271); **0.7.0 aceptado y cerrado** junto con la 0.6.0 (Tu turno, AHORA y Ver tareas; usuario 2026-10-20, unidades 294 a 298); **0.8.0 a 0.9.1 aceptados y cerrados** (Delegar, tramos y su lista plegada; usuario 2026-10-24); 0.10.0 construido (el panel en la app de escritorio, unidad 361); 0.11.0 panel angosto legible en la app y sin preguntas de `nzt-questions` (M5, sin ver en la app); en `mods/nzt-software-state/` |
+| `nzt-changes` | Genérico | Panel lateral al estilo Replay Theater que recorre, un diff por vez, lo que Claude editó en el último turno o todo lo cambiado contra `HEAD` | las ediciones de Claude del turno y el repositorio git del proyecto (ningún artefacto de NZT) | `Plan/specs/mods/nzt-changes/` (spec y mockup) | aceptado y cerrado, 0.4.0 (alto fijo, scroll, índice clickeable, regla de cambios); 0.4.1 con aire bajo la pestaña; 0.5.0 aceptado y cerrado (aire entre partes, posición arriba, botones a la derecha, índice de HEAD por estado y carpeta desplegable); 0.6.0 la app de escritorio: una pestaña sin marco con todo por scroll, índice con la fila entera clickeable y el diff pintado como el de Visual Studio (unidad 364, sin ver en la app), en `mods/nzt-changes/` |
+| `nzt-files` | Genérico | Panel lateral que recorre el proyecto como el explorador de VS Code: árbol de carpetas con marcas de git arriba y el archivo elegido abajo, solo lectura | las carpetas y archivos del proyecto y su repositorio git (ningún artefacto de NZT) | `Plan/specs/mods/nzt-files/` (spec y mockup) | aceptado y cerrado, 0.1.0; 0.1.1 con aire bajo la pestaña; **0.2.0 aceptado y cerrado** (actividad de Claude, Markdown, búsqueda, git ampliado con el diff entero, ajustes; usuario 2026-10-20, unidad 287); 0.5.7 la app de escritorio: árbol en su pestaña y el archivo elegido en otra, con el aspecto del explorador de la app y la fila entera clickeable, el C# cambiado como el diff de Visual Studio (unidad 363, sin ver en la app), en `mods/nzt-files/` |
+| `nzt-look` | Genérico | Temas (los 15 de la referencia y NZT, oscuro y claro, también para `/theme`), banda de uso configurable sobre el prompt (contexto con las marcas 30/40 del kernel, límites del plan, costo, modelo y effort de la sesión; sin botón `/clear` desde 0.8.0) y la conversación redibujada; le pasa la cifra de contexto al agente. Reemplaza a `nzt-context`, ya retirado (M4) | la cifra de contexto, los límites, el costo, el modelo y el effort de la sesión, y lo que dibuja la conversación (ningún artefacto de NZT) | `Plan/specs/mods/nzt-look/` (spec y mockups) | **aceptado y cerrado en 0.5.0** (usuario 2026-10-19, unidad 272; BUG-001 sigue sin verificar en vivo); 0.1.0 (unidades 227 a 239); cambio 0.2.0 (modelo y effort, unidades 241 y 242), probado en vivo por el usuario (224); cambio 0.3.0 (fila de skill, filas plegables tocándolas, temas que no cansen; unidades 256 a 262); cambio 0.4.0 (banda en una línea con rótulos a la izquierda y naranja desde el 30; unidades 263 y 264); cambio 0.5.0 (el look sigue tras `/clear`, botón que copia NZT oscuro y claro para `/theme` y elegirlos ahí pone `nzt`; unidades 269 y 270); cambio 0.6.0 (arranca en `default`, el dibujo de Claude Code, primero en TEMA; unidades 300 a 303, sin aceptar); cambio 0.7.0 (marcas 30/40 por D80, sin naranja; sin aceptar ni probar en vivo); cambio 0.8.0 (la app de escritorio: tablas en grilla, código en una fuente, variante del sistema, temas copiados solos a `/theme`; unidad 362); 0.8.1 (tablas del escritorio con banda de encabezado); 0.8.2 (*Copiar* de las tablas del escritorio en una fila arriba, QT-21; sin ver en la app); 0.8.3 (columnas de las tablas del escritorio nunca más angostas que su palabra más larga; sin ver en la app); en `mods/nzt-look/` |
 
 Esta tabla y la sección **Mods** del `README.md` del repo dicen lo mismo. Agregar un mod
 cambia las dos. **Un mod entra al `README.md` cuando se publica**, no cuando se especifica: la
@@ -158,7 +161,7 @@ caminos:
   Se desinstala con `claude plugin uninstall <mod>@nzt` y se actualiza con
   `claude plugin update <mod>@nzt`. `claude plugin validate .` revisa el marketplace y cada mod
   que lista. Agregar un mod agrega su entrada (M1, usuario 2026-10-14).
-- **Mientras se desarrolla.** `claude --plugin-dir nzt-software/mods/<mod>` o la variable
+- **Mientras se desarrolla.** `claude --plugin-dir mods/<mod>` o la variable
   `CLAUDE_CODE_PLUGIN_DIRS` cargan el mod desde la carpeta.
 
 **Con el instalador** (hasta la v5; desde D100 `nzt-ai` no existe y los mods se instalan solo
@@ -204,7 +207,7 @@ cambio en esta sección cambia esas guías y la de la landing.
 Cada mod tiene su propia versión en `plugin.json`, independiente de la de NZT (M2, usuario
 2026-10-14). Una release de NZT no sube la versión de un mod que no cambió, y un cambio de
 un mod no obliga a sacar una release de NZT. El changelog del repo nombra el mod cuando
-cambia. `claude plugin tag nzt-software/mods/<mod>` crea el tag `<mod>--v<versión>` y comprueba que
+cambia. `claude plugin tag mods/<mod>` crea el tag `<mod>--v<versión>` y comprueba que
 `plugin.json` y la entrada del marketplace coincidan.
 
 **Un cambio de un mod llega solo si sube su versión**: Claude Code toma la de `plugin.json` y,
@@ -221,7 +224,7 @@ por delante del kernel instalado, nunca por detrás; RN-mod-lee-formatos-viejos 
   corra dentro de la app y dibuje en su interfaz (D24 y D63 revisados el 2026-10-16;
   `Plan/specs/nzt-installer.md` sección 1), así que no hay a qué portar un mod.
 - **Que un mod escriba artefactos de NZT** (RN-mod-lee-no-escribe), salvo el modo de
-  delegación desde `nzt-state`.
+  delegación desde `nzt-software-state`.
 - **Publicar los mods en un marketplace de terceros.** El repo como marketplace alcanza
   para el caso pedido.
 

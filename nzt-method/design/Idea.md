@@ -469,8 +469,16 @@ ninguna skill nombra un host ni una herramienta.
    paso 2; probado, `together-fix-mid-build` 12/12 contra 6/12) y S2 resuelta: los ejes
    concretos son de software y van al paquete; en el método los cubre el mundo cerrado.
    Falta que el usuario decida S3 (idioma en las reglas de `nzt`), S4 (una carpeta por
-   pieza) y S5 (datos de prueba), y que revise lo aplicado y pida commit si le parece.
-   Detalle en `Trabajo-por-etapas.md` → *Séptima prueba real*. Lo de reglas genéricas en `nzt-software` quedó guardado allá
+   pieza) y S5 (datos de prueba). Detalle en `Trabajo-por-etapas.md` → *Séptima prueba real*.
+   **Hecho el 2026-11-10, con commit y push:** los dos plugins en el marketplace (pendiente
+   4), los mods en `mods/` con `nzt-software-state` y la landing (rama `instalacion-plugin`
+   de `nzt-ai-landing`) con la instalación por plugin y búsqueda con Pagefind; detalle en
+   `Plan/specs/pendientes.md` punto 5. **Lo que sigue, en orden:** (1) PR de
+   `metodo-generico` a `main` en nzt-ai (ya incluye todo `pendientes-post-v5`) y PR de
+   `instalacion-plugin` a `main` en la landing; (2) tras el merge, los primeros releases:
+   tag `v6.0.0` (crea `plugin-nzt-software`) y tag `nzt-v0.1.0` (crea `plugin-nzt`), y
+   probar `/plugin install nzt@nzt` y `nzt-software@nzt` en una sesión; (3) S3–S5; (4) reglas
+   genéricas de `nzt-software` (`Plan/specs/reglas-genericas.md`, con su propio prompt). Lo de reglas genéricas en `nzt-software` quedó guardado allá
    (`Plan/specs/reglas-genericas.md`, punto 4 de `Plan/specs/pendientes.md`), no acá. Para la
    próxima prueba: no borrar la sesión antes de revisarla. Lo de abajo de este punto ya está
    hecho (revisado en la séptima).
@@ -516,12 +524,17 @@ ninguna skill nombra un host ni una herramienta.
 2. ~~Escribir `nzt-retro`~~ hecho y aprobado el 2026-11-09, commit `1c5e9ce`.
 3. ~~Actualizar `Estructura.md` y crear los manifiestos~~ hecho el 2026-11-09; M1
    decidido (nombres cortos).
-4. **Marketplace (M2):** el usuario decidió que el plugin `nzt` **tiene que tener
-   marketplace**, pero queda para después. Hay que sumar su entrada en
-   `.claude-plugin/marketplace.json` (Claude Code) y en `.agents/plugins/marketplace.json`
-   (Codex), en la raíz del repo, fuera de `nzt-method/`: pedir permiso antes de tocarlos.
-   Decidir de dónde sale (la carpeta `nzt-method/plugin` o una rama propia, como
-   `plugin-nzt-software`) y el pipeline de release propio.
+4. ~~**Marketplace (M2)**~~ hecho el 2026-11-10, sin commit todavía: `nzt` está en los dos
+   marketplaces de la raíz y sale de su **rama propia `plugin-nzt`** (decisión del usuario),
+   como `nzt-software`. Workflow `.github/workflows/nzt-release.yml`: corre en PR si se tocó
+   `nzt-method/` o los marketplaces; un tag `nzt-vX.Y.Z` comprueba versiones (tag,
+   `nzt-method/VERSION`, los dos manifiestos) y skills (name, description, referencias que
+   existen en su carpeta o en la de `nzt`), publica la carpeta `nzt-method/plugin/` sin
+   `evals/` en `plugin-nzt` y crea el release con `--latest=false` (D99). README de la rama
+   en `nzt-method/release/plugin-README.md`. Las puertas se probaron en local; el release no
+   corrió nunca (hace falta el primer tag). El nombre queda `nzt@nzt` aunque la v5 de
+   software se llamaba igual: el usuario dijo que nadie más tiene la v5, así que no se
+   avisa; se sacó de la landing el paso que desinstalaba la v5 con `nzt@nzt`.
 5. Correr `nzt/evals/kernel-loaded` con el plugin instalado (necesita el marketplace o
    instalarlo desde la carpeta). El script de disparo de
    `skill-creator` (`scripts.run_eval`) falla en Windows (`WinError 10038`): no sirve para

@@ -58,7 +58,7 @@ const INDEX_ROWS = { inline: 4, dock: 8 } as const
 const DOCK_COLUMNS = 58
 const INLINE_ROWS = 24
 const DOCK_FLOOR = 110
-// The accent of NZT's mods, the one nzt-state uses: a theme key, so it follows the theme.
+// The accent of NZT's mods, the one nzt-software-state uses: a theme key, so it follows the theme.
 const ACCENT = 'claude'
 const CURRENT = 'cyan'
 // The app draws one tree of up to 100,000 characters of text: a diff past that is cut short of it.

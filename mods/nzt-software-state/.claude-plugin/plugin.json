@@ -1,5 +1,5 @@
 {
-  "name": "nzt-state",
+  "name": "nzt-software-state",
   "version": "0.13.0",
   "description": "Live pane with the NZT plan and state from Plan/state.json",
   "author": { "name": "Ezefeola" },

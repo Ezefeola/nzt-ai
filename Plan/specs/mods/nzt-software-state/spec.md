@@ -1,7 +1,7 @@
-# Mod · nzt-state — panel del plan y el estado
+# Mod · nzt-software-state — panel del plan y el estado
 
 > Estado: **aceptado y cerrado**, versión 0.7.0; 0.6.0 (aviso de fase que NZT no conoce,
-> unidad 271), aceptado con ella. En `nzt-software/mods/nzt-state/` (B-01 a B-04 e idioma en las
+> unidad 271), aceptado con ella. En `mods/nzt-software-state/` (B-01 a B-04 e idioma en las
 > unidades 84 a 88; fases plegables y personajes en 91 a 95; aviso de varias fases en curso
 > en la 164; Plan y Modo al lado del personaje en la 166; aviso de preguntas abiertas,
 > RN-panel-preguntas y -preguntas-espera, aprobado en la 202, construido en la 209 y aceptado
@@ -41,7 +41,7 @@ estado en vivo, al costado de la conversación, sin que nadie tenga que pedirlo.
 - **AHORA**: la última hecha, la que está en curso y la que sigue, en vivo (RN-panel-ahora).- **Las tareas, ocultas detrás de un botón** (RN-panel-tareas): una sola lista de unidades, en el orden del plan y agrupada por fase, que se marca
   como un checklist: hechas, la que está en curso (o la que sigue) y pendientes
   (RN-panel-lista). Las notas (**Notas para retomar**, lo que una sesión nueva necesita para
-  seguir) en una sección que se pliega.- **Tu turno**: lo que se espera de nosotros, arriba de todo, plegado y latiendo (RN-panel-espera).- El comando `/nzt-state`, que abre el panel.
+  seguir) en una sección que se pliega.- **Tu turno**: lo que se espera de nosotros, arriba de todo, plegado y latiendo (RN-panel-espera).- El comando `/nzt-software-state`, que abre el panel.
 - La lectura de los tres formatos del estado: el actual (D62), el de D61 y el anterior con
   `phase`.
 - Los avisos de un estado que rompe el formato del kernel: un estado inválido, más de una
@@ -99,7 +99,7 @@ dibuja Plan ni Modo.
 
 ### RN-panel-abre-con-estado · origin: reverse (R-01)
 Al empezar la sesión, el panel se abre solo si el proyecto tiene `Plan/state.json`. En un
-proyecto sin estado no aparece, y `/nzt-state` lo abre igual.
+proyecto sin estado no aparece, y `/nzt-software-state` lo abre igual.
 
 ### RN-panel-sin-estado · origin: reverse (R-01)
 Si el panel está abierto y el proyecto no tiene `Plan/state.json`, lo dice y se llena solo
@@ -165,9 +165,9 @@ abajo, porque así las ordena el plan. Ejemplo, con la fase Verificación en cur
 
 ```
 Verificación · 1 de 3
-✓ 297  Prueba en vivo de nzt-state 0.7.0
+✓ 297  Prueba en vivo de nzt-software-state 0.7.0
 ▶ 287  Cerrar nzt-files 0.2.0 cuando el usuario lo acepte
-○ 298  Cerrar nzt-state 0.7.0 cuando el usuario lo acepte
+○ 298  Cerrar nzt-software-state 0.7.0 cuando el usuario lo acepte
 ```
 
 ### RN-panel-lista-marcas · origin: usuario 2026-10-20; los glifos, propuesta del agente (Q-03)Cada unidad lleva delante una marca, la misma en la terminal y en el escritorio:
@@ -181,11 +181,11 @@ hacer. Con el estado de esta corrida al aprobarse el plan (ninguna en curso, fas
 curso, 294 primera pendiente), la 294 se muestra como `▷ 294 … sigue`. Si no hay fase en
 curso, o la fase en curso no tiene pendientes, ninguna lleva ▷.
 
-### RN-panel-lista-detalle · origin: propuesta del agente, por "nzt-state se siente como que tiene muchisima informacion" (Q-03)El detalle de la unidad en curso va debajo de ella en **un solo renglón**, cortado con «…» si
+### RN-panel-lista-detalle · origin: propuesta del agente, por "nzt-software-state se siente como que tiene muchisima informacion" (Q-03)El detalle de la unidad en curso va debajo de ella en **un solo renglón**, cortado con «…» si
 no entra. Un clic en la unidad lo despliega entero y otro lo vuelve a un renglón; dura lo que
 la sesión. Las demás unidades no muestran su detalle.
 
-### RN-panel-espera · origin: usuario 2026-10-20 ("cuando esta esperando algo de nosotros se ve siempre en pantalla, en nzt-state estaria bueno que eso se vea mas lindo"); la forma, Q-01 y Q-04; el nombre, usuario ("en vez de que diga 'Te toca' que diga 'Tu turno'")Mientras el estado trae `waiting_on`, el panel
+### RN-panel-espera · origin: usuario 2026-10-20 ("cuando esta esperando algo de nosotros se ve siempre en pantalla, en nzt-software-state estaria bueno que eso se vea mas lindo"); la forma, Q-01 y Q-04; el nombre, usuario ("en vez de que diga 'Te toca' que diga 'Tu turno'")Mientras el estado trae `waiting_on`, el panel
 muestra **Tu turno** ("Your turn") en el primer renglón debajo del título, arriba de todo lo
 demás. **Plegado**, es un solo renglón: `▸ ⏸ Tu turno`, el texto de `waiting_on` cortado con «…»
 . **Mientras está a la vista, el título brilla suave**: va de un amarillo apagado al
@@ -249,7 +249,7 @@ detalle, notas) se muestra tal cual, en el idioma en que se escribió.
 **Cómo se elige** (decisión del agente, 2026-10-14; el usuario no eligió entre las tres
 opciones ofrecidas): una opción del mod, **idioma**, con los valores `es` y `en` y `es` por
 defecto. Se elige al instalar y se cambia en el menú de configuración o con
-`claude plugin configure nzt-state`. Razón: Claude Code no le da al mod el idioma del
+`claude plugin configure nzt-software-state`. Razón: Claude Code no le da al mod el idioma del
 usuario (no hay ningún dato de idioma ni región en los tipos del motor, versión 2.1.296), y
 adivinarlo del texto del estado puede fallar con un objetivo corto o mezclado. `es` por
 defecto porque es lo que el panel hace hoy. **Se reabre** si el motor empieza a exponer el
@@ -476,7 +476,7 @@ propuestas, de las que eligió la 1 (Q-04).
 - **Terminal de 256 colores:** no se probó cómo se ve el personaje.
 ## Tests
 
-`hooks/register.test.ts` corre con `claude plugin test nzt-software/mods/nzt-state`. Cubre la línea de
+`hooks/register.test.ts` corre con `claude plugin test mods/nzt-software-state`. Cubre la línea de
 fases en los tres formatos, la lectura del estado, el JSON roto, el panel con la unidad en
 curso, AHORA con la última hecha, la que está en curso y la que sigue (y nada más), el
 detalle que se despliega, ▷ sigue sin unidad en curso, el plan completo, Tu turno primero,
@@ -550,7 +550,7 @@ Decision: QT-04 del usuario (una línea y la lista plegada). Aceptado tras la pr
 ### 2026-10-20 · Tu turno, AHORA y las tareas a pedido — 0.7.0
 Type:     modify
 Change:   lo que espera de la persona va primero, plegado y brillando suave; lo que está pasando se ve en un cuadro AHORA (la última hecha, la que está en curso brillando y la que sigue); todas las unidades, como un checklist por fase, solo cuando se piden.
-Reason:   el usuario, al ver Clean View: "nzt-state se siente como que tiene muchisima informacion ademas el 'EN CURSO' no se ve bien y no me permite seguir bien con que esta"; "me gustaria una lista asi ordenada"; "no quiero todas las fases tiradas ahi".
+Reason:   el usuario, al ver Clean View: "nzt-software-state se siente como que tiene muchisima informacion ademas el 'EN CURSO' no se ve bien y no me permite seguir bien con que esta"; "me gustaria una lista asi ordenada"; "no quiero todas las fases tiradas ahi".
 Before:   secciones En curso, Pendientes, Hechas y Descartadas, el detalle entero de la unidad en curso, la espera en un recuadro y las preguntas sueltas debajo; el panel leía el estado de la carpeta donde estuviera el agente.
 Now:      Tu turno, AHORA y Ver tareas; el detalle en un renglón que se despliega; el estado, siempre de la carpeta donde empezó la sesión.
 Impact:   RN-panel-ahora, -tareas, -lista, -lista-marcas, -lista-siguiente, -lista-detalle, -espera nuevas · RN-panel-unidad-en-su-fase, -varias-en-curso, -fases-plegables, -formatos-viejos, -carpeta-sesion cambiadas · las secciones por estado, quitadas

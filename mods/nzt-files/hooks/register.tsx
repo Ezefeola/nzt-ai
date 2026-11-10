@@ -79,7 +79,7 @@ const SIZE_LIMIT_MS = 15_000
 const INDEX_LIMIT = 50_000
 // Unfolding stops opening folders past this many, each one a read of the disk.
 const OPEN_ALL_LIMIT = 500
-// The accent of NZT's mods, the one nzt-state uses: a theme key, so it follows the theme.
+// The accent of NZT's mods, the one nzt-software-state uses: a theme key, so it follows the theme.
 const ACCENT = 'claude'
 const CURRENT = 'cyan'
 const CHOSEN_BG = '#263a42'

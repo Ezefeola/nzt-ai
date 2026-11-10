@@ -1,6 +1,6 @@
 # nzt-changes
 
-> Versión **0.6.0** · spec en [`Plan/specs/mods/nzt-changes/spec.md`](../../../Plan/specs/mods/nzt-changes/spec.md)
+> Versión **0.6.0** · spec en [`Plan/specs/mods/nzt-changes/spec.md`](../../Plan/specs/mods/nzt-changes/spec.md)
 
 Un panel lateral de Claude Code para recorrer los cambios **un diff por vez**, con el diseño
 de [Replay Theater](https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/replay-theater),
@@ -21,12 +21,12 @@ el mod de ejemplo de Anthropic. Tiene dos vistas:
 │ ▾ M Modificados 4                                      │
 │      1 README.md                                 +1 -0 │
 │   ▸ Plan/ 1                                            │
-│   ▾ nzt-software/mods/nzt-changes/hooks/ 2                          │
+│   ▾ mods/nzt-changes/hooks/ 2                          │
 │     ▸  4 register.tsx                          +41 -12 │
 │ ▸ A Nuevos 1                                           │
 │ ────────────────────────────────────────────────────── │
 │                   líneas 1–6 de 53   rueda k: ▲ j: ▼   │
-│ nzt-software/mods/nzt-changes/hooks/register.tsx                    │
+│ mods/nzt-changes/hooks/register.tsx                    │
 │                                                        │
 │ modificado · ● Claude · TypeScript  +41 -12            │
 │                                                        │
@@ -43,7 +43,7 @@ mueven. El diff se dibuja como los de Claude Code (número de línea, fondo verd
 colores según el lenguaje) en una ventana que se desplaza sola; a su derecha, una regla
 marca dónde están los cambios del diff entero (verde sumadas, rojo sacadas, amarillo las dos)
 y en gris lo que se ve. El mockup completo, con todos sus estados, está en
-[`Plan/specs/mods/nzt-changes/mockup.html`](../../../Plan/specs/mods/nzt-changes/mockup.html).
+[`Plan/specs/mods/nzt-changes/mockup.html`](../../Plan/specs/mods/nzt-changes/mockup.html).
 
 **Es opcional.** NZT funciona completo sin el panel. Funciona solo en Claude Code, porque
 Codex no tiene mods. La vista HEAD necesita que el proyecto esté en un repositorio git; la
@@ -124,7 +124,7 @@ Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerl
 los proyectos.
 
 Es un plugin de Claude Code aparte del método: los demás mods están en la sección **Mods** del
-[`README.md`](../../README.md) de nzt-software.
+[`README.md`](../../nzt-software/README.md) de nzt-software.
 
 **Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
 `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
@@ -136,18 +136,18 @@ Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-changes@nzt`
 ## Desarrollo
 
 ```bash
-claude plugin validate nzt-software/mods/nzt-changes   # manifiesto, hooks y contrato de tipos
-claude plugin test nzt-software/mods/nzt-changes       # los tests de hooks/*.test.ts(x)
-claude --plugin-dir nzt-software/mods/nzt-changes      # una sesión con el mod cargado desde la carpeta
+claude plugin validate mods/nzt-changes   # manifiesto, hooks y contrato de tipos
+claude plugin test mods/nzt-changes       # los tests de hooks/*.test.ts(x)
+claude --plugin-dir mods/nzt-changes      # una sesión con el mod cargado desde la carpeta
 ```
 
 Que los tests pasen no prueba que el módulo cargue en una sesión: probalo siempre cargado
 de verdad. Todo lo que use `$` va en `hooks/register.tsx`, porque la sesión no acepta `$`
 pasado a una función importada de otro archivo.
 
-El chequeo de tipos (`tsc -p nzt-software/mods/nzt-changes/tsconfig.json`) necesita los tipos del motor
+El chequeo de tipos (`tsc -p mods/nzt-changes/tsconfig.json`) necesita los tipos del motor
 en `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta,
 con su propio `.gitignore`, así que git no los sigue.
 
-La spec, con sus reglas, está en [`Plan/specs/mods/nzt-changes/spec.md`](../../../Plan/specs/mods/nzt-changes/spec.md),
-con el mockup al lado, y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../../Plan/specs/nzt-mods.md).
+La spec, con sus reglas, está en [`Plan/specs/mods/nzt-changes/spec.md`](../../Plan/specs/mods/nzt-changes/spec.md),
+con el mockup al lado, y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../Plan/specs/nzt-mods.md).

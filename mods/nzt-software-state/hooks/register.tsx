@@ -19,7 +19,7 @@ import {
   WIDTH,
 } from './sprites'
 
-const PANE = 'nzt-state'
+const PANE = 'nzt-software-state'
 const FILE = 'Plan/state.json'
 const POLL_MS = 2000
 const FRAME_MS = 220
@@ -43,18 +43,18 @@ const SIDE_BY_SIDE_MIN = 40
 const SIDE_BY_SIDE_MIN_FLOW = 72
 const SIDE_BY_SIDE_GAP = 2
 
-const snapshot = atom({ plugin: 'nzt-state', key: 'snapshot' } as const, {
+const snapshot = atom({ plugin: 'nzt-software-state', key: 'snapshot' } as const, {
   kind: 'missing',
 } as Snapshot)
-const expanded = atom({ plugin: 'nzt-state', key: 'expanded' } as const, {
+const expanded = atom({ plugin: 'nzt-software-state', key: 'expanded' } as const, {
   turn: false,
   detail: false,
   tasks: false,
   notes: false,
   slices: false,
 } as Expanded)
-const glow = atom({ plugin: 'nzt-state', key: 'glow' } as const, 0)
-const delegating = atom({ plugin: 'nzt-state', key: 'delegating' } as const, null as string | null)
+const glow = atom({ plugin: 'nzt-software-state', key: 'glow' } as const, 0)
+const delegating = atom({ plugin: 'nzt-software-state', key: 'delegating' } as const, null as string | null)
 
 // The mtime last read; a reload starts over and reads the file again.
 let lastMtime = -1
@@ -180,7 +180,7 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     root = e.cwd
     await $.command.register({
-      name: 'nzt-state',
+      name: 'nzt-software-state',
       description: t.commandDescription,
     })
     await refresh($, true)
@@ -207,7 +207,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'nzt-state' }, async $ => {
+  on('command.run', { command: 'nzt-software-state' }, async $ => {
     await refresh($, true)
     const opened = await $.ui.open({ id: PANE, title: t.title })
 

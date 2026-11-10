@@ -1,6 +1,6 @@
-# nzt-state
+# nzt-software-state
 
-> Versión **0.13.0** · spec en [`Plan/specs/mods/nzt-state/spec.md`](../../../Plan/specs/mods/nzt-state/spec.md)
+> Versión **0.13.0** · spec en [`Plan/specs/mods/nzt-software-state/spec.md`](../../Plan/specs/mods/nzt-software-state/spec.md)
 
 Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
 leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
@@ -15,7 +15,7 @@ Modo  ⚡ autónomo · 80–82 sin            ██ ▀▀  ▀▀ ██
       frenar · 1 de 3 hechas             ████████████
                                           ▀█▀ ▀▀ ▀█▀
 Objetivo Mods de NZT: spec, el              Build
-mod en nzt-software/mods/ y el catálogo.
+mod en mods/ y el catálogo.
 
 ✓ Discovery → ● Build → ○ Verificación
 
@@ -24,7 +24,7 @@ mod en nzt-software/mods/ y el catálogo.
                                  actualizado recién
 ╭────────────────────────────────────────────────╮
 │ AHORA · Build                    Unidad 4 de 5 │
-│ ✓ 80  Mod en nzt-software/mods/                             │
+│ ✓ 80  Mod en mods/                             │
 │ ▶ 81  Docs: README del mod + sección Mods      │
 │       falta la sección Mods del README…        │
 │ ○ 82  Verificar: tests, build y links          │
@@ -39,7 +39,7 @@ igual. Funciona solo en Claude Code, porque Codex no tiene mods.
 ## Cómo se usa
 
 ```
-/nzt-state
+/nzt-software-state
 ```
 
 Abre el panel si lo cerraste; en un proyecto con `Plan/state.json` ya se abre solo al
@@ -96,9 +96,9 @@ Una fase que NZT no conoce usa el cangrejo sin sombrero y un color neutro.
 ## Dónde aparece
 
 Al costado de la conversación, cuando Claude Code tiene lugar para ponerlo; si no, queda
-esperando y `/nzt-state` dice por qué. Se abre solo al empezar la sesión si la carpeta donde
+esperando y `/nzt-software-state` dice por qué. Se abre solo al empezar la sesión si la carpeta donde
 se abrió tiene `Plan/state.json`; en una subcarpeta del proyecto, o en un proyecto sin estado,
-no aparece, y abierto con `/nzt-state` dice que no hay estado hasta que el archivo exista.
+no aparece, y abierto con `/nzt-software-state` dice que no hay estado hasta que el archivo exista.
 
 Un cambio en el estado se ve en 2 segundos como máximo, y en el acto cuando lo escribe el
 agente. Lee también los estados escritos con formatos anteriores de NZT. Lo único que
@@ -117,7 +117,7 @@ El panel habla **español** (por defecto) o **inglés**. Se elige al instalarlo 
 en el menú de configuración de Claude Code o con:
 
 ```bash
-claude plugin configure nzt-state
+claude plugin configure nzt-software-state
 ```
 
 Lo que viene del estado —objetivo, unidades, notas— se muestra tal como está escrito.
@@ -127,41 +127,41 @@ Lo que viene del estado —objetivo, unidades, notas— se muestra tal como est�
 En una sesión de Claude Code en la terminal (versión 2.1.275 o posterior):
 
 ```
-/plugin install nzt-state --marketplace Ezefeola/nzt-ai
+/plugin install nzt-software-state --marketplace Ezefeola/nzt-ai
 ```
 
 Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerlo en todos
 los proyectos.
 
 Es un plugin de Claude Code aparte del método: los demás mods están en la sección **Mods** del
-[`README.md`](../../README.md) de nzt-software.
+[`README.md`](../../nzt-software/README.md) de nzt-software.
 
 **Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
 `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
-versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-state@nzt` en
+versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-software-state@nzt` en
 la terminal.
 
-Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-state@nzt`.
+Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-software-state@nzt`.
 
 ## Desarrollo
 
 ```bash
-claude plugin validate nzt-software/mods/nzt-state   # manifiesto, hooks y contrato de tipos
-claude plugin test nzt-software/mods/nzt-state       # los tests de hooks/*.test.ts
-claude --plugin-dir nzt-software/mods/nzt-state      # una sesión con el mod cargado desde la carpeta
+claude plugin validate mods/nzt-software-state   # manifiesto, hooks y contrato de tipos
+claude plugin test mods/nzt-software-state       # los tests de hooks/*.test.ts
+claude --plugin-dir mods/nzt-software-state      # una sesión con el mod cargado desde la carpeta
 ```
 
 Para ver el panel con un estado que tiene de todo —fases hechas, en curso, pendientes y
-descartadas, con unidades en cada estado— abrí una sesión en `nzt-software/mods/nzt-state/demo/`, que
+descartadas, con unidades en cada estado— abrí una sesión en `mods/nzt-software-state/demo/`, que
 trae su propio `Plan/state.json` de prueba.
 
 Que los tests pasen no prueba que el módulo cargue en una sesión: probalo siempre cargado
 de verdad. Todo lo que use `$` va en `hooks/register.tsx`, porque la sesión no acepta `$`
 pasado a una función importada de otro archivo.
 
-El chequeo de tipos (`tsc -p nzt-software/mods/nzt-state/tsconfig.json`) necesita los tipos del motor en
+El chequeo de tipos (`tsc -p mods/nzt-software-state/tsconfig.json`) necesita los tipos del motor en
 `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta, con
 su propio `.gitignore`, así que git no los sigue.
 
-La spec, con sus reglas, está en [`Plan/specs/mods/nzt-state/spec.md`](../../../Plan/specs/mods/nzt-state/spec.md),
-y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../../Plan/specs/nzt-mods.md).
+La spec, con sus reglas, está en [`Plan/specs/mods/nzt-software-state/spec.md`](../../Plan/specs/mods/nzt-software-state/spec.md),
+y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../Plan/specs/nzt-mods.md).

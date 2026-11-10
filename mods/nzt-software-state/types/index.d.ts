@@ -79,7 +79,7 @@ declare module 'claude-code' {
      * `glow` is the step of the soft glow of Tu turno and the unit in progress, while either shows.
      * `delegating` is why the last press on Delegar could not write the mode, or null.
      */
-    'nzt-state': {
+    'nzt-software-state': {
       snapshot: Snapshot
       expanded: Expanded
       glow: number

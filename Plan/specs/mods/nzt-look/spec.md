@@ -5,7 +5,7 @@
 > la de la fila de una skill en RN-skin-textos-claude: BUG-001 sigue *fixed, pending verification*
 > porque nadie miró esa fila en vivo · Cómo llegó acá: **especificada** en la unidad 216
 > (2026-10-17); tema `nzt` en la 222 y diseño técnico en la 223; **0.1.0** en las 227 a 239
-> (2026-10-18), código en `nzt-software/mods/nzt-look/` · **0.2.0** (241 y 242): modelo y effort en la banda,
+> (2026-10-18), código en `mods/nzt-look/` · **0.2.0** (241 y 242): modelo y effort en la banda,
 > pedido del usuario: *"ver además de los datos del context, limite semanal y diario el modelo que
 > esta corriendo actualmente y su effort"* · **Textos (244):** el mod no cambia los textos de Claude
 > Code: *"me gusta el cambio de estilo digamos pero no me gusta que se le cambien sus textos"* ·
@@ -374,7 +374,7 @@ convive con la referencia si la persona también lo tiene instalado.
 | Ediciones | tarjeta de diff con `+N −M`, líneas numeradas y resaltado | la misma tarjeta, en celdas (RN-skin-diff-legible) |
 | Consola | tarjeta con estado, stderr aparte, salida larga plegada, rutas, números y palabras de error, aviso y éxito en color | tarjeta con el comando, la salida en color, `✓` o `✗ exit N`, stderr en rojo, cada flujo plegado a 8 + 4 líneas |
 | Salida de solo lectura (apagada por defecto) | lecturas y búsquedas en una fila; un fallo deja su línea de error | igual |
-| Tablas | tarjeta con una fila arriba, `tabla · N filas` tenue y *Copiar* a la derecha, como el código (QT-21); debajo, el encabezado en una banda (el acento sobre `surface`, con el tinte que deje legible el texto); filas alternadas con aire arriba y abajo (opción A de `nzt-software/mods/nzt-look/mocks/tablas.html`, elegida por el usuario 2026-10-28) | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) |
+| Tablas | tarjeta con una fila arriba, `tabla · N filas` tenue y *Copiar* a la derecha, como el código (QT-21); debajo, el encabezado en una banda (el acento sobre `surface`, con el tinte que deje legible el texto); filas alternadas con aire arriba y abajo (opción A de `mods/nzt-look/mocks/tablas.html`, elegida por el usuario 2026-10-28) | grilla con banda de encabezado; si es más ancha que la terminal, las celdas bajan de línea (RN-skin-tabla-ancha) |
 | Diagramas | bloques Mermaid como tarjeta (los 17 tipos de la referencia) | los mismos, en celdas |
 | Fórmulas | tarjeta tipográfica; `$…$` en línea como Unicode | fracciones y límites apilados |
 | Salida de comandos | `/cost`, `/context` y salida de plugins: tablas, código y pares `clave: valor` como tarjetas | como grillas |
@@ -790,7 +790,7 @@ diagramas también se escriben acá (QT-18).
 
 ### Piezas
 
-`nzt-software/mods/nzt-look/` con la estructura de todo mod (`Plan/specs/nzt-mods.md` sección 3), más `themes/`:
+`mods/nzt-look/` con la estructura de todo mod (`Plan/specs/nzt-mods.md` sección 3), más `themes/`:
 
 | Pieza | Qué hace | Usa `$` |
 |---|---|---|
@@ -1146,7 +1146,7 @@ Registro **append-only**. Origen de cada entrada: `usuario`, `agente, dentro del
 Registro **append-only**: una respuesta superada se marca con lo que la reemplazó, nunca se borra.
 Origen de cada entrada: `usuario`, `agente, dentro del alcance`, `investigado` (con fuente y fecha)
 o `propuesta`. Fuentes de lo investigado, leídas el 2026-10-18:
-- los tipos de Claude Code 2.1.302 (`nzt-software/mods/nzt-state/.claude-plugin/types/claude-code/index.d.ts`);
+- los tipos de Claude Code 2.1.302 (`mods/nzt-state/.claude-plugin/types/claude-code/index.d.ts`);
 - <https://code.claude.com/docs/en/plugins/components> (*Themes and output styles*) y
   <https://code.claude.com/docs/en/terminal-config> (*Create a custom theme*);
 - el código de la referencia en la copia local de la máquina.
@@ -1163,7 +1163,7 @@ de la 223; mientras tanto, los flujos van en lista.
   ("Copyright (c) 2026 Craft Docs"). El repo de NZT es MIT. Todo lo que usa `$` está en
   `register.tsx`, como pide la regla de los mods (memoria *$ no cruza imports*).
 - opciones:
-  - **partir de su código**: se copia a `nzt-software/mods/nzt-look/`, se le quita lo que la spec deja afuera y
+  - **partir de su código**: se copia a `mods/nzt-look/`, se le quita lo que la spec deja afuera y
     se le suma lo de NZT. Tiene todo el alcance de la referencia desde el primer día. A
     cambio, NZT pasa a mantener 16 mil líneas que no escribió, y las correcciones de la referencia
     hay que traerlas a mano;
@@ -1185,7 +1185,7 @@ de la 223; mientras tanto, los flujos van en lista.
   en la carpeta.
 - observado (spike S-04): con el mod cargado desde `dev-mods`, el tema no apareció. Falta S-04c
   (instalado por marketplace o con `--plugin-dir`).
-- respuesta: van como temas del plugin, en `nzt-software/mods/nzt-look/themes/`. El mod no escribe en
+- respuesta: van como temas del plugin, en `mods/nzt-look/themes/`. El mod no escribe en
   `~/.claude/themes/`. Si en la 224 no aparecen instalados, esta pregunta se reabre con
   alternativas. · investigado
 - observado (2026-10-19, 2.1.303, `$.config.list` con el mod por `--plugin-dir` y con un tema en

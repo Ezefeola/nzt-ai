@@ -181,10 +181,10 @@ method to show something.
 
 | Mod | Type | What it does | Install |
 |---|---|---|---|
-| [`nzt-state`](mods/nzt-state/README.md) | NZT: needs `Plan/state.json` | Side panel with the run's plan and state, read from `Plan/state.json` and updated live | `/plugin install nzt-state --marketplace Ezefeola/nzt-ai` |
-| [`nzt-changes`](mods/nzt-changes/README.md) | Generic | Replay Theater-style side panel: steps, one diff at a time, through what Claude edited in the last turn or everything changed against `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
-| [`nzt-files`](mods/nzt-files/README.md) | Generic | Side panel that browses the project like VS Code's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file below, read-only and without using context | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
-| [`nzt-look`](mods/nzt-look/README.md) | Generic, with an NZT layer | Themes (NZT and fifteen more, dark and light), a band above the prompt with the context and its 30/40 marks, the plan's limits, the cost and the model with its effort, and the conversation redrawn: tools, console, diffs, tables, code, formulas and diagrams | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
+| [`nzt-software-state`](../mods/nzt-software-state/README.md) | NZT: needs `Plan/state.json` | Side panel with the run's plan and state, read from `Plan/state.json` and updated live | `/plugin install nzt-software-state --marketplace Ezefeola/nzt-ai` |
+| [`nzt-changes`](../mods/nzt-changes/README.md) | Generic | Replay Theater-style side panel: steps, one diff at a time, through what Claude edited in the last turn or everything changed against `HEAD` | `/plugin install nzt-changes --marketplace Ezefeola/nzt-ai` |
+| [`nzt-files`](../mods/nzt-files/README.md) | Generic | Side panel that browses the project like VS Code's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file below, read-only and without using context | `/plugin install nzt-files --marketplace Ezefeola/nzt-ai` |
+| [`nzt-look`](../mods/nzt-look/README.md) | Generic, with an NZT layer | Themes (NZT and fifteen more, dark and light), a band above the prompt with the context and its 30/40 marks, the plan's limits, the cost and the model with its effort, and the conversation redrawn: tools, console, diffs, tables, code, formulas and diagrams | `/plugin install nzt-look --marketplace Ezefeola/nzt-ai` |
 
 ### Installing them
 
@@ -202,7 +202,7 @@ when that version goes up.
   `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**. From then on each new
   session downloads new versions and says `Run /reload-plugins` to load them.
 - **By hand.** `claude plugin update <mod>@nzt` in the terminal (for example,
-  `claude plugin update nzt-state@nzt`) or **Update marketplace** in that same `/plugin` tab.
+  `claude plugin update nzt-software-state@nzt`) or **Update marketplace** in that same `/plugin` tab.
 
 ### Uninstalling them
 
@@ -239,11 +239,11 @@ nzt-software/
   method/skills/   the method's skills (nested here, flat once installed)
   method/agents/   the subagents, for Claude Code and for Codex
   evals/           the suite that measures whether the right skill triggers
-  mods/            the Claude Code mods, one per folder (optional)
   build/           build.sh / build.ps1 — the development loop: validates the skills and builds dist/plugin
   VERSION          the version of the plugin and of its release tag
   release/         the plugin branch's README and each version's notes
   presentation/    the NZT deck
+mods/              (at the repo root) the Claude Code mods, one per folder (optional)
 Plan/specs/        nzt-core/ — the founding spec, plus the plugin's, the mods' and one per mod
 ```
 

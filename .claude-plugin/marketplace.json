@@ -3,31 +3,44 @@
   "owner": {
     "name": "Ezefeola"
   },
-  "description": "NZT for software and its optional mods for Claude Code",
+  "description": "NZT plugins (the generic method and NZT for software) and their optional mods for Claude Code",
   "plugins": [
     {
+      "name": "nzt",
+      "source": {
+        "source": "github",
+        "repo": "Ezefeola/nzt-ai",
+        "ref": "plugin-nzt"
+      },
+      "description": "The generic NZT method, for any work in any domain"
+    },
+    {
       "name": "nzt-software",
-      "source": { "source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin-nzt-software" },
+      "source": {
+        "source": "github",
+        "repo": "Ezefeola/nzt-ai",
+        "ref": "plugin-nzt-software"
+      },
       "description": "The NZT method, its agents and its software rules"
     },
     {
-      "name": "nzt-state",
-      "source": "./nzt-software/mods/nzt-state",
-      "description": "Live pane with the NZT plan and state from Plan/state.json"
+      "name": "nzt-software-state",
+      "source": "./mods/nzt-software-state",
+      "description": "nzt-software mod: live pane with the plan and state from Plan/state.json"
     },
     {
       "name": "nzt-changes",
-      "source": "./nzt-software/mods/nzt-changes",
+      "source": "./mods/nzt-changes",
       "description": "Step through the last turn's edits or the project's changes against HEAD, one diff at a time"
     },
     {
       "name": "nzt-files",
-      "source": "./nzt-software/mods/nzt-files",
+      "source": "./mods/nzt-files",
       "description": "Browse the project like an editor's explorer: folders that open and close, git marks, what Claude reads and writes, and the chosen file beneath"
     },
     {
       "name": "nzt-look",
-      "source": "./nzt-software/mods/nzt-look",
+      "source": "./mods/nzt-look",
       "description": "Themes (NZT and fifteen more, dark and light), a usage band with NZT's 30/40 context marks, and the conversation redrawn"
     }
   ]

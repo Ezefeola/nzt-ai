@@ -111,7 +111,7 @@ test('the pane draws the unit in progress and what comes next', async ($, on) =>
   on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
 
   await $.command.run({
-    command: 'nzt-state',
+    command: 'nzt-software-state',
     args: '',
     origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 },
@@ -119,10 +119,10 @@ test('the pane draws the unit in progress and what comes next', async ($, on) =>
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({
-      plugin: 'nzt-state',
+      plugin: 'nzt-software-state',
       surface,
       component: 'Pane',
-      requestId: 'nzt-state',
+      requestId: 'nzt-software-state',
       viewport: { columns: 80, rows: 40 },
       props: {
         title: 'NZT state',
@@ -218,16 +218,16 @@ const mountPane = async (
   on('ui.open', async () => ({ value: { isPlaced: true } }))
   on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
   await $.command.run({
-    command: 'nzt-state',
+    command: 'nzt-software-state',
     args: '',
     origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 },
   })
   return $.ui.mount({
-    plugin: 'nzt-state',
+    plugin: 'nzt-software-state',
     surface,
     component: 'Pane',
-    requestId: 'nzt-state',
+    requestId: 'nzt-software-state',
     viewport: { columns: 80, rows: 60 },
     props: {
       title: 'NZT',
@@ -718,7 +718,7 @@ test('the tab says what the pane is, and the heading keeps a blank row under it'
   })
   on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
   await $.command.run({
-    command: 'nzt-state',
+    command: 'nzt-software-state',
     args: '',
     origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 },
@@ -726,10 +726,10 @@ test('the tab says what the pane is, and the heading keeps a blank row under it'
   expect(titles).toEqual(['Estado'])
 
   const ui = await $.ui.mount({
-    plugin: 'nzt-state',
+    plugin: 'nzt-software-state',
     surface: 'terminal',
     component: 'Pane',
-    requestId: 'nzt-state',
+    requestId: 'nzt-software-state',
     viewport: { columns: 80, rows: 60 },
     props: { title: 'Estado', isFocused: false, bodyColumns: 76, placement: 'dock', scroll: { offset: 0, bodyRows: 56 }, view: {} },
   })
@@ -930,7 +930,7 @@ test('on the desktop Enter on Tu turno unfolds it, and the detail unfolds the un
 })
 
 test('a project with Plan/state.json opens the pane when the session starts', async ($, on) => {
-  expect(await startSession($, on, true)).toEqual(['nzt-state'])
+  expect(await startSession($, on, true)).toEqual(['nzt-software-state'])
 })
 
 test('the state is read from the folder the session started in, wherever the agent moves', async ($, on) => {
@@ -976,17 +976,17 @@ test('an autonomous batch reads as a range with its progress and kept stops', as
   on('clock.now', async () => ({ value: Date.parse('2026-10-13T12:00:00Z') }))
 
   await $.command.run({
-    command: 'nzt-state',
+    command: 'nzt-software-state',
     args: '',
     origin: { kind: 'composer' },
     presentation: { isFullscreen: false, columns: 120 },
   })
 
   const ui = await $.ui.mount({
-    plugin: 'nzt-state',
+    plugin: 'nzt-software-state',
     surface: 'terminal',
     component: 'Pane',
-    requestId: 'nzt-state',
+    requestId: 'nzt-software-state',
     viewport: { columns: 80, rows: 40 },
     props: {
       title: 'NZT',
