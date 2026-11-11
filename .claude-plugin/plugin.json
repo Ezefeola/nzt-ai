@@ -1,0 +1,8 @@
+{
+  "name": "nzt-software",
+  "description": "NZT for software: a way of working. Its method lives in the nzt skill, which loads first in every session.",
+  "version": "6.0.0",
+  "license": "MIT",
+  "author": { "name": "Ezefeola", "url": "https://github.com/Ezefeola" },
+  "repository": "https://github.com/Ezefeola/nzt-ai"
+}
