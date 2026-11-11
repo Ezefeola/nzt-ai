@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: remove-reminders
+expected_outcome: |
+  A removal of something agreed becomes a change.md next to the reminders part's definition, typed as remove, with the person's sentence as origin and a check that no email is sent; it asks for approval and touches no definition, state or code before the yes.
+context:
+  scaffold_script: place-files.sh

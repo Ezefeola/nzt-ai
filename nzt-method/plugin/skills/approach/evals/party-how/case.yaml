@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: party-how
+expected_outcome: |
+  For a non-technical work it works out the how decisions from what the party is (venue, catering, drinks, music, invitations, budget split), with concrete options and what each implies within the budget, records them as H-NN questions, and uses no technical jargon.
+context:
+  scaffold_script: place-files.sh

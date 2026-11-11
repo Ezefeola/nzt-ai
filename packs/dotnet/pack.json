@@ -1,9 +1,0 @@
-{
-  "description": "MCP de Microsoft Learn: la documentación oficial de .NET",
-  "mcp": [
-    {
-      "name": "microsoft-learn",
-      "url": "https://learn.microsoft.com/api/mcp"
-    }
-  ]
-}

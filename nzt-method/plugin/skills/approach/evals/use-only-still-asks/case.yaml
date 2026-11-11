@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: use-only-still-asks
+expected_outcome: |
+  With the base answered and a person who says they only want to use the app, it still asks how the code is organised inside and its conventions (in plain words, with what each means for the person), and asks how the details are decided (together recommended, the agent proposes, or the person dictates). It does not decide any of them on its own or write them into how.md as decided by the agent.
+context:
+  scaffold_script: place-files.sh

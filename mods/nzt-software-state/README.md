@@ -1,0 +1,167 @@
+# nzt-software-state
+
+> Versión **0.13.0** · spec en [`Plan/specs/mods/nzt-software-state/spec.md`](../../Plan/specs/mods/nzt-software-state/spec.md)
+
+Un panel lateral de Claude Code que muestra el plan y el estado de la corrida de NZT,
+leídos de `Plan/state.json`, y se actualiza en vivo mientras el agente trabaja.
+
+```
+
+ NZT  Estado
+▸ ⏸ Tu turno  que mires el mockup y elijas…   ? 2
+
+Plan  ● aprobado                         ▄▄████████▄▄
+Modo  ⚡ autónomo · 80–82 sin            ██ ▀▀  ▀▀ ██
+      frenar · 1 de 3 hechas             ████████████
+                                          ▀█▀ ▀▀ ▀█▀
+Objetivo Mods de NZT: spec, el              Build
+mod en mods/ y el catálogo.
+
+✓ Discovery → ● Build → ○ Verificación
+
+3 de 5 unidades hechas                         60%
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                                 actualizado recién
+╭────────────────────────────────────────────────╮
+│ AHORA · Build                    Unidad 4 de 5 │
+│ ✓ 80  Mod en mods/                             │
+│ ▶ 81  Docs: README del mod + sección Mods      │
+│       falta la sección Mods del README…        │
+│ ○ 82  Verificar: tests, build y links          │
+╰────────────────────────────────────────────────╯
+☰ Ver tareas · 5
+▸ NOTAS PARA RETOMAR · 2
+```
+
+**Es opcional.** NZT funciona completo sin el panel: el estado vive en `Plan/state.json`
+igual. Funciona solo en Claude Code, porque Codex no tiene mods.
+
+## Cómo se usa
+
+```
+/nzt-software-state
+```
+
+Abre el panel si lo cerraste; en un proyecto con `Plan/state.json` ya se abre solo al
+empezar la sesión. **Un clic** despliega o pliega **Tu turno**, el detalle de la unidad en
+curso (clic en su texto), las tareas (**☰ Ver tareas** / **☰ Ocultar tareas**), cada fase
+dentro de ellas y las notas.
+
+De arriba hacia abajo muestra:
+
+- **⏸ Tu turno**, primero de todo, mientras la corrida espera algo de vos: lo que dice
+  `waiting_on`. Va plegado en un renglón y su título late mientras espera; un clic lo
+  despliega con el texto entero. Si no se espera nada, no aparece.
+- Arriba a la derecha, el personaje de la fase en curso, animado, con el nombre de la fase
+  debajo. A su izquierda: si el plan está aprobado, en qué modo corre (acompañado, o
+  autónomo con la tanda, cuántas unidades lleva hechas y en cuáles frena igual), cómo
+  delega lecturas el agente (**Delegar**: `auto`, `ask` u `off`; un clic pasa al siguiente) y
+  el objetivo de la corrida, con la etiqueta **Objetivo**. Con menos de 40 columnas útiles no
+  entran lado a lado, y el personaje va centrado arriba, con lo demás debajo.
+- En un plan cortado en **tramos**, la fila **Tramo** (*2 de 3 · F-003 Cupones*) y debajo,
+  plegada, **▸ Tramos · 3**: un clic la abre con cada tramo en un renglón y su marca. Con un
+  solo tramo no hay lista. Todo lo que sigue —fases, avance, AHORA, tareas— es
+  del tramo en curso; cuando no le queda nada pendiente, AHORA dice qué tramo sigue.
+- La línea de fases de la corrida con su estado, el porcentaje de avance
+  (hechas sobre todas menos las descartadas) y hace cuánto se actualizó.
+- **AHORA**, en el color de la fase: la última unidad hecha, la que está en curso con su
+  detalle en un renglón, y la próxima pendiente, con "Unidad n de m". Si ninguna figura en
+  curso (el agente escribe el estado al terminar cada unidad), la que sigue lleva **▷ · sigue**.
+- **☰ Ver tareas**: todas las unidades del plan, cada una una vez y en su lugar, como un
+  checklist (✓ hecha, ▶ en curso, ▷ la que sigue, ○ pendiente, ✗ descartada y tachada),
+  agrupadas por fase con "hechas de cuántas". Arrancan ocultas; al mostrarlas, solo la fase
+  en curso está desplegada.
+- Las **notas para retomar**: lo que una sesión nueva necesita saber después de `/clear`.
+
+Avisa cuando el estado rompe el formato del kernel: una unidad con un status que no existe,
+más de una unidad en curso, más de una fase en curso, o una tanda que nombra unidades que no están. No lo corrige.
+
+### Fases y personajes
+
+Cada fase tiene su color y un cangrejo pixelado con su sombrero. El de la fase en curso
+camina arriba del panel; los demás aparecen en miniatura en la línea de fases y en los
+grupos.
+
+| Fase | Sombrero | Color |
+|---|---|---|
+| Discovery | birrete | violeta |
+| Arquitectura | casco de obra | azul |
+| Diseño | boina | rosa |
+| Build | casco con llave, y un martillo chico en alto en la mano derecha | naranja |
+| Verificación | gorro de detective con lupa | verde agua |
+| Release | galera gris con cinta dorada | dorado |
+
+Una fase que NZT no conoce usa el cangrejo sin sombrero y un color neutro.
+
+## Dónde aparece
+
+Al costado de la conversación, cuando Claude Code tiene lugar para ponerlo; si no, queda
+esperando y `/nzt-software-state` dice por qué. Se abre solo al empezar la sesión si la carpeta donde
+se abrió tiene `Plan/state.json`; en una subcarpeta del proyecto, o en un proyecto sin estado,
+no aparece, y abierto con `/nzt-software-state` dice que no hay estado hasta que el archivo exista.
+
+Un cambio en el estado se ve en 2 segundos como máximo, y en el acto cuando lo escribe el
+agente. Lee también los estados escritos con formatos anteriores de NZT. Lo único que
+escribe en `Plan/state.json` es la clave `delegation`, cuando apretás Delegar, y deja el
+resto del archivo byte por byte; no corrige nada más.
+
+En la terminal se dibuja con celdas de color, y se ve completo en terminales de 24 bits
+(Windows Terminal, iTerm2, Ghostty, kitty, WezTerm; Terminal.app desde macOS Tahoe). En la
+app de escritorio y en VS Code se dibuja como SVG, con los mismos dibujos, y el panel se acomoda
+al ancho de la app en lugar de contar columnas: el avance es una barra y cada fila ocupa lo que
+queda al lado de su marca.
+
+## Idioma
+
+El panel habla **español** (por defecto) o **inglés**. Se elige al instalarlo y se cambia
+en el menú de configuración de Claude Code o con:
+
+```bash
+claude plugin configure nzt-software-state
+```
+
+Lo que viene del estado —objetivo, unidades, notas— se muestra tal como está escrito.
+
+## Instalación
+
+En una sesión de Claude Code en la terminal (versión 2.1.275 o posterior):
+
+```
+/plugin install nzt-software-state --marketplace Ezefeola/nzt-ai
+```
+
+Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerlo en todos
+los proyectos.
+
+Es un plugin de Claude Code aparte del método: los demás mods están en la sección **Mods** del
+[`README.md`](../../nzt-software/README.md) de nzt-software.
+
+**Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
+`/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
+versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-software-state@nzt` en
+la terminal.
+
+Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-software-state@nzt`.
+
+## Desarrollo
+
+```bash
+claude plugin validate mods/nzt-software-state   # manifiesto, hooks y contrato de tipos
+claude plugin test mods/nzt-software-state       # los tests de hooks/*.test.ts
+claude --plugin-dir mods/nzt-software-state      # una sesión con el mod cargado desde la carpeta
+```
+
+Para ver el panel con un estado que tiene de todo —fases hechas, en curso, pendientes y
+descartadas, con unidades en cada estado— abrí una sesión en `mods/nzt-software-state/demo/`, que
+trae su propio `Plan/state.json` de prueba.
+
+Que los tests pasen no prueba que el módulo cargue en una sesión: probalo siempre cargado
+de verdad. Todo lo que use `$` va en `hooks/register.tsx`, porque la sesión no acepta `$`
+pasado a una función importada de otro archivo.
+
+El chequeo de tipos (`tsc -p mods/nzt-software-state/tsconfig.json`) necesita los tipos del motor en
+`.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta, con
+su propio `.gitignore`, así que git no los sigue.
+
+La spec, con sus reglas, está en [`Plan/specs/mods/nzt-software-state/spec.md`](../../Plan/specs/mods/nzt-software-state/spec.md),
+y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../Plan/specs/nzt-mods.md).

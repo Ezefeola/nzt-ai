@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: change-existing-plan
+expected_outcome: |
+  Reads Plan/state.md, proposes where the new chapter goes and what changes in the order, shows the change before applying it and leaves Plan/state.md untouched until the yes.
+context:
+  scaffold_script: place-files.sh

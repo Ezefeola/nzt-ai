@@ -1,47 +1,91 @@
 {
   "version": 2,
-  "updated": "2026-11-06T06:50:00Z",
-  "goal": "NZT también como plugin de Claude Code: una skill /nzt:setup que escribe el kernel en un CLAUDE.md con un script, más un hook que avisa si quedó viejo o hay dos bloques (rama nzt-plugin-for-claude, D91, specs/nzt-plugin.md)",
+  "updated": "2026-11-08T04:20:11Z",
+  "goal": "specs/pendientes.md: S1 a S4 hechos; S5: una sola forma de instalar nzt-software, como plugin en Claude Code y en Codex, sin el CLI nzt-ai (rama pendientes-post-v5)",
   "cadence": "upfront",
   "slices": [
     {
       "id": "S1",
-      "name": "Qué hace el plugin y cómo se arma",
+      "name": "Herramientas en cualquier fase, sin packs",
       "status": "done",
       "phases": [
-        {
-          "name": "discovery",
-          "status": "done",
-          "units": [
-            {
-              "id": 461,
-              "do": "Verificar en las fuentes y anotar como hechos en specs/nzt-core.md lo que el diseño supone: plugins de Codex (skills, scripts, AGENTS.md) y, en Claude Code, disable-model-invocation, ${CLAUDE_PLUGIN_ROOT} en skills y choque de nombres",
-              "status": "done",
-              "detail": "Hechos C7 (Claude Code) y C8 (Codex) en specs/nzt-core.md sección 3. Claude Code: todo lo que el diseño supone está documentado. Codex: el plugin trae skills pero no AGENTS.md, los hooks no corren sin revisión del usuario, y cómo llega una skill a su script y con qué nombre se invoca quedan sin verificar (prueba contra Codex 0.164.0)"
-            },
-            {
-              "id": 462,
-              "do": "Spec del plugin en specs/nzt-plugin.md: setup global o de proyecto, aviso de versión, desinstalación, convivencia con el instalador y lo que queda afuera",
-              "status": "done",
-              "detail": "specs/nzt-plugin.md: reglas RN-plugin-*, historias, Q-01 a Q-08 contestadas el 2026-11-04 (solo Claude Code; global o CLAUDE.md del proyecto; una sola skill de setup que instala y quita; se frena ante nzt-ai; avisa la versión; guarda en el kernel). Q-09 se contestó en la 464"
-            }
-          ]
-        },
         {
           "name": "architecture",
           "status": "done",
           "units": [
             {
-              "id": 463,
-              "do": "D91 en specs/nzt-core.md: revisa D24, NZT también se distribuye como plugin con skill de setup",
-              "status": "done",
-              "detail": "D91 en specs/nzt-core.md sección 12, aceptada por el usuario: cinco opciones con su costo, lo que se acepta y cómo revertirla. D24 marcada como revisada por D91; las menciones de 'no se distribuye como plugin' en nzt-core (C5 y sección 9) y nzt-installer §1 corregidas. README sin tocar hasta publicar"
+              "id": 497,
+              "do": "D96 en specs/nzt-core.md: qué se va (packs/, nzt-games, nzt-ai project), la regla general de herramientas y tech.md con tecnologías y prácticas; QT-114 a QT-118 con sus respuestas",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 498,
+              "do": "core/kernel.md: la sección Packs pasa a elegir las references de nzt-software por las filas de tech.md, y una sección Agent tools con la regla general",
+              "status": "done"
             },
             {
-              "id": 464,
-              "do": "Diseño técnico en specs/nzt-plugin.md: variante del build con nombres nzt:, script de setup .ps1 y .sh, hook de versión y chequeo byte a byte del bloque",
+              "id": 499,
+              "do": "skills/nzt/research/references/tools.md nueva: buscar en fuentes oficiales, proponer, instalar en el proyecto, registrar en Docs/agent-tools.md, comprobar y anotar rechazos",
+              "status": "done"
+            },
+            {
+              "id": 500,
+              "do": "skills/nzt/architecture/references/tech.md sin packs: tecnologías y prácticas como filas, el paso 4 apunta a la regla general y las herramientas salen a Docs/agent-tools.md",
+              "status": "done"
+            },
+            {
+              "id": 501,
+              "do": "skills/nzt/software/SKILL.md y choosing.md eligen references por las filas de tech.md; references de software sin la palabra pack",
+              "status": "done"
+            },
+            {
+              "id": 502,
+              "do": "El resto del método sin packs: routers architecture, build, plan, ship, research, retro y sus references, y agents/nzt-worker.md y .toml",
+              "status": "done"
+            },
+            {
+              "id": 503,
+              "do": "Borrar skills/nzt/games y packs/; install/build.sh y build.ps1 sin validar packs; release.yml sin el test de nzt-games",
+              "status": "done"
+            },
+            {
+              "id": 504,
+              "do": "installer: quitar el subcomando project, PackCatalog.cs, el recurso embebido del csproj y sus checks; installer/README.md y specs/nzt-installer.md al día",
+              "status": "done"
+            },
+            {
+              "id": 505,
+              "do": "evals: routing/pack-setup pasa a tool-setup, fixtures (packs.sh, project.sh) y casos stack con tech.md sin packs",
+              "status": "done"
+            },
+            {
+              "id": 506,
+              "do": "README.md, .github/plugin-README.md y specs/pendientes.md al día: sin packs ni nzt-games, punto 1 hecho",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 507,
+              "do": "Correr install/build.sh y build.ps1, los checks del installer y una búsqueda de pack o nzt-games que haya quedado",
               "status": "done",
-              "detail": "Sección 'Diseño técnico' de specs/nzt-plugin.md y registro QT-96 a QT-104, modo propuestas. Usuario: rama plugin (QT-96), una línea del adaptador traduce nombres (QT-97), Q-09 avisa y aplica uno (suma RN-plugin-dos-bloques y US-007). Sin verificar: QT-98 (hook igual en los tres sistemas) y QT-103 (subagente que precarga nzt:nzt-research)"
+              "detail": "build.sh y build.ps1 (pwsh) sin warnings, 13 skills; 184 checks del installer pasan; sin restos de packs fuera de la historia"
+            },
+            {
+              "id": 508,
+              "do": "Ofrecido: correr los evals de routing y stack afectados, una corrida, y anotar el resultado en specs/nzt-core.md",
+              "status": "dropped",
+              "detail": "el usuario: los casos se arman en 505, los evals no se corren por costo"
             }
           ]
         }
@@ -49,7 +93,7 @@
     },
     {
       "id": "S2",
-      "name": "El plugin funcionando en Claude Code, con evals",
+      "name": "NZT como paquete nzt-software",
       "status": "done",
       "phases": [
         {
@@ -57,10 +101,9 @@
           "status": "done",
           "units": [
             {
-              "id": 465,
-              "do": "Prueba contra Claude Code 2.1.312 que cierra QT-98 (hook igual en Windows con y sin Git Bash, macOS y Linux) y QT-103 (subagente que precarga una skill nzt:)",
-              "status": "done",
-              "detail": "Prueba en Windows anotada en specs/nzt-plugin.md (registro, prueba de la 465). QT-103 observado: el agente precarga nzt: sin problema. QT-98, usuario: la línea doble powershell ... -File check.ps1 || sh check.sh; sin aviso en Windows sin Git Bash ni PowerShell 7"
+              "id": 509,
+              "do": "D97 en specs/nzt-core.md: plugin nzt-software; skills y agentes sin prefijo nzt- solo en el plugin (kernel nzt-software:nzt); repo y Codex igual; mods y marketplace nzt con su nombre; v6.0.0 y cómo migra quien tiene nzt",
+              "status": "done"
             }
           ]
         },
@@ -69,28 +112,33 @@
           "status": "done",
           "units": [
             {
-              "id": 466,
-              "do": "Build: adaptador del plugin, kernel/CLAUDE.md con la línea nzt:plugin, chequeo byte a byte del kernel, subagentes y versión en dist/plugin",
+              "id": 510,
+              "do": "install/build.sh y build.ps1: plugin.json nzt-software; en dist/plugin carpetas y name: de skills y agentes sin nzt-, y el skills: de los agentes como nzt-software:<x>",
               "status": "done",
-              "detail": "core/adapter-claude-plugin.md (guarda, nombres nzt: salvo packs del proyecto); build.sh y build.ps1 arman kernel/CLAUDE.md con nzt:plugin <versión del csproj>, comparan su kernel con dist/CLAUDE.md, copian plugin/ y los subagentes con skills: nzt:nzt-research. Las dos salidas iguales salvo el CRLF previo de plugin.json en ps1"
+              "detail": "build.sh y build.ps1 dan el mismo dist/plugin: 13 skills y 2 agentes sin prefijo, plugin.json nzt-software"
             },
             {
-              "id": 467,
-              "do": "Scripts setup.ps1 y setup.sh (status, install, remove) con sus pruebas sobre los mismos casos",
-              "status": "done",
-              "detail": "plugin/skills/setup/scripts/setup.sh y setup.ps1 (5.1 y 7); plugin/tests/setup.test.sh: 18 casos, 54/54 en sh, pwsh y powershell en Windows. QT-105: actualizar un bloque editado también pide --force-edited. Sin probar en macOS y Linux reales"
+              "id": 511,
+              "do": "core/adapter-claude-skill.md: donde NZT nombra nzt-<x> se carga nzt-software:<x>, el kernel es nzt-software:nzt y se invoca /nzt-software:<name>",
+              "status": "done"
             },
             {
-              "id": 468,
-              "do": "Skill /nzt:setup que pregunta, simula, confirma con No marcado y corre los scripts",
+              "id": 512,
+              "do": "Instalación: .claude-plugin/marketplace.json, install/install.sh y .ps1, installer (Installer.cs, CliCommand.cs, Manifest.cs, ModCatalog.cs y sus checks) y release.yml con nzt-software; quitar nzt si está instalado",
               "status": "done",
-              "detail": "plugin/skills/setup/SKILL.md: status, pregunta acción y alcance, --dry-run, confirma con No primero, aplica; los frenos los decide el script. El build la valida y claude plugin validate 2.1.312 pasa (avisa README e ícono: van en la 472). Sin probar en vivo: que allowed-tools evite el pedido de permiso (471)"
+              "detail": "nzt-ai no instala el plugin del método: cambian marketplace.json, ModCatalog.MethodPluginName, su check y la ruta skills/software en release.yml; la migración queda en los documentos"
             },
             {
-              "id": 469,
-              "do": "Hook SessionStart check (versión vieja y dos bloques) con sus pruebas",
+              "id": 513,
+              "do": "evals: casos y fixtures que esperan nzt:nzt-… pasan a nzt-software:…; no se corren",
               "status": "done",
-              "detail": "plugin/hooks/hooks.json (línea doble de QT-98), check.sh y check.ps1; plugin/tests/check.test.sh: 11 casos, 33/33 en sh, pwsh y powershell, y fallan al romper el script a propósito. La línea real corre con 0 contra dist/plugin. Sin verificar: que systemMessage de SessionStart se vea (471)"
+              "detail": "44 archivos: skills nzt-software:<x> y rutas skills/<x>/references; se arregló el [/\\]+ roto de tool-research y tool-setup"
+            },
+            {
+              "id": 514,
+              "do": "Documentos: README.md, .github/plugin-README.md, installer/README.md, READMEs de mods, specs/nzt-plugin.md y nzt-installer.md, specs/pendientes.md; versión 6.0.0 en Nzt.Cli.csproj y .github/releases/v6.0.0.md",
+              "status": "done",
+              "detail": "installer/README.md y los README de mods no nombraban el plugin del método: sin cambios"
             }
           ]
         },
@@ -99,236 +147,10 @@
           "status": "done",
           "units": [
             {
-              "id": 470,
-              "do": "Evals: traducción de nombres nzt:, guarda sin el plugin y que /nzt:setup no se dispare solo",
+              "id": 515,
+              "do": "Correr build.sh y build.ps1 y los checks del installer, revisar nombres y descriptions en dist/plugin, y buscar nzt:nzt- o nzt@nzt que haya quedado",
               "status": "done",
-              "detail": "evals/plugin: names, guard, setup-unasked, fixture plugin-block.sh, el build copia CLAUDE.plugin.md. Calibración de una corrida, US$1,00: names 1.00, setup-unasked 1.00, guard 1.00 con plugin y 0.67 sin él (avisa bien, pero responde con la forma de NZT). Anotado en evals/README.md. QT-106 (usuario, A): sin plugin cuenta avisar y no correr el ciclo; criterio de guard reescrito, sin volver a correr"
-            },
-            {
-              "id": 471,
-              "do": "Prueba en vivo con --plugin-dir: instalar global y en un proyecto, frenos, aviso de versión, dos bloques y quitar",
-              "status": "done",
-              "detail": "Preparado: build al día, nzt-ai desinstalado por el usuario (sin CLAUDE.md global, sin manifiesto, sin CLI), carpeta de prueba en el scratchpad (prueba-plugin/proyecto con un CLAUDE.md propio). Ronda 1 corrida por el usuario: bloque instalado en el proyecto, su texto intacto debajo, registro en plugins/data/nzt-inline. De ahí salieron QT-107 (sin copias: sacadas de setup.sh/ps1, tests 54/54, spec y SKILL) y QT-108 (No primero sin marca). Sin pedido de permiso y hook callado al reabrir (anotado en la spec). Ronda 2 corrida y anotada en la spec: aviso de versión visible, freno por editado, un solo NZT, aviso de dos bloques, quitar el del proyecto idéntico al original. Quitar el global no corrió en vivo (falló el clasificador del modo automático); verificado sobre una copia, y el agente borró a pedido del usuario el ~/.claude/CLAUDE.md de prueba (idéntico al bloque). Sin aclarar: si allowed-tools evita el clasificador del modo automático. nzt-ai sigue desinstalado. El freno por nzt-ai presente queda cubierto solo por plugin/tests"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "S2b",
-      "name": "El método dentro de la skill nzt:nzt, sin setup ni hook (QT-109)",
-      "status": "done",
-      "phases": [
-        {
-          "name": "build",
-          "status": "done",
-          "units": [
-            {
-              "id": 473,
-              "do": "Variante del plugin: kernel dentro de nzt:nzt (entrada como referencia), sin /nzt:setup ni hook en dist/plugin",
-              "status": "done",
-              "detail": "core/adapter-claude-skill.md nuevo; install/build.sh y build.ps1 arman dist/plugin/skills/nzt/SKILL.md = kernel + ese adaptador (136 líneas, descripción de 199 caracteres que pide cargarla primero en toda sesión y tras compactar) y references/entry.md = el cuerpo de skills/nzt. Comprueba el kernel byte a byte contra CLAUDE.md. dist/plugin ya no trae /nzt:setup, hook ni kernel/CLAUDE.md; el bloque viejo queda solo como fixture (dist/CLAUDE.plugin.md) hasta la 476, y plugin/ sigue en el repo sin construirse. Las dos builds dan lo mismo; claude plugin validate 2.1.318 pasa. Ojo: la suite vieja siembra el kernel en CLAUDE.md y ahora además lo trae nzt:nzt (kernel dos veces); se resuelve en la 476"
-            }
-          ]
-        },
-        {
-          "name": "verify",
-          "status": "done",
-          "units": [
-            {
-              "id": 474,
-              "do": "Evals sin CLAUDE.md: nzt:nzt es la primera skill cargada, antes de otra skill y de editar, en pedidos variados y una pregunta suelta",
-              "status": "done",
-              "detail": "evals/skill (feature, implement, small-edit, question) + _fixtures/no-kernel.sh, sin CLAUDE.md. 3 corridas c/u, US$3,15 medidos: 12/12 con Skill(nzt:nzt) como primera herramienta (leído de la traza). Aplicó el método después. Para mirar: small-edit 1/3 escribió state.json en vez de editar; implement 1/3 escribió un doc de arquitectura antes de aprobar. Anotado en evals/README.md y la spec"
-            },
-            {
-              "id": 475,
-              "do": "Prueba en vivo: después de /compact el método sigue o nzt:nzt se vuelve a cargar; con el plugin desactivado no queda rastro de NZT",
-              "status": "done",
-              "detail": "En vivo, las 3 rondas como se esperaba: nzt:nzt primera en sesión nueva; tras /compact Claude Code re-adjuntó nzt:nzt y nzt:nzt-plan solo (Skills restored); sin plugin, Claude sin rastro de NZT. Desvíos del método (no de la carga): no objetó saltear el plan, pregunta sin id QT. Anotado en la spec"
-            },
-            {
-              "id": 476,
-              "do": "Decidir con los resultados: reescribir la spec y D91, retirar setup/hook/bloques y ajustar la guía de la landing, o plan B (hook de una línea)",
-              "status": "done",
-              "detail": "D92 aceptada (specs/nzt-core.md); spec del plugin reescrita arriba, registro intacto; specs/nzt-installer.md al día. Retirados plugin/, core/adapter-claude-plugin.md, evals/plugin y plugin-block.sh; el build ya no arma el bloque. Las dos builds iguales, validate pasa. Guía de la landing reescrita (unidad 31 de la landing). QT-111 (usuario, A): la suite pasa a medir el plugin en la 477"
-            },
-            {
-              "id": 477,
-              "do": "Suite al plugin (QT-111): los fixtures dejan de sembrar CLAUDE.md, \"ninguna skill\" pasa a \"ninguna salvo nzt:nzt\", kernel-loaded mide que carga nzt:nzt; correr la suite y recalibrar",
-              "status": "done",
-              "detail": "Hecho sin gastar modelo: project, kernel-only, node-project y foreign-repo ya no siembran CLAUDE.md, y el build ya no lo copia a _fixtures (sh y ps1). restraint/trivial pasa a no-skill-but-nzt (Skill que no sea nzt:nzt, max 0; regex probada en node), y kernel-loaded exige nzt:nzt exacto. READMEs de evals al día. Verificado: los 40 scaffolds corren desde dist/plugin sin dejar CLAUDE.md, las dos builds pasan y claude plugin validate pasa. Corridos los dos casos que cambiaron, 1 corrida, sin ablación, US$0,35 medidos: kernel-loaded 1.00 (nzt:nzt una vez, plan en castellano sin ejecutar) y restraint-trivial 1.00 (ninguna skill salvo nzt:nzt). Anotado en evals/README.md. Sin correr el resto de la suite contra el plugin (40 casos x 3, del orden de US$20-30), a propósito por el límite de uso: correrla antes de confiar en otros umbrales"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "S2c",
-      "name": "Los packs dentro del plugin: nzt-software y nzt-games (D93)",
-      "status": "done",
-      "phases": [
-        {
-          "name": "architecture",
-          "status": "done",
-          "units": [
-            {
-              "id": 478,
-              "do": "D93 en specs/nzt-core.md: las reglas de los packs viajan con el marco, una skill por dominio con referencias a un nivel",
-              "status": "done",
-              "detail": "Aceptada por el usuario en el debate: un solo plugin, software y juegos separados, todo a un nivel del SKILL.md (Skill authoring best practices de Anthropic, leída el 2026-11-05). Revisa D88"
-            }
-          ]
-        },
-        {
-          "name": "build",
-          "status": "done",
-          "units": [
-            {
-              "id": 479,
-              "do": "skills/nzt/software: SKILL.md router (tabla por tema, genérico a la izquierda) y references/<pack>/ movidas desde packs/ sin encadenarse",
-              "status": "done",
-              "detail": "git mv de las 75 referencias; quitadas las líneas Builds on/read it first y los Read architecture.md first, el orden pasa al router. Reglas de C# a csharp/rules.md. 151 líneas, descripción de 199"
-            },
-            {
-              "id": 480,
-              "do": "skills/nzt/games: SKILL.md y unity/editor.md con la conexión al editor",
-              "status": "done",
-              "detail": "Lo único que tenía unity era el MCP; editor.md lo dice por plataforma. Sin reglas de juego todavía"
-            },
-            {
-              "id": 481,
-              "do": "Kernel *Packs*, adaptador del plugin, nzt-build, nzt-ship, nzt-retro y nzt-architecture (catálogo, claude mcp add / plugin install --scope project, ejes desde la skill del dominio)",
-              "status": "done",
-              "detail": "Comandos verificados con --help de Claude Code"
-            },
-            {
-              "id": 482,
-              "do": "packs/ como catálogo de MCP (csharp, dotnet, blazor, unity, sin requires); build: chequeo de referencias en subcarpetas sin índice, sin copiar packs a fixtures; checks del instalador",
-              "status": "done",
-              "detail": "Las dos builds iguales y sin avisos; validate pasa; check de packs del instalador reescrito"
-            },
-            {
-              "id": 483,
-              "do": "Evals: graders a nzt-software/references/<pack>/, not-dotnet mide que no lee references/dotnet ni blazor, packs.sh sin efecto",
-              "status": "done",
-              "detail": "15 rutas de graders comprobadas contra disco; 40 scaffolds corren"
-            },
-            {
-              "id": 484,
-              "do": "Auditoría con gestionar-skills, specs del plugin e instalador al día, y humo de los casos stack/",
-              "status": "done",
-              "detail": "Dry-run del instalador: 155 archivos (14 skills + 137 referencias + CLAUDE.md + 2 agentes + manifiesto). Specs del instalador y descripciones de evals al día; routing/pack-setup reescrito: mide proponer el MCP con claude mcp add --scope project, no instalar packs. Humo con modelo, 1 corrida, sin ablación, ~US$2,5 en total: stack-ef-listado 0.89 (carga nzt-software y lee paginación, consultas y DTOs; nunca lee dotnet/ef-core.md, ni con la fila every time ni nombrándolo en cada fila: va directo a los específicos) y stack-not-dotnet 0.75 (no lee nada de dotnet ni blazor; el juez falla porque frenó a preguntar el contrato de la paginación). Sin línea base desde D88 para saber si ef-core-base-read fallaba antes. Corregido después: dotnet/ef-core.md era una base que el agente salteaba y repetía a ef-core-queries; sus reglas propias pasaron a ef-core-queries, ef-core-writes y ef-core-mappings, y salió su grader (el de tracking en el código sigue). El fixture Node trae US-012 especificada, el plugin de Prisma, la ruta tipada y schema.prisma; el juez de not-dotnet aclara que mostrar el código sin aplicarlo es lo esperado sin herramientas de escritura. Recorrida: stack-ef-listado 1.00 (US$0,60) y stack-not-dotnet 1.00 (US$0,25)"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "S2d",
-      "name": "state check como scripts de nzt-plan, para el plugin y el irm, sin depender del CLI",
-      "status": "done",
-      "phases": [
-        {
-          "name": "build",
-          "status": "done",
-          "units": [
-            {
-              "id": 485,
-              "do": "skills/nzt/plan/scripts/state-check.py (macOS, Linux) y state-check.ps1 (Windows, PS 5.1 y 7, UTF-8 con BOM) con las reglas, mensajes y orden de StateCheck.cs",
-              "status": "done",
-              "detail": "Paridad en installer/tests/Nzt.Cli.Checks (CheckState corre cada estado también por los scripts; StateScriptsMatchTheCli): 69 corridas iguales al CLI con python, powershell y pwsh; 241 checks pasan. El error de JSON solo compara que lo sea (el texto es del parser)"
-            },
-            {
-              "id": 486,
-              "do": "Build e instalador llevan scripts/ de cada skill",
-              "status": "done",
-              "detail": "Build: copia los scripts igual al repo (cmp). Instalador: csproj embebe skills/**/scripts/*.*; ContentCatalog decodifica los scripts desde sus bytes (StreamReader quitaba el BOM aun sin detección: el check lo atrapó) y Manifest.Hash ignora un BOM inicial (File.ReadAllText lo quita al releer). Check InstallsTheScriptsByteForByte: embebe los 2, instala byte a byte, reinstalar sin editados, desinstalar los borra. 246 checks pasan"
-            },
-            {
-              "id": 487,
-              "do": "Kernel (core/kernel.md:111), nzt-plan SKILL.md (47, 84) y sus references state.md y parallel.md: correr el script de nzt-plan (.ps1 en Windows, .py en macOS/Linux) en vez de nzt-ai state check; sin intérprete, validar contra el contrato y avisar",
-              "status": "done",
-              "detail": "Kernel: la hard rule dice correr el state check de nzt-plan. nzt-plan SKILL.md: sección State check (powershell -NoProfile -ExecutionPolicy Bypass -File <carpeta>/scripts/state-check.ps1 en Windows, python3 .../state-check.py en macOS/Linux; sin intérprete, revisar contra references/state.md y decir que no corrió); paso 5 y Done when la nombran. state.md y parallel.md apuntan a SKILL.md. Las dos builds iguales, validate pasa, 246 checks; los dos comandos corridos desde dist/plugin dan exit 0 (python3 aquí es el alias de la Store; se probó con py). La carpeta de la skill es la que el host da al cargarla (visto en Claude Code; en Codex sin verificar). Specs (nzt-core D68, nzt-installer §12.2) quedan para D94 en la 490"
-            },
-            {
-              "id": 488,
-              "do": "Comprobación del instalador: instalar en una carpeta temporal y ver los scripts con BOM. OJO: en Windows el instalador ignora HOME/USERPROFILE (SpecialFolder.UserProfile); usar el destino que usan los otros checks",
-              "status": "done",
-              "detail": "Cubierta en la 486 por InstallsTheScriptsByteForByte: instala el catálogo real en una carpeta temporal (InTemp, Provider.ClaudeCode(home)) y compara bytes con el repo; el .ps1 sale con BOM"
-            },
-            {
-              "id": 489,
-              "do": "Verificar en las fuentes que macOS trae python3 con las Command Line Tools; anotarlo en la spec del plugin",
-              "status": "done",
-              "detail": "specs/nzt-plugin.md, 'El state check en macOS': las notas de Catalina 10.15 y 12.3 (documented) dicen que los runtimes son legado y que se quitó 2.7. Que python3 llega con las CLT por un shim en /usr/bin lo dice solo un ingeniero de Apple en el foro (rango 5). Sin verificar macOS 26 ni qué devuelve el shim sin CLT. nzt-plan SKILL.md: 'If the script cannot run (no interpreter, or macOS offers to install the Command Line Tools)'. El párrafo 'no hay scripts' de la spec, corregido. Build al día"
-            },
-            {
-              "id": 490,
-              "do": "D94 en specs/nzt-core.md (state check vive en nzt-plan como scripts; el CLI queda como instalador), commit y push",
-              "status": "done",
-              "detail": "D94 en specs/nzt-core.md (revisa D68, marcada); specs/nzt-installer.md §12.2 con la nota [modify] D94. Commit y push de S2d en nzt-plugin-for-claude"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "S2e",
-      "name": "El irm instala como el plugin: kernel dentro de la skill nzt, sin CLAUDE.md ni AGENTS.md, en Claude Code y Codex (QT-113)",
-      "status": "done",
-      "phases": [
-        {
-          "name": "architecture",
-          "status": "done",
-          "units": [
-            {
-              "id": 491,
-              "do": "D95 en specs/nzt-core.md (revisa D92 y lo anotado: una sola vía, la skill nzt) y specs/nzt-installer.md al día: qué instala, cómo migra el bloque viejo, Codex sin verificar",
-              "status": "done",
-              "detail": "D95 en specs/nzt-core.md: frontmatter común en core/skill-nzt.md, kernel + adaptador por host, entry como referencia, dist/claude-code/nzt y dist/codex/nzt, el bloque viejo sale como huérfano; acepta Codex sin evidencia y marcadores sin manifiesto sin tocar. specs/nzt-installer.md §2, §4, §7, §8, §9 I2 con [modify] D95"
-            }
-          ]
-        },
-        {
-          "name": "build",
-          "status": "done",
-          "units": [
-            {
-              "id": 492,
-              "do": "Adaptadores de skill por host para el irm (Claude Code con nombres nzt-, Codex) y el build arma la skill nzt de cada uno como la del plugin",
-              "status": "done",
-              "detail": "core/skill-nzt.md (frontmatter común); adapter-claude.md y adapter-codex.md reescritos como adaptadores de skill (esta skill es el kernel, entry.md, recargar tras compactar). build.sh y build.ps1: build_nzt arma dist/plugin/skills/nzt, dist/claude-code/nzt y dist/codex/nzt y borran dist/CLAUDE.md y AGENTS.md; sale el chequeo kernel_of (ahora es el mismo armado). Builds iguales, skill del plugin idéntica a la anterior, validate pasa"
-            },
-            {
-              "id": 493,
-              "do": "Instalador: la skill nzt lleva kernel + adaptador + references/entry.md, deja de escribir CLAUDE.md/AGENTS.md, al actualizar quita el bloque viejo; checks",
-              "status": "done",
-              "detail": "Installer.NztSkill compone frontmatter + kernel + adapter y entry.md; Plan ya no planea CLAUDE.md/AGENTS.md; sin la escritura del bloque, su pre-scan ni el backup; el bloque viejo sale por la lógica de huérfanos. Checks nuevos: InstallsTheKernelInsideTheNztSkill, RemovesTheBlockOfAnOldInstall, KeepsAnEditedOldBlock, LeavesMarkersWithoutAManifestAlone, NztSkillMatchesWhatTheBuildEmits (claude-code y codex idénticos al build), DoesNotTouchADamagedBlock sobre una instalación vieja. 248 pasan. Dry-run real: 156 archivos por proveedor, ninguno de instrucciones"
-            },
-            {
-              "id": 494,
-              "do": "install.ps1/install.sh, README y lo que nombre el kernel en CLAUDE.md/AGENTS.md, al día",
-              "status": "done",
-              "detail": "README (kernel en la skill nzt, el bloque viejo se quita), installer/README (tabla, convivencia, advertencias), comentarios de install.sh/ps1, glosario y build de specs/nzt-plugin.md, evals/README. Build, 248 checks y validate pasan. La guía de la landing (otra rama) no se tocó"
-            }
-          ]
-        },
-        {
-          "name": "verify",
-          "status": "done",
-          "units": [
-            {
-              "id": 495,
-              "do": "Prueba en vivo en Claude Code con el irm: nzt primera en sesión nueva, tras /compact, actualizar desde una instalación con bloque y desinstalar",
-              "status": "dropped",
-              "detail": "Usuario, 2026-11-06: no se corre; Claude Code ya quedó probado con el plugin (474, 475). Sin probar en vivo lo propio del irm: la skill en ~/.claude/skills con el nombre nzt, y quitar un bloque viejo real (cubierto solo por los checks)"
-            },
-            {
-              "id": 496,
-              "do": "Prueba en Codex con el usuario: carga nzt primero sin AGENTS.md",
-              "status": "done",
-              "detail": "Usuario, 2026-11-06: lo probó con el irm de esta rama y Codex cargó nzt bien. Observado por el usuario, sin traza revisada por el agente"
+              "detail": "build.sh y build.ps1 sin warnings y con el mismo dist/plugin (6.0.0, nzt-software, 13 skills, 2 subagentes); 184 checks del installer pasan; lo que queda de nzt:nzt es historia o la migración"
             }
           ]
         }
@@ -336,18 +158,197 @@
     },
     {
       "id": "S3",
-      "name": "Publicación",
-      "status": "todo",
+      "name": "Estructura de carpetas: todo en nzt-software/",
+      "status": "done",
       "phases": [
         {
-          "name": "ship",
-          "status": "todo",
+          "name": "architecture",
+          "status": "done",
           "units": [
             {
-              "id": 472,
-              "do": "Release v5: versión 5.0.0 de NZT, workflow de release a la rama plugin, entrada nzt en el marketplace y README",
-              "status": "todo",
-              "detail": "Con D93, D94 y D95: el plugin con nzt-software y nzt-games, y el irm con el método en la skill nzt. Se hace cuando el usuario avise que mergeó el PR de nzt-plugin-for-claude"
+              "id": 516,
+              "do": "D98 en specs/nzt-core.md: la raíz queda con marketplace, .github, Plan (con specs), README índice y LICENSE; el resto a nzt-software/ (method, evals, mods, build, cli, release, presentation); Plan/mejoras se borra; rama plugin-nzt-software",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 517,
+              "do": "git mv: core, skills y agents a nzt-software/method; evals, mods, presentation; install/build.* a build/, installer a cli/, install.* y variants.sh a cli/install/; .github/releases y plugin-README a nzt-software/release; specs a Plan/specs; borrar Plan/mejoras",
+              "status": "done",
+              "detail": "installer/src queda en disco con .vs, bin y obj ignorados: Visual Studio los tiene abiertos"
+            },
+            {
+              "id": 518,
+              "do": "nzt-software/build/build.sh y build.ps1 con las rutas nuevas; dist en nzt-software/dist; .gitignore al día",
+              "status": "done",
+              "detail": "build.sh da plugin, claude-code y codex idénticos a la línea base; .gitignore con nzt-software/dist y nzt-software/evals/results"
+            },
+            {
+              "id": 519,
+              "do": "cli: ContentRoot e includes del Nzt.Cli.csproj, RepoRoot y rutas de los checks y del CLI",
+              "status": "done",
+              "detail": "ContentRoot en method/ y RepoRoot para el marketplace; los checks buscan el repo por nzt-software/method/core/kernel.md; 184 checks y verify pasan"
+            },
+            {
+              "id": 520,
+              "do": "Workflow: nzt-software-release.yml con las rutas nuevas, filtro de paths y publicación en la rama plugin-nzt-software",
+              "status": "done",
+              "detail": "nzt-software-release.yml: rutas nuevas, filtro paths en pull_request y rama plugin-nzt-software; variants.sh corre desde cli/install"
+            },
+            {
+              "id": 521,
+              "do": ".claude-plugin/marketplace.json: mods en ./nzt-software/mods/ y el plugin en ref plugin-nzt-software",
+              "status": "done",
+              "detail": "mods en ./nzt-software/mods/ y el plugin en ref plugin-nzt-software"
+            },
+            {
+              "id": 522,
+              "do": "Rutas citadas en skills, kernel, evals, specs, READMEs de mods y comentarios: specs/, install/, installer/, mods/, core/, skills/",
+              "status": "done",
+              "detail": "rutas reescritas en specs, READMEs, mods, CLI y build; mockups HTML y datos de tests sin tocar; las decisiones viejas de nzt-core.md citan las rutas de su momento"
+            },
+            {
+              "id": 523,
+              "do": "README.md raíz como índice de productos y nzt-software/README.md con la guía de hoy",
+              "status": "done",
+              "detail": "README.md raíz como índice; nzt-software/README.md con su árbol nuevo"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 524,
+              "do": "Correr build.sh y build.ps1, los checks y verify del CLI, comparar dist con la línea base guardada antes de mover y buscar rutas viejas",
+              "status": "done",
+              "detail": "build.sh y build.ps1 sin warnings e iguales; skills de plugin, claude-code y codex idénticas a la línea base (solo cambia el texto de evals/README); 184 checks y verify pasan; 0 enlaces relativos rotos"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "name": "Partir nzt-core.md y fijar el latest de los releases",
+      "status": "done",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 525,
+              "do": "D99 con QT-119 (nzt-core.md en cuatro archivos dentro de Plan/specs/nzt-core/) y QT-120 (nzt-software publica con --latest; otro producto usa <producto>-vX.Y.Z y --latest=false)",
+              "status": "done"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 526,
+              "do": "Partir Plan/specs/nzt-core.md en Plan/specs/nzt-core/README.md (§1–11 y Fuentes), decisions.md (§12), temper-v3.md (§13) y build-status.md (§14), con los números de sección intactos",
+              "status": "done",
+              "detail": "README 1044, decisions 2520, temper-v3 1374, build-status 641 líneas; README con git mv para conservar la historia"
+            },
+            {
+              "id": 527,
+              "do": "Referencias a nzt-core.md en specs, READMEs, mods, CLI, build y workflow: a README.md o a decisions.md según lo que citan",
+              "status": "done",
+              "detail": "referencias a nzt-core.md en 13 archivos: las que citan una D-NN o R1 a decisions.md, el resto a README.md; los mockups HTML y el histórico de state.json sin tocar"
+            },
+            {
+              "id": 528,
+              "do": "nzt-software-release.yml publica con --latest; la regla de tags por producto en nzt-installer.md y en la sección 9",
+              "status": "done",
+              "detail": "el release publica con --latest; la regla de tags por producto en nzt-installer.md 10.1 y en la sección 9"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 529,
+              "do": "Builds, checks y verify del CLI, enlaces relativos y búsqueda de nzt-core.md suelto",
+              "status": "done",
+              "detail": "builds sin warnings e iguales, skills idénticas a la línea base; 184 checks y verify pasan; 0 enlaces rotos; nzt-core.md solo queda en el texto de D99 y en mockups"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "name": "Solo plugin, en Claude Code y en Codex",
+      "status": "done",
+      "phases": [
+        {
+          "name": "architecture",
+          "status": "done",
+          "units": [
+            {
+              "id": 530,
+              "do": "D100: nzt-software se instala solo como plugin en Claude Code y en Codex; QT-121 se borra el CLI nzt-ai; lo verificado de Codex con fuente y fecha, y lo que queda para el spike",
+              "status": "done"
+            },
+            {
+              "id": 531,
+              "do": "Spike en Codex con un plugin mínimo en un marketplace local: si la skill nzt carga primero, cómo nombra las skills del plugin, si un plugin trae subagentes, y si lee .claude-plugin/marketplace.json con la fuente github",
+              "status": "done",
+              "detail": "codex 0.164.0 en un CODEX_HOME descartable: instala el plugin con su .claude-plugin/plugin.json; lee .agents/plugins/marketplace.json antes que el de .claude-plugin; no entiende la fuente github de Claude (saltea nzt-software) y sí los mods locales; source url con ref sale como git. Nombres nzt-software:<x> según openai/codex PR 28608, no probado en una sesión"
+            }
+          ]
+        },
+        {
+          "name": "build",
+          "status": "done",
+          "units": [
+            {
+              "id": 532,
+              "do": "Build: dist/plugin con el manifiesto de Codex (o una variante de Codex si el spike lo pide) y el adapter del plugin para Codex",
+              "status": "done",
+              "detail": "un solo adapter (adapter-plugin.md) para Claude Code y Codex; se borran adapter-claude.md, adapter-codex.md y los .toml de los subagentes; la versión sale de nzt-software/VERSION; el build arma solo dist/plugin"
+            },
+            {
+              "id": 533,
+              "do": "Marketplace de Codex: .agents/plugins/marketplace.json, o el de .claude-plugin si el spike muestra que alcanza",
+              "status": "done",
+              "detail": ".agents/plugins/marketplace.json con solo nzt-software (fuente url y ref plugin-nzt-software): Codex lo lee antes que el de .claude-plugin, y así no ve los mods"
+            },
+            {
+              "id": 534,
+              "do": "Borrar nzt-software/cli (instalador, checks, one-liners) y lo que solo servía al instalador (adapter-claude.md, dist/claude-code, dist/codex); workflow sin binarios ni prueba de migración, con build y state check como puertas",
+              "status": "done",
+              "detail": "se borra nzt-software/cli; workflow con puertas build y state check, versión en VERSION, sin binarios ni prueba de migración; el release se crea sin assets"
+            },
+            {
+              "id": 535,
+              "do": "Documentos: READMEs con la instalación como plugin en los dos proveedores, notas de la v6.0.0 con la migración desde nzt-ai, nzt-installer.md retirada, nzt-plugin.md con Codex, sección 9 y pendientes",
+              "status": "done",
+              "detail": "READMEs, mods, plugin-README y notas v6.0.0; nzt-installer.md retirada; nzt-plugin.md con Codex, los dos marketplaces y QT-121; sección 9 de nzt-core/README.md reescrita con la regla de tags; nzt-mods.md y pendientes.md al día; build.sh y build.ps1 sin warnings e iguales"
+            }
+          ]
+        },
+        {
+          "name": "verify",
+          "status": "done",
+          "units": [
+            {
+              "id": 536,
+              "do": "Builds; instalar el plugin desde una carpeta local en Claude Code y en Codex y ver que la skill nzt carga primero; buscar restos de irm, curl y nzt-ai",
+              "status": "dropped",
+              "detail": "el usuario: si funciona en Claude Code, en Codex también; no se prueba la instalación en vivo"
             }
           ]
         }
@@ -357,15 +358,20 @@
   "approved": true,
   "delegation": "ask",
   "autonomy": {
-    "units": [],
+    "units": [
+      530,
+      531,
+      532,
+      533,
+      534,
+      535
+    ],
     "keep_stops": []
   },
-  "waiting_on": "PR #13 mergeado. La 472 queda pendiente de revisar el PR de release y autorizar el tag v5.0.0.",
+  "waiting_on": "el usuario: publicar el release v6.0.0; después, merge y deploy de la rama instalacion-plugin de nzt-ai-landing",
   "notes": [
-    "Codex: D95 probado por el usuario (496). Evals: el usuario decidió no correr la suite completa por costo (2026-11-06); se prueba en uso",
-    "S1 y S2 en db92912, S2b (473-476) en f5ea141, rama nzt-plugin-for-claude. La guía de la landing está sin commitear en landing-docs-mods-palette",
-    "Run anterior: nzt-look 0.8.3 mergeado en el PR #12 sin la unidad 459 (probar las tablas en la app), que quedó pendiente",
-    "2026-11-05: el agente instaló NZT por error en el ~/.claude real (Windows ignora HOME); el usuario lo desinstaló el 2026-11-06 (verificado: sin CLAUDE.md, skills nzt* ni agentes). Sin NZT global, las guías se leen de skills/ del repo",
-    "QT-113 (usuario, 2026-11-06) revisa lo anterior: el irm instala igual que el plugin (kernel en la skill nzt, sin CLAUDE.md/AGENTS.md) en Claude Code y Codex; Codex lo prueba el usuario al final. Los chequeos viven como scripts en las skills; el CLI queda como instalador. Orden: S2d, S2e, PR y la 472"
+    "D96 a D99 hechos y pusheados en origin/pendientes-post-v5 (último a3bbdb0). Desde S5 el usuario no quiere commit ni push hasta que lo pida.",
+    "Codex verificado el 2026-11-08 en developers.openai.com/plugins/build/plugins y learn.chatgpt.com/docs/developer-commands: codex plugin marketplace add owner/repo[@ref], codex plugin add <plugin@marketplace>; lee .claude-plugin/marketplace.json como legado; no documenta subagentes ni el nombre de las skills del plugin.",
+    "Landing en la rama instalacion-plugin de nzt-ai-landing, pusheada: explica solo el plugin; no se publica hasta el release v6.0.0."
   ]
 }

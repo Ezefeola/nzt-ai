@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: new-topic-italian
+expected_outcome: |
+  Treats it as a topic to keep up: probes where the person really is with a small question or task instead of asking how much they know, asks only what changes the objectives, and does not write a plan, state file or lesson before the person answers and approves.

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: train-sales-emails
+expected_outcome: |
+  Treats it as practice on something the person already does: isolates one part to work on and says the rest is not looked at, gives a first repetition on a concrete case with what a good result looks like, does not write the email for them, and waits for their attempt.

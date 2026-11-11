@@ -1,0 +1,3 @@
+# Capítulo 2: macetas y sustrato
+
+Cualquier maceta sirve si tiene agujeros abajo...

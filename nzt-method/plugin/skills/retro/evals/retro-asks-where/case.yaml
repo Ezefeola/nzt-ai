@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: retro-asks-where
+expected_outcome: |
+  Asks where to save the retro before writing, suggesting a place inside the work folder, and writes no file yet.
+context:
+  scaffold_script: place-files.sh

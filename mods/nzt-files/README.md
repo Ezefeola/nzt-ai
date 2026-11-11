@@ -1,6 +1,6 @@
 # nzt-files
 
-> Versión **0.5.7** · spec en [`specs/mods/nzt-files/spec.md`](../../specs/mods/nzt-files/spec.md)
+> Versión **0.5.7** · spec en [`Plan/specs/mods/nzt-files/spec.md`](../../Plan/specs/mods/nzt-files/spec.md)
 
 Un panel lateral de Claude Code para **recorrer el proyecto como el explorador de VS Code**:
 arriba el árbol de carpetas y archivos, abajo el archivo elegido, los dos a la vez. Sirve
@@ -13,12 +13,12 @@ para ver **qué lee y qué escribe Claude** mientras trabaja.
 │ ⌕ Buscar (s)      g:± Cambios d:⊞ Desplegar p:⊟ Plegar │
 │ ▸ mods/                               19 oct   M:2     │
 │ ▸ Plan/                               19 oct   U:1 M:1 │
-│ ▾ specs/                              19 oct   M:2     │
+│ ▾ Plan/specs/                              19 oct   M:2     │
 │     mockup.html              +212 -96 19 oct   M       │
 │     spec.md                  +241 -18 19 oct   M       │
 │   README.md                            9 oct           │
 │ ────────────────────────────────────────────────────── │
-│ specs/mods/nzt-files/spec.md                           │
+│ Plan/specs/mods/nzt-files/spec.md                           │
 │ M modificado · Markdown · 31 KB · 412 líneas           │
 │ ☑ Markdown  Ampliar  Copiar ruta  Abrir ↗              │
 │ Mod · nzt-files — explorador del proyecto              │
@@ -31,7 +31,7 @@ para ver **qué lee y qué escribe Claude** mientras trabaja.
 
 El panel mide siempre lo mismo: abrir carpetas o elegir otro archivo no lo estira ni mueve
 el botón. El mockup completo, con todos sus estados, está en
-[`specs/mods/nzt-files/mockup.html`](../../specs/mods/nzt-files/mockup.html).
+[`Plan/specs/mods/nzt-files/mockup.html`](../../Plan/specs/mods/nzt-files/mockup.html).
 
 **Es opcional.** NZT funciona completo sin el panel. Funciona solo en Claude Code, porque
 Codex no tiene mods. Las marcas de git necesitan que el proyecto esté en un repositorio; sin
@@ -146,13 +146,13 @@ En una sesión de Claude Code en la terminal (versión 2.1.303 o posterior):
 Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerlo en todos
 los proyectos.
 
-También viene con NZT: la línea `install-claude-full`, o el instalador con `--mods all`,
-instala todos los mods (sección **Mods** del [`README.md`](../../README.md) del repo).
+Es un plugin de Claude Code aparte del método: los demás mods están en la sección **Mods** del
+[`README.md`](../../nzt-software/README.md) de nzt-software.
 
 **Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
 `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
 versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-files@nzt` en
-la terminal, o volver a correr el instalador de NZT.
+la terminal.
 
 Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-files@nzt`.
 
@@ -172,5 +172,5 @@ El chequeo de tipos (`tsc -p mods/nzt-files/tsconfig.json`) necesita los tipos d
 `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta,
 con su propio `.gitignore`, así que git no los sigue.
 
-La spec, con sus reglas, está en [`specs/mods/nzt-files/spec.md`](../../specs/mods/nzt-files/spec.md),
-con el mockup al lado, y las reglas de todos los mods, en [`specs/nzt-mods.md`](../../specs/nzt-mods.md).
+La spec, con sus reglas, está en [`Plan/specs/mods/nzt-files/spec.md`](../../Plan/specs/mods/nzt-files/spec.md),
+con el mockup al lado, y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../Plan/specs/nzt-mods.md).

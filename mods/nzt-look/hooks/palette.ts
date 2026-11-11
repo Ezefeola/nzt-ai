@@ -51,7 +51,7 @@ const theme = (
   code: Theme['code'] = null,
 ): Theme => ({ name, label, dark: paletteOf(dark), light: light === null ? null : paletteOf(light), words: { es, en }, code })
 
-// nzt is specs/nzt-brand.md, which rules over it: its dark palette takes the reading tones, not
+// nzt is Plan/specs/nzt-brand.md, which rules over it: its dark palette takes the reading tones, not
 // the brand's own values, which glare over a long conversation. The other fifteen carry the colors
 // of the public themes they are named after.
 export const THEMES: readonly Theme[] = [

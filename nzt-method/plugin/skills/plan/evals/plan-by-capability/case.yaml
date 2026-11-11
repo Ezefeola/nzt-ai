@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: plan-by-capability
+expected_outcome: |
+  With the tasks part defined as four capabilities with acceptance criteria, it cuts units by capability (one each, or a few small ones together), never by layer (database, screens), each unit's done criterion citing the acceptance criteria by id; it asks for approval and writes nothing before the yes.
+context:
+  scaffold_script: place-files.sh

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: new-app-interview
+expected_outcome: |
+  A new app is never direct: it goes to understanding what is wanted first, in plain language, asking more than the feature list (purpose, how the person manages today, a concrete or bad case), with no question about technology, language or storage technology, recording the questions, and building nothing.

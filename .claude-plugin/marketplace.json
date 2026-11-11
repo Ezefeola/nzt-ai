@@ -3,17 +3,30 @@
   "owner": {
     "name": "Ezefeola"
   },
-  "description": "NZT and its optional mods for Claude Code",
+  "description": "NZT plugins (the generic method and NZT for software) and their optional mods for Claude Code",
   "plugins": [
     {
       "name": "nzt",
-      "source": { "source": "github", "repo": "Ezefeola/nzt-ai", "ref": "plugin" },
-      "description": "The NZT method, its agents and the software and games packs"
+      "source": {
+        "source": "github",
+        "repo": "Ezefeola/nzt-ai",
+        "ref": "plugin-nzt"
+      },
+      "description": "The generic NZT method, for any work in any domain"
     },
     {
-      "name": "nzt-state",
-      "source": "./mods/nzt-state",
-      "description": "Live pane with the NZT plan and state from Plan/state.json"
+      "name": "nzt-software",
+      "source": {
+        "source": "github",
+        "repo": "Ezefeola/nzt-ai",
+        "ref": "plugin-nzt-software"
+      },
+      "description": "The NZT method, its agents and its software rules"
+    },
+    {
+      "name": "nzt-software-state",
+      "source": "./mods/nzt-software-state",
+      "description": "nzt-software mod: live pane with the plan and state from Plan/state.json"
     },
     {
       "name": "nzt-changes",

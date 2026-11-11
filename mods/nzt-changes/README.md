@@ -1,6 +1,6 @@
 # nzt-changes
 
-> Versión **0.6.0** · spec en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md)
+> Versión **0.6.0** · spec en [`Plan/specs/mods/nzt-changes/spec.md`](../../Plan/specs/mods/nzt-changes/spec.md)
 
 Un panel lateral de Claude Code para recorrer los cambios **un diff por vez**, con el diseño
 de [Replay Theater](https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/replay-theater),
@@ -43,7 +43,7 @@ mueven. El diff se dibuja como los de Claude Code (número de línea, fondo verd
 colores según el lenguaje) en una ventana que se desplaza sola; a su derecha, una regla
 marca dónde están los cambios del diff entero (verde sumadas, rojo sacadas, amarillo las dos)
 y en gris lo que se ve. El mockup completo, con todos sus estados, está en
-[`specs/mods/nzt-changes/mockup.html`](../../specs/mods/nzt-changes/mockup.html).
+[`Plan/specs/mods/nzt-changes/mockup.html`](../../Plan/specs/mods/nzt-changes/mockup.html).
 
 **Es opcional.** NZT funciona completo sin el panel. Funciona solo en Claude Code, porque
 Codex no tiene mods. La vista HEAD necesita que el proyecto esté en un repositorio git; la
@@ -123,13 +123,13 @@ En una sesión de Claude Code en la terminal (versión 2.1.275 o posterior):
 Contestá `y` para agregar el marketplace y elegí el scope **user** para tenerlo en todos
 los proyectos.
 
-También viene con NZT: la línea `install-claude-full`, o el instalador con `--mods all`,
-instala todos los mods (sección **Mods** del [`README.md`](../../README.md) del repo).
+Es un plugin de Claude Code aparte del método: los demás mods están en la sección **Mods** del
+[`README.md`](../../nzt-software/README.md) de nzt-software.
 
 **Para actualizarlo**, la actualización automática viene apagada: se activa una vez en
 `/plugin` → **Marketplaces** → `nzt` → **Enable auto-update**, y cada sesión nueva baja la
 versión nueva y avisa `Run /reload-plugins`. A mano: `claude plugin update nzt-changes@nzt`
-en la terminal, o volver a correr el instalador de NZT.
+en la terminal.
 
 Para desinstalarlo, desde la terminal: `claude plugin uninstall nzt-changes@nzt`.
 
@@ -149,5 +149,5 @@ El chequeo de tipos (`tsc -p mods/nzt-changes/tsconfig.json`) necesita los tipos
 en `.claude-plugin/types/`. Claude Code los escribe ahí cuando carga el mod desde la carpeta,
 con su propio `.gitignore`, así que git no los sigue.
 
-La spec, con sus reglas, está en [`specs/mods/nzt-changes/spec.md`](../../specs/mods/nzt-changes/spec.md),
-con el mockup al lado, y las reglas de todos los mods, en [`specs/nzt-mods.md`](../../specs/nzt-mods.md).
+La spec, con sus reglas, está en [`Plan/specs/mods/nzt-changes/spec.md`](../../Plan/specs/mods/nzt-changes/spec.md),
+con el mockup al lado, y las reglas de todos los mods, en [`Plan/specs/nzt-mods.md`](../../Plan/specs/nzt-mods.md).

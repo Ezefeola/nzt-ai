@@ -1,0 +1,114 @@
+# Release de nzt-software (D46, D98, D100).
+#
+# Un tag vX.Y.Z publica el plugin nzt-software en la rama plugin-nzt-software, la que leen
+# los marketplaces de Claude Code y de Codex, y crea el release con sus notas. Antes corren
+# las mismas puertas que en local: si una falla, no hay release.
+
+name: release
+
+on:
+  pull_request:
+    branches: [main]
+    # Solo lo que toca a nzt-software: otro producto del repo no corre estas puertas.
+    paths:
+      - 'nzt-software/**'
+      - '.claude-plugin/**'
+      - '.agents/plugins/**'
+      - 'Plan/state.json'
+      - '.github/workflows/nzt-software-release.yml'
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # El tag y nzt-software/VERSION son la misma versión (D100).
+      - if: github.event_name == 'push'
+        name: Tag coincide con la versión
+        run: |
+          version="$(tr -d ' \r\n' < nzt-software/VERSION)"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "El tag es $GITHUB_REF_NAME y nzt-software/VERSION dice $version." >&2
+            exit 1
+          fi
+
+      # Valida el árbol de skills (nombres, descripciones, presupuestos, referencias) y arma el plugin.
+      - name: Build del plugin
+        run: bash nzt-software/build/build.sh
+
+      - name: State check de este repo
+        run: python3 nzt-software/method/skills/nzt/plan/scripts/state-check.py
+
+  release:
+    if: github.event_name == 'push'
+    needs: gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publicar el plugin de este tag
+        run: |
+          bash nzt-software/build/build.sh
+          plugin="$RUNNER_TEMP/nzt-plugin"
+          mkdir "$plugin"
+          rsync -a --exclude=/evals/ nzt-software/dist/plugin/ "$plugin/"
+          cp LICENSE "$plugin/"
+          cp nzt-software/release/plugin-README.md "$plugin/README.md"
+          test "$(jq -r .version "$plugin/.claude-plugin/plugin.json")" = "${GITHUB_REF_NAME#v}"
+          test -s "$plugin/skills/software/SKILL.md"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git_dir="$(git rev-parse --absolute-git-dir)"
+          export GIT_INDEX_FILE="$RUNNER_TEMP/plugin.index"
+          git -C "$plugin" --git-dir="$git_dir" --work-tree=. add --force .
+          tree="$(git write-tree)"
+          parents=()
+          if test -n "$(git ls-remote --heads origin refs/heads/plugin-nzt-software)"; then
+            git fetch origin refs/heads/plugin-nzt-software
+            previous="$(git rev-parse FETCH_HEAD)"
+            if test "$(git rev-parse "$previous^{tree}")" = "$tree"; then
+              echo "El plugin de este tag ya está publicado."
+              exit 0
+            fi
+            old="$(git show "$previous:.claude-plugin/plugin.json" | jq -r .version)"
+            new="${GITHUB_REF_NAME#v}"
+            test "$old" != "$new"
+            test "$(printf '%s\n' "$old" "$new" | sort -V | tail -1)" = "$new"
+            parents=(-p "$previous")
+          fi
+          commit="$(git commit-tree "$tree" "${parents[@]}" -m "NZT $GITHUB_REF_NAME")"
+          git push origin "$commit:refs/heads/plugin-nzt-software"
+          test "$(git ls-remote origin refs/heads/plugin-nzt-software | cut -f1)" = "$commit"
+
+      - name: Publicar el release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=()
+          if test -f "nzt-software/release/notes/$GITHUB_REF_NAME.md"; then
+            notes=(--notes-file "nzt-software/release/notes/$GITHUB_REF_NAME.md")
+          fi
+          # --latest (D99): el latest del repo es siempre el de nzt-software. Otro producto
+          # publica con tags <producto>-vX.Y.Z y --latest=false.
+          gh release create "$GITHUB_REF_NAME" --verify-tag --latest --generate-notes "${notes[@]}" --title "NZT $GITHUB_REF_NAME"
+
+  notify-landing:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: repository_dispatch a nzt-ai-landing
+        env:
+          GH_TOKEN: ${{ secrets.LANDING_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/Ezefeola/nzt-ai-landing/dispatches \
+            -f event_type=nzt-ai-release \
+            -f "client_payload[tag]=$GITHUB_REF_NAME"

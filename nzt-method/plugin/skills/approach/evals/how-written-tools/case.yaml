@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: how-written-tools
+expected_outcome: |
+  With every topic of how already answered (base, structure, quality, conventions, libraries, delivery, with no clash left), it writes Docs/How/how.md with one line per decision tagged by topic, the conventions as one-liners and the reasons citing H-NN, keeps the agent's tools out of it, and then asks the person which tools to work with, as concrete options plus none, even though nothing is missing; it installs nothing.
+context:
+  scaffold_script: place-files.sh

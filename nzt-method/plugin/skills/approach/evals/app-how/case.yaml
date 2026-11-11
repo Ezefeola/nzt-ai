@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: app-how
+expected_outcome: |
+  With the what agreed, it works out the how decisions of a small app (where it runs, what it is made with, where tasks are kept, how reminders are sent), records them as H-NN questions in Docs/How/questions.md, and asks them with concrete named options, what each implies and the recommended first; it does not change the definition or build anything.
+context:
+  scaffold_script: place-files.sh

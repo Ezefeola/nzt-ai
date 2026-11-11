@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: spreadsheet-no-learn-question
+expected_outcome: |
+  Works out that the agent makes the spreadsheet, does not ask whether the person wants to learn, and asks which program it will be kept in, with a recommendation, before making it.

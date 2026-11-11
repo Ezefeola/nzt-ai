@@ -1,0 +1,3 @@
+# Capítulo 1: elegir el lugar
+
+Buscá el rincón del balcón con más horas de sol...

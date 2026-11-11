@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: book-how
+expected_outcome: |
+  For a family recipe book whose base (format, where it is written) is answered, it goes on to the other topics as they apply to content: how the book is organised (chapters, order, a fixed shape per recipe), how it is checked (testing recipes, proofreading, who reviews), conventions (units, tone, a style sheet), third parties (photo rights, the printer) and delivery (printing, PDF), each asked with concrete options or said not to apply; no software jargon, and nothing written in the definition.
+context:
+  scaffold_script: place-files.sh

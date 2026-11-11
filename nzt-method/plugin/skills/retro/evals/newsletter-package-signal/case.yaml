@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: newsletter-package-signal
+expected_outcome: |
+  Writes the retro and proposes a possible package for this kind of writing, naming which contributions it would bring with the moments behind them, without building it or changing anything else.
+context:
+  scaffold_script: place-files.sh

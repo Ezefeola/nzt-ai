@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: resume-overdue-reviews
+expected_outcome: |
+  Reads the topic's state first, sees two reviews overdue (vinaigrette due 2026-11-03, salting due 2026-11-06) and sends their questions before the new rice lesson, as a short batch with its size, letting the person skip; does not probe again or reopen the old lessons.
+context:
+  scaffold_script: place-files.sh

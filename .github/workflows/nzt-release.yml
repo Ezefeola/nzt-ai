@@ -1,0 +1,112 @@
+# Release de nzt, el método genérico (nzt-method/).
+#
+# Un tag nzt-vX.Y.Z publica el plugin nzt en la rama plugin-nzt, la que leen los
+# marketplaces de Claude Code y de Codex, y crea el release con --latest=false: el latest
+# del repo es el de nzt-software (D99). Antes corren las puertas: si una falla, no hay release.
+
+name: release-nzt
+
+on:
+  pull_request:
+    branches: [main]
+    # Solo lo que toca a nzt: otro producto del repo no corre estas puertas.
+    paths:
+      - 'nzt-method/**'
+      - '.claude-plugin/**'
+      - '.agents/plugins/**'
+      - '.github/workflows/nzt-release.yml'
+  push:
+    tags: ['nzt-v*']
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # El tag, nzt-method/VERSION y los dos manifiestos dicen la misma versión.
+      - name: Versiones iguales
+        run: |
+          version="$(tr -d ' \r\n' < nzt-method/VERSION)"
+          for manifest in nzt-method/plugin/.claude-plugin/plugin.json nzt-method/plugin/plugin.json; do
+            test "$(jq -r .version "$manifest")" = "$version" || { echo "$manifest no dice $version." >&2; exit 1; }
+            test "$(jq -r .name "$manifest")" = "nzt" || { echo "$manifest no se llama nzt." >&2; exit 1; }
+          done
+          if [ "${{ github.event_name }}" = "push" ] && [ "nzt-v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "El tag es $GITHUB_REF_NAME y nzt-method/VERSION dice $version." >&2
+            exit 1
+          fi
+
+      # Cada skill tiene su SKILL.md con name igual a su carpeta y una description, y cada
+      # referencia que nombra existe, en su carpeta o en la de nzt (las compartidas).
+      - name: Skills
+        run: |
+          status=0
+          for dir in nzt-method/plugin/skills/*/; do
+            skill="$(basename "$dir")"
+            file="$dir/SKILL.md"
+            test -s "$file" || { echo "$skill: falta SKILL.md" >&2; status=1; continue; }
+            name="$(sed -n '2,10s/^name: *//p' "$file" | head -1)"
+            test "$name" = "$skill" || { echo "$skill: name es '$name'" >&2; status=1; }
+            grep -q '^description: .\+' "$file" || { echo "$skill: sin description" >&2; status=1; }
+            for ref in $(grep -o '`\(references\|assets\)/[^`]*\.md`' "$file" | tr -d '`' | sort -u); do
+              test -f "$dir/$ref" || test -f "nzt-method/plugin/skills/nzt/$ref" || { echo "$skill: no existe $ref" >&2; status=1; }
+            done
+          done
+          exit $status
+
+  release:
+    if: github.event_name == 'push'
+    needs: gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publicar el plugin de este tag
+        run: |
+          plugin="$RUNNER_TEMP/nzt-plugin"
+          mkdir "$plugin"
+          rsync -a --exclude='evals/' nzt-method/plugin/ "$plugin/"
+          cp LICENSE "$plugin/"
+          cp nzt-method/release/plugin-README.md "$plugin/README.md"
+          test "$(jq -r .version "$plugin/.claude-plugin/plugin.json")" = "${GITHUB_REF_NAME#nzt-v}"
+          test -s "$plugin/skills/nzt/SKILL.md"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git_dir="$(git rev-parse --absolute-git-dir)"
+          export GIT_INDEX_FILE="$RUNNER_TEMP/plugin.index"
+          git -C "$plugin" --git-dir="$git_dir" --work-tree=. add --force .
+          tree="$(git write-tree)"
+          parents=()
+          if test -n "$(git ls-remote --heads origin refs/heads/plugin-nzt)"; then
+            git fetch origin refs/heads/plugin-nzt
+            previous="$(git rev-parse FETCH_HEAD)"
+            if test "$(git rev-parse "$previous^{tree}")" = "$tree"; then
+              echo "El plugin de este tag ya está publicado."
+              exit 0
+            fi
+            old="$(git show "$previous:.claude-plugin/plugin.json" | jq -r .version)"
+            new="${GITHUB_REF_NAME#nzt-v}"
+            test "$old" != "$new"
+            test "$(printf '%s\n' "$old" "$new" | sort -V | tail -1)" = "$new"
+            parents=(-p "$previous")
+          fi
+          commit="$(git commit-tree "$tree" "${parents[@]}" -m "NZT $GITHUB_REF_NAME")"
+          git push origin "$commit:refs/heads/plugin-nzt"
+          test "$(git ls-remote origin refs/heads/plugin-nzt | cut -f1)" = "$commit"
+
+      - name: Publicar el release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=()
+          if test -f "nzt-method/release/notes/$GITHUB_REF_NAME.md"; then
+            notes=(--notes-file "nzt-method/release/notes/$GITHUB_REF_NAME.md")
+          fi
+          gh release create "$GITHUB_REF_NAME" --verify-tag --latest=false --generate-notes "${notes[@]}" --title "NZT (método genérico) $GITHUB_REF_NAME"

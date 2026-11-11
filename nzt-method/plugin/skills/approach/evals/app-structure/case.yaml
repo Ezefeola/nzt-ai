@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: app-structure
+expected_outcome: |
+  With the base of a small .NET app already answered, it does not stop at the base: it asks how the code is organised (architecture, patterns, how data is reached), how it is checked (automated tests or not), its conventions, third-party libraries and how it is run or delivered, each with concrete options and their cost, or says why a topic does not apply; it decides none of them on its own and builds nothing.
+context:
+  scaffold_script: place-files.sh
